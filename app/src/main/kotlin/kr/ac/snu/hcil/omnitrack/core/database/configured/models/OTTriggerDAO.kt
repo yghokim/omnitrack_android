@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.database.configured.models
 
 import android.content.Intent
 import android.support.v4.content.LocalBroadcastManager
+import com.google.gson.JsonObject
 import io.reactivex.Completable
 import io.realm.RealmList
 import io.realm.RealmObject
@@ -10,6 +11,7 @@ import io.realm.annotations.Ignore
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.ExpressionEvaluator
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
@@ -162,6 +164,26 @@ open class OTTriggerDAO : RealmObject() {
     var userCreatedAt: Long = System.currentTimeMillis()
 
     var serializedCreationFlags: String = "{}"
+
+    @Ignore
+    private var _parsedLockedPropertyInfo: JsonObject? = null
+
+    fun getParsedLockedPropertyInfo(): JsonObject {
+        if (_parsedLockedPropertyInfo == null) {
+            _parsedLockedPropertyInfo = LockedPropertiesHelper.parseLockedProperties(serializedLockedPropertyInfo)
+        }
+        return _parsedLockedPropertyInfo!!
+    }
+
+    fun isEditingLocked(): Boolean {
+        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.COMMON_EDIT, getParsedLockedPropertyInfo())
+                ?: false
+    }
+
+    fun isDeletionLocked(): Boolean {
+        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.COMMON_DELETE, getParsedLockedPropertyInfo())
+                ?: false
+    }
 
     fun initialize(forceRefresh: Boolean = false) {
         if (forceRefresh) {

@@ -168,7 +168,9 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
         val activeNotificationCount: BehaviorSubject<Int> = BehaviorSubject.createDefault(0)
 
+        val trackerRemovable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(true)
         val trackerEditable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(true)
+
 
         val isBookmarked: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
 
@@ -257,10 +259,8 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
             isBookmarked.onNextIfDifferAndNotNull(snapshot.isBookmarked)
             isForExperiment.onNextIfDifferAndNotNull(CreationFlagsHelper.isForExperiment(snapshot.getParsedCreationFlags()))
 
-            /* TODO editable flags
-            if (trackerEditable.value != snapshot.isEditable) {
-                trackerEditable.onNext(snapshot.isEditable)
-            }*/
+            trackerEditable.onNextIfDifferAndNotNull(!snapshot.isEditingLocked())
+            trackerRemovable.onNextIfDifferAndNotNull(!snapshot.isDeletionLocked())
 
         }
 

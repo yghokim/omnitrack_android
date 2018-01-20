@@ -33,8 +33,10 @@ import android.widget.TextView
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.tracker_list_element.view.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -72,13 +74,13 @@ class TrackerListFragment : OTFragment() {
     @Inject
     lateinit var authManager: OTAuthManager
 
-    lateinit private var listView: FallbackRecyclerView
+    private lateinit var listView: FallbackRecyclerView
 
-    lateinit private var emptyMessageView: TextView
+    private lateinit var emptyMessageView: TextView
 
     private lateinit var trackerListAdapter: TrackerListAdapter
 
-    lateinit private var trackerListLayoutManager: LinearLayoutManager
+    private lateinit var trackerListLayoutManager: LinearLayoutManager
 
     private lateinit var addTrackerFloatingButton: FloatingActionButton
 
@@ -557,17 +559,40 @@ class TrackerListFragment : OTFragment() {
                         }
                 )
 
+
+                subscriptions.add(
+                        Observable.combineLatest<Boolean, Boolean, Boolean>(
+                                viewModel.trackerEditable.map { !it }, viewModel.trackerRemovable.map { !it }, BiFunction { editionLocked: Boolean, removalLocked: Boolean ->
+                            editionLocked || removalLocked
+                        }).subscribe { isLocked ->
+                            lockedIndicator.visibility = if (isLocked) {
+                                View.VISIBLE
+                            } else View.GONE
+                        }
+                )
+
+
                 subscriptions.add(
                         viewModel.trackerEditable.subscribe {
                             editable ->
-                            if (editable) {
-                                lockedIndicator.visibility = View.GONE
-                                editButton.visibility = View.VISIBLE
-                                removeButton.visibility = View.VISIBLE
+
+                            editButton.isEnabled = editable
+                            editButton.alpha =
+                                    if (editable) {
+                                        1.0f
+                                    } else {
+                                        0.7f
+                                    }
+                        }
+                )
+
+                subscriptions.add(
+                        viewModel.trackerRemovable.subscribe { editable ->
+                            removeButton.isEnabled = editable
+                            removeButton.alpha = if (editable) {
+                                1.0f
                             } else {
-                                lockedIndicator.visibility = View.VISIBLE
-                                editButton.visibility = View.GONE
-                                removeButton.visibility = View.GONE
+                                0.7f
                             }
                         }
                 )

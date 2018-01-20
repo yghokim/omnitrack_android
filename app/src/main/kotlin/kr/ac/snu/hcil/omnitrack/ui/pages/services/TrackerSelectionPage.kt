@@ -6,7 +6,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.InputType
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,7 +38,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
     override val canGoNext: Boolean = true
     override val getTitleResourceId: Int = R.string.msg_service_wizard_title_tracker_selection
 
-    private var trackers: MutableList<OTTrackerDAO> = ArrayList()
+    private var trackers: List<OTTrackerDAO> = ArrayList()
     private var trackerListView: RecyclerView? = null
 
     lateinit var selectedTrackerDAO: OTTrackerDAO
@@ -65,7 +64,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
     override fun onEnter() {
         val userId = authManager.userId!!
         val realm = realmProvider.get()
-        trackers = dbManager.get().makeTrackersOfUserQuery(userId, realm).findAll()
+        trackers = dbManager.get().makeTrackersOfUserQuery(userId, realm).findAll().filter { !it.isEditingLocked() }
         realm.close()
         trackerListView?.adapter?.notifyDataSetChanged()
     }

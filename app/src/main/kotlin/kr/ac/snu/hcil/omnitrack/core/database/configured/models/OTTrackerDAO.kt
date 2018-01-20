@@ -13,6 +13,7 @@ import io.realm.annotations.Index
 import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
+import kr.ac.snu.hcil.omnitrack.core.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
@@ -28,20 +29,6 @@ import java.util.*
 open class OTTrackerDAO : RealmObject() {
 
     data class SimpleTrackerInfo(override val objectId: String?, val name: String, @ColorInt val color: Int) : IReadonlyObjectId
-
-    companion object {
-        val CREATION_FLAG_TUTORIAL: Map<String, String> by lazy {
-            val result = HashMap<String, String>()
-            result["source"] = "generated_example"
-            result
-        }
-
-        val CREATION_FLAG_OPEN_OMNITRACK: Map<String, String> by lazy {
-            val result = HashMap<String, String>()
-            result["source"] = "generated_omnitrack_open_format"
-            result
-        }
-    }
 
     @PrimaryKey
     var objectId: String? = null
@@ -99,6 +86,16 @@ open class OTTrackerDAO : RealmObject() {
         return _parsedCreationFlags!!
     }
 
+    @Ignore
+    private var _parsedLockedPropertyInfo: JsonObject? = null
+
+    fun getParsedLockedPropertyInfo(): JsonObject {
+        if (_parsedLockedPropertyInfo == null) {
+            _parsedLockedPropertyInfo = LockedPropertiesHelper.parseLockedProperties(serializedLockedPropertyInfo)
+        }
+        return _parsedLockedPropertyInfo!!
+    }
+
     fun isExternalFilesInvolved(configuredContext: ConfiguredContext): Boolean {
         return getLiveAttributesSync().find { it.getHelper(configuredContext).isExternalFile(it) } != null
     }
@@ -140,6 +137,15 @@ open class OTTrackerDAO : RealmObject() {
         return SimpleTrackerInfo(objectId, name, color)
     }
 
+    fun isEditingLocked(): Boolean {
+        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.COMMON_EDIT, getParsedLockedPropertyInfo())
+                ?: false
+    }
+
+    fun isDeletionLocked(): Boolean {
+        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.COMMON_DELETE, getParsedLockedPropertyInfo())
+                ?: false
+    }
 
 }
 
@@ -184,6 +190,32 @@ open class OTAttributeDAO : RealmObject() {
         } catch (ex: JsonSyntaxException) {
             ex.printStackTrace(); null
         }
+    }
+
+
+    @Ignore
+    private var _parsedLockedPropertyInfo: JsonObject? = null
+
+    fun getParsedLockedPropertyInfo(): JsonObject {
+        if (_parsedLockedPropertyInfo == null) {
+            _parsedLockedPropertyInfo = LockedPropertiesHelper.parseLockedProperties(serializedLockedPropertyInfo)
+        }
+        return _parsedLockedPropertyInfo!!
+    }
+
+    fun isEditingLocked(): Boolean {
+        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.COMMON_EDIT, getParsedLockedPropertyInfo())
+                ?: false
+    }
+
+    fun isDeletionLocked(): Boolean {
+        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.COMMON_DELETE, getParsedLockedPropertyInfo())
+                ?: false
+    }
+
+    fun isVisibilityLocked(): Boolean {
+        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.ATTRIBUTE_VISIBILITY, getParsedLockedPropertyInfo())
+                ?: false
     }
 
     fun getHelper(configuredContext: ConfiguredContext): OTAttributeHelper {

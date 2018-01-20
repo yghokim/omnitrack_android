@@ -11,6 +11,7 @@ import io.realm.Realm
 import io.realm.RealmChangeListener
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
@@ -76,6 +77,8 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     val isBookmarkedObservable = BehaviorSubject.createDefault<Boolean>(false)
     val colorObservable = BehaviorSubject.createDefault<Int>(OTApp.instance.colorPalette[0])
     val attributeViewModelListObservable = BehaviorSubject.create<List<AttributeInformationViewModel>>()
+
+    val areAttributesRemovable = BehaviorSubject.createDefault<Boolean>(true)
     //===================================================
 
     private var lastRemovedAttributeId: String? = null
@@ -154,6 +157,8 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                                 nameObservable.onNextIfDifferAndNotNull(snapshot.name)
                                 isBookmarkedObservable.onNextIfDifferAndNotNull(snapshot.isBookmarked)
                                 colorObservable.onNextIfDifferAndNotNull(snapshot.color)
+                                areAttributesRemovable.onNextIfDifferAndNotNull(!(LockedPropertiesHelper.isLocked(LockedPropertiesHelper.TRACKER_REMOVE_ATTRIBUTES, snapshot.getParsedLockedPropertyInfo())
+                                        ?: false))
 
                                 if (trackerDao != dao) {
                                     subscriptions.add(
@@ -390,6 +395,10 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
         val isInDatabase: Boolean get() = attributeDAO.isManaged
 
+        val isEditable = BehaviorSubject.createDefault<Boolean>(true)
+        val isRemovable = BehaviorSubject.createDefault<Boolean>(true)
+        val isVisibilityEditable = BehaviorSubject.createDefault<Boolean>(true)
+
         val nameObservable = BehaviorSubject.createDefault<String>("")
         val isRequiredObservable = BehaviorSubject.createDefault<Boolean>(false)
         val typeObservable = BehaviorSubject.createDefault<Int>(-1)
@@ -523,6 +532,10 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             name = editedDao.name
 
             isRequired = editedDao.isRequired
+
+            isEditable.onNextIfDifferAndNotNull(!editedDao.isEditingLocked())
+            isRemovable.onNextIfDifferAndNotNull(!editedDao.isDeletionLocked())
+            isVisibilityEditable.onNextIfDifferAndNotNull(!editedDao.isVisibilityLocked())
 
             defaultValuePolicy = editedDao.fallbackValuePolicy
             defaultValuePreset = editedDao.fallbackPresetSerializedValue

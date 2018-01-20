@@ -23,7 +23,9 @@ import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.salomonbrys.kotson.set
 import dagger.Lazy
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.attribute_list_element.view.*
 import kotlinx.android.synthetic.main.fragment_tracker_detail_structure.*
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -58,12 +60,12 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         val toastForRemoved by lazy { Toast.makeText(OTApp.instance, R.string.msg_shortcut_removed, Toast.LENGTH_SHORT) }
     }
 
-    lateinit private var rootScrollView: NestedScrollView
+    private lateinit var rootScrollView: NestedScrollView
 
-    lateinit private var attributeListView: AdapterLinearLayout
+    private lateinit var attributeListView: AdapterLinearLayout
     //lateinit private var attributeListAdapter: AttributeListAdapter
 
-    lateinit private var attributeListItemTouchHelper: ItemTouchHelper
+    private lateinit var attributeListItemTouchHelper: ItemTouchHelper
 
     //private lateinit var fab: FloatingActionButton
 
@@ -456,6 +458,27 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 columnNameView.text = attributeViewModel.name
 
                 previewContainer.alpha = 0.5f
+
+                viewHolderSubscriptions.add(
+                        attributeViewModel.isEditable.subscribe { isEditable ->
+                            editButton.isEnabled = isEditable
+                            editButton.alpha = if (isEditable) 1.0f else 0.2f
+                        }
+                )
+
+                viewHolderSubscriptions.add(
+                        Observable.combineLatest<Boolean, Boolean, Boolean>(viewModel.areAttributesRemovable, attributeViewModel.isRemovable, BiFunction { globalRemovable: Boolean, localRemovable: Boolean -> (globalRemovable && localRemovable) }).subscribe { isRemovable: Boolean ->
+                            removeButton.isEnabled = isRemovable
+                            removeButton.alpha = if (isRemovable) 1.0f else 0.2f
+                        }
+                )
+
+                viewHolderSubscriptions.add(
+                        attributeViewModel.isVisibilityEditable.subscribe { isEditable ->
+                            itemView.ui_button_visible.isEnabled = isEditable
+                            itemView.ui_button_visible.alpha = if (isEditable) 1.0f else 0.2f
+                        }
+                )
 
                 viewHolderSubscriptions.add(
                         attributeViewModel.isRequiredObservable.subscribe {
