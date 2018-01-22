@@ -593,6 +593,7 @@
 
     <string name="msg_insert_invitation_code">Insert invitation code</string>
     <string name="msg_experiment_withdraw">Withdraw</string>
+    <string name="msg_number_button_unit">Inc/Dec Unit</string>
 
 
 </resources>
