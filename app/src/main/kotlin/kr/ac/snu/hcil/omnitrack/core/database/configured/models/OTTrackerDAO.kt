@@ -147,6 +147,17 @@ open class OTTrackerDAO : RealmObject() {
                 ?: false
     }
 
+    fun isInstantLoggingAvailable(): Boolean {
+        for (attribute in getLiveAttributesSync()) {
+            if (attribute.isRequired) {
+                if (attribute.serializedConnection != null || attribute.fallbackValuePolicy != OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL) {
+                    continue
+                } else return false
+            }
+        }
+
+        return true
+    }
 }
 
 
