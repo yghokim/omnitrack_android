@@ -3,10 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.di.configured
 import com.udojava.evalex.Expression
 import dagger.Module
 import dagger.Provides
-import kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions.DailyLogCountExpression
-import kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions.LatestItemTimestampExpression
-import kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions.StartOfDayRelativeExpression
-import kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions.TodayLogCountExpression
+import kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions.*
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 
@@ -22,7 +19,8 @@ class ScriptingModule {
                 TodayLogCountExpression(configuredContext),
                 DailyLogCountExpression(configuredContext),
                 LatestItemTimestampExpression(configuredContext),
-                StartOfDayRelativeExpression()
+                StartOfDayRelativeExpression(),
+                IsWeekendExpression()
         )
     }
 }
