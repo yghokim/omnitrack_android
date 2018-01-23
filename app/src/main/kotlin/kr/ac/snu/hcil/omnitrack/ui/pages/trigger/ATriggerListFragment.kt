@@ -231,7 +231,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
     }
 
-    inner abstract class ATriggerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    abstract inner class ATriggerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         abstract fun bind(triggerViewModel: TriggerViewModel)
     }
 
@@ -248,6 +248,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
         private var attachedTrackerInfoList = ArrayList<OTTrackerDAO.SimpleTrackerInfo>()
         private val attachedTrackerListAdapter = AttachedTrackerAdapter()
+
 
 
         init {
@@ -333,6 +334,40 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                     triggerViewModel.triggerSwitch.subscribe {
                         itemView.ui_trigger_switch.isChecked = it
                         toggleColorFilter(it)
+                    }
+            )
+
+            subscriptions.add(
+                    triggerViewModel.switchLocked.subscribe { locked ->
+                        itemView.ui_trigger_switch.isEnabled = !locked
+
+                        itemView.ui_trigger_switch.alpha = if (locked) {
+                            0.2f
+                        } else {
+                            1.0f
+                        }
+                    }
+            )
+
+            subscriptions.add(
+                    triggerViewModel.editionLocked.subscribe { locked ->
+                        if (locked) {
+                            itemView.setOnClickListener(null)
+                        } else {
+                            itemView.setOnClickListener(this)
+                        }
+                    }
+            )
+
+            subscriptions.add(
+                    triggerViewModel.deletionLocked.subscribe { locked ->
+                        itemView.ui_button_remove.isEnabled = !locked
+
+                        itemView.ui_button_remove.alpha = if (locked) {
+                            0.2f
+                        } else {
+                            1.0f
+                        }
                     }
             )
 
