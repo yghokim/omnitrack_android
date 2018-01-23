@@ -104,22 +104,26 @@ class OTShortcutPanelManager @Inject constructor(
 
                 element.setTextViewText(R.id.ui_name, trackers[i].name)
 
-                if (true) {
+                if (trackers[i].isInstantLoggingAvailable()) {
+
+                    element.setViewVisibility(R.id.ui_button_instant, View.VISIBLE)
+
                     val buttonBitmap = Bitmap.createBitmap(buttonSize, buttonSize, Bitmap.Config.ARGB_8888)
                     val buttonCanvas = Canvas(buttonBitmap)
                     paint.color = ColorUtils.setAlphaComponent(trackers[i].color, 200)
                     buttonCanvas.drawCircle(buttonRadius, buttonRadius, buttonRadius, paint)
                     element.setImageViewBitmap(R.id.ui_background_image, buttonBitmap)
                     element.setImageViewBitmap(R.id.ui_button_instant, VectorIconHelper.getConvertedBitmap(context, R.drawable.instant_add))
+
+
+                    val instantLoggingIntent = PendingIntent.getService(context, i, OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, configuration.id, true, trackers[i].objectId!!), PendingIntent.FLAG_UPDATE_CURRENT)
+                    element.setOnClickPendingIntent(R.id.ui_button_instant, instantLoggingIntent)
                 } else {
-                    element.setInt(R.id.ui_button_container, "setBackgroundColor", ColorUtils.setAlphaComponent(trackers[i].color, 200))
-                    element.setViewVisibility(R.id.ui_background_image, View.INVISIBLE)
+                    element.setViewVisibility(R.id.ui_button_instant, View.GONE)
                 }
 
-                val instantLoggingIntent = PendingIntent.getService(context, i, OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, configuration.id, true, trackers[i].objectId!!), PendingIntent.FLAG_UPDATE_CURRENT)
                 val openItemActivityIntent = PendingIntent.getActivity(context, i, ItemDetailActivity.makeNewItemPageIntent(trackers[i].objectId!!, context), PendingIntent.FLAG_UPDATE_CURRENT)
 
-                element.setOnClickPendingIntent(R.id.ui_button_instant, instantLoggingIntent)
                 element.setOnClickPendingIntent(R.id.group, openItemActivityIntent)
             }
 
