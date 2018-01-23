@@ -40,6 +40,10 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
     val triggerCondition: BehaviorSubject<ATriggerCondition> = BehaviorSubject.create()
     val triggerId: BehaviorSubject<String> = BehaviorSubject.create()
 
+    val deletionLocked: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+    val editionLocked: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+    val switchLocked: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+
     val configIconResId: BehaviorSubject<Int> = BehaviorSubject.create()
     val configDescResId: BehaviorSubject<Int> = BehaviorSubject.create()
 
@@ -100,6 +104,10 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
         configSummary.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigSummaryText(dao))
         scriptUsed.onNextIfDifferAndNotNull(dao.checkScript && dao.additionalScript?.isNotBlank() == true)
         triggerSwitch.onNextIfDifferAndNotNull(dao.isOn)
+
+        editionLocked.onNextIfDifferAndNotNull(dao.isEditingLocked())
+        deletionLocked.onNextIfDifferAndNotNull(dao.isDeletionLocked())
+        switchLocked.onNextIfDifferAndNotNull(dao.isSwitchLocked())
 
         if (!dao.isManaged) {
 
