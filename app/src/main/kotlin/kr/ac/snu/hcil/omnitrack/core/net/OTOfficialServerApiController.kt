@@ -87,4 +87,11 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
+
+    override fun retrievePublicInvitations(): Single<List<ExperimentInvitation>> {
+        return service.getPublicInvitations()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 }

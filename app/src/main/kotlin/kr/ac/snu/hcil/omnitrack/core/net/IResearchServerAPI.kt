@@ -17,6 +17,15 @@ data class ExperimentCommandResult(
         val experiment: ExperimentInfo?
 )
 
+@Keep
+data class ExperimentInvitation(
+        val code: String,
+        val experiment: Experiment
+)
+
+@Keep
+data class Experiment(val _id: String, val name: String)
+
 
 @Keep
 data class DropoutBody(val reason: String?)
@@ -28,4 +37,6 @@ interface IResearchServerAPI {
     fun dropOutFromExperiment(experimentId: String, reason: CharSequence?): Single<ExperimentCommandResult>
 
     fun retrieveJoinedExperiments(after: Long = Long.MIN_VALUE): Single<List<ExperimentInfo>>
+
+    fun retrievePublicInvitations(): Single<List<ExperimentInvitation>>
 }

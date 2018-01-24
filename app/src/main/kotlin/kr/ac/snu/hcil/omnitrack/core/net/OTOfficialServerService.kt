@@ -52,4 +52,7 @@ interface OTOfficialServerService {
 
     @GET("api/research/experiments/history")
     fun getJoinedExperiments(@Query("after") after: Long): Single<List<ExperimentInfo>>
+
+    @GET("api/research/invitations/public")
+    fun getPublicInvitations(): Single<List<ExperimentInvitation>>
 }
