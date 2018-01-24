@@ -43,7 +43,7 @@ object TypeStringSerializationHelper {
             "java.lang.Integer" to TYPENAME_INT,
             Long::class.java.name to TYPENAME_LONG,
             "java.lang.Long" to TYPENAME_LONG,
-            "java.lang.Float" to TYPENAME_FLOAT,
+            "java.lang.Number" to TYPENAME_FLOAT,
             "java.lang.Double" to TYPENAME_DOUBLE,
             BigDecimal::class.java.name to TYPENAME_BIGDECIMAL,
             TimePoint::class.java.name to TYPENAME_TIMEPOINT,

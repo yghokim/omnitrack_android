@@ -185,6 +185,11 @@ open class OTTriggerDAO : RealmObject() {
                 ?: false
     }
 
+    fun isSwitchLocked(): Boolean {
+        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.TRIGGER_CHANGE_SWITCH, getParsedLockedPropertyInfo())
+                ?: false
+    }
+
     fun initialize(forceRefresh: Boolean = false) {
         if (forceRefresh) {
             _action = null

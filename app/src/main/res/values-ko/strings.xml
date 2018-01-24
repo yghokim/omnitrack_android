@@ -418,6 +418,7 @@
     <string name="msg_experiment_withdraw">하차</string>
     <string name="msg_format_experiment_joined_at">%1$s에 시작</string>
     <string name="msg_format_experiment_dropped_at">%1$s에 중단</string>
+    <string name="msg_number_button_unit">증가/감소 버튼 단위</string>
 
 
     <string-array name="purpose_entries">

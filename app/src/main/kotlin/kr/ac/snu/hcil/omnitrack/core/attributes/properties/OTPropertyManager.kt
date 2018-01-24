@@ -7,7 +7,7 @@ import java.util.*
  */
 object OTPropertyManager {
     enum class EPropertyType {
-        Boolean, ChoiceEntryList, NumberStyle, RatingOptions, Selection
+        Boolean, ChoiceEntryList, NumberStyle, RatingOptions, Selection, Number
     }
 
     private val propertyHelperTable = Hashtable<EPropertyType, OTPropertyHelper<out Any>>()
@@ -21,6 +21,7 @@ object OTPropertyManager {
                 EPropertyType.NumberStyle -> OTNumberStylePropertyHelper()
                 EPropertyType.RatingOptions -> OTRatingOptionsPropertyHelper()
                 EPropertyType.Selection -> OTSelectionPropertyHelper()
+                EPropertyType.Number -> OTNumberPropertyHelper()
             }
             propertyHelperTable.set(type, newHelper)
 
