@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.net
 
 import android.support.annotation.Keep
+import android.support.v7.util.DiffUtil
 import io.reactivex.Completable
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
@@ -18,10 +19,41 @@ data class ExperimentCommandResult(
 )
 
 @Keep
+data class ParticipantInfo(
+        val user: String,
+        val isDenied: Boolean,
+        val isConsentApproved: Boolean,
+        val dropped: Boolean
+)
+
+@Keep
 data class ExperimentInvitation(
         val code: String,
-        val experiment: Experiment
-)
+        val experiment: Experiment,
+        val participants: List<ParticipantInfo>
+) {
+    class DiffCallback(val oldList: List<ExperimentInvitation>, val newList: List<ExperimentInvitation>) : DiffUtil.Callback() {
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].code == newList[newItemPosition].code
+        }
+
+        override fun getOldListSize(): Int {
+            return oldList.size
+        }
+
+        override fun getNewListSize(): Int {
+            return newList.size
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val old = oldList[oldItemPosition]
+            val new = newList[newItemPosition]
+            return old.code == new.code && old.experiment._id == new.experiment._id
+        }
+
+    }
+}
 
 @Keep
 data class Experiment(val _id: String, val name: String)

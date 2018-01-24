@@ -531,9 +531,12 @@
     <style name="FancyButtonStyle">
         <item name="fb_defaultColor">@color/colorPointed.Light</item>
         <item name="fb_focusColor">@color/colorPointed</item>
-        <item name="fb_radius">8dp</item>
-        <item name="android:paddingStart">8dp</item>
-        <item name="android:paddingEnd">8dp</item>
+        <item name="fb_radius">6dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+
         <item name="fb_textColor">#FFF</item>
     </style>
 
@@ -541,6 +544,7 @@
         <item name="fb_defaultColor">@color/colorRed.Light</item>
         <item name="fb_focusColor">@color/colorRed</item>
     </style>
+
 
     <style name="NumberPickerStyleImmersive">
         <item name="np_selectedTextColor">@color/colorPointed</item>
