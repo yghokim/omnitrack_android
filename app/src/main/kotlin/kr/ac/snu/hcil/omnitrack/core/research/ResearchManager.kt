@@ -11,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.Experim
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.OTExperimentDAO
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.di.configured.Research
+import kr.ac.snu.hcil.omnitrack.core.net.ExperimentInvitation
 import kr.ac.snu.hcil.omnitrack.core.net.IResearchServerAPI
 import javax.inject.Inject
 
@@ -83,6 +84,10 @@ class ResearchManager @Inject constructor(val serverApiController: IResearchServ
                     return@defer Completable.complete()
                 }
         }
+    }
+
+    fun loadPublicInvitations(): Single<List<ExperimentInvitation>> {
+        return serverApiController.retrievePublicInvitations()
     }
 
     fun getExperimentsInLocal(): Single<List<ExperimentInfo>> {

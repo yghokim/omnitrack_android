@@ -9,9 +9,9 @@ import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.InvitationInfo
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.OTExperimentDAO
 import kr.ac.snu.hcil.omnitrack.core.di.configured.Research
+import kr.ac.snu.hcil.omnitrack.core.net.ExperimentInvitation
 import kr.ac.snu.hcil.omnitrack.core.research.ResearchManager
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import javax.inject.Inject
@@ -31,7 +31,7 @@ class ResearchViewModel(application: Application) : AndroidViewModel(application
     private val realm: Realm
 
     val invitationLoadingStatus = BehaviorSubject.create<Boolean>()
-    val invitationListSubject = BehaviorSubject.create<List<InvitationInfo>>()
+    val invitationListSubject = BehaviorSubject.create<List<ExperimentInvitation>>()
 
     val experimentLoadingStatus = BehaviorSubject.create<Boolean>()
     val experimentListSubject = BehaviorSubject.create<List<ExperimentInfo>>()
@@ -46,18 +46,15 @@ class ResearchViewModel(application: Application) : AndroidViewModel(application
     fun initialize(userId: String) {
         if (!this::userId.isInitialized || this.userId != userId) {
             this.userId = userId
-            subscriptions.add(
-                    researchManager.updateExperimentsFromServer().doOnSubscribe {
-                        experimentLoadingStatus.onNextIfDifferAndNotNull(true)
-                    }.doOnComplete {
-                        experimentLoadingStatus.onNextIfDifferAndNotNull(false)
-                    }.subscribe())
+
 
             subscriptions.add(
                     realm.where(OTExperimentDAO::class.java).sort("joinedAt", Sort.DESCENDING).findAllAsync().asFlowable().filter { it.isLoaded && it.isValid }.subscribe { results ->
                         experimentListSubject.onNext(results.map { it.getInfo() })
                     }
             )
+
+            reload()
         }
     }
 
@@ -65,7 +62,27 @@ class ResearchViewModel(application: Application) : AndroidViewModel(application
         subscriptions.add(
                 researchManager.approveInvitation(invitationCode).subscribe { result ->
                     println("invitation approval success: ${result}")
+
                 }
+        )
+    }
+
+    fun reload() {
+        subscriptions.add(
+                researchManager.updateExperimentsFromServer().doOnSubscribe {
+                    experimentLoadingStatus.onNextIfDifferAndNotNull(true)
+                }.doOnComplete {
+                            experimentLoadingStatus.onNextIfDifferAndNotNull(false)
+                        }.subscribe())
+
+        subscriptions.add(
+                researchManager.loadPublicInvitations().map { invitation ->
+                    invitation.filter { it.participants.isEmpty() }
+                }.subscribe({ invitations ->
+                            invitationListSubject.onNextIfDifferAndNotNull(invitations)
+                        }, { ex ->
+                            ex.printStackTrace()
+                        })
         )
     }
 
@@ -73,6 +90,7 @@ class ResearchViewModel(application: Application) : AndroidViewModel(application
         subscriptions.add(
                 researchManager.dropoutFromExperiment(experimentId, reason).subscribe {
                     println("withdrew from the experiment.")
+                    reload()
                 }
         )
     }
@@ -82,5 +100,4 @@ class ResearchViewModel(application: Application) : AndroidViewModel(application
         realm.close()
         super.onCleared()
     }
-
 }
