@@ -35,7 +35,12 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null, initialValu
             }
         }
 
-    private var moveUnit: BigDecimal = BigDecimal(1)
+    var moveUnit: BigDecimal = BigDecimal(1)
+        set(value) {
+            if (field != value) {
+                field = value
+            }
+        }
 
     private val increaseButton: View = findViewById(R.id.ui_button_plus)
     private val decreaseButton: View = findViewById(R.id.ui_button_minus)

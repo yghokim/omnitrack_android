@@ -17,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.convertNumericToDouble
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import java.math.BigDecimal
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -25,6 +26,7 @@ class OTNumberAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
 
     companion object {
         const val NUMBERSTYLE = "style"
+        const val BUTTON_UNIT = "buttonUnit"
     }
 
     override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
@@ -54,15 +56,25 @@ class OTNumberAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_BIGDECIMAL
 
     override val propertyKeys: Array<String>
-        get() = arrayOf(NUMBERSTYLE)
+        get() = arrayOf(NUMBERSTYLE, BUTTON_UNIT)
 
     override fun <T> getPropertyHelper(propertyKey: String): OTPropertyHelper<T> {
         return when (propertyKey) {
             NUMBERSTYLE ->
                 OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.NumberStyle)
+            BUTTON_UNIT ->
+                OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.Number)
 
             else -> throw IllegalArgumentException("Unsupported property key.")
         } as OTPropertyHelper<T>
+    }
+
+    override fun getPropertyTitle(propertyKey: String): String {
+        return when (propertyKey) {
+            NUMBERSTYLE -> ""
+            BUTTON_UNIT -> configuredContext.applicationComponent.applicationContext().getString(R.string.msg_number_button_unit)
+            else -> ""
+        }
     }
 
     private fun getNumberStyle(attribute: OTAttributeDAO): NumberStyle? {
@@ -72,6 +84,7 @@ class OTNumberAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
     override fun getPropertyInitialValue(propertyKey: String): Any? {
         return when (propertyKey) {
             NUMBERSTYLE -> NumberStyle()
+            BUTTON_UNIT -> BigDecimal.ONE
             else -> null
         }
     }
@@ -82,6 +95,7 @@ class OTNumberAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
         if (inputView is NumberInputView) {
             inputView.numberStyle = getNumberStyle(attribute) ?: NumberStyle()
+            inputView.moveUnit = getDeserializedPropertyValue<BigDecimal>(BUTTON_UNIT, attribute) ?: BigDecimal.ONE
         }
     }
 

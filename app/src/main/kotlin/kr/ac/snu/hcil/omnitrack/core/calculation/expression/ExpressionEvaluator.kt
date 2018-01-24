@@ -15,7 +15,7 @@ class ExpressionEvaluator(val expressionString:String, vararg supportedFunctions
         }
     }
 
-    fun eval(): Number{
+    fun eval(): Number {
         return expression.eval()
     }
 
