@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
+import android.support.annotation.StringRes
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
@@ -53,7 +54,6 @@ class LoadingIndicatorBar : FrameLayout {
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     init {
         inflateContent(R.layout.component_loading_indicator_bar, true)
@@ -121,7 +121,7 @@ class LoadingIndicatorBar : FrameLayout {
         }
     }
 
-    fun setMessage(res: Int) {
+    fun setMessage(@StringRes res: Int) {
         this.messageView.setText(res)
     }
 

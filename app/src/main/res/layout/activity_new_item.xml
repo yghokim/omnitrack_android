@@ -35,7 +35,6 @@
             android:id="@+id/ui_loading_indicator"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_below="@+id/appbar"
             android:visibility="visible" />
     </android.support.design.widget.AppBarLayout>
 

@@ -2,8 +2,10 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.research
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
+import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
 import dagger.internal.Factory
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.SerialDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.Realm
 import io.realm.Sort
@@ -36,6 +38,8 @@ class ResearchViewModel(application: Application) : AndroidViewModel(application
     val experimentLoadingStatus = BehaviorSubject.create<Boolean>()
     val experimentListSubject = BehaviorSubject.create<List<ExperimentInfo>>()
 
+    private val networkSubscription = SerialDisposable()
+
     private val subscriptions = CompositeDisposable()
 
     init {
@@ -54,7 +58,7 @@ class ResearchViewModel(application: Application) : AndroidViewModel(application
                     }
             )
 
-            reload()
+            startWatchingNetworkForRefresh()
         }
     }
 
@@ -62,9 +66,24 @@ class ResearchViewModel(application: Application) : AndroidViewModel(application
         subscriptions.add(
                 researchManager.approveInvitation(invitationCode).subscribe { result ->
                     println("invitation approval success: ${result}")
-
+                    reload()
                 }
         )
+    }
+
+    fun startWatchingNetworkForRefresh() {
+        this.networkSubscription.set(
+                ReactiveNetwork.observeInternetConnectivity().subscribe { connectivity ->
+                    println("connectivity changed : " + connectivity)
+                    if (connectivity == true) {
+                        reload()
+                    }
+                }
+        )
+    }
+
+    fun stopWatchingNetworkForRefresh() {
+        this.networkSubscription.set(null)
     }
 
     fun reload() {
@@ -76,9 +95,13 @@ class ResearchViewModel(application: Application) : AndroidViewModel(application
                         }.subscribe())
 
         subscriptions.add(
-                researchManager.loadPublicInvitations().map { invitation ->
-                    invitation.filter { it.participants.isEmpty() }
-                }.subscribe({ invitations ->
+                researchManager.loadPublicInvitations().doOnSubscribe {
+                    invitationLoadingStatus.onNextIfDifferAndNotNull(true)
+                }.doOnEvent { ev, err ->
+                            invitationLoadingStatus.onNextIfDifferAndNotNull(false)
+                        }.map { invitation ->
+                            invitation.filter { it.participants.isEmpty() || it.participants.find { participant -> participant.dropped == true } != null }
+                        }.subscribe({ invitations ->
                             invitationListSubject.onNextIfDifferAndNotNull(invitations)
                         }, { ex ->
                             ex.printStackTrace()
@@ -88,7 +111,11 @@ class ResearchViewModel(application: Application) : AndroidViewModel(application
 
     fun withdrawFromExperiment(experimentId: String, reason: String?) {
         subscriptions.add(
-                researchManager.dropoutFromExperiment(experimentId, reason).subscribe {
+                researchManager.dropoutFromExperiment(experimentId, reason).doOnSubscribe {
+                    this.experimentLoadingStatus.onNextIfDifferAndNotNull(true)
+                }.doOnComplete {
+                            this.experimentLoadingStatus.onNextIfDifferAndNotNull(false)
+                        }.subscribe {
                     println("withdrew from the experiment.")
                     reload()
                 }

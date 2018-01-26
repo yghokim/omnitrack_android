@@ -120,6 +120,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     private var touchMoveAmount: PointF = PointF()
 
     protected val creationSubscriptions = CompositeDisposable()
+    protected val resumeSubscriptions = CompositeDisposable()
 
     private val signedInUserSubject = BehaviorSubject.create<String>()
 
@@ -247,6 +248,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     override fun onPause() {
         super.onPause()
+        this.resumeSubscriptions.clear()
 
         if (isSessionLoggingEnabled) {
             val from = if (intent.hasExtra(OTApp.INTENT_EXTRA_FROM)) {
