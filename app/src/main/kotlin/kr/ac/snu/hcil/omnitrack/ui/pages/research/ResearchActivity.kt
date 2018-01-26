@@ -6,6 +6,9 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.content.ContextCompat
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.activity_research.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
@@ -39,6 +42,33 @@ class ResearchActivity : MultiButtonActionBarActivity(R.layout.activity_research
                     this.viewModel.initialize(userId)
                 }
         )
+
+        creationSubscriptions.add(
+                Observable.combineLatest<Boolean, Boolean, Boolean>(
+                        this.viewModel.experimentLoadingStatus,
+                        this.viewModel.invitationLoadingStatus,
+                        BiFunction { loading1: Boolean, loading2: Boolean -> loading1 || loading2 })
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {
+                            if (it == true)
+                                this.ui_loading_indicator.show()
+                            else this.ui_loading_indicator.dismiss()
+                        }
+        )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        this.resumeSubscriptions.add(
+                signedInUserObservable.subscribe {
+                    this.viewModel.startWatchingNetworkForRefresh()
+                }
+        )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        this.viewModel.stopWatchingNetworkForRefresh()
     }
 
     override fun onToolbarLeftButtonClicked() {

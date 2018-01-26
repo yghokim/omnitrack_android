@@ -80,12 +80,7 @@ class InvitationListFragment : OTFragment() {
             this.invitation = invitation
             itemView.name.text = invitation.experiment.name
             itemView.description.text = invitation.code
-            val me = invitation.participants.firstOrNull()
-            if (me != null) {
-                itemView.btn_join.visibility = View.GONE
-            } else {
-                itemView.btn_join.visibility = View.VISIBLE
-            }
+            itemView.btn_join.visibility = View.VISIBLE
         }
     }
 
