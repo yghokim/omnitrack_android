@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="kr.ac.snu.hcil.omnitrack">
+    package="kr.ac.snu.hcil.omnitrack"
+    android:versionCode="${versionCode}"
+    android:versionName="${versionName}">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -58,6 +60,8 @@
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
+
+        <!--This version metadata is used by external parsers to get the version information of the apk file.-->
 
         <!--
         <provider

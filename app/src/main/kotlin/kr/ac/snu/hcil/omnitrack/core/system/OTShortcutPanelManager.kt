@@ -16,6 +16,7 @@ import android.widget.RemoteViews
 import dagger.Lazy
 import dagger.internal.Factory
 import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -139,7 +140,9 @@ class OTShortcutPanelManager @Inject constructor(
         if (!isWatchingForShortcutRefresh) {
             val realm = backendRealmProvider.get()
             shortcutRefreshSubscription.set(
-                    dbManager.get().makeShortcutPanelRefreshObservable(userId, realm).doAfterTerminate { realm.close() }
+                    dbManager.get().makeShortcutPanelRefreshObservable(userId, realm)
+                            .unsubscribeOn(AndroidSchedulers.mainThread())
+                            .doAfterTerminate { realm.close() }
                             .subscribe({}, {}, {})
             )
             return true
