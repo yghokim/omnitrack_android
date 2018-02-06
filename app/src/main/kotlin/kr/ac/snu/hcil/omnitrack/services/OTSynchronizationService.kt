@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncQueueDbHelper
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.utils.ConfigurableJobService
+import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
 
 /**
@@ -62,7 +63,9 @@ class OTSynchronizationService : ConfigurableJobService() {
             println("start synchronization... ${job.extras}")
 
             if (authManager.get().isUserSignedIn() && configuredContext.isActive) {
-                shortcutPanelManager.get().registerShortcutRefreshSubscription(authManager.get().userId ?: "", "$TAG/${configuredContext.configuration.id}")
+                runOnUiThread {
+                    shortcutPanelManager.get().registerShortcutRefreshSubscription(authManager.get().userId ?: "", "$TAG/${configuredContext.configuration.id}")
+                }
             }
 
             val internalSubject = PublishSubject.create<SyncQueueDbHelper.AggregatedSyncQueue>()
@@ -95,7 +98,9 @@ class OTSynchronizationService : ConfigurableJobService() {
         }
 
         fun onStopped() {
-            shortcutPanelManager.get().unregisterShortcutRefreshSubscription("$TAG/${configuredContext.configuration.id}")
+            runOnUiThread {
+                shortcutPanelManager.get().unregisterShortcutRefreshSubscription("$TAG/${configuredContext.configuration.id}")
+            }
         }
 
     }

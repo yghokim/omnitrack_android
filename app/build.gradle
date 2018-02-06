@@ -2,6 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
+//apply plugin: 'io.fabric'
+
 import java.util.regex.Pattern
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -118,6 +120,7 @@ android {
 }
 
 kapt {
+    useBuildCache = true
     generateStubs = true
 }
 
@@ -159,8 +162,8 @@ dependencies {
     }
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
 
-    implementation "android.arch.lifecycle:extensions:1.0.0"
-    kapt "android.arch.lifecycle:compiler:1.0.0"
+    implementation "android.arch.lifecycle:extensions:1.1.0"
+    kapt "android.arch.lifecycle:compiler:1.1.0"
 
     kapt 'com.android.databinding:compiler:3.0.1'
 
@@ -282,7 +285,11 @@ ext.refreshVersion = {
             variant->
                 variant.mergedFlavor.versionCode = versionCode
                 variant.mergedFlavor.versionName = versionName
+
+                variant.mergedFlavor.manifestPlaceholders.versionName = versionName
+                variant.mergedFlavor.manifestPlaceholders.versionCode = versionCode
         }
+
         println("new versionName: ${versionName}, versionCode: ${versionCode}")
 
         android.applicationVariants.all {
@@ -290,6 +297,8 @@ ext.refreshVersion = {
                 variant.outputs.all{ output ->
                     outputFileName = "${variant.name}-${versionName}.apk"
                 }
+
+                variant.resValue "string", "version_name", versionName
         }
 }
 
