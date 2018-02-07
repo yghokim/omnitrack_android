@@ -264,7 +264,7 @@ ext.refreshVersion = {
         versionProperties.load(new FileInputStream(versionPropsFile))
         def releaseIncrease = increase ? 1 : 0
 
-        def patternVersionNumber = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)(\\s[a-zA-Z0-9]+)?")
+        def patternVersionNumber = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)(-[a-zA-Z0-9]+)?")
         def matcherVersionNumber = patternVersionNumber.matcher(versionProperties["versionName"])
         matcherVersionNumber.find()
         def majorVersion = Integer.parseInt(matcherVersionNumber.group(1))
