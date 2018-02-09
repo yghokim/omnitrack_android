@@ -1,29 +1,17 @@
 package kr.ac.snu.hcil.omnitrack.services
 
-import android.app.Notification
-import android.app.PendingIntent
-import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
-import android.support.v4.app.NotificationCompat
-import android.support.v4.content.ContextCompat
-import android.util.Log
 import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.firebase.jobdispatcher.Job
 import com.firebase.jobdispatcher.JobParameters
 import com.firebase.jobdispatcher.JobService
+import com.github.javiersantos.appupdater.AppUpdaterUtils
+import com.github.javiersantos.appupdater.enums.AppUpdaterError
+import com.github.javiersantos.appupdater.objects.Update
 import dagger.Lazy
-import io.reactivex.disposables.Disposables
-import io.reactivex.disposables.SerialDisposable
-import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.RemoteConfigManager
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
 import kr.ac.snu.hcil.omnitrack.core.di.global.VersionCheck
-import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
-import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
-import org.jetbrains.anko.notificationManager
+import kr.ac.snu.hcil.omnitrack.core.system.OTAppVersionCheckManager
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -55,7 +43,40 @@ class OTVersionCheckService : JobService() {
         }
     }
 
+    private lateinit var updaterUtils: AppUpdaterUtils
 
+    override fun onCreate() {
+        super.onCreate()
+        updaterUtils = OTAppVersionCheckManager.makeAppUpdaterUtils(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        updaterUtils.stop()
+    }
+
+    override fun onStartJob(job: JobParameters): Boolean {
+        updaterUtils.withListener(object : AppUpdaterUtils.UpdateListener {
+            override fun onSuccess(update: Update, isUpdateAvailable: Boolean) {
+
+                this@OTVersionCheckService.jobFinished(job, false)
+            }
+
+            override fun onFailed(error: AppUpdaterError) {
+                this@OTVersionCheckService.jobFinished(job, true)
+            }
+
+        })
+        updaterUtils.start()
+        return true
+    }
+
+    override fun onStopJob(job: JobParameters): Boolean {
+        updaterUtils.stop()
+        return true
+    }
+
+/*
     private val checkSubscription = SerialDisposable()
 
     @field:[Inject Default]
@@ -125,5 +146,5 @@ class OTVersionCheckService : JobService() {
     override fun onDestroy() {
         super.onDestroy()
         checkSubscription.set(Disposables.empty())
-    }
+    }*/
 }
