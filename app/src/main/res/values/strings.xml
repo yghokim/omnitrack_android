@@ -600,5 +600,8 @@
     <string name="msg_experiment_withdraw">Withdraw</string>
     <string name="msg_number_button_unit">Inc/Dec Unit</string>
 
+    <string name="msg_app_update_title">New Update Released</string>
+    <string name="msg_app_update_message">New update is available to download.\nWe strongly recommend to update to get the latest bug fixes and improvements.</string>
+    <string name="msg_app_update_update_button">Download</string>
 
 </resources>

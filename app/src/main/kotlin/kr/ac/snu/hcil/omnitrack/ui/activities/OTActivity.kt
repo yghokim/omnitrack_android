@@ -1,6 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.ui.activities
 
-import android.content.*
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.graphics.PointF
 import android.graphics.Rect
 import android.os.Bundle
@@ -10,6 +13,8 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import com.github.javiersantos.appupdater.AppUpdater
+import com.github.javiersantos.appupdater.enums.Display
 import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
 import dagger.Lazy
@@ -25,9 +30,8 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
-import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
+import kr.ac.snu.hcil.omnitrack.core.system.OTAppVersionCheckManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
-import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.VersionCheckDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
@@ -126,6 +130,15 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     private var backgroundSignInCheckThread: Thread? = null
 
+    protected val appUpdater: AppUpdater by lazy {
+        OTAppVersionCheckManager.makeAppUpdater(this).apply { postProcessAppUpdater(this) }
+    }
+
+    protected fun postProcessAppUpdater(instance: AppUpdater) {
+        instance.setDisplay(Display.DIALOG)
+    }
+
+    /*
     private val broadcastReceiver: BroadcastReceiver by lazy {
         object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -141,7 +154,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
             }
 
         }
-    }
+    }*/
 
     val signedInUserObservable: Observable<String>
         get() = signedInUserSubject
@@ -232,7 +245,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
         if (checkUpdateAvailable) {
             try {
-                registerReceiver(broadcastReceiver, intentFilter)
+                appUpdater.start()
             } catch(ex: Exception) {
                 ex.printStackTrace()
                 println("failed to register update check receiver")
@@ -265,7 +278,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
         if (checkUpdateAvailable) {
             try {
-                unregisterReceiver(broadcastReceiver)
+                appUpdater.stop()
             } catch(ex: Exception) {
                 ex.printStackTrace()
                 println("failed to unregister update check receiver")

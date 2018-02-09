@@ -220,6 +220,7 @@ dependencies {
     implementation 'uk.co.samuelwall:material-tap-target-prompt:2.4.0'
     implementation 'com.wdullaer:materialdatetimepicker:3.4.0'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.0.5'
+    implementation 'com.github.javiersantos:AppUpdater:2.6.4'
 
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
     testImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
