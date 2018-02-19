@@ -7,11 +7,17 @@ import kr.ac.snu.hcil.omnitrack.OTApp
  * Created by younghokim on 2018. 2. 19..
  */
 abstract class AFlagsHelperBase {
-    fun parseCreationFlags(json: String): JsonObject {
-        return OTApp.instance.serializationComponent.genericGson().fromJson(json, JsonObject::class.java)
+    companion object {
+        fun parseFlags(json: String): JsonObject {
+            return OTApp.instance.serializationComponent.genericGson().fromJson(json, JsonObject::class.java)
+        }
     }
 
-    open inner class BuilderBase {
+    fun parseFlags(json: String): JsonObject {
+        return AFlagsHelperBase.parseFlags(json)
+    }
+
+    open class BuilderBase {
 
         protected val json: JsonObject
 
@@ -20,7 +26,7 @@ abstract class AFlagsHelperBase {
         }
 
         constructor(base: String) {
-            this.json = parseCreationFlags(base)
+            this.json = parseFlags(base)
         }
 
         fun build(): String {
