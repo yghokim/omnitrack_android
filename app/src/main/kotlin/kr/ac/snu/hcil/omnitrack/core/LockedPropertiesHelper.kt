@@ -1,13 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core
 
+import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.utils.getBooleanCompat
 
 /**
  * Created by Young-Ho on 1/19/2018.
  */
-object LockedPropertiesHelper {
+object LockedPropertiesHelper : AFlagsHelperBase() {
     const val COMMON_DELETE = "delete"
     const val COMMON_EDIT = "edit"
     const val TRACKER_BOOKMARK = "bookmark"
@@ -22,12 +22,14 @@ object LockedPropertiesHelper {
 
     const val ATTRIBUTE_VISIBILITY = "visibility"
 
-    fun parseLockedProperties(json: String): JsonObject {
-        return OTApp.instance.serializationComponent.genericGson().fromJson(json, JsonObject::class.java)
-    }
-
     fun isLocked(key: String, properties: JsonObject): Boolean? {
         return properties.getBooleanCompat(key)
     }
 
+    class Builder : BuilderBase() {
+        fun setLocked(key: String, isLocked: Boolean?): Builder {
+            this.json.set(key, isLocked)
+            return this
+        }
+    }
 }
