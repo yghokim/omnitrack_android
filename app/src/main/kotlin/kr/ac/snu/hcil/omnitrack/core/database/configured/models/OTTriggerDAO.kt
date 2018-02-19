@@ -170,7 +170,7 @@ open class OTTriggerDAO : RealmObject() {
 
     fun getParsedLockedPropertyInfo(): JsonObject {
         if (_parsedLockedPropertyInfo == null) {
-            _parsedLockedPropertyInfo = LockedPropertiesHelper.parseLockedProperties(serializedLockedPropertyInfo)
+            _parsedLockedPropertyInfo = LockedPropertiesHelper.parseFlags(serializedLockedPropertyInfo)
         }
         return _parsedLockedPropertyInfo!!
     }

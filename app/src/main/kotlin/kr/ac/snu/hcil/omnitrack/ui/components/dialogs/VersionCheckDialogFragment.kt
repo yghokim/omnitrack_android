@@ -13,10 +13,10 @@ import android.widget.Button
 import android.widget.TextView
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.Disposables
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.RemoteConfigManager
 
 /**
  * Created by Young-Ho Kim on 2017-04-10.
@@ -110,6 +110,7 @@ class VersionCheckDialogFragment : DialogFragment() {
     private fun compareVersions(latestVersion: String) {
         latestVersionTextView.text = latestVersion
 
+        /* TODO replace logic with AppUpdater
         if (RemoteConfigManager.isNewVersionGreater(BuildConfig.VERSION_NAME, latestVersion)) {
             storeButton.isEnabled = true
             storeButton.setText(R.string.msg_button_label_new_version_available)
@@ -118,17 +119,19 @@ class VersionCheckDialogFragment : DialogFragment() {
             storeButton.isEnabled = false
             storeButton.setText(R.string.msg_button_label_latest_version)
             storeCaption.visibility = View.GONE
-        }
+        }*/
     }
 
     private fun startLoadingVersion(): Disposable {
+        /* TODO replace logic with AppUpdater
         return RemoteConfigManager.getServerLatestVersionName().subscribe({
             versionName ->
             this.latestVersion = versionName
             compareVersions(versionName)
         }, {
             storeButton.isEnabled = false
-        })
+        })*/
+        return Disposables.empty()
     }
 
     override fun onDestroyView() {

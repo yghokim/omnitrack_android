@@ -81,7 +81,7 @@ open class OTTrackerDAO : RealmObject() {
 
     fun getParsedCreationFlags(): JsonObject {
         if (_parsedCreationFlags == null) {
-            _parsedCreationFlags = CreationFlagsHelper.parseCreationFlags(serializedCreationFlags)
+            _parsedCreationFlags = CreationFlagsHelper.parseFlags(serializedCreationFlags)
         }
         return _parsedCreationFlags!!
     }
@@ -91,7 +91,7 @@ open class OTTrackerDAO : RealmObject() {
 
     fun getParsedLockedPropertyInfo(): JsonObject {
         if (_parsedLockedPropertyInfo == null) {
-            _parsedLockedPropertyInfo = LockedPropertiesHelper.parseLockedProperties(serializedLockedPropertyInfo)
+            _parsedLockedPropertyInfo = LockedPropertiesHelper.parseFlags(serializedLockedPropertyInfo)
         }
         return _parsedLockedPropertyInfo!!
     }
@@ -209,7 +209,7 @@ open class OTAttributeDAO : RealmObject() {
 
     fun getParsedLockedPropertyInfo(): JsonObject {
         if (_parsedLockedPropertyInfo == null) {
-            _parsedLockedPropertyInfo = LockedPropertiesHelper.parseLockedProperties(serializedLockedPropertyInfo)
+            _parsedLockedPropertyInfo = LockedPropertiesHelper.parseFlags(serializedLockedPropertyInfo)
         }
         return _parsedLockedPropertyInfo!!
     }
