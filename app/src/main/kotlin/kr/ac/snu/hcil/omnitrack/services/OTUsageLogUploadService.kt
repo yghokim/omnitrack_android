@@ -74,10 +74,11 @@ class OTUsageLogUploadService : ConfigurableJobService() {
                             realm.use {
                                 realm.executeTransaction {
                                     realm.where(UsageLog::class.java).`in`("id", storedIds.toTypedArray())
-                                            .findAll()
-                                            .forEach { l ->
-                                                l.isSynchronized = true
-                                            }
+                                            .findAll().deleteAllFromRealm()
+                                    /*.findAll()
+                                    .forEach { l ->
+                                        l.isSynchronized = true
+                                    }*/
                                 }
                             }
                         }.observeOn(AndroidSchedulers.mainThread()).subscribe({ list ->

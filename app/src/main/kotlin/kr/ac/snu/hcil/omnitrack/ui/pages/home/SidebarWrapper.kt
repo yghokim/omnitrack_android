@@ -30,6 +30,7 @@ import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfiguration
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTUserDAO
 import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.configured.InformationUpload
+import kr.ac.snu.hcil.omnitrack.core.di.configured.ResearchSync
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
@@ -39,6 +40,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.research.ResearchActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import javax.inject.Inject
+import javax.inject.Provider
 
 /**
  * Created by Young-Ho Kim on 2017-01-31.
@@ -62,6 +64,9 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
 
     @field:[Inject InformationUpload]
     lateinit var informationUploadJobProvider: Job.Builder
+
+    @field:[Inject ResearchSync]
+    lateinit var researchSyncJob: Provider<Job>
 
     @Inject
     lateinit var configuration: OTConfiguration
@@ -211,6 +216,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                     //OTApp.instance.syncManager.performSynchronizationOf(ESyncDataType.ITEM)
                     syncManager.get().queueFullSync()
                     syncManager.get().reserveSyncServiceNow()
+                    jobDispatcher.mustSchedule(researchSyncJob.get())
                 }, true),
 
                 RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_plask, "Research", null, {

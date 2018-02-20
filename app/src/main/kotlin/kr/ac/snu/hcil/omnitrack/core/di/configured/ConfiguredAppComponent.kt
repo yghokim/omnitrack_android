@@ -33,10 +33,10 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.*
-import kr.ac.snu.hcil.omnitrack.ui.pages.services.AttributeSelectionPage
-import kr.ac.snu.hcil.omnitrack.ui.pages.services.TrackerSelectionPage
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.*
+import kr.ac.snu.hcil.omnitrack.ui.pages.services.AttributeSelectionPage
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceWizardView
+import kr.ac.snu.hcil.omnitrack.ui.pages.services.TrackerSelectionPage
 import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.FieldPresetSelectionBottomSheetFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailStructureTabFragment
@@ -64,7 +64,8 @@ import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetService
     SynchronizationModule::class,
     TriggerSystemModule::class,
     ScriptingModule::class,
-    UsageLoggingModule::class
+    UsageLoggingModule::class,
+    ResearchModule::class
 ])
 interface ConfiguredAppComponent {
 
@@ -83,6 +84,7 @@ interface ConfiguredAppComponent {
         fun plus(module: TriggerSystemModule): Builder
         fun plus(module: ScriptingModule): Builder
         fun plus(module: UsageLoggingModule): Builder
+        fun plus(module: ResearchModule): Builder
 
         fun build(): ConfiguredAppComponent
     }

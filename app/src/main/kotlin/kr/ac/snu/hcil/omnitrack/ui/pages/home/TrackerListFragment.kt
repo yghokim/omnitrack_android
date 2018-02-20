@@ -543,6 +543,14 @@ class TrackerListFragment : OTFragment() {
                 )
 
                 subscriptions.add(
+                        viewModel.experimentName.subscribe { (name) ->
+                            if (name != null) {
+                                itemView.ui_experiment_name.text = name
+                            }
+                        }
+                )
+
+                subscriptions.add(
                         viewModel.trackerColor.subscribe {
                             colorInt ->
                             color.setBackgroundColor(colorInt)

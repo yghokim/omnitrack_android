@@ -210,6 +210,8 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation "com.github.bumptech.glide:glide:$rootProject.ext.glide_version"
     kapt "com.github.bumptech.glide:compiler:$rootProject.ext.glide_version"
+    implementation "com.github.bumptech.glide:annotations:$rootProject.ext.glide_version"
+
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
     implementation 'com.wonderkiln:camerakit:0.13.1'
     implementation 'com.github.mukeshsolanki:country-picker-android:1.2.0'
