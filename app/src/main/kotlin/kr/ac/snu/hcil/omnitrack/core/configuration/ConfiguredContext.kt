@@ -75,6 +75,7 @@ class ConfiguredContext(val configuration: OTConfiguration, val applicationCompo
                 .plus(scheduledJobModule)
                 .plus(synchronizationModule)
                 .plus(loggingModule)
+                .plus(researchModule)
                 .plus(ScriptingModule())
                 .plus(InformationHelpersModule())
                 .build()

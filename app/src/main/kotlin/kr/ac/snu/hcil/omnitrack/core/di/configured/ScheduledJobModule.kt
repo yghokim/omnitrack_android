@@ -7,10 +7,7 @@ import dagger.Provides
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfiguration
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
-import kr.ac.snu.hcil.omnitrack.services.OTBinaryUploadService
-import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadService
-import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
-import kr.ac.snu.hcil.omnitrack.services.OTUsageLogUploadService
+import kr.ac.snu.hcil.omnitrack.services.*
 import javax.inject.Qualifier
 
 /**
@@ -110,6 +107,19 @@ class ScheduledJobModule {
                 .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
                 .addConstraint(Constraint.ON_ANY_NETWORK)
     }
+
+    @Provides
+    @ResearchSync
+    fun provideResearchSyncJob(configuration: OTConfiguration, builder: Job.Builder): Job {
+        return builder.setService(OTResearchSynchronizationService::class.java)
+                .setTag(configuration.id)
+                .setLifetime(Lifetime.FOREVER)
+                .setReplaceCurrent(true)
+                .setTrigger(Trigger.executionWindow(0, 0))
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .addConstraint(Constraint.ON_ANY_NETWORK)
+                .build()
+    }
 }
 
 @Qualifier
@@ -123,3 +133,8 @@ class ScheduledJobModule {
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class InformationUpload
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class ResearchSync
+

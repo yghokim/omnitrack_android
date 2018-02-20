@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.di.configured
 import dagger.Subcomponent
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.research.ResearchManager
+import kr.ac.snu.hcil.omnitrack.services.OTResearchSynchronizationService
 import kr.ac.snu.hcil.omnitrack.ui.pages.research.ResearchViewModel
 
 /**
@@ -26,4 +27,5 @@ interface ResearchComponent {
     fun manager(): ResearchManager
 
     fun inject(viewModel: ResearchViewModel)
+    fun inject(service: OTResearchSynchronizationService.ConfiguredTask)
 }

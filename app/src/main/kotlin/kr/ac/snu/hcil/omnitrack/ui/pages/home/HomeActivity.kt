@@ -132,6 +132,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
                     {
                         if(NetworkHelper.isConnectedToInternet()) {
                             viewModel.startPullSync()
+                            viewModel.syncResearch()
                         }
                     }
                 }

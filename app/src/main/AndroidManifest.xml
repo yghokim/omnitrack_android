@@ -217,6 +217,7 @@
         </service>
         <service android:name=".services.OTBinaryLocalCacheService" />
         <service android:name=".services.OTInformationUploadService" />
+        <service android:name=".services.OTResearchSynchronizationService" />
 
 
         <meta-data
