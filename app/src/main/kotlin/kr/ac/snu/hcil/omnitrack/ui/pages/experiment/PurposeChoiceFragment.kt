@@ -16,13 +16,16 @@ class PurposeChoiceFragment : SlideFragment() {
 
     lateinit var purposeChoiceView: ChoiceFormView
 
-    val selectedPurposes: Array<String> get() = purposeChoiceView.selectedEntries.map {
+    val selectedPurposes: Array<String>
+        get() = if (this::purposeChoiceView.isInitialized) {
+            purposeChoiceView.selectedEntries.map {
         if (it.isCustom) {
             "other: ${it.text}"
         } else {
             it.id
         }
-    }.toTypedArray()
+            }.toTypedArray()
+        } else emptyArray<String>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.slide_purposes, container, false)

@@ -154,6 +154,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                         trackerDao?.clearCreationFlagsCache()
                         trackerDao?.synchronizedAt = null
                     }
+                    registerSyncJob()
                 }
             } else {
                 experimentIdObservable.onNextIfDifferAndNotNull(Nullable(value))

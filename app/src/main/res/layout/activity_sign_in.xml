@@ -98,7 +98,7 @@
         android:layout_marginRight="8dp"
         android:fontFamily="sans-serif-condensed"
         android:gravity="center"
-        android:text="Copyright © 2016-2017 the OmniTrack team. All Rights Reserved."
+        android:text="Copyright © 2016-2018 the OmniTrack team. All Rights Reserved."
         android:textColor="@color/textColorMidLight"
 
         android:textSize="10sp"

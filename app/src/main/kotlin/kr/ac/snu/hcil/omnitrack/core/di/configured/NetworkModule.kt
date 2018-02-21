@@ -64,6 +64,7 @@ class NetworkModule {
                             .addHeader("OTRole", "ServiceUser")
                             .addHeader("OTLocale", LocaleHelper.getLanguageCode(context))
                             .build()
+                    println("Provide HTTP client bounding to " + newRequest.url().toString())
                     chain.proceed(newRequest)
                 }.build()
     }
