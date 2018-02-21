@@ -259,6 +259,21 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                 }
             }
 
+            trackerDao.addChangeListener(this)
+            updateValues(trackerDao)
+        }
+
+        private fun updateValues(snapshot: OTTrackerDAO) {
+
+            trackerDao.clearCreationFlagsCache()
+            trackerColor.onNextIfDifferAndNotNull(snapshot.color)
+            trackerName.onNextIfDifferAndNotNull(snapshot.name)
+            isBookmarked.onNextIfDifferAndNotNull(snapshot.isBookmarked)
+            isForExperiment.onNextIfDifferAndNotNull(CreationFlagsHelper.isForExperiment(snapshot.getParsedCreationFlags()))
+
+            trackerEditable.onNextIfDifferAndNotNull(!snapshot.isEditingLocked())
+            trackerRemovable.onNextIfDifferAndNotNull(!snapshot.isDeletionLocked())
+
             CreationFlagsHelper.getExperimentId(trackerDao.getParsedCreationFlags())?.let { experimentId ->
                 println("Observe the name of the experiment : ${experimentId}")
                 subscriptions.add(
@@ -273,20 +288,6 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                                 }
                 )
             }
-
-            trackerDao.addChangeListener(this)
-            updateValues(trackerDao)
-        }
-
-        private fun updateValues(snapshot: OTTrackerDAO) {
-            trackerColor.onNextIfDifferAndNotNull(snapshot.color)
-            trackerName.onNextIfDifferAndNotNull(snapshot.name)
-            isBookmarked.onNextIfDifferAndNotNull(snapshot.isBookmarked)
-            isForExperiment.onNextIfDifferAndNotNull(CreationFlagsHelper.isForExperiment(snapshot.getParsedCreationFlags()))
-
-            trackerEditable.onNextIfDifferAndNotNull(!snapshot.isEditingLocked())
-            trackerRemovable.onNextIfDifferAndNotNull(!snapshot.isDeletionLocked())
-
         }
 
         override fun onChange(snapshot: OTTrackerDAO) {

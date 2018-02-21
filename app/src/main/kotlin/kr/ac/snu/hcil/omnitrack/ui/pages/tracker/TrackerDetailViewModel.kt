@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 import android.app.Application
 import android.support.annotation.DrawableRes
 import dagger.Lazy
+import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
@@ -11,6 +12,7 @@ import io.realm.Realm
 import io.realm.RealmChangeListener
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
@@ -20,6 +22,9 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.OTExperimentDAO
+import kr.ac.snu.hcil.omnitrack.core.di.configured.Research
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -52,6 +57,10 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     @Inject
     protected lateinit var syncManager: OTSyncManager
 
+    @field:[Inject Research]
+    protected lateinit var researchRealmFactory: Factory<Realm>
+
+    private lateinit var researchRealm: Realm
 
     private var isInitialized = false
 
@@ -67,6 +76,8 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     var trackerId: String? = null
         private set
 
+    private var experimentList = ArrayList<ExperimentInfo>()
+
     //Observables========================================
     val hasTrackerRemovedOutside = BehaviorSubject.create<String>()
     val trackerIdObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable(null))
@@ -79,6 +90,13 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     val attributeViewModelListObservable = BehaviorSubject.create<List<AttributeInformationViewModel>>()
 
     val areAttributesRemovable = BehaviorSubject.createDefault<Boolean>(true)
+
+    val isInjectedObservable = BehaviorSubject.create<Boolean>()
+
+    val experimentIdObservable = BehaviorSubject.create<Nullable<String>>()
+
+    val experimentListObservable = BehaviorSubject.create<List<ExperimentInfo>>()
+
     //===================================================
 
     private var lastRemovedAttributeId: String? = null
@@ -125,6 +143,22 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             }
         }
 
+    var assignedExperimentId: String?
+        get() = experimentIdObservable.value?.datum
+        set(value) {
+            if (trackerDao != null) {
+                if (!CreationFlagsHelper.isInjected(trackerDao!!.getParsedCreationFlags())) {
+                    realm.executeTransactionIfNotIn {
+                        trackerDao?.serializedCreationFlags = CreationFlagsHelper.Builder(trackerDao?.serializedCreationFlags
+                                ?: "{}").setExperiment(value).build()
+                        trackerDao?.clearCreationFlagsCache()
+                    }
+                }
+            } else {
+                experimentIdObservable.onNextIfDifferAndNotNull(Nullable(value))
+            }
+        }
+
     val onChangesApplied = PublishSubject.create<String>()
 
     private val removedAttributes = HashSet<AttributeInformationViewModel>()
@@ -137,6 +171,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     override fun onInject(configuredContext: ConfiguredContext) {
         configuredContext.configuredAppComponent.inject(this)
+        researchRealm = researchRealmFactory.get()
     }
 
     fun init(trackerId: String?) {
@@ -159,6 +194,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                                 colorObservable.onNextIfDifferAndNotNull(snapshot.color)
                                 areAttributesRemovable.onNextIfDifferAndNotNull(!(LockedPropertiesHelper.isLocked(LockedPropertiesHelper.TRACKER_REMOVE_ATTRIBUTES, snapshot.getParsedLockedPropertyInfo())
                                         ?: false))
+
+                                isInjectedObservable.onNextIfDifferAndNotNull(CreationFlagsHelper.isInjected(snapshot.getParsedCreationFlags()))
+                                experimentIdObservable.onNextIfDifferAndNotNull(Nullable(CreationFlagsHelper.getExperimentId(snapshot.getParsedCreationFlags())))
 
                                 if (trackerDao != dao) {
                                     subscriptions.add(
@@ -205,7 +243,6 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                         }
                 )
 
-
                 shortcutPanelManager.get().registerShortcutRefreshSubscription(authManager.get().userId!!, TAG)
 
                 /*
@@ -213,7 +250,24 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 attributeRealmResults = OTApp.instance.databaseManager.getAttributeListQuery(trackerId, realm).findAllSortedAsync("position")
                 attributeRealmResults?.addChangeListener(attributeListChangedListener)*/
 
-            } else trackerDao = null
+            } else {
+                trackerDao = null
+                isInjectedObservable.onNextIfDifferAndNotNull(false)
+            }
+
+            subscriptions.add(
+                    researchRealm.where(OTExperimentDAO::class.java)
+                            .isNull("droppedAt")
+                            .findAllAsync().asFlowable()
+                            .filter {
+                                it.isValid && it.isLoaded
+                            }
+                            .subscribe { results ->
+                                this.experimentList.clear()
+                                this.experimentList.addAll(results.map { it.getInfo() })
+                                this.experimentListObservable.onNext(this.experimentList)
+                            }
+            )
 
             trackerIdObservable.onNext(Nullable(trackerId))
 
@@ -336,6 +390,10 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 trackerDao.isBookmarked = isBookmarkedObservable.value
                 trackerDao.color = colorObservable.value
 
+                if (isInjectedObservable.value != true) {
+                    trackerDao.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(assignedExperimentId).build()
+                }
+
                 currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
                     if (!attrViewModel.isInDatabase) {
                         attrViewModel.attributeDAO.localId = attributeManager.get().makeNewAttributeLocalId(attrViewModel.attributeDAO.userCreatedAt)
@@ -385,6 +443,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         clearCurrentAttributeList()
         removedAttributes.clear()
         shortcutPanelManager.get().unregisterShortcutRefreshSubscription(TAG)
+        if (this::researchRealm.isInitialized) {
+            researchRealm.close()
+        }
     }
 
     class AttributeInformationViewModel(_attributeDAO: OTAttributeDAO, val realm: Realm, val attributeManager: OTAttributeManager) : IReadonlyObjectId, RealmChangeListener<OTAttributeDAO> {
