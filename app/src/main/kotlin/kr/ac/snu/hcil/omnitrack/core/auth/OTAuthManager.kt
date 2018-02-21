@@ -15,7 +15,6 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.Lazy
 import dagger.internal.Factory
@@ -208,7 +207,7 @@ class OTAuthManager @Inject constructor(
         loadGoogleSignInAccount().flatMapObservable { acc ->
             firebaseAuthWithGoogle(acc)
         }.subscribe({ authResult ->
-            notifySignedIn(authResult.user)
+                    notifySignedIn()
             resultsHandler.onSuccess()
         }, { ex ->
             resultsHandler.onError(ex)
@@ -323,11 +322,11 @@ class OTAuthManager @Inject constructor(
                 //Signed in successfully.
                 println("signed in google account: ${result.signInAccount}")
                 firebaseAuthWithGoogle(result.signInAccount!!).flatMap { authResult ->
+                    println("Signed in through Google account. try to push device info to server...")
                     OTDeviceInfo.makeDeviceInfo(configuredContext.firebaseComponent).flatMapObservable { deviceInfo ->
-                        synchronizationServerController.get().putDeviceInfo(deviceInfo).
-                                flatMap { result ->
-                                    handlePutDeviceInfoResult(result)
-                                }
+                        synchronizationServerController.get().putDeviceInfo(deviceInfo).flatMap { result ->
+                            handlePutDeviceInfoResult(result)
+                        }
                                 .toObservable()
                                 .map { success ->
                                     println("refreshed device info.")
@@ -338,10 +337,12 @@ class OTAuthManager @Inject constructor(
                     }
                 }.observeOn(AndroidSchedulers.mainThread()).subscribe({ authResult ->
                     println("sign in succeeded.")
-                    notifySignedIn(authResult.user)
+                    notifySignedIn()
                     resultHandler?.onSuccess()
                 }, {
                     ex ->
+                    println("Failed to push device information to server.")
+                    ex.printStackTrace()
                     firebaseAuth.signOut()
                     Auth.GoogleSignInApi.signOut(mGoogleApiClient)
                     resultHandler?.onError(ex)
@@ -399,7 +400,7 @@ class OTAuthManager @Inject constructor(
         notifySignedOut()
     }
 
-    private fun notifySignedIn(user: FirebaseUser) {
+    private fun notifySignedIn() {
         OTApp.instance.sendBroadcast(Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_IN)
                 .putExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID, configuredContext.configuration.id)
                 .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId))
