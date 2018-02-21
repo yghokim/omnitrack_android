@@ -28,6 +28,10 @@ open class OTExperimentDAO : RealmObject() {
 @Keep
 data class ExperimentInfo(val id: String, val name: String, val joinedAt: Long, val droppedAt: Long? = null) {
 
+    override fun toString(): String {
+        return name
+    }
+
     class DiffUtilCallback(val oldList: List<ExperimentInfo>, val newList: List<ExperimentInfo>) : DiffUtil.Callback() {
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             return oldList[oldItemPosition].id == newList[newItemPosition].id

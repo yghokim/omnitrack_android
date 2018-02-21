@@ -35,6 +35,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.AdapterLinearLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
@@ -42,6 +43,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.research.ExperimentSelectionSpinnerAdapter
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
@@ -146,6 +148,45 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                     currentAttributeViewModelList.addAll(newList)
 
                     diffResult.dispatchUpdatesTo(attributeListAdapter)
+                }
+        )
+
+        val experimentListObservable: Observable<Pair<Boolean, List<ExperimentInfo>>> = Observable.combineLatest(this.viewModel.isInjectedObservable, this.viewModel.experimentListObservable, BiFunction { t1: Boolean, t2: List<ExperimentInfo> -> Pair(t1, t2) })
+
+        creationSubscriptions.add(
+                experimentListObservable.subscribe { (isInjected, experimentList) ->
+                    if (isInjected) {
+                        assignedExperimentProperty.visibility = View.GONE
+                    } else {
+                        assignedExperimentProperty.visibility = View.VISIBLE
+                        assignedExperimentProperty.setAdapter(ExperimentSelectionSpinnerAdapter(this@TrackerDetailStructureTabFragment.act, experimentList))
+                        viewModel.assignedExperimentId?.let { experimentId ->
+                            assignedExperimentProperty.value = experimentList.find { it.id == experimentId }
+                        }
+                    }
+                }
+        )
+
+        creationSubscriptions.add(
+                viewModel.experimentIdObservable.subscribe { (experimentId) ->
+                    val spinnerAdapter = (assignedExperimentProperty.adapter as? ExperimentSelectionSpinnerAdapter)
+                    if (spinnerAdapter != null) {
+                        val info = spinnerAdapter.items.find { it is ExperimentInfo && it.id == experimentId }
+                        if (info != null) {
+                            assignedExperimentProperty.value = info
+                        }
+                    }
+                }
+        )
+
+        creationSubscriptions.add(
+                assignedExperimentProperty.valueChanged.observable.subscribe { (sender, args) ->
+                    println("Assigned Experiment Id was changed : ${args}")
+                    if (args is ExperimentInfo) {
+                        viewModel.assignedExperimentId = args.id
+                    } else {
+                        viewModel.assignedExperimentId = null
+                    }
                 }
         )
 

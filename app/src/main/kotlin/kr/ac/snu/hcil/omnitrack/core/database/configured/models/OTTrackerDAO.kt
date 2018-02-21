@@ -79,6 +79,10 @@ open class OTTrackerDAO : RealmObject() {
     @Ignore
     private var _parsedCreationFlags: JsonObject? = null
 
+    fun clearCreationFlagsCache() {
+        _parsedCreationFlags = null
+    }
+
     fun getParsedCreationFlags(): JsonObject {
         if (_parsedCreationFlags == null) {
             _parsedCreationFlags = CreationFlagsHelper.parseFlags(serializedCreationFlags)

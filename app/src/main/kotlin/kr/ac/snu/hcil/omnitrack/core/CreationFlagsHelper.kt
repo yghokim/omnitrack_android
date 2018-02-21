@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core
 
-import com.github.salomonbrys.kotson.contains
 import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.utils.getBooleanCompat
@@ -17,16 +16,18 @@ object CreationFlagsHelper : AFlagsHelperBase() {
     }
 
     fun isForExperiment(flags: JsonObject): Boolean {
-        return flags.contains("experiment")
+        return !flags.getStringCompat("experiment").isNullOrBlank()
     }
 
     fun getExperimentId(flags: JsonObject): String? {
         return flags.getStringCompat("experiment")
     }
 
-    class Builder : BuilderBase() {
+    class Builder : BuilderBase {
+        constructor() : super()
+        constructor(base: String) : super(base)
 
-        fun setExperiment(experimentId: String): Builder {
+        fun setExperiment(experimentId: String?): Builder {
             this.json.set("experiment", experimentId)
             return this
         }
