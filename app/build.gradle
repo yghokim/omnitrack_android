@@ -140,7 +140,6 @@ configurations.all {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
-
     implementation "com.android.support:appcompat-v7:$rootProject.ext.android_support_version"
     implementation "com.android.support:recyclerview-v7:$rootProject.ext.android_support_version"
     implementation "com.android.support:design:$rootProject.ext.android_support_version"
@@ -156,29 +155,24 @@ dependencies {
     implementation "com.google.firebase:firebase-core:$rootProject.ext.google_play_version"
     implementation "com.google.firebase:firebase-auth:$rootProject.ext.google_play_version"
     implementation "com.google.firebase:firebase-messaging:$rootProject.ext.google_play_version"
-
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
-
-    implementation "android.arch.lifecycle:extensions:1.1.0"
+    implementation 'android.arch.lifecycle:extensions:1.1.0'
     kapt "android.arch.lifecycle:compiler:1.1.0"
-
     kapt 'com.android.databinding:compiler:3.0.1'
-
-    implementation "org.jetbrains.anko:anko:0.10.4"
-
+    implementation 'org.jetbrains.anko:anko:0.10.4'
     implementation "com.google.dagger:dagger:$rootProject.ext.dagger_version"
     implementation "com.google.dagger:dagger-android:$rootProject.ext.dagger_version"
     kapt "com.google.dagger:dagger-android-processor:$rootProject.ext.dagger_version"
     kapt "com.google.dagger:dagger-compiler:$rootProject.ext.dagger_version"
-
     implementation project(':microsoft-band-1.3.20307.2')
     implementation project(':material_dialog_core')
     implementation project(':UpPlatformSdk')
     implementation project(':material_about')
     implementation project(':fancybuttons')
     implementation project(':TedBottomPicker:tedbottompicker')
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+    implementation project(':AppUpdater:appupdater')
 
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation files('libs/opencsv-3.9.jar')
     implementation files('libs/jxl.jar')
@@ -189,7 +183,6 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.1.9'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation 'com.github.pwittchen:reactivenetwork-rx2:0.12.3'
-
     implementation 'jp.wasabeef:recyclerview-animators:2.2.7'
     implementation 'com.github.markushi:android-ui:1.2'
     implementation 'org.apmem.tools:layouts:1.10@aar'
@@ -199,9 +192,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
-
     implementation 'com.airbnb.android:lottie:2.2.5'
-
     implementation 'org.atteo:evo-inflector:1.2.2'
     implementation 'com.github.Epsiloni:android-target-tooltip:1.7'
     implementation 'us.feras.mdv:markdownview:1.1.0'
@@ -211,7 +202,6 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:$rootProject.ext.glide_version"
     kapt "com.github.bumptech.glide:compiler:$rootProject.ext.glide_version"
     implementation "com.github.bumptech.glide:annotations:$rootProject.ext.glide_version"
-
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
     implementation 'com.wonderkiln:camerakit:0.13.1'
     implementation 'com.github.mukeshsolanki:country-picker-android:1.2.0'
@@ -219,12 +209,9 @@ dependencies {
     implementation 'uk.co.samuelwall:material-tap-target-prompt:2.4.0'
     implementation 'com.wdullaer:materialdatetimepicker:3.4.0'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.0.5'
-    implementation 'com.github.javiersantos:AppUpdater:2.6.4'
-
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
     testImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
-
     compileOnly 'javax.annotation:jsr250-api:1.0'
     implementation 'com.larswerkman:lobsterpicker:1.0.1'
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0'

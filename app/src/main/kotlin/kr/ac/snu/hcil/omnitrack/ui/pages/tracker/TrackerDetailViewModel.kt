@@ -152,6 +152,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                         trackerDao?.serializedCreationFlags = CreationFlagsHelper.Builder(trackerDao?.serializedCreationFlags
                                 ?: "{}").setExperiment(value).build()
                         trackerDao?.clearCreationFlagsCache()
+                        trackerDao?.synchronizedAt = null
                     }
                 }
             } else {
