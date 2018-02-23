@@ -26,6 +26,7 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioItemListView
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AudioRecordInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.SendReportActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
@@ -143,6 +144,7 @@ interface ConfiguredAppComponent {
     fun inject(audioRecordInputView: AudioRecordInputView)
     fun inject(view: ImageInputView)
     fun inject(view: AudioItemListView)
+    fun inject(view: ChoiceInputView)
 
     fun inject(activity: ShortcutPanelWidgetConfigActivity)
 

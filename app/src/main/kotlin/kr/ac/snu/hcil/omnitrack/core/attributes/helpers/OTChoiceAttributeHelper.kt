@@ -31,10 +31,11 @@ class OTChoiceAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
     companion object {
         const val PROPERTY_MULTISELECTION = "multiSelection"
         const val PROPERTY_ENTRIES = "entries"
+        const val PROPERTY_ALLOW_APPENDING_FROM_VIEW = "allowAppendingFromView"
     }
 
     override fun getValueNumericCharacteristics(attribute: OTAttributeDAO): NumericCharacteristics {
-        return if (getAllowedMultiSelection(attribute) == true)
+        return if (getIsMultiSelectionAllowed(attribute) == true)
             NumericCharacteristics(false, false)
         else NumericCharacteristics(true, false)
     }
@@ -42,7 +43,7 @@ class OTChoiceAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
     override fun getTypeNameResourceId(attribute: OTAttributeDAO): Int = R.string.type_choice_name
 
     override fun getTypeSmallIconResourceId(attribute: OTAttributeDAO): Int {
-        return if (getAllowedMultiSelection(attribute) == true) {
+        return if (getIsMultiSelectionAllowed(attribute) == true) {
             R.drawable.icon_small_multiple_choice
         } else R.drawable.icon_small_single_choice
     }
@@ -51,15 +52,18 @@ class OTChoiceAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
 
     override fun getSupportedSorters(attribute: OTAttributeDAO): Array<AFieldValueSorter> {
         return arrayOf(
-                ChoiceSorter(attribute.name, getEntries(attribute) ?: UniqueStringEntryList(), attribute.localId)
+                ChoiceSorter(attribute.name, getChoiceEntries(attribute)
+                        ?: UniqueStringEntryList(), attribute.localId)
         )
     }
 
-    override val propertyKeys: Array<String> = arrayOf(PROPERTY_MULTISELECTION, PROPERTY_ENTRIES)
+    override val propertyKeys: Array<String> = arrayOf(
+            PROPERTY_MULTISELECTION, PROPERTY_ALLOW_APPENDING_FROM_VIEW, PROPERTY_ENTRIES)
 
     override fun <T> getPropertyHelper(propertyKey: String): OTPropertyHelper<T> {
         return when (propertyKey) {
             PROPERTY_MULTISELECTION -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.Boolean)
+            PROPERTY_ALLOW_APPENDING_FROM_VIEW -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.Boolean)
             PROPERTY_ENTRIES -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.ChoiceEntryList)
             else -> throw IllegalArgumentException("Unsupported property key ${propertyKey}")
         } as OTPropertyHelper<T>
@@ -68,37 +72,42 @@ class OTChoiceAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
     override fun getPropertyInitialValue(propertyKey: String): Any? {
         return when (propertyKey) {
             PROPERTY_MULTISELECTION -> false
+            PROPERTY_ALLOW_APPENDING_FROM_VIEW -> false
             PROPERTY_ENTRIES -> UniqueStringEntryList(OTChoiceEntryListPropertyHelper.PREVIEW_ENTRIES)
             else -> null
         }
+    }
+
+
+    override fun getPropertyTitle(propertyKey: String): String {
+        return when (propertyKey) {
+            PROPERTY_MULTISELECTION -> OTApp.getString(R.string.property_choice_allow_multiple_selections)
+            PROPERTY_ALLOW_APPENDING_FROM_VIEW -> OTApp.getString(R.string.msg_allow_appending_from_view)
+            PROPERTY_ENTRIES -> OTApp.getString(R.string.property_choice_entries)
+            else -> ""
+        }
+    }
+
+    private fun getIsMultiSelectionAllowed(attribute: OTAttributeDAO): Boolean? {
+        return getDeserializedPropertyValue<Boolean>(PROPERTY_MULTISELECTION, attribute)
+    }
+
+    private fun getIsAppendingFromViewAllowed(attribute: OTAttributeDAO): Boolean {
+        return getDeserializedPropertyValue<Boolean>(PROPERTY_ALLOW_APPENDING_FROM_VIEW, attribute)
+                ?: false
     }
 
     fun getChoiceEntries(attribute: OTAttributeDAO): UniqueStringEntryList? {
         return getDeserializedPropertyValue(PROPERTY_ENTRIES, attribute)
     }
 
-    override fun getPropertyTitle(propertyKey: String): String {
-        return when (propertyKey) {
-            PROPERTY_MULTISELECTION -> OTApp.getString(R.string.property_choice_allow_multiple_selections)
-            PROPERTY_ENTRIES -> OTApp.getString(R.string.property_choice_entries)
-            else -> ""
-        }
-    }
-
-    private fun getAllowedMultiSelection(attribute: OTAttributeDAO): Boolean? {
-        return getDeserializedPropertyValue<Boolean>(PROPERTY_MULTISELECTION, attribute)
-    }
-
-    private fun getEntries(attribute: OTAttributeDAO): UniqueStringEntryList? {
-        return getDeserializedPropertyValue<UniqueStringEntryList>(PROPERTY_ENTRIES, attribute)
-    }
-
     override fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int = AAttributeInputView.VIEW_TYPE_CHOICE
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
         if (inputView is ChoiceInputView) {
-            inputView.entries = getEntries(attribute)?.toArray() ?: emptyArray()
-            inputView.multiSelectionMode = getAllowedMultiSelection(attribute) == true
+            inputView.entries = getChoiceEntries(attribute)?.toArray() ?: emptyArray()
+            inputView.multiSelectionMode = getIsMultiSelectionAllowed(attribute) == true
+            inputView.allowAppendingFromView = getIsAppendingFromViewAllowed(attribute)
         }
     }
 
@@ -127,7 +136,7 @@ class OTChoiceAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
                 view.colorIndexList.clear()
 
                 if (value is IntArray && value.size > 0) {
-                    val entries = getEntries(attribute)
+                    val entries = getChoiceEntries(attribute)
                     if (entries != null) {
                         val list = ArrayList<String>()
                         for (idEntry in value.withIndex()) {
@@ -153,7 +162,7 @@ class OTChoiceAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
     }
 
     private fun getChoiceTexts(attribute: OTAttributeDAO, value: IntArray): List<String> {
-        val entries = getEntries(attribute)
+        val entries = getChoiceEntries(attribute)
         val list = ArrayList<String>()
         if (entries != null) {
             for (idEntry in value.withIndex()) {
