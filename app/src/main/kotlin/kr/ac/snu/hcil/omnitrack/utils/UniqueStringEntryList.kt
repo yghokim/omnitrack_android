@@ -191,8 +191,8 @@ class UniqueStringEntryList : IStringSerializable {
 
     val size: Int get() = list.size
 
-    fun appendNewEntry() {
-        list.add(Entry(getNewId, ""))
+    fun appendNewEntry(text: String = "") {
+        list.add(Entry(getNewId, text))
     }
 
     fun move(fromPosition: Int, toPosition: Int) {

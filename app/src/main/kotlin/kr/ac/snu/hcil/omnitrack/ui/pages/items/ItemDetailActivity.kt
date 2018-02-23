@@ -524,6 +524,12 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                         }
                 )
 
+                internalSubscriptions.add(
+                        attributeViewModel.onAttributeChanged.subscribe {
+                            attributeViewModel.attributeDAO.getHelper(configuredContext).refreshInputViewUI(inputView, attributeViewModel.attributeDAO)
+                        }
+                )
+
 
                 connectionIndicatorStubProxy.onBind(attributeViewModel.attributeDAO.getParsedConnection())
 

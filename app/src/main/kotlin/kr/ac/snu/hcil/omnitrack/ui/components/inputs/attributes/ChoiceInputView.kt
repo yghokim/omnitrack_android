@@ -4,18 +4,39 @@ import android.content.Context
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.InputType
 import android.util.AttributeSet
 import android.util.SparseIntArray
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import com.afollestad.materialdialogs.MaterialDialog
+import dagger.internal.Factory
+import io.realm.Realm
+import kotlinx.android.synthetic.main.input_choice.view.*
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTChoiceAttributeHelper
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
+import kr.ac.snu.hcil.omnitrack.ui.components.common.TintFancyButton
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
+import kr.ac.snu.hcil.omnitrack.utils.setPaddingLeft
+import org.jetbrains.anko.backgroundColorResource
 import java.util.*
+import javax.inject.Inject
 import kotlin.properties.Delegates
 
 /**
@@ -30,7 +51,35 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     private val idPivotedEntryIndexTable = SparseIntArray()
 
+    private var appendNewRowButton: TintFancyButton? = null
+
+
+    @field:[Inject Backend]
+    lateinit var realmProvider: Factory<Realm>
+
+    @Inject
+    lateinit var syncManager: OTSyncManager
+
+    private val newRowTextDialogBuilder: MaterialDialog.Builder by lazy {
+        MaterialDialog.Builder(this.context)
+                .title(R.string.msg_append_new_row)
+                .inputType(InputType.TYPE_CLASS_TEXT)
+                .setSyncWithKeyboard(true)
+                .inputRangeRes(1, 30, R.color.colorRed)
+                .cancelable(true)
+                .negativeText(R.string.msg_cancel)
+                .input("Insert new choice entry", null, false, { dialog, text ->
+                    if (entries.find { it.text == text } == null) {
+                        setAppendNewRow(text)
+                    } else {
+                        Toast.makeText(context, R.string.msg_duplicate_choice_entry, Toast.LENGTH_LONG).show()
+                    }
+                })
+    }
+
     init {
+        (context.applicationContext as OTApp).applicationComponent.configurationController().currentConfiguredContext.configuredAppComponent.inject(this)
+
         adapter = Adapter()
 
         listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -88,6 +137,13 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
         }
     }
 
+    var allowAppendingFromView: Boolean by Delegates.observable(false) { prop, old, new ->
+        if (old != new) {
+            this.setAppendNewEntryVisibility(new)
+        }
+    }
+
+
     override fun focus() {
 
     }
@@ -96,6 +152,63 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     private fun notifyUpdatedValue() {
 
+    }
+
+    private fun setAppendNewRow(text: CharSequence) {
+        if (boundAttributeObjectId != null) {
+            this.realmProvider.get().use { realm ->
+                val attribute = realm.where(OTAttributeDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, boundAttributeObjectId).findFirst()
+                if (attribute != null) {
+                    val configuredContext = (context.applicationContext as OTApp).applicationComponent.configurationController().currentConfiguredContext
+                    val helper = attribute.getHelper(configuredContext) as OTChoiceAttributeHelper
+                    val originalEntryList = helper.getChoiceEntries(attribute)
+                    if (originalEntryList != null) {
+                        originalEntryList.appendNewEntry(text.toString())
+                        realm.executeTransaction {
+                            helper.setPropertyValue(OTChoiceAttributeHelper.PROPERTY_ENTRIES, originalEntryList, attribute, realm)
+                        }
+                        attribute.trackerId?.let {
+                            val tracker = realm.where(OTTrackerDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, attribute.trackerId).findFirst()
+                            if (tracker != null) {
+                                realm.executeTransaction {
+                                    tracker.synchronizedAt = null
+                                }
+                                syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD)
+                            }
+                        }
+                        this.entries = originalEntryList.toArray()
+                    }
+                }
+
+            }
+        }
+    }
+
+    private fun setAppendNewEntryVisibility(visible: Boolean) {
+        if (visible == true) {
+            if (appendNewRowButton == null) {
+                val newButton = TintFancyButton(context)
+                newButton.text = context.getString(R.string.msg_append_new_row)
+                newButton.backgroundColorResource = android.R.color.transparent
+                newButton.setPaddingLeft(0)
+                newButton.setFocusBackgroundColor(ContextCompat.getColor(context, R.color.colorSecondary))
+                newButton.setIconResource(R.drawable.rounded_plus_light)
+                newButton.tintColor = ContextCompat.getColor(context, R.color.textColorLightLight)
+                newButton.setTextColor(ContextCompat.getColor(context, R.color.textColorLight))
+                newButton.setOnClickListener {
+                    newRowTextDialogBuilder.show()
+                }
+
+                newButton.gravity = Gravity.START or Gravity.CENTER_VERTICAL
+
+                newButton.layoutParams = LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+
+                appendNewRowButton = newButton
+                ui_container.addView(newButton)
+            }
+        } else {
+            appendNewRowButton?.visibility = View.GONE
+        }
     }
 
     private inner class Adapter : RecyclerView.Adapter<Adapter.ViewHolder>() {

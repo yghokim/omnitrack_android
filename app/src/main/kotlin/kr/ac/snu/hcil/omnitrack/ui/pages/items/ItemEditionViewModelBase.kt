@@ -6,8 +6,10 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
@@ -122,11 +124,10 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
         }
     }
 
-    class AttributeInputViewModel(val attributeDAO: OTAttributeDAO) : IReadonlyObjectId {
-        override val objectId: String?
-            get() = attributeDAO.objectId
+    inner class AttributeInputViewModel(unmanagedAttributeDao: OTAttributeDAO) : IReadonlyObjectId {
+        override val objectId: String? = unmanagedAttributeDao.objectId
 
-        val attributeLocalId: String get() = attributeDAO.localId
+        val attributeLocalId: String = unmanagedAttributeDao.localId
         val columnNameObservable: Observable<String> = BehaviorSubject.createDefault<String>("")
         val isRequiredObservable: Observable<Boolean> = BehaviorSubject.create<Boolean>()
         val stateObservable: Observable<OTItemBuilderWrapperBase.EAttributeValueState> = BehaviorSubject.create<OTItemBuilderWrapperBase.EAttributeValueState>()
@@ -171,7 +172,16 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
         private val subscriptions = CompositeDisposable()
 
+        val onAttributeChanged = PublishSubject.create<OTAttributeDAO>()
+
+        val attributeDAO: OTAttributeDAO = realm.where(OTAttributeDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, unmanagedAttributeDao.objectId).findFirst()!!
+
         init {
+
+            attributeDAO.addChangeListener<OTAttributeDAO> { newAttributeDao ->
+                onAttributeChanged.onNext(newAttributeDao)
+            }
+
             (columnNameObservable as BehaviorSubject<String>).onNext(attributeDAO.name)
             (isRequiredObservable as BehaviorSubject<Boolean>).onNext(attributeDAO.isRequired)
             validateValue()
