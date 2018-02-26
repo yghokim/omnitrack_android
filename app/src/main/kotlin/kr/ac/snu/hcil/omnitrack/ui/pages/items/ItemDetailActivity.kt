@@ -426,8 +426,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
             private val validationIndicator: LottieAnimationView by bindView(R.id.ui_validation_indicator)
 
-            private val optionButton: View by bindView(R.id.ui_button_option)
-
             private val internalSubscriptions = CompositeDisposable()
 
             private var currentValidationState: Boolean by Delegates.observable(true) { property, old, new ->
@@ -455,6 +453,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
                 connectionIndicatorStubProxy = ConnectionIndicatorStubProxy(frame, R.id.ui_connection_indicator_stub)
 
+                /*
                 optionButton.setOnClickListener {
                     /*
                     val tracker = tracker
@@ -463,7 +462,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                         val historyDialog = RecentItemValuePickerBottomSheetFragment.getInstance(tracker.objectId, attributeLocalId)
                         historyDialog.show(supportFragmentManager, RecentItemValuePickerBottomSheetFragment.TAG)
                     }*/
-                }
+                }*/
             }
 
             private fun setTimestampIndicatorText(timestamp: Long?) {

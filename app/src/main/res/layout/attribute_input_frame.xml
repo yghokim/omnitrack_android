@@ -98,17 +98,18 @@
             android:id="@+id/sidebar"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="match_parent">
-
-            <ImageButton
-                android:id="@+id/ui_button_option"
-                android:layout_width="@dimen/button_height_tiny"
-                android:layout_height="@dimen/button_height_tiny"
-                android:layout_gravity="bottom|center_horizontal"
-                android:background="@drawable/transparent_button_background"
-                android:padding="6dp"
-                android:scaleType="centerInside"
-                android:tint="@color/textColorLight"
-                app:srcCompat="@drawable/more" />
+            <!--
+                        <ImageButton
+                            android:id="@+id/ui_button_option"
+                            android:visibility="gone"
+                            android:layout_width="@dimen/button_height_tiny"
+                            android:layout_height="@dimen/button_height_tiny"
+                            android:layout_gravity="bottom|center_horizontal"
+                            android:background="@drawable/transparent_button_background"
+                            android:padding="6dp"
+                            android:scaleType="centerInside"
+                            android:tint="@color/textColorLight"
+                            app:srcCompat="@drawable/more" />-->
         </FrameLayout>
 
         <LinearLayout
