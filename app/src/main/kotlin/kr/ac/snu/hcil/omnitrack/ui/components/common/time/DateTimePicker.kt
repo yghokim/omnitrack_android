@@ -7,6 +7,7 @@ import android.view.View
 import kotlinx.android.synthetic.main.component_timepoint.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
+import kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CalendarPickerDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.*
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
@@ -83,8 +84,7 @@ class DateTimePicker : ConstraintLayout {
         get() = calendar.getAmPm()
 
 
-    private val pickerValueChangedHandler = {
-        picker: Any, newVal: Int ->
+    private val pickerValueChangedHandler = { picker: Any, changeArgs: NumericUpDown.ChangeArgs ->
 
         val before = time
 
@@ -93,15 +93,28 @@ class DateTimePicker : ConstraintLayout {
                 when (picker) {
                     ui_left_picker -> //hour_of_day
                     {
-                        calendar.set(Calendar.HOUR_OF_DAY, newVal)
+                        if (changeArgs.changeType == NumericUpDown.ChangeType.MANUAL)
+                            calendar.set(Calendar.HOUR_OF_DAY, changeArgs.newValue)
+                        else {
+                            calendar.add(Calendar.HOUR_OF_DAY, changeArgs.delta)
+                        }
                     }
                     ui_middle_picker -> //minute
                     {
-                        calendar.set(Calendar.MINUTE, newVal)
+
+                        if (changeArgs.changeType == NumericUpDown.ChangeType.MANUAL) {
+                            calendar.set(Calendar.MINUTE, changeArgs.newValue)
+                        } else {
+                            calendar.add(Calendar.MINUTE, changeArgs.delta)
+                        }
                     }
                     ui_right_picker -> //second
                     {
-                        calendar.set(Calendar.SECOND, newVal)
+                        if (changeArgs.changeType == NumericUpDown.ChangeType.MANUAL) {
+                            calendar.set(Calendar.SECOND, changeArgs.newValue)
+                        } else {
+                            calendar.add(Calendar.SECOND, changeArgs.delta)
+                        }
                     }
                 }
             }
@@ -110,15 +123,23 @@ class DateTimePicker : ConstraintLayout {
                 when (picker) {
                     ui_left_picker -> //hour
                     {
-                        calendar.set(Calendar.HOUR_OF_DAY, (newVal % 12) + 12 * ui_right_picker.value)
+                        if (changeArgs.changeType == NumericUpDown.ChangeType.MANUAL) {
+                            calendar.set(Calendar.HOUR_OF_DAY, (changeArgs.newValue % 12) + 12 * ui_right_picker.value)
+                        } else {
+                            calendar.add(Calendar.HOUR_OF_DAY, changeArgs.delta)
+                        }
                     }
                     ui_middle_picker -> //minute
                     {
-                        calendar.set(Calendar.MINUTE, newVal)
+                        if (changeArgs.changeType == NumericUpDown.ChangeType.MANUAL) {
+                            calendar.set(Calendar.MINUTE, changeArgs.newValue)
+                        } else {
+                            calendar.add(Calendar.MINUTE, changeArgs.delta)
+                        }
                     }
                     ui_right_picker -> //ampm
                     {
-                        calendar.set(Calendar.AM_PM, newVal)
+                        calendar.set(Calendar.AM_PM, changeArgs.newValue)
                     }
                 }
             }
@@ -126,14 +147,14 @@ class DateTimePicker : ConstraintLayout {
             DATE -> {
                 when (picker) {
                     ui_left_picker -> { //year
-                        calendar.set(Calendar.YEAR, newVal)
+                        calendar.set(Calendar.YEAR, changeArgs.newValue)
                     }
                     ui_middle_picker -> { //month
                         calendar.set(Calendar.DAY_OF_MONTH, Math.min(calendar.get(Calendar.DAY_OF_MONTH), calendar.getActualMaximum(Calendar.DAY_OF_MONTH)))
-                        calendar.set(Calendar.MONTH, newVal)
+                        calendar.set(Calendar.MONTH, changeArgs.newValue)
                     }
                     ui_right_picker -> { //day
-                        calendar.set(Calendar.DAY_OF_MONTH, newVal)
+                        calendar.set(Calendar.DAY_OF_MONTH, changeArgs.newValue)
                     }
                 }
             }
@@ -254,15 +275,15 @@ class DateTimePicker : ConstraintLayout {
                 ui_left_picker.maxValue = 23
                 ui_left_picker.displayedValues = hourNames
 
-                ui_left_picker.value = calendar.get(Calendar.HOUR_OF_DAY)
+                ui_left_picker.setValue(calendar.get(Calendar.HOUR_OF_DAY))
 
                 ui_middle_picker.minValue = 0
                 ui_middle_picker.maxValue = 59
-                ui_middle_picker.value = calendar.get(Calendar.MINUTE)
+                ui_middle_picker.setValue(calendar.get(Calendar.MINUTE))
 
                 ui_right_picker.minValue = 0
                 ui_right_picker.maxValue = 59
-                ui_right_picker.value = calendar.get(Calendar.SECOND)
+                ui_right_picker.setValue(calendar.get(Calendar.SECOND))
             }
 
             MINUTE -> {
@@ -281,19 +302,19 @@ class DateTimePicker : ConstraintLayout {
 
                 ui_right_picker.minValue = 0
                 ui_right_picker.maxValue = 1
-                ui_right_picker.displayedValues = arrayOf("AM", "PM")
+                ui_right_picker.displayedValues = resources.getStringArray(R.array.am_pm)
 
 
-                ui_right_picker.value = calendar.getAmPm()
+                ui_right_picker.setValue(calendar.getAmPm())
 
-                ui_middle_picker.value = calendar.getMinute()
+                ui_middle_picker.setValue(calendar.getMinute())
 
                 val hour = calendar.getHour()
-                ui_left_picker.value = if (hour == 0) {
+                ui_left_picker.setValue(if (hour == 0) {
                     12
                 } else {
                     hour
-                }
+                })
 
             }
 
@@ -303,16 +324,16 @@ class DateTimePicker : ConstraintLayout {
 
                 ui_left_picker.minValue = 1950
                 ui_left_picker.maxValue = 2050
-                ui_left_picker.value = calendar.get(Calendar.YEAR)
+                ui_left_picker.setValue(calendar.get(Calendar.YEAR))
 
                 ui_middle_picker.minValue = 0
                 ui_middle_picker.maxValue = 11
-                ui_middle_picker.value = calendar.get(Calendar.MONTH)
+                ui_middle_picker.setValue(calendar.get(Calendar.MONTH))
                 ui_middle_picker.displayedValues = monthNames
 
                 ui_right_picker.minValue = 1
                 ui_right_picker.maxValue = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-                ui_right_picker.value = calendar.get(Calendar.DAY_OF_MONTH)
+                ui_right_picker.setValue(calendar.get(Calendar.DAY_OF_MONTH))
             }
         }
     }

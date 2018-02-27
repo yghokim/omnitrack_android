@@ -107,5 +107,9 @@
     <string name="granularity_month">Month</string>
     <string name="granularity_year">Year</string>
 
+    <string-array name="am_pm">
+        <item>AM</item>
+        <item>PM</item>
+    </string-array>
 
 </resources>

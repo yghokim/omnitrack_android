@@ -13,7 +13,7 @@ class NumericUpDownPropertyView(context: Context, attrs: AttributeSet?) : APrope
     override var value: Int
         get() = picker.value
         set(value) {
-            picker.value = value
+            picker.setValue(value, NumericUpDown.ChangeType.MANUAL)
         }
 
 
@@ -22,7 +22,7 @@ class NumericUpDownPropertyView(context: Context, attrs: AttributeSet?) : APrope
     init {
         picker.valueChanged += {
             sender, args ->
-            onValueChanged(args)
+            onValueChanged(args.newValue)
         }
     }
 

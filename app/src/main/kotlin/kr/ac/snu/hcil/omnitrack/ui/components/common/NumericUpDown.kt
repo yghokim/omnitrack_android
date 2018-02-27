@@ -19,7 +19,11 @@ import kotlin.properties.Delegates
  */
 class NumericUpDown : LinearLayout, OnLongClickListener, OnClickListener, OnTouchListener {
 
+    enum class ChangeType { INC, DEC, MANUAL }
+    data class ChangeArgs(val newValue: Int, val changeType: ChangeType, val delta: Int)
+
     companion object {
+
         const val MODE_PLUS_MINUS = 0
         const val MODE_UP_DOWN = 1
 
@@ -39,14 +43,16 @@ class NumericUpDown : LinearLayout, OnLongClickListener, OnClickListener, OnTouc
         }
 
     var value: Int = 0
-        set(value) {
-            val clamped = Math.max(minValue, Math.min(maxValue, value))
-            if (field != clamped) {
-                field = clamped
-                invalidateViews()
-                valueChanged.invoke(this, clamped)
-            }
+        private set
+
+    fun setValue(newValue: Int, changeType: ChangeType = ChangeType.MANUAL, delta: Int = 0) {
+        val clamped = Math.max(minValue, Math.min(maxValue, newValue))
+        if (value != clamped) {
+            value = clamped
+            invalidateViews()
+            valueChanged.invoke(this, ChangeArgs(clamped, changeType, delta))
         }
+    }
 
     var displayedValues: Array<String>? = null
         set(value) {
@@ -71,7 +77,7 @@ class NumericUpDown : LinearLayout, OnLongClickListener, OnClickListener, OnTouc
         }
     }
 
-    val valueChanged = Event<Int>()
+    val valueChanged = Event<ChangeArgs>()
 
     private lateinit var upButton: ImageButton
     private lateinit var downButton: ImageButton
@@ -176,19 +182,19 @@ class NumericUpDown : LinearLayout, OnLongClickListener, OnClickListener, OnTouc
     }
 
     fun increase() {
-        value = if (value + 1 > maxValue) {
+        setValue(if (value + 1 > maxValue) {
             minValue
         } else {
             value + 1
-        }
+        }, ChangeType.INC, 1)
     }
 
     fun decrease() {
-        value = if (value - 1 < minValue) {
+        setValue(if (value - 1 < minValue) {
             maxValue
         } else {
             value - 1
-        }
+        }, ChangeType.DEC, -1)
     }
 
     private fun getDisplayedValue(value: Int): String {

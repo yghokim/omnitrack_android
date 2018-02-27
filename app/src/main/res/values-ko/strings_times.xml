@@ -106,4 +106,10 @@
     <string name="granularity_year">1년</string>
 
 
+    <string-array name="am_pm">
+        <item>오전</item>
+        <item>오후</item>
+    </string-array>
+
+
 </resources>
