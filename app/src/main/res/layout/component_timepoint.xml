@@ -15,10 +15,11 @@
         android:textSize="16sp"
         android:textStyle="bold"
         app:fb_borderColor="@color/textColorLightLight"
-
         app:fb_borderWidth="1dp"
+
         app:fb_defaultColor="@color/transparent"
         app:fb_text="February 2nd, 2016, Sunday"
+        app:fb_textColor="@color/titleTextColor"
 
         />
 

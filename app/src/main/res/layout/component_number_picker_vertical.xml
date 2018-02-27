@@ -33,7 +33,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
-        android:fontFamily="sans-serif-light"
 
         android:textAlignment="center"
         android:textSize="20sp" />
