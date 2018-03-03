@@ -103,13 +103,13 @@ class TrackerReorderActivity: MultiButtonActionBarActivity(R.layout.activity_mul
 
         }
 
-        override fun onBindViewHolder(holder: TrackerViewHolder?, position: Int) {
-            holder?.title = currentTrackerViewModelList[position].name
-            holder?.setColor(currentTrackerViewModelList[position].color)
+        override fun onBindViewHolder(holder: TrackerViewHolder, position: Int) {
+            holder.title = currentTrackerViewModelList[position].name
+            holder.setColor(currentTrackerViewModelList[position].color)
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): TrackerViewHolder {
-            val view = LayoutInflater.from(parent?.context).inflate(R.layout.sortable_list_element, parent, false)
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackerViewHolder {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.sortable_list_element, parent, false)
             return TrackerViewHolder(view)
         }
 

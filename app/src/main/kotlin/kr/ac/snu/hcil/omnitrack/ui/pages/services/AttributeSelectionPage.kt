@@ -105,7 +105,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
 
     inner class AttributeListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             return when (viewType) {
                 0 -> AttributeAttachViewHolder(parent)
                 1 -> AttributeListViewHolder(parent)
@@ -113,7 +113,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
             }
         }
 
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             if (position >= 1) {
                 (holder as AttributeListViewHolder).bind(attributes[position - 1])
             }

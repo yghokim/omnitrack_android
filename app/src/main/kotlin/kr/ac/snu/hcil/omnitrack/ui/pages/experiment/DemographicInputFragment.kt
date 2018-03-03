@@ -12,6 +12,8 @@ import com.mukesh.countrypicker.CountryPicker
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
 import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
+import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
+import org.jetbrains.anko.support.v4.act
 import java.util.*
 
 /**
@@ -32,17 +34,19 @@ class DemographicInputFragment : SlideFragment(), ExtendedSpinner.OnItemSelected
         resources.getStringArray(R.array.occupation_entry_keys)
     }*/
 
-    val selectedGenderKey: String? get() {
-        return if (genderSelector.selectedIndex != -1)
-            genderKeys[genderSelector.selectedIndex]
-        else null
-    }
+    val selectedGenderKey: String?
+        get() {
+            return if (genderSelector.selectedIndex != -1)
+                genderKeys[genderSelector.selectedIndex]
+            else null
+        }
 
-    val selectedAgeKey: String? get() {
-        return if (ageSpinner.selectedItemPosition != -1)
-            ageKeys[ageSpinner.selectedItemPosition]
-        else null
-    }
+    val selectedAgeKey: String?
+        get() {
+            return if (ageSpinner.selectedItemPosition != -1)
+                ageKeys[ageSpinner.selectedItemPosition]
+            else null
+        }
 
     /*
     val selectedOccupationKey: String? get() {
@@ -99,7 +103,15 @@ class DemographicInputFragment : SlideFragment(), ExtendedSpinner.OnItemSelected
             countryPicker.dismiss()
         }
 
-        val userCountry = Country.getCountryFromSIM(context) ?: Country.getCountryByLocale(Locale.getDefault())
+        val userCountry = Country.getCountryFromSIM(context) ?: try {
+            Country.getCountryByISO(Locale.getDefault().country)!!
+        } catch (ex: Exception) {
+            println("put language as country code")
+            Country.getCountryByName(LocaleHelper.getNearestLanguageToDevice(act))!!
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            Country.getCountryByISO("kr")
+        }
 
         selectedCountryCode = userCountry.code
         selectedCountryName = userCountry.name
