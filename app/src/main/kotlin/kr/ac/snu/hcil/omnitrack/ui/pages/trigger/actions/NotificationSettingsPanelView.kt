@@ -143,7 +143,7 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, View.OnClickL
             holder.isSelected = selectedLevelIndex == position
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(context).inflate(R.layout.notification_type_list_element, parent, false)
             return ViewHolder(view)
         }

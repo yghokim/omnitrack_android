@@ -199,7 +199,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
     }
 
     inner class TriggerListAdapter : RecyclerView.Adapter<ATriggerViewHolder>() {
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ATriggerViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ATriggerViewHolder {
             return when (viewType) {
                 VIEWTYPE_GHOST -> {
                     TriggerViewHolder(parent)
@@ -211,8 +211,8 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             }
         }
 
-        override fun onBindViewHolder(holder: ATriggerViewHolder?, position: Int) {
-            holder?.bind(getTriggerViewModelAt(position))
+        override fun onBindViewHolder(holder: ATriggerViewHolder, position: Int) {
+            holder.bind(getTriggerViewModelAt(position))
         }
 
         override fun getItemCount(): Int {
@@ -499,7 +499,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                 return attachedTrackerInfoList.size
             }
 
-            override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): AttachedTrackerViewHolder {
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttachedTrackerViewHolder {
                 return AttachedTrackerViewHolder(parent)
             }
 

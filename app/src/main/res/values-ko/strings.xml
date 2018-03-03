@@ -273,6 +273,7 @@
     <string name="informed_consent_filename">informed_consent_ko.md</string>
 
     <string name="msg_demographic_gender">당신의 성별은 무엇인가요?</string>
+    <string name="msg_demographic_age">나이대가 어떻게 되시나요? (만 나이)</string>
     <string name="msg_demographic_occupation">당신의 현재 상태를 가장 잘 나타내는 항목을 골라주세요.</string>
     <string name="msg_demographic_nationality">현재 어느 나라에 살고 있나요?</string>
     <string name="msg_demographic_complete_form">모든 정보를 입력해주세요.</string>

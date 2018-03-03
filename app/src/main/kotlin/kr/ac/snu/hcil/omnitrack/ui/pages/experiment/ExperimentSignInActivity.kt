@@ -36,13 +36,14 @@ class ExperimentSignInActivity : IntroActivity() {
         buttonNextFunction = BUTTON_NEXT_FUNCTION_NEXT
         isButtonBackVisible = false
 
+        /*
         addSlide(
                 FragmentSlide.Builder()
                         .fragment(ConsentFormSlideFragment())
                         .background(R.color.colorPointed_Light)
                         .backgroundDark(R.color.colorPointed)
                         .build()
-        )
+        )*/
 
         demographicSlide = FragmentSlide.Builder()
                 .fragment(DemographicInputFragment())

@@ -152,7 +152,7 @@ class TrackerAssignPanel : RecyclerView {
     }
 
     private inner class AssignElementAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             return when (viewType) {
                 0 -> RemovableAttachedTrackerViewHolder(parent)
                 1 -> AttachButtonViewHolder(parent)
@@ -166,7 +166,7 @@ class TrackerAssignPanel : RecyclerView {
             } else return 1
         }
 
-        override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             if (position < trackers.size) {
                 (holder as RemovableAttachedTrackerViewHolder).run {
                     val info = trackers[position]

@@ -100,7 +100,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
             }
         }
 
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             if (position >= 1) {
                 (holder as TrackerListViewHolder).run {
                     holder.bind(trackers[position - 1])

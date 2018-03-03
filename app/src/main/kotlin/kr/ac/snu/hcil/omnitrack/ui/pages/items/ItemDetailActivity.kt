@@ -389,7 +389,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
             return getItem(position).attributeDAO.getInputViewType(configuredContext, false)
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
             val frame = LayoutInflater.from(this@ItemDetailActivity).inflate(R.layout.attribute_input_frame, parent, false)
 
