@@ -2,10 +2,12 @@ package kr.ac.snu.hcil.omnitrack.ui.components.dialogs
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.support.v4.app.FragmentManager
 import android.widget.CalendarView
+import android.widget.DatePicker
 import kr.ac.snu.hcil.omnitrack.R
 import java.util.*
 
@@ -51,30 +53,61 @@ class CalendarPickerDialogFragment : DialogFragment() {
         month = arguments?.getInt(MONTH, now.get(Calendar.MONTH)) ?: now.get(Calendar.MONTH)
         day = arguments?.getInt(DAY, now.get(Calendar.DAY_OF_MONTH)) ?: now.get(Calendar.DAY_OF_MONTH)
 
-        val cal = GregorianCalendar(TimeZone.getDefault())
-        cal.set(year, month, day)
 
-        val calendarView = CalendarView(context)
-        calendarView.setDate(cal.timeInMillis, false, true)
-
-        calendarView.setOnDateChangeListener(object : CalendarView.OnDateChangeListener {
-            override fun onSelectedDayChange(p0: CalendarView, p1: Int, p2: Int, p3: Int) {
-                year = p1
-                month = p2
-                day = p3
-            }
-        })
-
-        return AlertDialog.Builder(activity)
-                .setTitle(resources.getString(R.string.msg_pick_date))
-                .setView(calendarView)
+        val dialogBuilder = AlertDialog.Builder(activity)
                 .setPositiveButton(R.string.msg_ok) { a, b ->
                     val calendar = GregorianCalendar(TimeZone.getDefault())
                     calendar.set(year, month, day)
                     listener?.invoke(calendar.timeInMillis, year, month, day)
                 }
                 .setNegativeButton(R.string.msg_cancel, null)
-                .create()
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+            val datePicker = DatePicker(context)
+
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+                datePicker.calendarViewShown = false
+                datePicker.spinnersShown = true
+            }
+
+            datePicker.init(year, month, day, object : DatePicker.OnDateChangedListener {
+                override fun onDateChanged(view: DatePicker?, year: Int, monthOfYear: Int, dayOfMonth: Int) {
+                    this@CalendarPickerDialogFragment.year = year
+                    this@CalendarPickerDialogFragment.month = monthOfYear
+                    this@CalendarPickerDialogFragment.day = dayOfMonth
+                }
+
+            })
+            dialogBuilder
+                    .setPositiveButton(R.string.msg_ok) { a, b ->
+                        year = datePicker.year
+                        month = datePicker.month
+                        day = datePicker.dayOfMonth
+                        val calendar = GregorianCalendar(TimeZone.getDefault())
+                        calendar.set(year, month, day)
+                        listener?.invoke(calendar.timeInMillis, year, month, day)
+                    }.setView(datePicker)
+        } else {
+
+            val cal = GregorianCalendar(TimeZone.getDefault())
+            cal.set(year, month, day)
+
+            val calendarView = CalendarView(context)
+            calendarView.setDate(cal.timeInMillis, false, true)
+
+            calendarView.setOnDateChangeListener(object : CalendarView.OnDateChangeListener {
+                override fun onSelectedDayChange(p0: CalendarView, p1: Int, p2: Int, p3: Int) {
+                    year = p1
+                    month = p2
+                    day = p3
+                }
+            })
+            dialogBuilder
+                    .setTitle(resources.getString(R.string.msg_pick_date))
+                    .setView(calendarView)
+        }
+
+        return dialogBuilder.create()
     }
 
 
