@@ -207,7 +207,7 @@ dependencies {
     implementation 'com.github.mukeshsolanki:country-picker-android:1.2.0'
     implementation 'com.patloew.rxlocation:rxlocation:1.0.3'
     implementation 'uk.co.samuelwall:material-tap-target-prompt:2.4.0'
-    implementation 'com.wdullaer:materialdatetimepicker:3.4.0'
+    implementation 'com.wdullaer:materialdatetimepicker:3.5.1'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.0.5'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
     testImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
