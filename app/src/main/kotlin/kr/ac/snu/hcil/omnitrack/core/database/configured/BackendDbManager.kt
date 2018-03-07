@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.database.configured
 
 import android.content.Intent
+import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
 import dagger.Lazy
 import io.reactivex.Completable
@@ -9,6 +10,7 @@ import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
 import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.*
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
@@ -33,6 +35,7 @@ import javax.inject.Inject
 @Configured
 class BackendDbManager @Inject constructor(
         @Backend private val config: RealmConfiguration,
+        private val eventLogger: IEventLogger,
         private val shortcutPanelManager: Lazy<OTShortcutPanelManager>,
         private val serializationManager: DaoSerializationManager,
         private val triggerSystemManager: OTTriggerSystemManager,
@@ -468,11 +471,37 @@ class BackendDbManager @Inject constructor(
         }
     }
 
-    override fun getDirtyRowsToSync(type: ESyncDataType): Single<List<String>> {
+    override fun getDirtyRowsToSync(type: ESyncDataType, ignoreFlags: Boolean): Single<List<String>> {
         return when (type) {
-            ESyncDataType.TRIGGER -> getDirtyRowsToSyncImpl(OTTriggerDAO::class.java, { trigger -> serializationManager.serializeTrigger(trigger, true) })
-            ESyncDataType.TRACKER -> getDirtyRowsToSyncImpl(OTTrackerDAO::class.java, { tracker -> serializationManager.serializeTracker(tracker, true) })
-            ESyncDataType.ITEM -> getDirtyRowsToSyncImpl(OTItemDAO::class.java, { item -> serializationManager.serializeItem(item, true) })
+            ESyncDataType.TRIGGER -> getDirtyRowsToSyncImpl(OTTriggerDAO::class.java, { trigger -> serializationManager.serializeTrigger(trigger, true) }, ignoreFlags)
+            ESyncDataType.TRACKER -> getDirtyRowsToSyncImpl(OTTrackerDAO::class.java, { tracker -> serializationManager.serializeTracker(tracker, true) }, ignoreFlags)
+            ESyncDataType.ITEM -> getDirtyRowsToSyncImpl(OTItemDAO::class.java, { item -> serializationManager.serializeItem(item, true) }, ignoreFlags)
+        }
+    }
+
+    override fun setAllRowsDirty(type: ESyncDataType): Single<Long> {
+        val modelClass: Class<out RealmObject> = when (type) {
+            ESyncDataType.TRIGGER -> OTTriggerDAO::class.java
+            ESyncDataType.TRACKER -> OTTrackerDAO::class.java
+            ESyncDataType.ITEM -> OTItemDAO::class.java
+        }
+        return Single.defer {
+            val realm = makeNewRealmInstance()
+            val count = realm.where(modelClass).count()
+            if (count > 0) {
+                realm.executeTransaction {
+                    realm.where(modelClass).findAll().forEach {
+                        if (it is OTTrackerDAO) {
+                            it.synchronizedAt = null
+                        } else if (it is OTTriggerDAO) {
+                            it.synchronizedAt = null
+                        } else if (it is OTItemDAO) {
+                            it.synchronizedAt = null
+                        }
+                    }
+                }
+            }
+            return@defer Single.just(count)
         }
     }
 
@@ -568,10 +597,17 @@ class BackendDbManager @Inject constructor(
     }
 
 
-    private fun <T : RealmObject> getDirtyRowsToSyncImpl(tableClass: Class<T>, serialize: (T) -> String): Single<List<String>> {
+    private fun <T : RealmObject> getDirtyRowsToSyncImpl(tableClass: Class<T>, serialize: (T) -> String, ignoreFlags: Boolean = false): Single<List<String>> {
         return Single.defer {
             val realm = makeNewRealmInstance()
-            val list = realm.where(tableClass).equalTo(FIELD_SYNCHRONIZED_AT, null as Long?).findAll().map { it -> serialize(it) }.toList()
+            val query = realm.where(tableClass).let { if (ignoreFlags) it else it.equalTo(FIELD_SYNCHRONIZED_AT, null as Long?) }
+
+            eventLogger.logEvent("BackendDbManager", "get_dirty_rows", jsonObject(
+                    "model" to tableClass.canonicalName,
+                    "ignoreFlags" to ignoreFlags,
+                    "count" to query.count()))
+
+            val list = query.findAll().map { it -> serialize(it) }.toList()
             realm.close()
             return@defer Single.just(list)
         }

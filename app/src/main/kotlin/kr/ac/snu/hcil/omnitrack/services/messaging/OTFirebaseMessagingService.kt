@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.services.messaging
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher
+import com.github.salomonbrys.kotson.jsonObject
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
@@ -27,6 +28,8 @@ import javax.inject.Inject
 class OTFirebaseMessagingService : FirebaseMessagingService() {
 
     companion object {
+        const val TAG = "OTFirebaseMessagingService"
+
         const val COMMAND_SYNC = "sync_down"
         const val COMMAND_SIGNOUT = "sign_out"
         const val COMMAND_DUMP_DB = "dump_db"
@@ -71,6 +74,8 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
                                 if (configuredContext != null) {
                                     val data = remoteMessage.data
                                     if (data != null && data.size > 0) {
+
+                                        configuredContext.configuredAppComponent.getEventLogger().logEvent(TAG, "received_gcm_command", jsonObject("command" to data.get("command")))
                                         try {
                                             when (data.get("command")) {
                                                 COMMAND_SYNC -> handleSyncCommand(data, configuredContext)
@@ -101,19 +106,19 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
         syncInfoArray.forEach { syncInfo ->
             val typeString = (syncInfo as JsonObject).get("type")?.asString
             if (typeString != null) {
-                configuredContext.configuredAppComponent.getSyncManager().registerSyncQueue(ESyncDataType.valueOf(typeString), SyncDirection.DOWNLOAD, false)
+                configuredContext.configuredAppComponent.getSyncManager().registerSyncQueue(ESyncDataType.valueOf(typeString), SyncDirection.DOWNLOAD, false, false)
                 registeredCount++
             }
         }
 
         if (registeredCount > 0) {
-
             configuredContext.configuredAppComponent.getSyncManager().reserveSyncServiceNow()
         }
     }
 
     private fun handleDumpCommand(data: Map<String, String>, configuredContext: ConfiguredContext) {
-
+        configuredContext.configuredAppComponent.getSyncManager().queueFullSync(SyncDirection.UPLOAD, true)
+        configuredContext.configuredAppComponent.getSyncManager().reserveSyncServiceNow()
     }
 
     private fun handleSignOutCommand(data: Map<String, String>, configuredContext: ConfiguredContext) {

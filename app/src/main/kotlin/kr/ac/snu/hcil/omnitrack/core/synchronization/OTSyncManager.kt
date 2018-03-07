@@ -5,6 +5,7 @@ import com.firebase.jobdispatcher.Job
 import dagger.Lazy
 import io.reactivex.Completable
 import io.reactivex.Single
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.di.configured.ServerSyncOneShot
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
@@ -20,19 +21,20 @@ class OTSyncManager @Inject constructor(
         private val syncQueueDbHelper: SyncQueueDbHelper,
         private val syncClient: Lazy<ISynchronizationClientSideAPI>,
         private val syncServer: Lazy<ISynchronizationServerSideAPI>,
+        private val eventLogger: Lazy<IEventLogger>,
         @ServerSyncOneShot private val oneShotJobProvider: Provider<Job>,
         private val dispatcher: Lazy<FirebaseJobDispatcher>) {
 
-    fun registerSyncQueue(type: ESyncDataType, direction: SyncDirection, reserveService: Boolean = true) {
-        syncQueueDbHelper.insertNewEntry(type, direction, System.currentTimeMillis())
+    fun registerSyncQueue(type: ESyncDataType, direction: SyncDirection, reserveService: Boolean = true, ignoreDirtyFlags: Boolean = false) {
+        syncQueueDbHelper.insertNewEntry(type, direction, System.currentTimeMillis(), ignoreDirtyFlags)
         if (reserveService) {
             reserveSyncServiceNow()
         }
     }
 
-    fun queueFullSync(direction: SyncDirection = SyncDirection.BIDIRECTIONAL) {
+    fun queueFullSync(direction: SyncDirection = SyncDirection.BIDIRECTIONAL, ignoreFlags: Boolean) {
         ESyncDataType.values().forEach { type ->
-            syncQueueDbHelper.insertNewEntry(type, SyncDirection.BIDIRECTIONAL, System.currentTimeMillis())
+            syncQueueDbHelper.insertNewEntry(type, direction, System.currentTimeMillis(), ignoreFlags)
         }
     }
 
@@ -68,13 +70,13 @@ class OTSyncManager @Inject constructor(
         }
 
         val upDirection = Completable.defer {
-            val downTypes = batchData.data.filter { it.second.contains(SyncDirection.UPLOAD) }.map { it.first }.toTypedArray()
-            println("start sync download from server: ${downTypes.joinToString(",")}")
-            if (downTypes.isEmpty()) {
+            val downEntries = batchData.data.filter { it.second.contains(SyncDirection.UPLOAD) }.toTypedArray()
+            println("start sync download from server: ${downEntries.map { it.first }.joinToString(",")}")
+            if (downEntries.isEmpty()) {
                 return@defer Completable.complete()
             }
 
-            return@defer Single.zip(downTypes.map { type -> syncClient.get().getDirtyRowsToSync(type).map { Pair(type, it) } }) { clientDirtyRowsArray ->
+            return@defer Single.zip(downEntries.map { (type, direction, ignoreFlags) -> syncClient.get().getDirtyRowsToSync(type, ignoreFlags).map { Pair(type, it) } }) { clientDirtyRowsArray ->
                 clientDirtyRowsArray.map { it as Pair<ESyncDataType, List<String>> }
             }.flatMap {
                 println("sync send dirty rows to server: ${it}")

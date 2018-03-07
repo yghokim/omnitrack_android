@@ -101,7 +101,7 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
                     }
                 }
             }
-            syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD)
+            syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
             return true
         } else return false
     }

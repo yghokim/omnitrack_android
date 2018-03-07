@@ -168,7 +168,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     private val currentAttributeViewModelList = ArrayList<AttributeInformationViewModel>()
 
     fun registerSyncJob() {
-        syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD)
+        syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
     }
 
     override fun onInject(configuredContext: ConfiguredContext) {

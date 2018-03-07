@@ -60,7 +60,7 @@ class HomeScreenViewModel(app: Application):UserAttachedViewModel(app) {
             return false
         }else{
             pullSyncSubscription.replace(
-                    syncManager.makeSynchronizationTask(SyncQueueDbHelper.AggregatedSyncQueue(IntArray(0), ESyncDataType.values().map { Pair(it, SyncDirection.DOWNLOAD) }.toTypedArray()))
+                    syncManager.makeSynchronizationTask(SyncQueueDbHelper.AggregatedSyncQueue(IntArray(0), ESyncDataType.values().map { Triple(it, SyncDirection.DOWNLOAD, false) }.toTypedArray()))
                             .doOnSubscribe {
                                 _syncStateSubject.onNextIfDifferAndNotNull(SYNC_STATE_SYNCHRONIZING)
                             }

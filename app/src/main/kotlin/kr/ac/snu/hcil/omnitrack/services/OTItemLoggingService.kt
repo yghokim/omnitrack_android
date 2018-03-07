@@ -151,7 +151,7 @@ class OTItemLoggingService : ConfigurableWakefulService(TAG) {
 
                                     println(table)
 
-                                    syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD)
+                                    syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
 
                                     if (notify) {
                                         this@OTItemLoggingService.runOnUiThread {
@@ -189,7 +189,7 @@ class OTItemLoggingService : ConfigurableWakefulService(TAG) {
                     realm.executeTransaction {
                         dbManager.removeItem(item, false, realm)
                     }
-                    syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD)
+                    syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
 
                     if (intent.hasExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID)) {
                         val notiId = intent.getIntExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID, -100)

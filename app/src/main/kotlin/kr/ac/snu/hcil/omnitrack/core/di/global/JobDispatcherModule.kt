@@ -20,7 +20,6 @@ class JobDispatcherModule {
     }
 
     @Provides
-    @Singleton
     fun providesJobBuilder(dispatcher: FirebaseJobDispatcher): Job.Builder {
         return dispatcher.newJobBuilder()
     }

@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.di.global
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.google.gson.Gson
 import dagger.Component
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -36,6 +37,8 @@ interface ApplicationComponent {
 
     @ForGeneric
     fun genericGson(): Gson
+
+    fun jobDispatcher(): FirebaseJobDispatcher
 
     fun configuredAppComponentBuilder(): ConfiguredAppComponent.Builder
     fun scheduledJobComponentBuilder(): ScheduledJobComponent.Builder

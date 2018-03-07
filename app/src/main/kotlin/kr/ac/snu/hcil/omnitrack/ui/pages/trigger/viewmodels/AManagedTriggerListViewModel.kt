@@ -79,7 +79,7 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
         beforeAddNewTrigger(dao)
 
         dbManager.get().saveTrigger(dao, realm)
-        syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD)
+        syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
 
     }
 
@@ -87,7 +87,7 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
         val viewModel = currentTriggerViewModels.find { it.objectId == objectId }
         if (viewModel != null) {
             dbManager.get().removeTrigger(viewModel.dao, false, realm)
-            syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD)
+            syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
         }
 
     }

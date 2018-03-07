@@ -48,7 +48,26 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
     }
 
     override fun postDirtyRows(vararg batch: ISynchronizationServerSideAPI.DirtyRowBatchParameter): Single<Map<ESyncDataType, Array<SyncResultEntry>>> {
-        return service.postLocalDataChanges(batch).subscribeOn(Schedulers.io())
+        val maxChunkSize = 200
+        if (batch.sumBy { it.rows.size } > maxChunkSize) {
+            //divide chunk
+            val chunkList = ArrayList<ISynchronizationServerSideAPI.DirtyRowBatchParameter>()
+            batch.forEach { entry ->
+                chunkList.addAll(entry.rows.toList().chunked(maxChunkSize, { chunk -> ISynchronizationServerSideAPI.DirtyRowBatchParameter(entry.type, chunk.toTypedArray()) }))
+            }
+            println("chunkList: " + chunkList.size)
+            return Single.concat(chunkList.map { service.postLocalDataChanges(arrayOf(it)).subscribeOn(Schedulers.io()) }).reduce(HashMap<ESyncDataType, Array<SyncResultEntry>>() as Map<ESyncDataType, Array<SyncResultEntry>>) { finalMap: Map<ESyncDataType, Array<SyncResultEntry>>, newMap: Map<ESyncDataType, Array<SyncResultEntry>> ->
+                newMap.entries.forEach {
+                    if (finalMap.containsKey(it.key)) {
+                        (finalMap as HashMap).set(it.key, finalMap[it.key]!! + it.value)
+                    } else {
+                        (finalMap as HashMap).set(it.key, it.value)
+                    }
+                }
+
+                return@reduce finalMap
+            }
+        } else return service.postLocalDataChanges(batch).subscribeOn(Schedulers.io())
     }
 
     override fun uploadLocalUsageLogs(serializedLogs: List<String>): Single<List<Long>> {
