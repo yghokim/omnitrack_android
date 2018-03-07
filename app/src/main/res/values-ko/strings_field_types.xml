@@ -86,8 +86,8 @@
 
 
     <string name="property_time_format_granularity_day">yyyy년 MM월 d일</string>
-    <string name="property_time_format_granularity_minute">yyyy/MM/d a hh:mm</string>
-    <string name="property_time_format_granularity_second">yyyy/MM/d a hh:mm:ss</string>
+    <string name="property_time_format_granularity_minute">yyyy/MM/dd a hh:mm</string>
+    <string name="property_time_format_granularity_second">yyyy/MM/dd a hh:mm:ss</string>
 
     <string name="hint_long_text">이곳에 입력하세요.</string>
     <string name="hint_short_text">이곳에 입력하세요.</string>

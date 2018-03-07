@@ -47,7 +47,7 @@ abstract class ConfigurableJobService : JobService() {
     }
 
     override fun onStartJob(job: JobParameters): Boolean {
-        println("try start upload usage logs...")
+        println("try start configured job service...: ${job.service}, ${job.extras}")
         val configId = extractConfigIdOfJob(job)
         val context = configController.getConfiguredContextOf(configId)
         if (context != null) {
@@ -68,7 +68,7 @@ abstract class ConfigurableJobService : JobService() {
     }
 
     protected open fun extractConfigIdOfJob(job: JobParameters): String {
-        return job.tag
+        return job.tag.split(";").last()
     }
 
     abstract fun makeNewTask(configuredContext: ConfiguredContext): IConfiguredTask

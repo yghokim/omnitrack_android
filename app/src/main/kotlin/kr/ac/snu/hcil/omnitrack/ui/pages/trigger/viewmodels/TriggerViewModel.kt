@@ -187,7 +187,7 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
                                 triggerSwitch.onNextIfDifferAndNotNull(true)
                                 triggerSystemManager.handleTriggerOn(dao)
                             }.doAfterTerminate {
-                                syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD)
+                                syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
                             }
                         } else Completable.error(validationError)
                     } else {
@@ -219,7 +219,7 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
                             triggerSwitch.onNextIfDifferAndNotNull(false)
                             triggerSystemManager.handleTriggerOff(dao)
                         }.doAfterTerminate {
-                            syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD)
+                            syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
                         }
                     } else {
                         println("offline mode trigger switch off")

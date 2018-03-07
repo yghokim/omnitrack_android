@@ -6,6 +6,7 @@ import dagger.Subcomponent
 import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.analytics.OTUsageLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAudioRecordAttributeHelper
@@ -98,6 +99,8 @@ interface ConfiguredAppComponent {
 
     @Backend
     fun backendRealmFactory(): Factory<Realm>
+
+    fun getEventLogger(): IEventLogger
 
     fun getAuthManager(): OTAuthManager
 

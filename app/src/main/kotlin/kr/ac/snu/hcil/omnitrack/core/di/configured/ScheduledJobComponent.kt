@@ -23,6 +23,9 @@ interface ScheduledJobComponent {
 
     fun getInformationUploadJobBuilderProvider(): Provider<Job.Builder>
 
+    @ServerSync
+    fun getFullSyncPeriodicJob(): Provider<Job>
+
     fun inject(receiver: PackageReceiver)
     fun inject(controller: OTBinaryStorageController)
 }

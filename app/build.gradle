@@ -176,7 +176,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation files('libs/opencsv-3.9.jar')
     implementation files('libs/jxl.jar')
-    implementation 'com.android.support:multidex:1.0.2'
+    implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta5'
     implementation 'com.google.android:flexbox:0.3.2'
     implementation "com.google.code.gson:gson:$rootProject.ext.gson_version"

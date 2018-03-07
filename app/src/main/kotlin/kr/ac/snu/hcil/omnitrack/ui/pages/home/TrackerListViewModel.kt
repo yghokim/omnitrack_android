@@ -147,7 +147,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                 dbManager.get().removeTracker(model.trackerDao, false, realm)
             }
         }
-        syncManager.get().registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD)
+        syncManager.get().registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
     }
 
     class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm, val researchRealm: Realm, dbManager: BackendDbManager) : IReadonlyObjectId, RealmChangeListener<OTTrackerDAO> {

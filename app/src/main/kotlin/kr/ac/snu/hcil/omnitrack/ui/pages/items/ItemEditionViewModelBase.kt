@@ -216,7 +216,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
     }
 
     protected fun syncItemToServer() {
-        syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD)
+        syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
     }
 
     abstract fun cacheEditingInfo(): Single<Boolean>

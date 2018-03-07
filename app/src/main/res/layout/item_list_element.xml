@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#fff"
@@ -105,25 +106,34 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height_normal"
+            android:layout_height="wrap_content"
             android:background="@drawable/top_separator_light"
+            android:minHeight="@dimen/button_height_normal"
+            android:paddingBottom="12dp"
             android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin">
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="12dp">
 
             <TextView
                 android:id="@+id/ui_logging_source"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|left"
-                android:textColor="@color/textColorMidLight" />
+                android:layout_gravity="center_vertical|end"
+                android:gravity="end"
+                android:lineSpacingMultiplier="1.2"
+                android:textColor="@color/textColorMidLight"
+                android:textSize="12sp"
+                tools:text="Logged Manually\n2018/03/06 03:00 AM" />
 
             <TextView
-                android:id="@+id/ui_logging_time"
+                android:id="@+id/ui_synchronization_indicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|right"
-                android:textColor="@color/textColorMidLight"
-                android:textStyle="italic" />
+                android:layout_gravity="center_vertical|end"
+                android:textColor="@color/textColorLight"
+                android:textSize="11sp"
+                android:visibility="gone"
+                tools:text="동기화됨" />
 
         </FrameLayout>
 

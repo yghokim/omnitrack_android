@@ -126,6 +126,8 @@ class ConfiguredContext(val configuration: OTConfiguration, val applicationCompo
 
     fun activateOnSystem() {
         triggerSystemComponent.getTriggerAlarmController().activateOnSystem()
+
+        applicationComponent.jobDispatcher().mustSchedule(scheduledJobComponent.getFullSyncPeriodicJob().get())
     }
 
     fun deactivateOnSystem() {

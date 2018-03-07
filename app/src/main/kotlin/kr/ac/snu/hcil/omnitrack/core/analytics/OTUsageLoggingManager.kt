@@ -53,6 +53,7 @@ class OTUsageLoggingManager(configuredContext: ConfiguredContext) : IEventLogger
     private var logIdGenerator = ConcurrentUniqueLongGenerator()
 
     override fun logEvent(name: String, sub: String?, content: JsonObject?, timestamp: Long) {
+        println("New usage log event: ${name}, ${sub}, ${content}, at ${timestamp}")
         val realm = realmFactory.get()
 
         val transaction = { realm: Realm ->

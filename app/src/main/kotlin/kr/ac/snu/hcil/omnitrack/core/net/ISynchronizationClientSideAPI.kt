@@ -11,7 +11,8 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
  */
 interface ISynchronizationClientSideAPI {
     fun setTableSynchronizationFlags(type: ESyncDataType, idTimestampPair: List<SyncResultEntry>): Completable
-    fun getDirtyRowsToSync(type: ESyncDataType): Single<List<String>>
+    fun getDirtyRowsToSync(type: ESyncDataType, ignoreFlags: Boolean): Single<List<String>>
+    fun setAllRowsDirty(type: ESyncDataType): Single<Long>
     fun applyServerRowsToSync(type: ESyncDataType, jsonList: List<JsonObject>): Completable
 
     fun getLatestSynchronizedServerTimeOf(type: ESyncDataType): Long

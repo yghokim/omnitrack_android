@@ -399,7 +399,6 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             val moreButton: View by bindView(R.id.ui_button_more)
 
             val sourceView: TextView by bindView(R.id.ui_logging_source)
-            val loggingTimeView: TextView by bindView(R.id.ui_logging_time)
 
             val valueListAdapter: TableRowAdapter
 
@@ -466,8 +465,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 monthView.text = String.format(Locale.US, "%tb", cal)
                 dayView.text = cal.getDayOfMonth().toString()
 
-                sourceView.text = itemVM.loggingSource.sourceText
-                loggingTimeView.text = OTTimeAttributeHelper.formats[OTTimeAttributeHelper.GRANULARITY_MINUTE]!!.format(Date(itemVM.timestamp))
+                sourceView.text = "${itemVM.loggingSource.sourceText}\n${OTTimeAttributeHelper.formats[OTTimeAttributeHelper.GRANULARITY_MINUTE]!!.format(Date(itemVM.timestamp))}"
 
                 itemLevelSubscriptions.add(
                         viewModel.currentSorterObservable.subscribe { sort ->
@@ -479,6 +477,14 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                             }
                         }
                 )
+
+                /*
+                itemLevelSubscriptions.add(
+                        itemVM.syncFlagObservable.subscribe { isSynchronized->
+                            itemView.ui_synchronization_indicator.setText(if(isSynchronized) R.string.msg_synchronized else R.string.msg_not_synchronized)
+                            itemView.ui_synchronization_indicator.textColor = ContextCompat.getColor(this@ItemBrowserActivity, if(isSynchronized) R.color.textColorLightLight else R.color.colorRed_Light)
+                        }
+                )*/
 
                 valueListAdapter.notifyDataSetChanged()
 
@@ -525,7 +531,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     } else TableRowViewHolder(view as ViewGroup)
                 }
 
-                inner open class TableRowViewHolder(val view: ViewGroup) : RecyclerView.ViewHolder(view), View.OnClickListener {
+                open inner class TableRowViewHolder(val view: ViewGroup) : RecyclerView.ViewHolder(view), View.OnClickListener {
 
                     val attributeNameView: TextView by bindView(R.id.ui_attribute_name)
                     var valueView: View

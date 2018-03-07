@@ -173,7 +173,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
                                 realm.executeTransaction {
                                     tracker.synchronizedAt = null
                                 }
-                                syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD)
+                                syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
                             }
                         }
                         this.entries = originalEntryList.toArray()

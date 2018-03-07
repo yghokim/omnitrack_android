@@ -214,7 +214,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
 
                 RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_refresh, "Refresh", null, {
                     //OTApp.instance.syncManager.performSynchronizationOf(ESyncDataType.ITEM)
-                    syncManager.get().queueFullSync()
+                    syncManager.get().queueFullSync(ignoreFlags = false)
                     syncManager.get().reserveSyncServiceNow()
                     jobDispatcher.mustSchedule(researchSyncJob.get())
                 }, true),

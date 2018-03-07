@@ -20,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
+import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import javax.inject.Inject
 
 /**
@@ -155,7 +156,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
             realm.executeTransaction {
                 dbManager.get().removeItem(viewModel.itemDao, false, realm)
             }
-            syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD)
+            syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
         }
     }
 
@@ -169,7 +170,6 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
         override val objectId: String? get() = _objectId
 
         private var _objectId: String? = null
-        val isSynchronized: Boolean get() = itemDao.synchronizedAt != null
 
         fun getItemValueOf(attributeLocalId: String): Any? = itemDao.getValueOf(attributeLocalId)
 
@@ -191,10 +191,18 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
                 }
             }
 
+        val syncFlagObservable = BehaviorSubject.create<Boolean>()
+        var isSynchronized: Boolean
+            get() = syncFlagObservable.value
+            private set(value) {
+                syncFlagObservable.onNextIfDifferAndNotNull(value)
+            }
+
         init {
             _objectId = itemDao.objectId
             timestamp = itemDao.timestamp
             loggingSource = itemDao.loggingSource
+            isSynchronized = itemDao.synchronizedAt != null
         }
 
         fun setValueOf(attributeLocalId: String, serializedValue: String?) {
@@ -209,7 +217,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
             return dbManager.get().saveItemObservable(itemDao, false, changedLocalIds.toList().toTypedArray(), realm)
                     .doAfterSuccess { (resultCode, _) ->
                         if (resultCode != BackendDbManager.SAVE_RESULT_FAIL) {
-                            syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD)
+                            syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
                         }
                     }
         }

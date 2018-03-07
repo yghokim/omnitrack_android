@@ -195,7 +195,7 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
                     apply(dao)
                     dbManager.get().saveTrigger(dao, realm)
                 }
-                syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD)
+                syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
             } else {
                 apply(dao)
             }

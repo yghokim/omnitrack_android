@@ -63,9 +63,9 @@ class OTUsageLogUploadService : ConfigurableJobService() {
         override fun onStartJob(job: JobParameters): Boolean {
             val count = getPendingUsageLogCount()
             if (count == 0L) {
+                println("No usage logs are pending. Finish service immediately")
                 return false
             } else {
-
                 subscriptions.add(
                         fetchPendingUsageLogsSerialized().flatMap { list ->
                             return@flatMap usageLogUploadApi.get().uploadLocalUsageLogs(list)
@@ -103,6 +103,9 @@ class OTUsageLogUploadService : ConfigurableJobService() {
         }
     }
 
+    override fun extractConfigIdOfJob(job: JobParameters): String {
+        return job.tag.split(";").last()
+    }
 
     override fun makeNewTask(configuredContext: ConfiguredContext): ConfiguredTask {
         return ConfiguredTask(configuredContext)

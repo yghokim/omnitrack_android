@@ -30,9 +30,11 @@ class OTResearchSynchronizationService : ConfigurableJobService() {
         override fun onStartJob(job: JobParameters): Boolean {
             subscriptions.add(
                     researchManager.updateExperimentsFromServer().subscribe({
+                        println("successfully received the experiment informations from server.")
                         jobFinished(job, false)
                     }, {
                         it.printStackTrace()
+                        println("Failed to receive the experiment informations from server. Retry later.")
                         jobFinished(job, true)
                     })
             )
@@ -44,6 +46,10 @@ class OTResearchSynchronizationService : ConfigurableJobService() {
             return true
         }
 
+    }
+
+    override fun extractConfigIdOfJob(job: JobParameters): String {
+        return job.tag.split(";").last()
     }
 
     override fun makeNewTask(configuredContext: ConfiguredContext): IConfiguredTask {
