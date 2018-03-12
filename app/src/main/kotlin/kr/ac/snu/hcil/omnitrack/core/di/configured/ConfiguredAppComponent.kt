@@ -200,6 +200,7 @@ interface ConfiguredAppComponent {
     fun inject(task: OTInformationUploadService.ConfiguredTask)
     fun inject(task: OTSynchronizationService.ConfiguredTask)
     fun inject(task: OTItemLoggingService.ConfiguredTask)
+    fun inject(task: OTTableExportService.ConfiguredTask)
 
     fun inject(service: OTBinaryUploadService)
 
