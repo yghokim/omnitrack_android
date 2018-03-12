@@ -59,8 +59,9 @@ class OTTableExportService : ConfigurableWakefulService(TAG) {
         const val EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE = "export_config_table_file_type"
 
 
-        fun makeIntent(context: Context, trackerId: String, exportUri: String, includeFiles: Boolean, tableFileType: TableFileType): Intent {
+        fun makeIntent(context: Context, configuredContext: ConfiguredContext, trackerId: String, exportUri: String, includeFiles: Boolean, tableFileType: TableFileType): Intent {
             val intent = Intent(context, OTTableExportService::class.java)
+                    .putExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID, configuredContext.configuration.id)
                     .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
                     .putExtra(EXTRA_EXPORT_URI, exportUri)
                     .putExtra(EXTRA_EXPORT_CONFIG_INCLUDE_FILE, includeFiles)
@@ -120,6 +121,10 @@ class OTTableExportService : ConfigurableWakefulService(TAG) {
         lateinit var logger: Lazy<IEventLogger>
 
         private val subscriptions = CompositeDisposable()
+
+        init {
+            configuredContext.configuredAppComponent.inject(this)
+        }
 
         override fun dispose() {
             subscriptions.clear()
