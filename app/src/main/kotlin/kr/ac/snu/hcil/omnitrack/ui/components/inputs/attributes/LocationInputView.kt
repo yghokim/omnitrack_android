@@ -182,10 +182,17 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
                     } catch (ex: SecurityException) {
                         ex.printStackTrace()
                         return@defer Single.just(Nullable(LatLng(0.0, 0.0)))
+                    } catch (ex: Exception) {
+                        println("get my location global error")
+                        ex.printStackTrace()
+                        return@defer Single.just(Nullable(LatLng(0.0, 0.0)))
                     }
-                }.subscribe { (location) ->
+                }.subscribe({ (location) ->
                     setValue(location, animate)
-                }
+                }, { err ->
+                    println("get my location unhandled error")
+                    err.printStackTrace()
+                })
         )
     }
 

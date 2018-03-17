@@ -50,10 +50,14 @@ class OTLocationAttributeHelper(configuredContext: ConfiguredContext) : OTAttrib
                                     .timeout(2L, TimeUnit.SECONDS, rxLocation.location().lastLocation().map { location -> LatLng(location.latitude, location.longitude) }.toFlowable())
                                     .firstOrError()
                                     .map { loc->Nullable(loc) }
+                                    .onErrorReturn { err -> Nullable(LatLng(0.0, 0.0)) }
                         }catch(ex: SecurityException)
                         {
                             ex.printStackTrace()
                             return@defer Single.just(Nullable(LatLng(0.0,0.0)))
+                        } catch (ex: Exception) {
+                            ex.printStackTrace()
+                            return@defer Single.just(Nullable(LatLng(0.0, 0.0)))
                         }
                     }
                 }
