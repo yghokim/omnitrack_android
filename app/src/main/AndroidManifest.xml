@@ -219,7 +219,6 @@
         <service android:name=".services.OTInformationUploadService" />
         <service android:name=".services.OTResearchSynchronizationService" />
 
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/icon_simple" />
