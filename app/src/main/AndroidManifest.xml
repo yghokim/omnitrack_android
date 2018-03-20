@@ -218,6 +218,7 @@
         <service android:name=".services.OTBinaryLocalCacheService" />
         <service android:name=".services.OTInformationUploadService" />
         <service android:name=".services.OTResearchSynchronizationService" />
+        <service android:name="com.github.javiersantos.appupdater.services.AppUpdateService" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
