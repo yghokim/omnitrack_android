@@ -27,6 +27,7 @@ object OTAppVersionCheckManager {
                 .setButtonUpdate(R.string.msg_app_update_update_button)
                 .setContentOnUpdateAvailable(R.string.msg_app_update_message)
                 .setTitleOnUpdateAvailable(R.string.msg_app_update_title)
+                .setIcon(R.drawable.icon_simple)
     }
 
 
