@@ -456,7 +456,8 @@ class TrackerListFragment : OTFragment() {
                 } else if (view === listButton) {
                     startActivityOnDelay(ItemBrowserActivity.makeIntent(trackerId!!, this@TrackerListFragment.act))
                 } else if (view === removeButton) {
-                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this@TrackerListFragment.act, trackerViewModel.trackerName.value, getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove,
+                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this@TrackerListFragment.act, trackerViewModel.trackerName.value
+                            ?: "OmniTrack", getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove,
                             onYes = { dialog ->
                         viewModel.removeTracker(trackerViewModel)
                         listView.invalidateItemDecorations()

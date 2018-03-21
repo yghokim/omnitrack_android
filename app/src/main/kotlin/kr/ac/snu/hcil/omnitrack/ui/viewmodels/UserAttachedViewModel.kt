@@ -12,9 +12,9 @@ open class UserAttachedViewModel(application: Application) : RealmViewModel(appl
 
     private val _userIdSubject = BehaviorSubject.createDefault<Nullable<String>>(Nullable<String>(null))
     var userId: String?
-        get() = _userIdSubject.value.datum
+        get() = _userIdSubject.value?.datum
         set(value) {
-            if (_userIdSubject.value.datum != value) {
+            if (_userIdSubject.value?.datum != value) {
                 _userIdSubject.onNext(Nullable(value))
                 if (value != null) {
                     onUserAttached(value)

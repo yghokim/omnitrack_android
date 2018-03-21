@@ -120,8 +120,8 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
         }
     }
 
-    override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet?) {
-        if (changeSet == null) {
+    override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet) {
+        if (changeSet.state == OrderedCollectionChangeSet.State.INITIAL) {
             currentAttachedTrackerInfoList.clear()
             currentAttachedTrackerInfoList.addAll(snapshot.map { it.getSimpleInfo() })
         } else { //deal with deletions
@@ -163,7 +163,7 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
     fun toggleSwitchAsync(): Completable {
 
         return Completable.defer {
-            return@defer turnSwitchAsync(!this.triggerSwitch.value)
+            return@defer turnSwitchAsync(!(this.triggerSwitch.value ?: false))
         }
     }
 

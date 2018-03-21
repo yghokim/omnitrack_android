@@ -58,8 +58,8 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
         trackerQueryResults?.addChangeListener(this)
     }
 
-    override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet?) {
-        if(changeSet == null)
+    override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet) {
+        if (changeSet.state == OrderedCollectionChangeSet.State.INITIAL)
         {
             //initial
             initialOrder = snapshot.map { it.objectId!! }.toMutableList()

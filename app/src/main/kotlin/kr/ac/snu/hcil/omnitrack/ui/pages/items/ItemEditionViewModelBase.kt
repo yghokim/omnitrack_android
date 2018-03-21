@@ -54,7 +54,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
     var isBusy: Boolean
         get() {
-            return isBusyObservable.value
+            return isBusyObservable.value ?: false
         }
         protected set(value) {
             if (isBusyObservable.value != value) {
@@ -66,7 +66,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
     var mode: ItemMode
         get() {
-            return modeObservable.value
+            return modeObservable.value ?: ItemMode.New
         }
         protected set(value) {
             if (modeObservable.value != value) {
@@ -146,7 +146,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
             }
 
         var isValidated: Boolean
-            get() = (validationObservable as BehaviorSubject).value
+            get() = (validationObservable as BehaviorSubject).value ?: true
             internal set(value) {
                 if ((validationObservable as BehaviorSubject).value != value) {
                     println("validation changed: ${attributeLocalId}, ${value}")
@@ -155,7 +155,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
             }
 
         var isRequired: Boolean
-            get() = (isRequiredObservable as BehaviorSubject<Boolean>).value
+            get() = (isRequiredObservable as BehaviorSubject<Boolean>).value ?: false
             internal set(value) {
                 if (isRequired != value) {
                     (isRequiredObservable as BehaviorSubject<Boolean>).onNext(value)
@@ -164,6 +164,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
         var state: OTItemBuilderWrapperBase.EAttributeValueState
             get() = (stateObservable as BehaviorSubject<OTItemBuilderWrapperBase.EAttributeValueState>).value
+                    ?: OTItemBuilderWrapperBase.EAttributeValueState.Idle
             internal set(value) {
                 if ((stateObservable as BehaviorSubject<OTItemBuilderWrapperBase.EAttributeValueState>).value != value) {
                     stateObservable.onNext(value)

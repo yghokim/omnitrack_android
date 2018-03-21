@@ -224,7 +224,8 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         }
 
         override fun getItemViewType(position: Int): Int {
-            return if (OTTriggerViewFactory.getConditionViewProvider(getTriggerViewModelAt(position).triggerConditionType.value) == null) {
+            return if (OTTriggerViewFactory.getConditionViewProvider(getTriggerViewModelAt(position).triggerConditionType.value
+                            ?: -1) == null) {
                 VIEWTYPE_GHOST
             } else VIEWTYPE_NORMAL
         }
@@ -386,12 +387,15 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             subscriptions.add(
                     triggerViewModel.triggerCondition.subscribe { condition ->
                         println("condition changed")
-                        val displayView = OTTriggerViewFactory.getConditionViewProvider(triggerViewModel.triggerConditionType.value)?.getTriggerDisplayView(currentHeaderView, triggerViewModel.dao, act, configuredContext)
-                        if (displayView != null) {
-                            refreshHeaderView(displayView)
-                        } else {
-                            //unsupported displayview for this datum
+                        triggerViewModel.triggerConditionType.value?.let { conditionType ->
+                            val displayView = OTTriggerViewFactory.getConditionViewProvider(conditionType)?.getTriggerDisplayView(currentHeaderView, triggerViewModel.dao, act, configuredContext)
+                            if (displayView != null) {
+                                refreshHeaderView(displayView)
+                            } else {
+                                //unsupported displayview for this datum
+                            }
                         }
+
                     }
             )
 

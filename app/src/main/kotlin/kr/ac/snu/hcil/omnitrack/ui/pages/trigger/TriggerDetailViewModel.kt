@@ -111,13 +111,13 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
 
     fun validateConfiguration(): List<CharSequence>? {
         val msgs = ArrayList<CharSequence>()
-        if (conditionInstance.value.isConfigurationValid(msgs)) {
+        if (conditionInstance.value?.isConfigurationValid(msgs) != false) {
             return null
         } else return msgs
     }
 
-    override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet?) {
-        if (changeSet == null) {
+    override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet) {
+        if (changeSet.state == OrderedCollectionChangeSet.State.INITIAL) {
             currentAttachedTrackerInfoList.clear()
             currentAttachedTrackerInfoList.addAll(snapshot.map { it.getSimpleInfo() })
         } else {
@@ -174,17 +174,19 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
         val dao = originalTriggerDao
         if (dao != null && isDirty) {
             fun apply(dao: OTTriggerDAO) {
-                dao.serializedCondition = conditionInstance.value.getSerializedString()
+                dao.serializedCondition = conditionInstance.value?.getSerializedString()
                 dao.additionalScript = script.value?.datum?.let { if (it.isBlank()) null else it }
-                dao.checkScript = useScript.value
+                dao.checkScript = useScript.value ?: false
                 dao.trackers.clear()
-                val trackerIds = attachedTrackers.value.mapNotNull { it.objectId }.toTypedArray()
-                if (trackerIds.isNotEmpty()) {
-                    val trackers = realm.where(OTTrackerDAO::class.java).`in`("objectId", attachedTrackers.value.mapNotNull { it.objectId }.toTypedArray()).findAll()
-                    if (dao.isManaged) {
-                        dao.trackers.addAll(trackers)
-                    } else {
-                        dao.trackers.addAll(realm.copyFromRealm(trackers))
+                attachedTrackers.value?.let {
+                    val trackerIds = it.mapNotNull { it.objectId }.toTypedArray()
+                    if (trackerIds.isNotEmpty()) {
+                        val trackers = realm.where(OTTrackerDAO::class.java).`in`("objectId", trackerIds).findAll()
+                        if (dao.isManaged) {
+                            dao.trackers.addAll(trackers)
+                        } else {
+                            dao.trackers.addAll(realm.copyFromRealm(trackers))
+                        }
                     }
                 }
                 dao.synchronizedAt = null

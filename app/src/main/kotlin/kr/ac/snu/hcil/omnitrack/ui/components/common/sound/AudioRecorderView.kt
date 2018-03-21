@@ -52,7 +52,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
 
     var state: State
         get() {
-            return stateObservable.value
+            return stateObservable.value ?: State.RECORD
         }
         set(value) {
             if (stateObservable.value != value) {
