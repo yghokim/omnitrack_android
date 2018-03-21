@@ -105,7 +105,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                             trackerAssignPanel = trackerAssignPanelContainer?.ui_tracker_assign_list
                             trackerAssignPanel?.let {
                                 if (viewModel.attachedTrackers.hasValue()) {
-                                    it.init(viewModel.attachedTrackers.value)
+                                    it.init(viewModel.attachedTrackers.value!!)
                                 }
 
                                 creationSubscriptions.add(
@@ -180,7 +180,8 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         ui_script_form.clearFocus()
         if (viewModel.isDirty) {
             val isEditMode = viewModel.viewModelMode.value == TriggerDetailViewModel.MODE_EDIT
-            val actionNameId = OTTriggerInformationHelper.getActionNameResId(viewModel.actionType.value) ?: R.string.msg_text_trigger
+            val actionNameId = OTTriggerInformationHelper.getActionNameResId(viewModel.actionType.value
+                    ?: 0) ?: R.string.msg_text_trigger
             val msg = if (isEditMode) {
                 String.format(OTApp.getString(R.string.msg_format_confirm_apply_change), OTApp.getString(actionNameId).toLowerCase())
             } else {

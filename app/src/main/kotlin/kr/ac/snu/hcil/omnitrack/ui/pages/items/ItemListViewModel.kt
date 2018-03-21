@@ -42,7 +42,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
 
     val trackerNameObservable = BehaviorSubject.createDefault<String>("")
     var trackerName: String
-        get() = trackerNameObservable.value
+        get() = trackerNameObservable.value ?: ""
         private set(value) {
             if (trackerNameObservable.value != value) {
                 trackerNameObservable.onNext(value)
@@ -59,7 +59,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
 
     val currentSorterObservable = BehaviorSubject.createDefault<ItemComparator>(ItemComparator.TIMESTAMP_SORTER)
     var currentSorter: ItemComparator
-        get() = currentSorterObservable.value
+        get() = currentSorterObservable.value ?: ItemComparator.TIMESTAMP_SORTER
         set(value) {
             currentSorterObservable.onNext(value)
         }
@@ -126,8 +126,8 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
         sortedItemsObservable.onNext(itemsSortedList)
     }
 
-    override fun onChange(snapshot: RealmResults<OTItemDAO>, changeSet: OrderedCollectionChangeSet?) {
-        if (changeSet == null) {
+    override fun onChange(snapshot: RealmResults<OTItemDAO>, changeSet: OrderedCollectionChangeSet) {
+        if (changeSet.state == OrderedCollectionChangeSet.State.INITIAL) {
             //initial fetch
             itemsInTimestampDescendingOrder.clear()
             itemsInTimestampDescendingOrder.addAll(snapshot.map { ItemViewModel(it) })
@@ -175,7 +175,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
 
         val timestampObservable = BehaviorSubject.create<Long>()
         var timestamp: Long
-            get() = timestampObservable.value
+            get() = timestampObservable.value ?: 0
             private set(value) {
                 if (timestampObservable.value != value) {
                     timestampObservable.onNext(value)
@@ -184,7 +184,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
 
         val loggingSourceObservable = BehaviorSubject.create<ItemLoggingSource>()
         var loggingSource: ItemLoggingSource
-            get() = loggingSourceObservable.value
+            get() = loggingSourceObservable.value ?: ItemLoggingSource.Unspecified
             set(value) {
                 if (loggingSourceObservable.value != value) {
                     loggingSourceObservable.onNext(value)
@@ -193,7 +193,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
 
         val syncFlagObservable = BehaviorSubject.create<Boolean>()
         var isSynchronized: Boolean
-            get() = syncFlagObservable.value
+            get() = syncFlagObservable.value ?: false
             private set(value) {
                 syncFlagObservable.onNextIfDifferAndNotNull(value)
             }

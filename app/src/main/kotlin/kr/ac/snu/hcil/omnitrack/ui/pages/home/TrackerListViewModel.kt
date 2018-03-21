@@ -66,9 +66,9 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         researchRealm = researchRealmFactory.get()
     }
 
-    override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet?) {
+    override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet) {
         if (snapshot.isLoaded && snapshot.isValid) {
-            if (changeSet == null) {
+            if (changeSet.state == OrderedCollectionChangeSet.State.INITIAL) {
                 println("Viewmodel first time limit")
                 //first time emit
                 clearTrackerViewModelList()
@@ -108,7 +108,9 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
     }
 
     fun generateNewTrackerName(): String {
-        return DefaultNameGenerator.generateName(OTApp.getString(R.string.msg_new_tracker_prefix), currentTrackerViewModelList.map { it.trackerName.value }, false)
+        return DefaultNameGenerator.generateName(OTApp.getString(R.string.msg_new_tracker_prefix), currentTrackerViewModelList.map {
+            it.trackerName.value ?: ""
+        }, false)
     }
 
     override fun onUserAttached(newUserId: String) {
@@ -164,11 +166,9 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
         val lastLoggingTimeObservable: BehaviorSubject<Nullable<Long>> = BehaviorSubject.createDefault(Nullable())
         var lastLoggingTime: Long?
-            get() = lastLoggingTimeObservable.value.datum
+            get() = lastLoggingTimeObservable.value?.datum
             private set(value) {
-                if (lastLoggingTimeObservable.value.datum != value) {
-                    lastLoggingTimeObservable.onNext(Nullable(value))
-                }
+                lastLoggingTimeObservable.onNextIfDifferAndNotNull(Nullable(value))
             }
 
         val trackerName: BehaviorSubject<String> = BehaviorSubject.create()
@@ -204,9 +204,6 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
             }
 
             attributesResult.addChangeListener { snapshot, changeSet ->
-                if (changeSet == null) {
-                    //first
-                }
 
                 //validation
                 currentAttributeValidationResultDict.clear()
@@ -222,7 +219,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                             currentAttributeValidationResultDict[localId] = validationResult
                         }.subscribe {
                             if (attributesResult.find { currentAttributeValidationResultDict[it.localId]?.first == false } == null) {
-                                if (!validationResult.value.first) {
+                                if ((validationResult.value?.first != false) == false) {
                                     validationResult.onNext(Pair<Boolean, List<CharSequence>?>(true, null))
                                 }
                             } else {
@@ -230,7 +227,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                                 val messages = attributesResult.filter { currentAttributeValidationResultDict[it.localId]?.first == false }
                                         .mapNotNull { currentAttributeValidationResultDict[it.localId]?.second }
 
-                                if (validationResult.value.first) {
+                                if (validationResult.value?.first != false) {
                                     validationResult.onNext(Pair(false, messages))
                                 }
                             }
@@ -239,10 +236,6 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
             }
 
             trackerItemsResult.addChangeListener { snapshot, changeSet ->
-                if (changeSet == null) {
-                    //first
-                }
-
                 snapshot.count().toLong().let {
                     if (totalItemCount.value != it) {
                         totalItemCount.onNext(it)

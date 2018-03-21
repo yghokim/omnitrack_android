@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
 import android.app.Application
+import io.realm.OrderedCollectionChangeSet
 import io.realm.RealmQuery
 import io.realm.RealmResults
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
@@ -47,7 +48,7 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
                 .findAllAsync()
 
         currentTriggerRealmResults?.addChangeListener { snapshot, changeSet ->
-            if (changeSet == null) {
+            if (changeSet.state == OrderedCollectionChangeSet.State.INITIAL) {
                 //initial set
                 currentTriggerViewModels.clear()
                 currentTriggerViewModels.addAll(

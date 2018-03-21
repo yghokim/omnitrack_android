@@ -102,7 +102,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     private var lastRemovedAttributeId: String? = null
 
     var name: String
-        get() = nameObservable.value
+        get() = nameObservable.value ?: ""
         set(value) {
             if (trackerDao != null) {
                 realm.executeTransactionIfNotIn {
@@ -116,7 +116,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         }
 
     var isBookmarked: Boolean
-        get() = isBookmarkedObservable.value
+        get() = isBookmarkedObservable.value ?: false
         set(value) {
             if (trackerDao != null) {
                 realm.executeTransactionIfNotIn {
@@ -130,7 +130,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         }
 
     var color: Int
-        get() = colorObservable.value
+        get() = colorObservable.value ?: 0
         set(value) {
             if (trackerDao != null) {
                 realm.executeTransactionIfNotIn {
@@ -388,9 +388,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             realm.executeTransaction {
                 val trackerDao = realm.createObject(OTTrackerDAO::class.java, UUID.randomUUID().toString())
                 trackerDao.userId = authManager.get().userId
-                trackerDao.name = nameObservable.value
-                trackerDao.isBookmarked = isBookmarkedObservable.value
-                trackerDao.color = colorObservable.value
+                trackerDao.name = nameObservable.value ?: ""
+                trackerDao.isBookmarked = isBookmarkedObservable.value ?: false
+                trackerDao.color = colorObservable.value ?: 0
 
                 if (isInjectedObservable.value != true) {
                     trackerDao.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(assignedExperimentId).build()
@@ -480,7 +480,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         private val propertyTable = Hashtable<String, Pair<String, String>>()
 
         var name: String
-            get() = nameObservable.value
+            get() = nameObservable.value ?: ""
             set(value) {
                 if (nameObservable.value != value) {
                     nameObservable.onNext(value)
@@ -488,7 +488,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             }
 
         var icon: Int
-            get() = iconObservable.value
+            get() = iconObservable.value ?: 0
             set(@DrawableRes value) {
                 if (iconObservable.value != value) {
                     iconObservable.onNext(value)
@@ -496,7 +496,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             }
 
         var isRequired: Boolean
-            get() = isRequiredObservable.value
+            get() = isRequiredObservable.value ?: false
             set(value) {
                 if (isRequiredObservable.value != value) {
                     isRequiredObservable.onNext(value)
@@ -504,7 +504,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             }
 
         var isHidden: Boolean
-            get() = isHiddenObservable.value
+            get() = isHiddenObservable.value ?: false
             set(value) {
                 if (isHiddenObservable.value != value) {
                     isHiddenObservable.onNext(value)
@@ -512,7 +512,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             }
 
         var defaultValuePolicy: Int
-            get() = defaultValuePolicyObservable.value
+            get() = defaultValuePolicyObservable.value ?: OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL
             set(value) {
                 if (value != defaultValuePolicyObservable.value) {
                     defaultValuePolicyObservable.onNext(value)
@@ -520,11 +520,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             }
 
         var defaultValuePreset: String?
-            get() = defaultValuePresetObservable.value.datum
+            get() = defaultValuePresetObservable.value?.datum
             set(value) {
-                if (value != defaultValuePresetObservable.value.datum) {
-                    defaultValuePresetObservable.onNext(Nullable(value))
-                }
+                defaultValuePresetObservable.onNextIfDifferAndNotNull(Nullable(value))
             }
 
         init {

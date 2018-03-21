@@ -579,7 +579,9 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
                 viewHolderSubscriptions.add(
                         attributeViewModel.onPropertyChanged.subscribe {
-                            preview = attributeManager.getAttributeHelper(attributeViewModel.typeObservable.value).getInputView(act, true, attributeViewModel.makeFrontalChangesToDao(), preview)
+                            attributeViewModel.typeObservable.value?.let { type ->
+                                preview = attributeManager.getAttributeHelper(type).getInputView(act, true, attributeViewModel.makeFrontalChangesToDao(), preview)
+                            }
                         }
                 )
 
@@ -591,7 +593,9 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     protected fun addNewAttribute(typeInfo: AttributePresetInfo) {
 
-        val newAttributeName = DefaultNameGenerator.generateName(typeInfo.name, currentAttributeViewModelList.map { it.nameObservable.value }, true)
+        val newAttributeName = DefaultNameGenerator.generateName(typeInfo.name, currentAttributeViewModelList.map {
+            it.nameObservable.value ?: ""
+        }, true)
         this.viewModel.addNewAttribute(newAttributeName, typeInfo.typeId, typeInfo.processor)
         scrollToBottomReserved = true
         eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_ADD, "", viewModel.trackerId) { content ->

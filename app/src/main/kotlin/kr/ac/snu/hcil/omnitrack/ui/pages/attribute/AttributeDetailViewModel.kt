@@ -12,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
+import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import java.util.*
 import javax.inject.Inject
 
@@ -54,38 +55,30 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
 
     var name: String
         get() {
-            return nameObservable.value
+            return nameObservable.value ?: ""
         }
         set(value) {
-            if (nameObservable.value != value) {
-                nameObservable.onNext(value)
-            }
+            nameObservable.onNextIfDifferAndNotNull(value)
         }
 
     var isRequired: Boolean
         get() {
-            return isRequiredObservable.value
+            return isRequiredObservable.value ?: false
         }
         set(value) {
-            if (isRequiredObservable.value != value) {
-                isRequiredObservable.onNext(value)
-            }
+            isRequiredObservable.onNextIfDifferAndNotNull(value)
         }
 
     var defaultValuePolicy: Int
-        get() = defaultValuePolicyObservable.value
+        get() = defaultValuePolicyObservable.value ?: -1
         set(value) {
-            if (value != defaultValuePolicyObservable.value) {
-                defaultValuePolicyObservable.onNext(value)
-            }
+            defaultValuePolicyObservable.onNextIfDifferAndNotNull(value)
         }
 
     var defaultValuePreset: String?
-        get() = defaultValuePresetObservable.value.datum
+        get() = defaultValuePresetObservable.value?.datum
         set(value) {
-            if (value != defaultValuePresetObservable.value.datum) {
-                defaultValuePresetObservable.onNext(Nullable(value))
-            }
+            defaultValuePresetObservable.onNextIfDifferAndNotNull(Nullable(value))
         }
 
     val isConnectionDirty: Boolean

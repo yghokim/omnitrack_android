@@ -30,7 +30,7 @@ class TrackerChartViewListViewModel(app: Application) : RealmViewModel(app) {
     val trackerNameSubject = BehaviorSubject.createDefault<String>("")
 
     var trackerName: String
-        get() = trackerNameSubject.value
+        get() = trackerNameSubject.value!!
         private set(value) {
             if (trackerNameSubject.value != value) {
                 trackerNameSubject.onNext(value)
@@ -38,7 +38,7 @@ class TrackerChartViewListViewModel(app: Application) : RealmViewModel(app) {
         }
 
     var granularity: Granularity
-        get() = currentGranularitySubject.value
+        get() = currentGranularitySubject.value!!
         set(value) {
             if (currentGranularitySubject.value != value) {
                 currentGranularitySubject.onNext(value)
@@ -47,7 +47,7 @@ class TrackerChartViewListViewModel(app: Application) : RealmViewModel(app) {
         }
 
     var point: Long
-        get() = currentPointSubject.value
+        get() = currentPointSubject.value!!
         set(value) {
             if (currentPointSubject.value != value) {
                 currentPointSubject.onNext(value)

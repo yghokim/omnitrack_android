@@ -119,7 +119,8 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
         return _measureFactories
     }
 
-    var state: ServiceState get() = onStateChanged.value
+    var state: ServiceState
+        get() = onStateChanged.value ?: ServiceState.DEACTIVATED
         protected set(value) {
             if (onStateChanged.value != value) {
                 onStateChanged.onNext(value)
