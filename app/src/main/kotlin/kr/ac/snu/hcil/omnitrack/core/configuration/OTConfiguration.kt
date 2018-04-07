@@ -1,8 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.core.configuration
 
+import android.net.Uri
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.utils.parseToMap
+import okhttp3.HttpUrl
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -10,6 +12,19 @@ import kotlin.collections.HashMap
  * Created by Young-Ho on 12/9/2017.
  */
 class OTConfiguration {
+
+    companion object {
+        private fun fallbackUrl(url: String): String {
+            val syncServerUrl = HttpUrl.parse(url)
+            val result = if (syncServerUrl == null) {
+                Uri.Builder().path(url).scheme("http").build().toString()
+            } else url
+
+            println("fallback url: ${result}")
+
+            return result
+        }
+    }
 
     private val table: MutableMap<String, Any?> = HashMap()
 
@@ -31,11 +46,20 @@ class OTConfiguration {
         firebaseGoogleApiKey = BuildConfig.FIREBASE_API_KEY
         firebaseProjectId = BuildConfig.FIREBASE_PROJECT_ID
         googleAuthClientId = BuildConfig.FIREBASE_AUTH_CLIENT_ID
+
+        process()
     }
 
     constructor(jsonString: String) {
         println("deserialize OTConfiguration JsonString: ${jsonString}")
         this.table.putAll(OTApp.instance.applicationComponent.genericGson().parseToMap(jsonString))
+
+        process()
+    }
+
+    private fun process() {
+        synchronizationServerUrl = fallbackUrl(synchronizationServerUrl)
+        mediaStorageServerUrl = fallbackUrl(mediaStorageServerUrl)
     }
 
     fun toJson(): String {
