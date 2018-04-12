@@ -45,6 +45,8 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext:
             itemDaoToSave.deviceId = OTApp.instance.deviceId
             itemDaoToSave.loggingSource = loggingSource ?: ItemLoggingSource.Unspecified
             itemDaoToSave.trackerId = dao.tracker?.objectId
+            itemDaoToSave.timezone = configuredContext.configuredAppComponent.getPreferredTimeZone().id
+            println("item timezone: ${itemDaoToSave.timezone}")
         } else {
             itemDaoToSave.userUpdatedAt = System.currentTimeMillis()
         }

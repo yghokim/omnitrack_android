@@ -30,6 +30,7 @@ class ItemTypeAdapter(isServerMode: Boolean) : ServerCompatibleTypeAdapter<OTIte
                 BackendDbManager.FIELD_SYNCHRONIZED_AT -> dao.synchronizedAt = reader.nextLong()
                 BackendDbManager.FIELD_TIMESTAMP_LONG -> dao.timestamp = reader.nextLong()
                 BackendDbManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
+                BackendDbManager.FIELD_TIMEZONE -> dao.timezone = reader.nextString()
                 "deviceId"->dao.deviceId = reader.nextString()
                 "source"-> dao.source = reader.nextString()
                 "dataTable" ->{
@@ -79,6 +80,7 @@ class ItemTypeAdapter(isServerMode: Boolean) : ServerCompatibleTypeAdapter<OTIte
         writer.name(if (isServerMode) "tracker" else BackendDbManager.FIELD_TRACKER_ID).value(value.trackerId)
         writer.name(BackendDbManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
         writer.name(BackendDbManager.FIELD_TIMESTAMP_LONG).value(value.timestamp)
+        writer.name(BackendDbManager.FIELD_TIMEZONE).value(value.timezone)
         writer.name(BackendDbManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
 
 
@@ -110,6 +112,7 @@ class ItemTypeAdapter(isServerMode: Boolean) : ServerCompatibleTypeAdapter<OTIte
                 BackendDbManager.FIELD_UPDATED_AT_LONG -> applyTo.userUpdatedAt = json.getLongCompat(key) ?: 0
                 BackendDbManager.FIELD_SYNCHRONIZED_AT -> applyTo.synchronizedAt = json.getLongCompat(key)
                 "deviceId" -> applyTo.deviceId = json.getStringCompat(key)
+                BackendDbManager.FIELD_TIMEZONE -> applyTo.timezone = json.getStringCompat(key)
                 "source" -> applyTo.source = json.getStringCompat(key)
                 "dataTable" -> {
                     val jsonList = try {

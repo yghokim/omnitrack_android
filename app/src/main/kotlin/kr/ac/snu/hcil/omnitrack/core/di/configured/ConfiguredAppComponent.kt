@@ -50,6 +50,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewMode
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerViewModel
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetService
+import java.util.*
 
 /**
  * Created by Young-Ho on 10/31/2017.
@@ -96,6 +97,8 @@ interface ConfiguredAppComponent {
     fun getSupportedScriptFunctions(): Array<Expression.LazyFunction>
 
     fun getBackendDbManager(): BackendDbManager
+
+    fun getPreferredTimeZone(): TimeZone
 
     @Backend
     fun backendRealmFactory(): Factory<Realm>

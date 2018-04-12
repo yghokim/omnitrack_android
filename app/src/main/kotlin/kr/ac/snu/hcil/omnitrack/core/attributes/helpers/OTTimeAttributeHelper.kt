@@ -69,7 +69,7 @@ class OTTimeAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeH
         get() = super.supportedFallbackPolicies.apply {
             this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(R.string.msg_intrinsic_time, isValueVolatile = true) {
                 override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
-                    return Single.just(Nullable(TimePoint()))
+                    return Single.just(Nullable(TimePoint(System.currentTimeMillis(), configuredContext.configuredAppComponent.getPreferredTimeZone().id)))
                 }
 
             }
@@ -133,7 +133,7 @@ class OTTimeAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeH
                 GRANULARITY_SECOND -> inputView.setPickerMode(DateTimePicker.SECOND)
             }
 
-            inputView.value = TimePoint()
+            inputView.value = TimePoint(System.currentTimeMillis(), configuredContext.configuredAppComponent.getPreferredTimeZone().id)
 
         }
     }

@@ -121,7 +121,7 @@ class OTTimeSpanAttributeHelper(configuredContext: ConfiguredContext) : OTAttrib
         get() = super.supportedFallbackPolicies.apply {
             this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(R.string.msg_intrinsic_time, isValueVolatile = true) {
                 override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
-                    return Single.just(Nullable(TimeSpan()))
+                    return Single.just(Nullable(TimeSpan().apply { this.timeZone = configuredContext.configuredAppComponent.getPreferredTimeZone() }))
                 }
             }
 

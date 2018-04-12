@@ -462,10 +462,19 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 val cal = Calendar.getInstance()
                 //val currentSorter = getCurrentSort()
                 cal.timeInMillis = itemVM.timestamp
+                if (itemVM.timezone != null) {
+                    cal.timeZone = TimeZone.getTimeZone(itemVM.timezone)
+                }
                 monthView.text = String.format(Locale.US, "%tb", cal)
                 dayView.text = cal.getDayOfMonth().toString()
 
-                sourceView.text = "${itemVM.loggingSource.sourceText}\n${OTTimeAttributeHelper.formats[OTTimeAttributeHelper.GRANULARITY_MINUTE]!!.format(Date(itemVM.timestamp))}"
+                var text = "${itemVM.loggingSource.sourceText}\n${OTTimeAttributeHelper.formats[OTTimeAttributeHelper.GRANULARITY_MINUTE]!!.format(Date(itemVM.timestamp))}"
+
+                if (itemVM.timezone != null) {
+                    text += " (${cal.timeZone.displayName})"
+                }
+
+                sourceView.text = text
 
                 itemLevelSubscriptions.add(
                         viewModel.currentSorterObservable.subscribe { sort ->

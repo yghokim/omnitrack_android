@@ -49,6 +49,8 @@ class BackendDbManager @Inject constructor(
         const val FIELD_SYNCHRONIZED_AT = "synchronizedAt"
         const val FIELD_REMOVED_BOOLEAN = "removed"
         const val FIELD_TIMESTAMP_LONG = "timestamp"
+        const val FIELD_TIMEZONE = "timezone"
+
 
         const val FIELD_IS_IN_TRASHCAN = "isInTrashcan"
         const val FIELD_IS_HIDDEN = "isHidden"
