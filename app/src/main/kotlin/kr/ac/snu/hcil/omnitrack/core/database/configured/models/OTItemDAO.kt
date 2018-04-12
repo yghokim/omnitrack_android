@@ -26,6 +26,8 @@ open class OTItemDAO : RealmObject() {
     @Index
     var timestamp: Long = System.currentTimeMillis()
 
+    var timezone: String? = null
+
     var source: String? = null
 
     var fieldValueEntries = RealmList<OTItemValueEntryDAO>()

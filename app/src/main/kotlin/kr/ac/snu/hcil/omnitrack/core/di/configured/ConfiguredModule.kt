@@ -8,6 +8,7 @@ import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfiguration
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import java.io.File
+import java.util.*
 import javax.inject.Qualifier
 
 /**
@@ -39,6 +40,11 @@ class ConfiguredModule(val configuration: OTConfiguration, val parent: Configure
     @ConfigurationDirectory
     fun providesConfigurationDirectory(context: Context, configuration: OTConfiguration): File {
         return File(context.filesDir, configuration.id)
+    }
+
+    @Provides
+    fun providesPreferredTimeZone(): TimeZone {
+        return TimeZone.getDefault()
     }
 }
 

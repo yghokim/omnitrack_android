@@ -20,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import javax.inject.Inject
 
@@ -182,6 +183,13 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
                 }
             }
 
+        val timezoneObservable = BehaviorSubject.create<Nullable<String>>()
+        var timezone: String?
+            get() = timezoneObservable.value?.datum
+            private set(value) {
+                timezoneObservable.onNextIfDifferAndNotNull(Nullable(value))
+            }
+
         val loggingSourceObservable = BehaviorSubject.create<ItemLoggingSource>()
         var loggingSource: ItemLoggingSource
             get() = loggingSourceObservable.value ?: ItemLoggingSource.Unspecified
@@ -201,6 +209,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
         init {
             _objectId = itemDao.objectId
             timestamp = itemDao.timestamp
+            timezone = itemDao.timezone
             loggingSource = itemDao.loggingSource
             isSynchronized = itemDao.synchronizedAt != null
         }
