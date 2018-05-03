@@ -10,6 +10,7 @@ import android.preference.ListPreference
 import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.widget.Toast
+import com.github.javiersantos.appupdater.AppUpdater
 import dagger.Lazy
 import dagger.internal.Factory
 import io.reactivex.disposables.CompositeDisposable
@@ -209,7 +210,7 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
                     }
                 }
 
-                "pref_check_updates" -> {
+                AppUpdater.PREF_CHECK_UPDATES-> {
                     if(sharedPreferences.getBoolean(key, false))
                     {
                         versionCheckServiceController.get().turnOnService()

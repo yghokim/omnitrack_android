@@ -8,7 +8,7 @@
             android:summary="@string/msg_pref_summary_show_shortcut_panel"
             android:title="@string/msg_pref_title_show_shortcut_panel" />
         <SwitchPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="pref_check_updates"
             android:summary="@string/msg_pref_summary_notify_new_update"
             android:title="@string/msg_pref_title_notify_new_update" />
