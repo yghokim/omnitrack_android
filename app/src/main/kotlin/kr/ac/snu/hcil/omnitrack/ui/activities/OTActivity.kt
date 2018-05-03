@@ -36,6 +36,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
+import org.jetbrains.anko.defaultSharedPreferences
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 import java.util.*
 import javax.inject.Inject
@@ -183,6 +184,19 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         PreferenceManager.setDefaultValues(this, R.xml.global_preferences, false)
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (checkUpdateAvailable && defaultSharedPreferences.getBoolean(AppUpdater.PREF_CHECK_UPDATES, false)) {
+            try {
+                appUpdater.start()
+            } catch(ex: Exception) {
+                ex.printStackTrace()
+                println("failed to register update check receiver")
+            }
+        }
+
+    }
+
     protected open fun processAuthorization() {
         if (checkRefreshingCredential) {
             val thread = Thread(Runnable {
@@ -240,17 +254,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     override fun onResume() {
         super.onResume()
-
         resumedAt = System.currentTimeMillis()
-
-        if (checkUpdateAvailable) {
-            try {
-                appUpdater.start()
-            } catch(ex: Exception) {
-                ex.printStackTrace()
-                println("failed to register update check receiver")
-            }
-        }
     }
 
     override fun onDestroy() {
@@ -276,7 +280,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
             }
         }
 
-        if (checkUpdateAvailable) {
+        if (checkUpdateAvailable && defaultSharedPreferences.getBoolean(AppUpdater.PREF_CHECK_UPDATES, false)) {
             try {
                 appUpdater.stop()
             } catch(ex: Exception) {
