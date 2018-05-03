@@ -423,6 +423,7 @@
     <string name="msg_contacts_permission_required">Contacts permissions Required</string>
 
     <string name="msg_contacts_permission_rationale">The permissions are needed only to help you select a Google account.</string>
+    <string name="msg_contacts_permission_storage">The permissions are need to download a new version of app</string>
     <string name="msg_contacts_permission_denied_message">We can\'t sign you in without allowing the permission :(</string>
     <string name="msg_permission_request_of_tracker">One or more trackers contain fields which require additional permissions.</string>
     <string name="msg_format_permission_request_of_tracker_single">%1$s tracker contains fields which require additional permissions.</string>
