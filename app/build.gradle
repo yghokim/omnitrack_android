@@ -152,9 +152,9 @@ dependencies {
     implementation "com.google.android.gms:play-services-gcm:$rootProject.ext.google_play_version"
     implementation "com.google.android.gms:play-services-plus:$rootProject.ext.google_play_version"
     implementation "com.google.android.gms:play-services-auth:$rootProject.ext.google_play_version"
-    implementation "com.google.firebase:firebase-core:$rootProject.ext.google_play_version"
-    implementation "com.google.firebase:firebase-auth:$rootProject.ext.google_play_version"
-    implementation "com.google.firebase:firebase-messaging:$rootProject.ext.google_play_version"
+    implementation "com.google.firebase:firebase-core:15.0.2"
+    implementation "com.google.firebase:firebase-auth:15.1.0"
+    implementation "com.google.firebase:firebase-messaging:15.0.2"
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     kapt "android.arch.lifecycle:compiler:1.1.1"
@@ -176,7 +176,7 @@ dependencies {
     implementation files('libs/opencsv-3.9.jar')
     implementation files('libs/jxl.jar')
     implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta6'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.google.android:flexbox:0.3.2'
     implementation "com.google.code.gson:gson:$rootProject.ext.gson_version"
     implementation 'io.reactivex.rxjava2:rxjava:2.1.11'
