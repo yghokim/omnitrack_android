@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.analytics
 
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 
 /**
  * Created by younghokim on 2017. 11. 28..
@@ -42,6 +43,11 @@ interface IEventLogger {
         const val SUB_SESSION_TYPE_ACTIVITY = "activity"
         const val SUB_SESSION_TYPE_FRAGMENT = "fragment"
 
+        const val TRIGGER_FIRED = "fire_trigger"
+        const val SUB_TRIGGER_TYPE_TIME = "time"
+        const val SUB_TRIGGER_TYPE_EVENT = "event"
+
+
         const val SUB_ITEM_REMOVED_FROM_LIST = "list"
         const val SUB_ITEM_REMOVED_FROM_NOTI = "noti"
     }
@@ -58,6 +64,8 @@ interface IEventLogger {
     fun logItemEditEvent(itemId: String, inject: ((JsonObject) -> Unit)? = null)
     fun logItemAddedEvent(itemId: String, source: ItemLoggingSource, inject: ((JsonObject) -> Unit)? = null)
     fun logItemRemovedEvent(itemId: String, removedFrom: String, inject: ((JsonObject) -> Unit)? = null)
+
+    fun logTriggerFireEvent(triggerId: String, triggerFiredTime: Long, trigger: OTTriggerDAO, inject: ((JsonObject) -> Unit)?)
 
     fun logTrackerReorderEvent()
 

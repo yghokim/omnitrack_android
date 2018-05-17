@@ -139,10 +139,10 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
                 val triggerSchedules = OTApp.instance.triggerAlarmManager.handleFiredAlarmAndGetTriggerInfo(user, alarmId, triggerTime, System.currentTimeMillis())
                 println("Handled system alarm and retrieved corresponding trigger schedules - ${triggerSchedules?.size}")
 
-                OTApp.logger.writeSystemLog("Handled system alarm and retrieved corresponding trigger schedules: ${triggerSchedules?.size}", TAG)
+                OTApp.eventLogger.writeSystemLog("Handled system alarm and retrieved corresponding trigger schedules: ${triggerSchedules?.size}", TAG)
                 if (triggerSchedules != null) {
 
-                    OTApp.logger.writeSystemLog("${triggerSchedules.size} triggers will be fired.", TAG)
+                    OTApp.eventLogger.writeSystemLog("${triggerSchedules.size} triggers will be fired.", TAG)
 
                     Observable.merge(triggerSchedules.map {
                         schedule ->
@@ -160,7 +160,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
                             }
                         }
                     }).observeOn(Schedulers.immediate()).doOnCompleted {
-                        OTApp.logger.writeSystemLog("Every trigger firing was done. Release the wake lock.", TAG)
+                        OTApp.eventLogger.writeSystemLog("Every trigger firing was done. Release the wake lock.", TAG)
 
                         println("every trigger was done. finish the wakeup")
 
