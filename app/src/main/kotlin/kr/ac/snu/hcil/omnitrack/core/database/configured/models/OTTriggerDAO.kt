@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.database.configured.models
 
 import android.content.Intent
 import android.support.v4.content.LocalBroadcastManager
+import com.github.salomonbrys.kotson.toJson
 import com.google.gson.JsonObject
 import io.reactivex.Completable
 import io.realm.RealmList
@@ -260,6 +261,9 @@ open class OTTriggerDAO : RealmObject() {
                                 .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER, triggerId)
                                 .putExtra(OTApp.INTENT_EXTRA_TRIGGER_TIME, triggerTime)
                         )
+                        configuredContext.configuredAppComponent.getEventLogger()
+                                .logTriggerFireEvent(objectId!!, System.currentTimeMillis(), this@OTTriggerDAO, { content -> content.add("idealTime", triggerTime.toJson()) })
+
                     }
                 }
     }

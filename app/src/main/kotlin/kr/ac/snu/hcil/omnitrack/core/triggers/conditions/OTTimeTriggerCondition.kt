@@ -1,5 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers.conditions
 
+import com.github.salomonbrys.kotson.toJson
+import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
@@ -12,6 +14,9 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
  * Created by younghokim on 2017. 10. 18..
  */
 class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIME) {
+    override fun writeEventLogContent(table: JsonObject) {
+        table.add("timeType", timeConditionType.toJson())
+    }
 
     class TimeTriggerConditionTypeAdapter : TypeAdapter<OTTimeTriggerCondition>() {
         override fun read(reader: JsonReader): OTTimeTriggerCondition {
@@ -64,6 +69,7 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
     companion object {
         const val TIME_CONDITION_ALARM: Byte = 0
         const val TIME_CONDITION_INTERVAL: Byte = 1
+        const val TIME_CONDITION_SAMPLING: Byte = 2
 
         val typeAdapter: TimeTriggerConditionTypeAdapter by lazy { TimeTriggerConditionTypeAdapter() }
     }

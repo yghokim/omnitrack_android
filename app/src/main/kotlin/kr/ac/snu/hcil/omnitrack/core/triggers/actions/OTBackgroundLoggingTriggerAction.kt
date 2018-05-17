@@ -12,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
  * Created by younghokim on 2017. 4. 17..
  */
 class OTBackgroundLoggingTriggerAction : OTTriggerAction() {
+
     class BackgroundLoggingActionTypeAdapter : TypeAdapter<OTBackgroundLoggingTriggerAction>() {
         override fun write(out: JsonWriter, value: OTBackgroundLoggingTriggerAction) {
             out.beginObject()
@@ -62,6 +63,5 @@ class OTBackgroundLoggingTriggerAction : OTTriggerAction() {
             Completable.complete()
         }
     }
-
 
 }
