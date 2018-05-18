@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
+import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -42,6 +43,9 @@ class RebootReceiver : BroadcastReceiver() {
         eventLogger.get().logEvent(IEventLogger.NAME_DEVICE_EVENT, "AfterBoot")
 
         triggerManager.onSystemRebooted()
+
+        context.startService(OTReminderService.makeSystemRebootedIntent(context, (context.applicationContext as OTApp).currentConfiguredContext.configuration.id))
+
         shortcutPanelManager.refreshNotificationShortcutViewsObservable(context).timeout(2, TimeUnit.SECONDS).doAfterTerminate {
             result.finish()
             wl.release()

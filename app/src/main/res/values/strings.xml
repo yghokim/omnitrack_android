@@ -20,6 +20,12 @@
         <item quantity="other">%d fields</item>
     </plurals>
 
+    <plurals name="msg_reminder_omitted">
+        <item quantity="zero">No reminders omitted</item>
+        <item quantity="one">One omitted</item>
+        <item quantity="other">%d omitted</item>
+    </plurals>
+
     <string name="msg_sort">Sort by</string>
 
     <string name="msg_sort_method_timestamp">Logged Time</string>
@@ -53,6 +59,12 @@
     <string name="msg_tracker_empty">No trackers yet. \nStart tracking by adding a new tracker.</string>
     <string name="msg_trigger_empty">No triggers yet.\nAdd a trigger to log tracker items automatically.</string>
     <string name="msg_reminder_empty">No reminders yet.\nAdd a reminder to notice you not to forget tracking.</string>
+
+    <string name="msg_reminder_omitted">The omitted reminder</string>
+
+    <string name="msg_reminder_open_input">Respond Now</string>
+    <string name="msg_reminder_skip">Skip Response</string>
+
     <string name="msg_field_empty">Currently this tracker contains no fields.\nIt will log timestamp only.</string>
 
     <string name="msg_change_screen_name">Change your screen name</string>
