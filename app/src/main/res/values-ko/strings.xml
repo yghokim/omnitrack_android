@@ -7,6 +7,12 @@
         <item quantity="other">%d개의 필드</item>
     </plurals>
 
+
+    <plurals name="msg_reminder_omitted">
+        <item quantity="zero">누락된 리마인더 없음</item>
+        <item quantity="other">%d개 누락</item>
+    </plurals>
+
     <string name="msg_sort">정렬</string>
 
     <string name="msg_confirm_order">변경된 순서를 적용하시겠습니까?</string>
@@ -178,6 +184,11 @@
     <string name="msg_format_login_to">%1$s에 로그인</string>
 
     <string name="msg_noti_tap_for_tracking_format">%1$s 로그를 기록하려면 탭하세요.</string>
+
+    <string name="msg_reminder_omitted">누락된 리마인더</string>
+
+    <string name="msg_reminder_open_input">응답 입력</string>
+    <string name="msg_reminder_skip">응답 건너뛰기</string>
 
     <string name="msg_format_removed_outside_return_home">%1$s이(가) 외부에서 삭제되었습니다. 스크린을 닫습니다.</string>
 

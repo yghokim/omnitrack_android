@@ -20,6 +20,7 @@ import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.airbnb.lottie.LottieAnimationView
 import com.github.salomonbrys.kotson.set
+import com.github.salomonbrys.kotson.toJson
 import com.google.gson.JsonObject
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -56,6 +57,8 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
         const val INTENT_EXTRA_REMINDER_TIME = "reminderTime"
 
+        const val INTENT_EXTRA_IGNORE_CACHED_INPUT = "ignoreCachedInput"
+
         const val INTENT_ACTION_NEW = "new_item"
         const val INTENT_ACTION_EDIT = "edit_item"
 
@@ -66,12 +69,12 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
             return intent
         }
 
-        fun makeIntent(trackerId: String, reminderTime: Long, context: Context): Intent {
+        fun makeReminderOpenIntent(trackerId: String, reminderTime: Long, context: Context): Intent {
             val intent = Intent(context, ItemDetailActivity::class.java)
             intent.action = INTENT_ACTION_NEW
             intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             intent.putExtra(INTENT_EXTRA_REMINDER_TIME, reminderTime)
-            intent.action = "item_edit:${trackerId}"
+            intent.putExtra(INTENT_EXTRA_IGNORE_CACHED_INPUT, true)
             return intent
         }
 
@@ -332,7 +335,11 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                     when (viewModel.mode) {
                         ItemEditionViewModelBase.ItemMode.New -> {
                             itemSaved = true
-                            eventLogger.get().logItemAddedEvent(result, ItemLoggingSource.Manual)
+                            eventLogger.get().logItemAddedEvent(result, ItemLoggingSource.Manual) { content ->
+                                if (this.intent.hasExtra(INTENT_EXTRA_REMINDER_TIME)) {
+                                    content.add("pivotReminderTime", this.intent.getLongExtra(INTENT_EXTRA_REMINDER_TIME, 0).toJson())
+                                }
+                            }
                         }
                         ItemEditionViewModelBase.ItemMode.Edit ->
                             eventLogger.get().logItemEditEvent(result) { content ->
