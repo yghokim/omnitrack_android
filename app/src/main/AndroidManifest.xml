@@ -125,6 +125,7 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="${applicationId}.action.ALARM" />
+                <action android:name="${applicationId}.action.ALARM_REMINDER_EXPIRY" />
             </intent-filter>
         </receiver>
 

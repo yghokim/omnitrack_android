@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
+import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerInterfaceOptions
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
@@ -116,6 +117,29 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                             }
                         }
                     } else trackerAssignPanelContainer?.visibility = View.GONE
+
+                    if (interfaceOptions.defaultActionType == OTTriggerDAO.ACTION_TYPE_REMIND) {
+                        //if remind, show reminder expiry
+                        ui_reminder_config_view.visibility = View.VISIBLE
+
+
+                        val currentAction = viewModel.actionInstance.value as? OTReminderAction
+                        if (currentAction != null) {
+                            println("apply current action's expiry: ${currentAction.expirySeconds}")
+                            ui_reminder_config_view.expiry = currentAction.expirySeconds
+                        }
+
+                        creationSubscriptions.add(ui_reminder_config_view.expirySubject.subscribe { expiry ->
+                            println("expiry seconds changed: ${expiry}")
+                            val currentAction = viewModel.actionInstance.value as? OTReminderAction
+                            if (currentAction != null && currentAction.expirySeconds != expiry) {
+                                viewModel.actionInstance.onNext((currentAction.clone() as OTReminderAction).apply { expirySeconds = expiry })
+                            }
+                        })
+
+                    } else {
+                        ui_reminder_config_view.visibility = View.GONE
+                    }
                 }
         )
     }
@@ -147,7 +171,6 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                         )
                         creationSubscriptions.add(
                                 configView.onConditionChanged.subscribe { newCondition ->
-                                    println("condition changed - ${newCondition.getSerializedString()}")
                                     viewModel.conditionInstance.onNext(newCondition)
                                 }
                         )

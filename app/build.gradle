@@ -196,7 +196,7 @@ dependencies {
     implementation 'com.github.Epsiloni:android-target-tooltip:1.7'
     implementation 'us.feras.mdv:markdownview:1.1.0'
     implementation 'com.heinrichreimersoftware:material-intro:1.6.2'
-    implementation 'com.jaredrummler:material-spinner:1.2.3'
+    implementation 'com.jaredrummler:material-spinner:1.2.5'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation "com.github.bumptech.glide:glide:$rootProject.ext.glide_version"
     kapt "com.github.bumptech.glide:compiler:$rootProject.ext.glide_version"

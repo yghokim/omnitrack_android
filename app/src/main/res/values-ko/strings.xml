@@ -183,7 +183,9 @@
 
     <string name="msg_format_login_to">%1$s에 로그인</string>
 
-    <string name="msg_noti_tap_for_tracking_format">%1$s 로그를 기록하려면 탭하세요.</string>
+    <string name="msg_noti_tap_for_tracking_format">탭해서 %1$s 기록</string>
+
+    <string name="msg_noti_reminder_until">%1$s까지</string>
 
     <string name="msg_reminder_omitted">누락된 리마인더</string>
 
@@ -446,6 +448,9 @@
     <string name="msg_duplicate_choice_entry">중복된 항목 텍스트입니다.</string>
     <string name="msg_synchronized">동기화됨</string>
     <string name="msg_not_synchronized">동기화 대기중</string>
+
+    <string name="msg_use_reminder_expiry">일정 시간이 지나면 알림 취소</string>
+    <string name="msg_reminder_expiry_time">자동취소 딜레이</string>
 
 
     <string-array name="purpose_entries">

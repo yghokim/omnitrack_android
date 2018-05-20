@@ -13,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
+import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
@@ -48,6 +49,7 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
     val actionType = BehaviorSubject.create<Byte>()
     val conditionType = BehaviorSubject.create<Byte>()
     val conditionInstance = BehaviorSubject.create<ATriggerCondition>()
+    val actionInstance = BehaviorSubject.create<OTTriggerAction>()
 
     val script = BehaviorSubject.create<Nullable<String>>()
     val useScript = BehaviorSubject.createDefault(false)
@@ -141,6 +143,7 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
 
     private fun applyToFront(dao: OTTriggerDAO) {
         actionType.onNextIfDifferAndNotNull(dao.actionType)
+        actionInstance.onNextIfDifferAndNotNull(dao.action?.clone() as OTTriggerAction)
         conditionType.onNextIfDifferAndNotNull(dao.conditionType)
         conditionInstance.onNextIfDifferAndNotNull(dao.condition?.clone() as ATriggerCondition)
         if (isOffline) {
@@ -167,7 +170,7 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
 
     val isDirty: Boolean
         get() {
-            return (conditionInstance.value != originalTriggerDao?.condition || isAttachedTrackersDirty || originalTriggerDao?.checkScript != useScript.value || originalTriggerDao?.additionalScript != script.value?.datum)
+            return (conditionInstance.value != originalTriggerDao?.condition || actionInstance.value != originalTriggerDao?.action || isAttachedTrackersDirty || originalTriggerDao?.checkScript != useScript.value || originalTriggerDao?.additionalScript != script.value?.datum)
         }
 
     fun saveFrontToDao() {
@@ -175,6 +178,7 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
         if (dao != null && isDirty) {
             fun apply(dao: OTTriggerDAO) {
                 dao.serializedCondition = conditionInstance.value?.getSerializedString()
+                dao.serializedAction = actionInstance.value?.getSerializedString()
                 dao.additionalScript = script.value?.datum?.let { if (it.isBlank()) null else it }
                 dao.checkScript = useScript.value ?: false
                 dao.trackers.clear()
