@@ -205,7 +205,9 @@
 
     <string name="msg_format_login_to">Login to %1$s</string>
 
-    <string name="msg_noti_tap_for_tracking_format">Tap to log new %1$s record.</string>
+    <string name="msg_noti_tap_for_tracking_format">Tap to open %1$s</string>
+
+    <string name="msg_noti_reminder_until">Until %1$s</string>
 
     <string name="msg_no_trackers_are_assigned">No trackers are assigned.</string>
 
@@ -622,5 +624,7 @@
     <string name="msg_duplicate_choice_entry">Duplicate choice entry</string>
     <string name="msg_synchronized">Synchronized</string>
     <string name="msg_not_synchronized">To be synchronized</string>
+    <string name="msg_use_reminder_expiry">Expire when delayed</string>
+    <string name="msg_reminder_expiry_time">Expiry time limit</string>
 
 </resources>

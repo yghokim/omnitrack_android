@@ -12,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.triggers.ITriggerAlarmController
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerAlarmManager
+import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import javax.inject.Inject
 
 /**
@@ -70,12 +71,22 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action == OTApp.BROADCAST_ACTION_TIME_TRIGGER_ALARM) {
-            println("time trigger alarm")
-            val serviceIntent = Intent(context, TimeTriggerWakefulHandlingService::class.java)
-            serviceIntent.putExtras(intent)
-            OTApp.logger.writeSystemLog("Start wakeful service", TAG)
-            startWakefulService(context, serviceIntent)
+        when (intent.action) {
+            OTApp.BROADCAST_ACTION_TIME_TRIGGER_ALARM -> {
+                println("time trigger alarm")
+                val serviceIntent = Intent(context, TimeTriggerWakefulHandlingService::class.java)
+                serviceIntent.putExtras(intent)
+                OTApp.logger.writeSystemLog("Start wakeful service", TAG)
+                startWakefulService(context, serviceIntent)
+            }
+            OTApp.BROADCAST_ACTION_REMINDER_EXPIRY_ALARM -> {
+                println("reminder auto expiry alarm")
+                val dismissIntent = Intent(context, OTReminderService::class.java).apply {
+                    this.action = OTReminderService.ACTION_ON_USER_DISMISS
+                    this.putExtras(intent)
+                }
+                context.startService(dismissIntent)
+            }
         }
     }
 

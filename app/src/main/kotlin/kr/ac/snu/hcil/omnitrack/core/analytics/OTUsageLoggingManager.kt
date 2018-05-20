@@ -92,7 +92,7 @@ class OTUsageLoggingManager(configuredContext: ConfiguredContext) : IEventLogger
         )
 
         trigger.condition?.writeEventLogContent(content)
-        trigger.action?.writeEventLogContent(content)
+        trigger.action?.writeEventLogContent(trigger, content)
 
         inject?.invoke(content)
 

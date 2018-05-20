@@ -20,6 +20,11 @@
     <string name="time_duration_minute">m</string>
     <string name="time_duration_second">s</string>
 
+    <string name="time_duration_hour_full">hour</string>
+    <string name="time_duration_minute_full">minute</string>
+    <string name="time_duration_second_full">second</string>
+
+
     <string name="time_just_now">Just now</string>
 
     <plurals name="time_duration_day">
@@ -111,5 +116,6 @@
         <item>AM</item>
         <item>PM</item>
     </string-array>
+
 
 </resources>

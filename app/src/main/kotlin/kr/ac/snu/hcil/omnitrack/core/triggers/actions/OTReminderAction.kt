@@ -36,6 +36,8 @@ class OTReminderAction : OTTriggerAction() {
             if (value.message?.isNotBlank() == true)
                 out.name("message").value(value.message)
 
+            out.name("expiry").value(value.expirySeconds)
+
             out.endObject()
         }
 
@@ -52,6 +54,13 @@ class OTReminderAction : OTTriggerAction() {
                     "message" -> {
                         if (reader.peek() != JsonToken.NULL) {
                             action.message = reader.nextString()
+                        } else {
+                            reader.skipValue()
+                        }
+                    }
+                    "expiry" -> {
+                        if (reader.peek() != JsonToken.NULL) {
+                            action.expirySeconds = reader.nextInt()
                         } else {
                             reader.skipValue()
                         }
@@ -90,6 +99,8 @@ class OTReminderAction : OTTriggerAction() {
 
     companion object {
         const val KEY_NOTIFICATION_LEVEL = "notificationLevel"
+
+        const val EXPIRY_INDEFINITE = 0
 
         val typeAdapter: TypeAdapter<OTReminderAction> by lazy {
             ReminderActionTypeAdapter()
@@ -136,13 +147,18 @@ class OTReminderAction : OTTriggerAction() {
 
     var message: String? = null
 
+    var expirySeconds: Int = 0
+
     var intrinsicNotificationLevel: NotificationLevel = NotificationLevel.Noti
 
     val notificationLevelForSystem: NotificationLevel
         get() {
-            return localNotificationLevel ?: intrinsicNotificationLevel
+            //return localNotificationLevel ?: intrinsicNotificationLevel
+            return intrinsicNotificationLevel
         }
 
+
+    /*
     var localNotificationLevel: NotificationLevel?
         get() {
             val deviceSetting = localSettingsPreferences.getString("${KEY_NOTIFICATION_LEVEL}_${trigger.objectId}", null)
@@ -161,10 +177,10 @@ class OTReminderAction : OTTriggerAction() {
             } else {
                 localSettingsPreferences.edit().remove("${KEY_NOTIFICATION_LEVEL}_${trigger.objectId}").apply()
             }
-        }
+        }*/
 
 
-    override fun performAction(triggerTime: Long, configuredContext: ConfiguredContext): Completable {
+    override fun performAction(trigger: OTTriggerDAO, triggerTime: Long, configuredContext: ConfiguredContext): Completable {
         return Completable.defer {
             println("trigger fired - send notification")
             /*
@@ -199,6 +215,25 @@ class OTReminderAction : OTTriggerAction() {
 
             return@defer Completable.complete()
         }
+    }
+
+    override fun clone(): OTTriggerAction {
+        return OTReminderAction().let {
+            it.intrinsicNotificationLevel = this.intrinsicNotificationLevel
+            it.expirySeconds = this.expirySeconds
+            it.message = this.message
+            it
+        }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return if (other === this) {
+            true
+        } else if (other is OTReminderAction) {
+            other.expirySeconds == this.expirySeconds
+                    && other.intrinsicNotificationLevel == this.intrinsicNotificationLevel
+                    && other.message == this.message
+        } else false
     }
 
 }

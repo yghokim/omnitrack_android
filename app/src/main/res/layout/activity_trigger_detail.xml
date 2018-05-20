@@ -77,11 +77,11 @@
 
             <View style="@style/HorizontalSeparator" />
 
-            <FrameLayout
-                android:id="@+id/ui_action_settings_container"
+            <kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ReminderActionConfigurationPanel
+                android:id="@+id/ui_reminder_config_view"
+                android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-                android:visibility="gone" />
+                android:orientation="vertical" />
 
             <ViewStub
                 android:id="@+id/ui_tracker_assign_panel_stub"

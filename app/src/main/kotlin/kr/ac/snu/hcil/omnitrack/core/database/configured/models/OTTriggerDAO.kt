@@ -116,14 +116,14 @@ open class OTTriggerDAO : RealmObject() {
             if (_action == null) {
                 _action = if (serializedAction == null) {
                     when (actionType) {
-                        ACTION_TYPE_LOG -> OTBackgroundLoggingTriggerAction().apply { trigger = this@OTTriggerDAO }
-                        ACTION_TYPE_REMIND -> OTReminderAction().apply { trigger = this@OTTriggerDAO }
+                        ACTION_TYPE_LOG -> OTBackgroundLoggingTriggerAction()
+                        ACTION_TYPE_REMIND -> OTReminderAction()
                         else -> null
                     }
                 } else {
                     when (actionType) {
-                        ACTION_TYPE_LOG -> OTBackgroundLoggingTriggerAction.typeAdapter.fromJson(serializedAction).apply { trigger = this@OTTriggerDAO }
-                        ACTION_TYPE_REMIND -> OTReminderAction.typeAdapter.fromJson(serializedAction).apply { trigger = this@OTTriggerDAO }
+                        ACTION_TYPE_LOG -> OTBackgroundLoggingTriggerAction.typeAdapter.fromJson(serializedAction)
+                        ACTION_TYPE_REMIND -> OTReminderAction.typeAdapter.fromJson(serializedAction)
                         else -> null
                     }
                 }
@@ -254,7 +254,8 @@ open class OTTriggerDAO : RealmObject() {
 
     fun performFire(triggerTime: Long, configuredContext: ConfiguredContext): Completable {
         val triggerId = objectId
-        return (action?.performAction(triggerTime, configuredContext) ?: Completable.error(IllegalStateException("Not proper action instance is generated.")))
+        return (action?.performAction(this, triggerTime, configuredContext)
+                ?: Completable.error(IllegalStateException("Not proper action instance is generated.")))
                 .doOnComplete {
                     configuredContext.applicationContext.runOnUiThread {
                         LocalBroadcastManager.getInstance(configuredContext.applicationContext).sendBroadcastSync(Intent(OTApp.BROADCAST_ACTION_TRIGGER_FIRED)
