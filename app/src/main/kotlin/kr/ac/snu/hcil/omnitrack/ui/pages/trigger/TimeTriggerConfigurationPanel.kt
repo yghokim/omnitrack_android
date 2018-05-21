@@ -76,13 +76,11 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
         repeatEndDate = GregorianCalendar(2016, 1, 1)
 
         configTypePropertyView.adapter = IconNameEntryArrayAdapter(context,
-                arrayOf(
-                        IconNameEntryArrayAdapter.Entry(OTTriggerInformationHelper.getTimeConfigIconResId(OTTimeTriggerCondition.TIME_CONDITION_ALARM)!!,
-                                OTTriggerInformationHelper.getTimeConfigDescResId(OTTimeTriggerCondition.TIME_CONDITION_ALARM)!!),
-
-                        IconNameEntryArrayAdapter.Entry(OTTriggerInformationHelper.getTimeConfigIconResId(OTTimeTriggerCondition.TIME_CONDITION_INTERVAL)!!,
-                                OTTriggerInformationHelper.getTimeConfigDescResId(OTTimeTriggerCondition.TIME_CONDITION_INTERVAL)!!)
-                ))
+                arrayOf(OTTimeTriggerCondition.TIME_CONDITION_ALARM, OTTimeTriggerCondition.TIME_CONDITION_INTERVAL, OTTimeTriggerCondition.TIME_CONDITION_SAMPLING).map {
+                    IconNameEntryArrayAdapter.Entry(OTTriggerInformationHelper.getTimeConfigIconResId(it)!!,
+                            OTTriggerInformationHelper.getTimeConfigDescResId(it)!!)
+                }.toTypedArray()
+        )
 
         configTypePropertyView.valueChanged += this
 

@@ -15,8 +15,9 @@
     <string name="msg_trigger_time_config_interval">Interval</string>
     <string name="msg_trigger_time_config_alarm_time">Trigger time</string>
 
-    <string name="msg_trigger_time_config_desc_alarm">At specific time</string>
+    <string name="msg_trigger_time_config_desc_alarm">At specific time points</string>
     <string name="msg_trigger_time_config_desc_interval">Repeated with interval</string>
+    <string name="msg_trigger_time_config_desc_ema">At random moments</string>
 
     <string name="msg_trigger_time_is_repeated">Repeat</string>
 
@@ -36,5 +37,9 @@
 
     <string name='msg_trigger_event_msg_tap_to_configure'>Tap to configure</string>
     <string name="msg_trigger_time_finish_on_end_date">Finish on End Date</string>
+
+
+    <string name="msg_use_reminder_expiry">Expire when delayed</string>
+    <string name="msg_reminder_expiry_time">Expiry time limit</string>
 
 </resources>

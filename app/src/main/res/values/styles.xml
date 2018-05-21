@@ -379,7 +379,6 @@
     </style>
 
     <style name="hourPickerHourStyle">
-        <!--<item name="fontPath">fonts/Roboto-Light.ttf</item>-->
         <item name="android:textSize">@dimen/number_digit_size</item>
         <item name="android:textColor">@color/colorSecondary</item>
     </style>

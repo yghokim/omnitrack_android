@@ -449,8 +449,6 @@
     <string name="msg_synchronized">동기화됨</string>
     <string name="msg_not_synchronized">동기화 대기중</string>
 
-    <string name="msg_use_reminder_expiry">일정 시간이 지나면 알림 취소</string>
-    <string name="msg_reminder_expiry_time">자동취소 딜레이</string>
 
 
     <string-array name="purpose_entries">
