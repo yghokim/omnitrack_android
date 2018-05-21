@@ -624,7 +624,5 @@
     <string name="msg_duplicate_choice_entry">Duplicate choice entry</string>
     <string name="msg_synchronized">Synchronized</string>
     <string name="msg_not_synchronized">To be synchronized</string>
-    <string name="msg_use_reminder_expiry">Expire when delayed</string>
-    <string name="msg_reminder_expiry_time">Expiry time limit</string>
 
 </resources>

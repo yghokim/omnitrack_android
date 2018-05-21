@@ -11,6 +11,7 @@ import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
+import uk.co.chrisjenx.calligraphy.CalligraphyUtils
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -57,6 +58,18 @@ class NumericUpDown : LinearLayout, OnLongClickListener, OnClickListener, OnTouc
     var displayedValues: Array<String>? = null
         set(value) {
             field = value
+            if (value != null) {
+                formatter = null
+            }
+            invalidateViews()
+        }
+
+    var formatter: ((Int) -> String)? = null
+        set(value) {
+            field = value
+            if (value != null) {
+                displayedValues = null
+            }
             invalidateViews()
         }
 
@@ -88,14 +101,38 @@ class NumericUpDown : LinearLayout, OnLongClickListener, OnClickListener, OnTouc
 
     private var timer: Timer? = null
 
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
         changeDirection(orientation)
+        applyStyle(context, attrs)
     }
 
-    constructor(context: Context?) : super(context) {
+    constructor(context: Context) : super(context) {
         changeDirection(LinearLayout.VERTICAL)
     }
 
+    private fun applyStyle(context: Context, attrs: AttributeSet?) {
+
+        val a = context.theme.obtainStyledAttributes(
+                attrs, intArrayOf(android.R.attr.textSize),
+                0, 0)
+
+        try {
+            if (a.hasValue(0))
+                field.textSize = a.getDimension(0, 12f)
+        } finally {
+            a.recycle()
+        }
+
+        val b = context.obtainStyledAttributes(attrs, R.styleable.NumericUpDown)
+        try {
+
+            if (b.hasValue(R.styleable.NumericUpDown_digitFontPath)) {
+                CalligraphyUtils.applyFontToTextView(context, field, b.getString(R.styleable.NumericUpDown_digitFontPath))
+            }
+        } finally {
+            b.recycle()
+        }
+    }
 
     private fun changeDirection(direction: Int) {
         orientation = direction
@@ -198,7 +235,8 @@ class NumericUpDown : LinearLayout, OnLongClickListener, OnClickListener, OnTouc
     }
 
     private fun getDisplayedValue(value: Int): String {
-        return displayedValues?.get(value - minValue) ?: if (zeroPad > 1) {
+        return formatter?.invoke(value) ?: displayedValues?.get(value - minValue)
+        ?: if (zeroPad > 1) {
             String.format("%0${zeroPad}d", value)
         } else if (quantityResId != null) {
             context.resources.getQuantityString(quantityResId!!, value)
