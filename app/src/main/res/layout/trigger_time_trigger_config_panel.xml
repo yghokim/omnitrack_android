@@ -22,6 +22,7 @@
         android:id="@+id/ui_group_interval"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:constraint_referenced_ids="ui_interval_group_config_header,ui_duration_picker,ui_checkbox_interval_use_timespan,ui_trigger_interval_timespan_picker_wrapper,ui_interval_group_config_bottom_separator" />
 
     <TextView
@@ -77,6 +78,7 @@
         android:id="@+id/ui_group_alarm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:constraint_referenced_ids="ui_alarm_group_config_header,ui_time_picker" />
 
     <TextView
@@ -103,15 +105,66 @@
         app:layout_constraintTop_toBottomOf="@id/ui_alarm_group_config_header" />
 
 
+    <android.support.constraint.Group
+        android:id="@+id/ui_ema_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="ui_ema_count,ui_ema_use_sampling_range,ui_ema_range_wrapper,ui_ema_group_config_bottom_separator" />
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.NumericUpDownPropertyView
+        android:id="@+id/ui_ema_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text="Alerts per day"
+        app:layout_constraintTop_toBottomOf="@id/ui_time_picker" />
+
+    <CheckBox
+        android:id="@+id/ui_ema_use_sampling_range"
+        style="@style/checkboxTextStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text="Sample within a specific time period"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ui_ema_count" />
+
+    <FrameLayout
+        android:id="@+id/ui_ema_range_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        app:layout_constraintTop_toBottomOf="@id/ui_ema_use_sampling_range">
+
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourRangePicker
+            android:id="@+id/ui_ema_range_picker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+    </FrameLayout>
+
+
+    <View
+        android:id="@+id/ui_ema_group_config_bottom_separator"
+        style="@style/HorizontalSeparator.OfConstraintLayout.Light"
+        app:layout_constraintTop_toBottomOf="@id/ui_ema_range_wrapper" />
+
+
     <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
         android:id="@+id/ui_is_repeated"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:text="@string/msg_trigger_time_is_repeated"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ui_time_picker" />
+        app:layout_constraintTop_toBottomOf="@id/ui_ema_group_config_bottom_separator" />
 
     <android.support.constraint.Group
         android:id="@+id/ui_group_repitition_config"

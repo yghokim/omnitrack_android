@@ -40,6 +40,7 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
                     "esmEndHr" -> condition.samplingHourEnd = reader.nextInt().toByte()
                     "esmIntervalMin" -> condition.samplingMinIntervalMinutes = reader.nextInt().toShort()
                     "esmCount" -> condition.samplingCount = reader.nextInt().toShort()
+                    "esmRanged" -> condition.samplingRangeUsed = reader.nextBoolean()
 
                     "repeat" -> condition.isRepeated = reader.nextBoolean()
                     "dow" -> condition.dayOfWeekFlags = reader.nextInt().toByte()
@@ -72,6 +73,8 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
             out.name("esmEndHr").value(value.samplingHourEnd)
             out.name("esmIntervalMin").value(value.samplingMinIntervalMinutes)
             out.name("esmCount").value(value.samplingCount)
+            out.name("esmRanged").value(value.samplingRangeUsed)
+
 
             out.name("repeat").value(value.isRepeated)
             out.name("dow").value(value.dayOfWeekFlags)
@@ -104,6 +107,7 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
     var samplingHourEnd: Byte = 23 // 0~23
     var samplingCount: Short = 10
     var samplingMinIntervalMinutes: Short = 30
+    var samplingRangeUsed: Boolean = false
 
     var isRepeated: Boolean = false
 
@@ -139,6 +143,7 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
                     && samplingCount == other.samplingCount
                     && samplingHourEnd == other.samplingHourEnd
                     && samplingHourStart == other.samplingHourStart
+                    && samplingRangeUsed == other.samplingRangeUsed
                     && samplingMinIntervalMinutes == other.samplingMinIntervalMinutes
         } else false
     }

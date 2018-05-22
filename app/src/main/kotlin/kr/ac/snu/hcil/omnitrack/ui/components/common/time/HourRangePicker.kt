@@ -73,7 +73,7 @@ class HourRangePicker : ConstraintLayout {
         val handler = { sender: Any, args: NumericUpDown.ChangeArgs ->
             onRangeChanged.invoke(this, Pair(fromHourOfDay, toHourOfDay))
 
-            ui_description.text = if (ui_picker_to.value == ui_picker_from.value) {
+            ui_description.text = if (ui_picker_to.value == ui_picker_from.value || (ui_picker_from.value == 0 && ui_picker_to.value == 24)) {
                 resources.getString(R.string.msg_full_day)
             } else {
                 val toNextDay = ui_picker_to.value < ui_picker_from.value
