@@ -89,8 +89,8 @@
 
     <string name="msg_full_day">Full day</string>
 
-    <string name="msg_midnight_0">Midnight (Start of the day)</string>
-    <string name="msg_midnight_24">Midnight (End of the day)</string>
+    <string name="msg_midnight_0">00:00</string>
+    <string name="msg_midnight_24">24:00</string>
 
     <string name="msg_everyday">Everyday</string>
     <string name="msg_once">Once</string>

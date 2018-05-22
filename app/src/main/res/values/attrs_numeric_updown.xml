@@ -2,5 +2,7 @@
 <resources>
     <declare-styleable name="NumericUpDown">
         <attr name="digitFontPath" format="string" />
+        <attr name="digitMin" format="integer" />
+        <attr name="digitMax" format="integer" />
     </declare-styleable>
 </resources>

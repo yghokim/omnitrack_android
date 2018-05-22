@@ -55,7 +55,9 @@ object OTTriggerViewFactory {
                             } else SamplingTimeConditionDisplayView(uiContext)
 
                             displayView.samplingCount = condition.samplingCount
-                            displayView.setSamplingRange(condition.samplingHourStart, condition.samplingHourEnd)
+                            if (condition.samplingRangeUsed) {
+                                displayView.setSamplingRange(condition.samplingHourStart, condition.samplingHourEnd)
+                            } else displayView.setSamplingFullDay()
 
                             return displayView
                         }

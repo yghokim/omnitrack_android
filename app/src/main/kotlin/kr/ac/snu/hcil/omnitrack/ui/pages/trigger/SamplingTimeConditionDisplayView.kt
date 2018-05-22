@@ -38,4 +38,8 @@ class SamplingTimeConditionDisplayView : ConstraintLayout {
             ui_text_hour_range.text = "${HourRangePicker.getTimeText(from.toInt(), false)} -\n${HourRangePicker.getTimeText(to.toInt(), to < from)}"
         }
     }
+
+    fun setSamplingFullDay() {
+        ui_text_hour_range.setText(R.string.msg_full_day)
+    }
 }

@@ -14,6 +14,7 @@ import android.widget.DatePicker
 import butterknife.bindView
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import kotlinx.android.synthetic.main.trigger_time_trigger_config_panel.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
@@ -132,6 +133,24 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
             }
         }
 
+        ui_ema_use_sampling_range.setOnCheckedChangeListener(this)
+        ui_ema_range_picker.onRangeChanged += { sender, range ->
+            if (currentCondition?.samplingHourStart != range.first.toByte()
+                    || currentCondition?.samplingHourEnd != range.second.toByte()) {
+                currentCondition?.samplingHourStart = range.first.toByte()
+                currentCondition?.samplingHourEnd = range.second.toByte()
+                notifyConditionChanged()
+            }
+        }
+        ui_ema_count.valueChanged += { sender, count ->
+            if (currentCondition?.samplingCount != count.toShort()) {
+                currentCondition?.samplingCount = count.toShort()
+                notifyConditionChanged()
+            }
+        }
+        ui_ema_count.picker.minValue = 1
+        ui_ema_count.picker.maxValue = 144
+
         InterfaceHelper.removeButtonTextDecoration(endDateButton)
         endDateButton.setOnClickListener(this)
         isEndSpecifiedCheckBox.setOnCheckedChangeListener(this)
@@ -168,11 +187,13 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
                 configTypePropertyView.value = 0
                 alarmConfigGroup.visibility = VISIBLE
                 intervalConfigGroup.visibility = GONE
+                ui_ema_group.visibility = GONE
             }
 
             OTTimeTriggerCondition.TIME_CONDITION_INTERVAL -> {
                 configTypePropertyView.value = 1
                 alarmConfigGroup.visibility = GONE
+                ui_ema_group.visibility = GONE
                 intervalConfigGroup.visibility = VISIBLE
             }
 
@@ -181,6 +202,7 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
 
                 alarmConfigGroup.visibility = GONE
                 intervalConfigGroup.visibility = GONE
+                ui_ema_group.visibility = View.VISIBLE
             }
         }
         refreshingViews = false
@@ -241,7 +263,7 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
         endDateButton.text = dateFormat.format(repeatEndDate.time)
     }
 
-    override fun onCheckedChanged(view: CompoundButton, p1: Boolean) {
+    override fun onCheckedChanged(view: CompoundButton, isChecked: Boolean) {
         if (view === timeSpanCheckBox) {
             TransitionManager.beginDelayedTransition(this)
             if (currentCondition?.intervalIsHourRangeUsed != timeSpanCheckBox.isChecked) {
@@ -273,8 +295,18 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
                     notifyConditionChanged()
                 }
             }
+        } else if (view === ui_ema_use_sampling_range) {
+            TransitionManager.beginDelayedTransition(this)
+            if (isChecked) {
+                ui_ema_range_picker.visibility = View.VISIBLE
+            } else {
+                ui_ema_range_picker.visibility = View.GONE
+            }
 
-
+            if (currentCondition?.samplingRangeUsed != isChecked) {
+                currentCondition?.samplingRangeUsed = isChecked
+                notifyConditionChanged()
+            }
         }
 
 
@@ -317,6 +349,12 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
                 timeSpanPicker.fromHourOfDay = condition.intervalHourRangeStart.toInt()
                 timeSpanPicker.toHourOfDay = condition.intervalHourRangeEnd.toInt()
             }
+
+            ui_ema_count.value = condition.samplingCount.toInt()
+            ui_ema_use_sampling_range.isChecked = condition.samplingRangeUsed
+
+            ui_ema_range_picker.fromHourOfDay = condition.samplingHourStart.toInt()
+            ui_ema_range_picker.toHourOfDay = condition.samplingHourEnd.toInt()
 
             suspendConditionChangeEvent = false
         }

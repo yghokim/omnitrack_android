@@ -86,8 +86,8 @@
     <string name="msg_format_next_day">다음날 %1$s</string>
     <string name="msg_full_day">하루 전체</string>
 
-    <string name="msg_midnight_0">자정 (하루 시작)</string>
-    <string name="msg_midnight_24">자정 (하루 끝)</string>
+    <string name="msg_midnight_0">00:00</string>
+    <string name="msg_midnight_24">24:00</string>
 
     <string name="msg_everyday">매일</string>
     <string name="msg_once">한 번만</string>
