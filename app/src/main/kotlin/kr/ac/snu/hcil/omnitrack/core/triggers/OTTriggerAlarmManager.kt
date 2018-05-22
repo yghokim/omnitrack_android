@@ -420,10 +420,10 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
 
                 calculator
             }
-            else -> throw Exception("Unsupported Time Config Type")
+            else -> null
         }
 
-        return nextTimeCalculator.calculateNext(pivot, now)
+        return nextTimeCalculator?.calculateNext(pivot, now)
     }
 
 }

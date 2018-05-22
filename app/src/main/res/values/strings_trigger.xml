@@ -41,5 +41,6 @@
 
     <string name="msg_use_reminder_expiry">Expire when delayed</string>
     <string name="msg_reminder_expiry_time">Expiry time limit</string>
+    <string name="msg_time_trigger_sampling_count_unit_text">times/day</string>
 
 </resources>
