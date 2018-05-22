@@ -28,7 +28,6 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
     constructor(context: Context, attrs: AttributeSet? = null) : this(context, attrs, 0)
 
     init {
-
         //buttonSize = //context.resources.getDimensionPixelSize(R.dimen.color_selection_button_size)
 
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -132,7 +131,7 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
 
     override fun onRestoreInstanceState(state: Parcelable?) {
         val thisState = state as SavedState
-        super.onRestoreInstanceState(state)
+        super.onRestoreInstanceState(thisState.superState)
         selectedIndex = thisState.selectedIndex
     }
 

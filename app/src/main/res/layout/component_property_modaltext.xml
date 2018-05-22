@@ -9,10 +9,11 @@
     <include layout="@layout/common_property_subheader" />
 
     <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/ui_value"
+        android:id="@+id/ui_text"
         style="@style/ShortTextFormStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:freezesText="true"
         android:background="@drawable/button_background_formlike"
         tools:text="Text" />
 </LinearLayout>

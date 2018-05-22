@@ -1,6 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 
 import android.content.Context
+import android.os.Parcel
+import android.os.Parcelable
 import android.text.InputType
 import android.util.AttributeSet
 import android.view.View
@@ -31,19 +33,19 @@ class ModalTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
     }
 
     override var value: String
-        get() = ui_value.text.toString()
+        get() = ui_text.text.toString()
         set(value) {
-            if (ui_value.text.toString() != value) {
-                ui_value.text = value
+            if (ui_text.text.toString() != value) {
+                ui_text.text = value
             }
         }
 
     init {
-        ui_value.setOnClickListener(this)
+        ui_text.setOnClickListener(this)
     }
 
     override fun onClick(view: View) {
-        if (view === ui_value) {
+        if (view === ui_text) {
             editTextDialog.show()
         }
     }
@@ -63,6 +65,37 @@ class ModalTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
     }
 
     override fun focus() {
+
+    }
+
+    override fun onSaveInstanceState(): Parcelable {
+        val superState = super.onSaveInstanceState()
+        val thisState = SavedState(superState)
+        return thisState
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        val thisState = state as SavedState
+        super.onRestoreInstanceState(thisState.superState)
+    }
+
+    class SavedState : APropertyView.SavedState {
+
+        constructor(source: Parcel) : super(source)
+
+        constructor(superState: Parcelable) : super(superState)
+
+
+        val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
+
+            override fun createFromParcel(source: Parcel): SavedState {
+                return SavedState(source)
+            }
+
+            override fun newArray(size: Int): Array<SavedState?> {
+                return arrayOfNulls(size)
+            }
+        }
 
     }
 }
