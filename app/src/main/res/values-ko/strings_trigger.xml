@@ -17,7 +17,7 @@
 
     <string name="msg_trigger_time_config_desc_alarm">특정한 시각에 발동</string>
     <string name="msg_trigger_time_config_desc_interval">정해진 시간 간격으로 발동</string>
-    <string name="msg_trigger_time_config_desc_ema">무작위 시각에 정해진 횟수로 발동</string>
+    <string name="msg_trigger_time_config_desc_ema">무작위 시각에 정해진 횟수만큼 발동</string>
 
     <string name="msg_trigger_time_is_repeated">반복</string>
 
@@ -41,5 +41,6 @@
 
     <string name="msg_use_reminder_expiry">일정 시간이 지나면 알림 취소</string>
     <string name="msg_reminder_expiry_time">자동취소 딜레이</string>
+    <string name="msg_time_trigger_sampling_count_unit_text">회(하루당)</string>
 
 </resources>

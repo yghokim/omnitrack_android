@@ -78,6 +78,17 @@
         <item name="android:layout_marginBottom">0dp</item>
     </style>
 
+    <style name="HorizontalSeparator.OfConstraintLayout" parent="HorizontalSeparator">
+        <item name="layout_constraintStart_toStartOf">parent</item>
+        <item name="layout_constraintEnd_toEndOf">parent</item>
+        <item name="android:layout_marginLeft">@dimen/activity_horizontal_margin</item>
+        <item name="android:layout_marginRight">@dimen/activity_horizontal_margin</item>
+    </style>
+
+    <style name="HorizontalSeparator.OfConstraintLayout.Light" parent="HorizontalSeparator.OfConstraintLayout">
+        <item name="android:background">@color/editTextLine</item>
+    </style>
+
     <style name="ListElementTitle">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">18sp</item>

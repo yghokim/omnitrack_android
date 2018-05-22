@@ -65,6 +65,7 @@ object OTTriggerInformationHelper {
         return when (timeConditionType) {
             OTTimeTriggerCondition.TIME_CONDITION_ALARM -> R.string.msg_trigger_time_config_desc_alarm
             OTTimeTriggerCondition.TIME_CONDITION_INTERVAL -> R.string.msg_trigger_time_config_desc_interval
+            OTTimeTriggerCondition.TIME_CONDITION_SAMPLING -> R.string.msg_trigger_time_config_desc_ema
             else -> null
         }
     }
@@ -74,6 +75,7 @@ object OTTriggerInformationHelper {
         return when (timeConditionType) {
                     OTTimeTriggerCondition.TIME_CONDITION_ALARM -> R.drawable.alarm_dark
                     OTTimeTriggerCondition.TIME_CONDITION_INTERVAL -> R.drawable.repeat_dark
+            OTTimeTriggerCondition.TIME_CONDITION_SAMPLING -> R.drawable.ic_alarm_ema_24px
                     else -> null
                 }
     }

@@ -2,12 +2,15 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.support.constraint.ConstraintLayout
 import android.transition.TransitionManager
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.CompoundButton
+import android.widget.DatePicker
 import butterknife.bindView
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -24,6 +27,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxProperty
 import kr.ac.snu.hcil.omnitrack.utils.*
 import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
 import kr.ac.snu.hcil.omnitrack.utils.time.Time
+import org.jetbrains.anko.backgroundResource
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,12 +35,12 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-08-24
  */
-class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView, IEventListener<Int>, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
+class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationView, IEventListener<Int>, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
     private val dateFormat = SimpleDateFormat(resources.getString(R.string.dateformat_ymd))
 
     private val configTypePropertyView: ComboBoxPropertyView by bindView(R.id.ui_time_trigger_type)
-    private val intervalConfigGroup: ViewGroup by bindView(R.id.ui_interval_group)
-    private val alarmConfigGroup: ViewGroup by bindView(R.id.ui_alarm_group)
+    private val intervalConfigGroup: View by bindView(R.id.ui_group_interval)
+    private val alarmConfigGroup: View by bindView(R.id.ui_group_alarm)
     private val durationPicker: DurationPicker by bindView(R.id.ui_duration_picker)
     private val timePicker: DateTimePicker by bindView(R.id.ui_time_picker)
     private val dayOfWeekPicker: DayOfWeekSelector by bindView(R.id.ui_day_of_week_selector)
@@ -49,7 +53,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
     private val isEndSpecifiedCheckBox: CheckBox by bindView(R.id.ui_checkbox_range_specify_end)
     private val endDateButton: Button by bindView(R.id.ui_button_end_date)
 
-    private val repetitionConfigGroup: ViewGroup by bindView(R.id.ui_repetition_config_group)
+    private val repetitionConfigGroup: View by bindView(R.id.ui_group_repitition_config)
 
     private val repeatEndDate: Calendar
 
@@ -69,10 +73,10 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     init {
-        //TODO change to merge
+        backgroundResource = R.drawable.bottom_separator_light
+
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        addView(inflater.inflate(R.layout.trigger_time_trigger_config_panel, this, false))
-        orientation = LinearLayout.VERTICAL
+        inflater.inflate(R.layout.trigger_time_trigger_config_panel, this, true)
         repeatEndDate = GregorianCalendar(2016, 1, 1)
 
         configTypePropertyView.adapter = IconNameEntryArrayAdapter(context,
@@ -138,11 +142,16 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
         if (animate) TransitionManager.beginDelayedTransition(this)
         if (isRepeated) {
             repetitionConfigGroup.visibility = View.VISIBLE
-            timeSpanCheckBox.isChecked = true
+            timeSpanCheckBox.isChecked = currentCondition?.intervalIsHourRangeUsed ?: false
             timeSpanCheckBox.isEnabled = true
+
         } else {
             repetitionConfigGroup.visibility = View.GONE
+            val rangeOriginallyUsed = currentCondition?.intervalIsHourRangeUsed ?: false
             timeSpanCheckBox.isChecked = false
+            if (rangeOriginallyUsed) {
+                currentCondition?.intervalIsHourRangeUsed = true
+            }
             timeSpanCheckBox.isEnabled = false
         }
     }
@@ -166,6 +175,13 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
                 alarmConfigGroup.visibility = GONE
                 intervalConfigGroup.visibility = VISIBLE
             }
+
+            OTTimeTriggerCondition.TIME_CONDITION_SAMPLING -> {
+                configTypePropertyView.value = 2
+
+                alarmConfigGroup.visibility = GONE
+                intervalConfigGroup.visibility = GONE
+            }
         }
         refreshingViews = false
     }
@@ -186,6 +202,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
                 val conditionType = when (args) {
                     0 -> OTTimeTriggerCondition.TIME_CONDITION_ALARM
                     1 -> OTTimeTriggerCondition.TIME_CONDITION_INTERVAL
+                    2 -> OTTimeTriggerCondition.TIME_CONDITION_SAMPLING
                     else -> OTTimeTriggerCondition.TIME_CONDITION_ALARM
                 }
 

@@ -27,12 +27,20 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
             while (reader.hasNext()) {
                 when (reader.nextName()) {
                     "cType" -> condition.timeConditionType = reader.nextInt().toByte()
+
                     "aHr" -> condition.alarmTimeHour = reader.nextInt().toByte()
                     "aMin" -> condition.alarmTimeMinute = reader.nextInt().toByte()
+
                     "iSec" -> condition.intervalSeconds = reader.nextInt().toShort()
                     "iRanged" -> condition.intervalIsHourRangeUsed = reader.nextBoolean()
                     "iStartHr" -> condition.intervalHourRangeStart = reader.nextInt().toByte()
                     "iEndHr" -> condition.intervalHourRangeEnd = reader.nextInt().toByte()
+
+                    "esmStartHr" -> condition.samplingHourStart = reader.nextInt().toByte()
+                    "esmEndHr" -> condition.samplingHourEnd = reader.nextInt().toByte()
+                    "esmIntervalMin" -> condition.samplingMinIntervalMinutes = reader.nextInt().toShort()
+                    "esmCount" -> condition.samplingCount = reader.nextInt().toShort()
+
                     "repeat" -> condition.isRepeated = reader.nextBoolean()
                     "dow" -> condition.dayOfWeekFlags = reader.nextInt().toByte()
                     "endAt" -> if (reader.peek() == JsonToken.STRING) {
@@ -51,12 +59,20 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
             out.beginObject()
 
             out.name("cType").value(value.timeConditionType)
+
             out.name("aHr").value(value.alarmTimeHour)
             out.name("aMin").value(value.alarmTimeMinute)
+
             out.name("iSec").value(value.intervalSeconds)
             out.name("iRanged").value(value.intervalIsHourRangeUsed)
             out.name("iStartHr").value(value.intervalHourRangeStart)
             out.name("iEndHr").value(value.intervalHourRangeEnd)
+
+            out.name("esmStartHr").value(value.samplingHourStart)
+            out.name("esmEndHr").value(value.samplingHourEnd)
+            out.name("esmIntervalMin").value(value.samplingMinIntervalMinutes)
+            out.name("esmCount").value(value.samplingCount)
+
             out.name("repeat").value(value.isRepeated)
             out.name("dow").value(value.dayOfWeekFlags)
             out.name("endAt").value(value.endAt)
@@ -83,6 +99,11 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
     var intervalIsHourRangeUsed: Boolean = false
     var intervalHourRangeStart: Byte = 9
     var intervalHourRangeEnd: Byte = 24
+
+    var samplingHourStart: Byte = 9 // 0~23
+    var samplingHourEnd: Byte = 23 // 0~23
+    var samplingCount: Short = 10
+    var samplingMinIntervalMinutes: Short = 30
 
     var isRepeated: Boolean = false
 
@@ -115,6 +136,10 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
                     && isRepeated == other.isRepeated
                     && dayOfWeekFlags == other.dayOfWeekFlags
                     && endAt == other.endAt
+                    && samplingCount == other.samplingCount
+                    && samplingHourEnd == other.samplingHourEnd
+                    && samplingHourStart == other.samplingHourStart
+                    && samplingMinIntervalMinutes == other.samplingMinIntervalMinutes
         } else false
     }
 }
