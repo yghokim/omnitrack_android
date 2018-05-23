@@ -15,7 +15,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingPrefix"
-        tools:text="10" />
+        tools:text="1" />
 
     <TextView
         android:id="@+id/ui_text_sampling_count_unit"
@@ -39,7 +39,7 @@
         android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@id/ui_text_hour_range"
         app:layout_constraintLeft_toRightOf="@+id/ui_text_sampling_count_unit"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@id/ui_text_sampling_count"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
@@ -48,9 +48,22 @@
         android:layout_height="wrap_content"
         android:text="@string/msg_full_day"
         android:textSize="13sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/ui_text_sampling_count"
         app:layout_constraintLeft_toLeftOf="@id/ui_header_sampling_range"
         app:layout_constraintTop_toBottomOf="@id/ui_header_sampling_range"
         app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/ui_text_next_time_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:layout_marginLeft="8dp"
+        android:textColor="@color/textColorDark"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ui_text_sampling_count"
+        tools:text="Hahaha" />
 
 </merge>

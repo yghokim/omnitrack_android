@@ -188,6 +188,9 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
                 alarmConfigGroup.visibility = VISIBLE
                 intervalConfigGroup.visibility = GONE
                 ui_ema_group.visibility = GONE
+
+                isRepeatedView.locked = false
+                isRepeatedView.alpha = 1.0f
             }
 
             OTTimeTriggerCondition.TIME_CONDITION_INTERVAL -> {
@@ -195,6 +198,9 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
                 alarmConfigGroup.visibility = GONE
                 ui_ema_group.visibility = GONE
                 intervalConfigGroup.visibility = VISIBLE
+
+                isRepeatedView.locked = false
+                isRepeatedView.alpha = 1.0f
             }
 
             OTTimeTriggerCondition.TIME_CONDITION_SAMPLING -> {
@@ -203,6 +209,13 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
                 alarmConfigGroup.visibility = GONE
                 intervalConfigGroup.visibility = GONE
                 ui_ema_group.visibility = View.VISIBLE
+
+                if (currentCondition?.isRepeated != true) {
+                    currentCondition?.isRepeated = true
+                    notifyConditionChanged()
+                }
+                isRepeatedView.locked = true
+                isRepeatedView.alpha = 0.3f
             }
         }
         refreshingViews = false

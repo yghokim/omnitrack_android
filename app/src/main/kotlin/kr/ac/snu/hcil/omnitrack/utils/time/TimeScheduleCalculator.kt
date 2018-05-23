@@ -28,7 +28,7 @@ abstract class TimeScheduleCalculator<T> where T : TimeScheduleCalculator<T> {
         return this as T
     }
 
-    fun calculateNext(last: Long?, now: Long): Long? {
+    open fun calculateNext(last: Long?, now: Long): Long? {
         if (now > endAt || availableDaysOfWeek.find { it == true } == null) {
             return null
         } else {

@@ -244,6 +244,10 @@ object TimeHelper {
         }
     }
 
+    fun getDayOfWeekBooleanInFlag(dayOfWeek: Int, flags: Int): Boolean {
+        return BitwiseOperationHelper.getBooleanAt(flags, 6 - dayOfWeek)
+    }
+
     fun loopForDays(from: Long, to: Long, loopHandler: (time: Long, start: Long, end: Long, dayOfYear: Int) -> Unit) {
         val rangeCal = Calendar.getInstance()
         val cal = Calendar.getInstance()

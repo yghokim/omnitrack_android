@@ -4,9 +4,12 @@ import android.content.Context
 import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import kotlinx.android.synthetic.main.trigger_display_time_ema.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourRangePicker
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
+import java.util.*
 
 class SamplingTimeConditionDisplayView : ConstraintLayout {
 
@@ -20,6 +23,17 @@ class SamplingTimeConditionDisplayView : ConstraintLayout {
         }
         set(value) {
             ui_text_sampling_count.text = value.toString()
+        }
+
+    var nextAlertTime: Long? = null
+        set(value) {
+            field = value
+            if (value == null) {
+                ui_text_next_time_info.visibility = GONE
+            } else {
+                ui_text_next_time_info.visibility = View.VISIBLE
+                ui_text_next_time_info.text = String.format(resources.getString(R.string.msg_trigger_ema_display_next_alert_format), TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(Date(value)))
+            }
         }
 
     constructor(context: Context?) : super(context)

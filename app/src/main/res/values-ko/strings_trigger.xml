@@ -43,4 +43,7 @@
     <string name="msg_reminder_expiry_time">자동취소 딜레이</string>
     <string name="msg_time_trigger_sampling_count_unit_text">회(하루당)</string>
 
+    <string name="msg_trigger_ema_display_next_alert_format">다음 발동: %1$s 중</string>
+    <string name="msg_trigger_alerts_per_day">일일 발동횟수</string>
+
 </resources>
