@@ -118,7 +118,7 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:text="Alerts per day"
+        android:text="@string/msg_trigger_alerts_per_day"
         app:layout_constraintTop_toBottomOf="@id/ui_time_picker" />
 
     <CheckBox

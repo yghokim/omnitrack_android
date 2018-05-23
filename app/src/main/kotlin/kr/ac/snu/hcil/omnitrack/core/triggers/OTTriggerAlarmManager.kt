@@ -24,7 +24,9 @@ import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
+import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
 import kr.ac.snu.hcil.omnitrack.utils.time.DesignatedTimeScheduleCalculator
+import kr.ac.snu.hcil.omnitrack.utils.time.ExperienceSamplingTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.IntervalTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.util.*
@@ -120,7 +122,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
 
     override fun registerTriggerAlarm(pivot: Long?, trigger: OTTriggerDAO): Boolean {
         val condition = retrieveTimeCondition(trigger)
-        val nextAlarmTime = calculateNextAlarmTime(pivot, condition)
+        val nextAlarmTime = calculateNextAlarmTime(pivot, condition, trigger.objectId!!)
         if (nextAlarmTime != null) {
             OTApp.logger.writeSystemLog("Next alarm time is ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(nextAlarmTime))}", TAG)
             reserveAlarm(trigger, nextAlarmTime, !condition.isRepeated)
@@ -383,14 +385,14 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
     }
 
 
-    fun calculateNextAlarmTime(pivot: Long?, condition: OTTimeTriggerCondition): Long? {
+    fun calculateNextAlarmTime(pivot: Long?, condition: OTTimeTriggerCondition, triggerId: String): Long? {
         val now = System.currentTimeMillis()
 
         val limitExclusive = if (condition.isRepeated && condition.endAt != null) {
             condition.endAt!!
         } else Long.MAX_VALUE
 
-        val nextTimeCalculator = when (condition.timeConditionType) {
+        when (condition.timeConditionType) {
             OTTimeTriggerCondition.TIME_CONDITION_ALARM -> {
 
                 val calculator = DesignatedTimeScheduleCalculator().setAlarmTime(condition.alarmTimeHour.toInt(), condition.alarmTimeMinute.toInt(), 0)
@@ -399,7 +401,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                             .setEndAt(limitExclusive)
                 }
 
-                calculator
+                return calculator.calculateNext(pivot, now)
             }
             OTTimeTriggerCondition.TIME_CONDITION_INTERVAL -> {
                 val intervalMillis = condition.intervalSeconds * 1000
@@ -418,12 +420,49 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                     calculator.setNoLimit()
                 }
 
-                calculator
+                return calculator.calculateNext(pivot, now)
             }
-            else -> null
-        }
+            OTTimeTriggerCondition.TIME_CONDITION_SAMPLING -> {
+                val calculator = ExperienceSamplingTimeScheduleCalculator()
+                if (condition.isRepeated) {
+                    calculator
+                            .setAvailableDaysOfWeekFlag(condition.dayOfWeekFlags.toInt())
+                            .setEndAt(limitExclusive)
+                }
 
-        return nextTimeCalculator?.calculateNext(pivot, now)
+                calculator.minIntervalMillis = (condition.samplingMinIntervalMinutes * TimeHelper.minutesInMilli)
+                calculator.numAlerts = condition.samplingCount
+                calculator.randomSeedBase = triggerId
+
+                if (condition.samplingRangeUsed) {
+                    val nowCal = GregorianCalendar.getInstance().apply { timeInMillis = now }
+                    val hour = nowCal.getHourOfDay()
+                    val durationLengthInHour = if (condition.samplingHourEnd < condition.samplingHourStart) {
+                        24 - condition.samplingHourStart + condition.samplingHourEnd
+                    } else condition.samplingHourEnd - condition.samplingHourStart
+
+                    calculator.rangeLength = durationLengthInHour * TimeHelper.hoursInMilli
+
+                    val startCal = Calendar.getInstance().apply { timeInMillis = now }
+                    startCal.set(Calendar.HOUR_OF_DAY, condition.samplingHourStart.toInt())
+                    startCal.set(Calendar.MINUTE, 0)
+                    startCal.set(Calendar.SECOND, 0)
+                    startCal.set(Calendar.MILLISECOND, 0)
+                    val rangeStartToday = startCal.timeInMillis
+                    val rangeEndToday = startCal.timeInMillis + durationLengthInHour * TimeHelper.hoursInMilli
+                    calculator.rangeStart = if (hour < rangeEndToday) {
+                        rangeStartToday
+                    } else {
+                        rangeStartToday + TimeHelper.daysInMilli
+                    }
+                } else {
+                    calculator.rangeStart = TimeHelper.getTodayRange().first
+                    calculator.rangeLength = TimeHelper.daysInMilli
+                }
+                return calculator.calculateNext(pivot, now)
+            }
+            else -> return null
+        }
     }
 
 }

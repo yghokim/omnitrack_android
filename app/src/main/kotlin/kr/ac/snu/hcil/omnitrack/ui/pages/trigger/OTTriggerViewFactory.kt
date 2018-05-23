@@ -73,12 +73,20 @@ object OTTriggerViewFactory {
                 }
 
                 override fun connectViewModelToDisplayView(viewModel: ATriggerConditionViewModel, displayView: View, outSubscription: CompositeDisposable) {
-                    if (viewModel is TimeConditionViewModel && displayView is TimeTriggerDisplayView) {
-                        outSubscription.add(
-                                viewModel.nextAlarmTime.observeOn(AndroidSchedulers.mainThread()).subscribe { nextAlarmTime ->
-                                    displayView.nextTriggerTime = nextAlarmTime.datum
-                                }
-                        )
+                    if (viewModel is TimeConditionViewModel) {
+                        if (displayView is TimeTriggerDisplayView) {
+                            outSubscription.add(
+                                    viewModel.nextAlarmTime.observeOn(AndroidSchedulers.mainThread()).subscribe { nextAlarmTime ->
+                                        displayView.nextTriggerTime = nextAlarmTime.datum
+                                    }
+                            )
+                        } else if (displayView is SamplingTimeConditionDisplayView) {
+                            outSubscription.add(
+                                    viewModel.nextAlarmTime.observeOn(AndroidSchedulers.mainThread()).subscribe { nextAlarmTime ->
+                                        displayView.nextAlertTime = nextAlarmTime.datum
+                                    }
+                            )
+                        }
                     }
                 }
 
