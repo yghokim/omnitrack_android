@@ -95,7 +95,7 @@ class ColorSelectionButton : AppCompatButton, ValueAnimator.AnimatorUpdateListen
             frameBounds.set(paddingLeft, paddingTop, paddingLeft + contentSize, paddingTop + contentSize)
             val paddingSize = Math.round(contentSize * 0.07f)
             val drawableSize = Math.round(paddingSize + contentSize - 2 * paddingSize)
-            checkedDrawable.setBounds(Math.round(paddingLeft + paddingSize), Math.round(paddingTop + paddingSize), drawableSize, drawableSize)
+            checkedDrawable.setBounds(Math.round(paddingLeft + paddingSize), Math.round(paddingTop + paddingSize), Math.round(paddingLeft + drawableSize), Math.round(paddingTop + drawableSize))
 
             if (isSelected) {
                 cornerRadius = contentSize * .2f
