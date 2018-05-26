@@ -1,124 +1,106 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common
 
+import android.annotation.TargetApi
 import android.content.Context
-import android.graphics.Rect
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.transition.TransitionManager
+import android.support.constraint.ConstraintLayout
+import android.support.constraint.ConstraintSet
 import android.util.AttributeSet
 import android.view.View
-import android.view.ViewGroup
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 
 /**
  * Created by Young-Ho Kim on 2016-07-19
  */
-class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : RecyclerView(context, attrs, defStyle) {
-
+class ColorPaletteView : ConstraintLayout, View.OnClickListener {
     private var selectedIndex: Int = 0
-
-    private var buttonSize: Int = 0
+        set(value) {
+            if (field != value) {
+                field = value
+                refreshUI()
+                colorChanged.invoke(this, selectedColor)
+            }
+        }
 
     val colorChanged = Event<Int>()
 
-    constructor(context: Context, attrs: AttributeSet? = null) : this(context, attrs, 0)
+    var colorPalette: IntArray = OTApp.instance.colorPalette
+        set(newPalette) {
+            if (!field.contentEquals(newPalette)) {
+                field = newPalette
+                refreshUI()
+            }
+        }
+
+    var buttons = ArrayList<ColorSelectionButton>()
 
     init {
-        //buttonSize = //context.resources.getDimensionPixelSize(R.dimen.color_selection_button_size)
-
-        layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-
-        adapter = Adapter()
-
-        addItemDecoration(OffsetDecoration())
-
+        refreshUI()
     }
+
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet? = null) : this(context, attrs, 0)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     var selectedColor: Int
         get() {
-            return OTApp.instance.colorPalette[selectedIndex]
+            return colorPalette[selectedIndex]
         }
         set(value) {
             val index = findColorIndex(value)
             if (index >= 0) {
-                if (index != selectedIndex) {
-                    val oldSelected = selectedIndex
-                    selectedIndex = index
-                    adapter.notifyItemChanged(selectedIndex)
-                    adapter.notifyItemChanged(oldSelected)
-                }
+                selectedIndex = index
             }
         }
 
 
     fun findColorIndex(color: Int): Int {
-        return OTApp.instance.colorPalette.indexOf(color)
+        return colorPalette.indexOf(color)
     }
 
-    inner class Adapter : RecyclerView.Adapter<Adapter.ViewHolder>() {
-
-        init {
-            setHasStableIds(true)
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = ColorSelectionButton(context)
-            buttonSize = ((parent.measuredWidth - parent.paddingLeft - parent.paddingRight) / itemCount - dipSize(4)).toInt()
-            view.layoutParams = LayoutParams(buttonSize, buttonSize)
-            return ViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(position)
-        }
-
-        override fun getItemCount(): Int {
-            return OTApp.instance.colorPalette.size
-        }
-
-        override fun getItemId(position: Int): Long {
-            return OTApp.instance.colorPalette[position].toLong()
-        }
-
-
-        inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-
-
-            init {
-                view.setOnClickListener {
-                    if (adapterPosition != selectedIndex) {
-                        selectedIndex = adapterPosition
-                        colorChanged.invoke(parent, selectedIndex)
-                    }
-
-                    TransitionManager.beginDelayedTransition(this@ColorPaletteView)
-                    notifyDataSetChanged()
+    private fun refreshUI() {
+        val lengthDiff = buttons.size - colorPalette.size
+        if (lengthDiff > 0) {
+            for (i in 1..lengthDiff)
+                removeView(buttons[0])
+            buttons.removeAt(0)
+        } else if (lengthDiff < 0) {
+            for (i in 1..-lengthDiff) {
+                ColorSelectionButton(context).let {
+                    it.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_CONSTRAINT, ConstraintLayout.LayoutParams.WRAP_CONTENT)
+                    it.id = View.generateViewId()
+                    it.setOnClickListener(this)
+                    addView(it)
+                    buttons.add(it)
                 }
             }
+        }
 
-            fun bind(position: Int) {
-                (view as ColorSelectionButton).color = OTApp.instance.colorPalette[position]
-                view.isSelected = selectedIndex == position
+        if (colorPalette.size > 0) {
+            val constraints = ConstraintSet()
+            constraints.clone(this)
+
+            buttons.forEachIndexed { index, button ->
+                constraints.connect(button.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
             }
+
+            constraints.createHorizontalChain(ConstraintSet.PARENT_ID, ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, buttons.map { it.id }.toIntArray(), buttons.map { 1f }.toFloatArray(), ConstraintSet.CHAIN_SPREAD)
+
+            constraints.applyTo(this)
+        }
+
+        colorPalette.forEachIndexed { index, color ->
+            buttons[index].color = color
+            buttons[index].isSelected = index == selectedIndex
         }
     }
 
-    inner class OffsetDecoration : ItemDecoration() {
-        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: State?) {
-            super.getItemOffsets(outRect, view, parent, state)
-
-            if (OTApp.instance.colorPalette.count() > 1) {
-
-                val margin = (parent.measuredWidth - parent.paddingLeft - parent.paddingRight - OTApp.instance.colorPalette.size * buttonSize) / (OTApp.instance.colorPalette.size - 1)
-
-                if (parent.getChildAdapterPosition(view) != 0) {
-                    outRect.left = margin
-                }
-            }
+    override fun onClick(v: View) {
+        val index = buttons.indexOf(v as? ColorSelectionButton)
+        if (index != -1) {
+            selectedIndex = index
         }
     }
 
@@ -126,6 +108,7 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
         val superState = super.onSaveInstanceState()
         val thisState = SavedState(superState)
         thisState.selectedIndex = selectedIndex
+        thisState.colorPalette = colorPalette
         return thisState
     }
 
@@ -133,30 +116,40 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
         val thisState = state as SavedState
         super.onRestoreInstanceState(thisState.superState)
         selectedIndex = thisState.selectedIndex
+        colorPalette = thisState.colorPalette ?: OTApp.instance.colorPalette
     }
 
     class SavedState : BaseSavedState {
 
         var selectedIndex: Int = 0
+        var colorPalette: IntArray? = null
 
         constructor(source: Parcel) : super(source) {
             selectedIndex = source.readInt()
+            colorPalette = source.createIntArray()
         }
 
+        @TargetApi(24)
+        constructor(source: Parcel, loader: ClassLoader?) : super(source, loader)
         constructor(superState: Parcelable?) : super(superState)
+
 
         override fun writeToParcel(out: Parcel, flags: Int) {
             super.writeToParcel(out, flags)
             out.writeInt(selectedIndex)
+            out.writeIntArray(colorPalette)
         }
 
-        val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
-            override fun createFromParcel(`in`: Parcel): SavedState {
-                return SavedState(`in`)
-            }
+        companion object {
+            @JvmField
+            val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
+                override fun createFromParcel(`in`: Parcel): SavedState {
+                    return SavedState(`in`)
+                }
 
-            override fun newArray(size: Int): Array<SavedState?> {
-                return arrayOfNulls(size)
+                override fun newArray(size: Int): Array<SavedState?> {
+                    return arrayOfNulls(size)
+                }
             }
         }
     }

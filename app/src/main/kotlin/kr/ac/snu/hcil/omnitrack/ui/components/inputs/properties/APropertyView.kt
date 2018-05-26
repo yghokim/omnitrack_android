@@ -1,8 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 
 import android.content.Context
-import android.os.Parcel
-import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.TextView
@@ -74,41 +72,5 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
 
     open fun compareAndShowEdited(comparedTo: T) {
         showEditedOnTitle = comparedTo != value
-    }
-
-    override fun onRestoreInstanceState(state: Parcelable?) {
-        val thisState = state as SavedState
-        super.onRestoreInstanceState(thisState.superState)
-        title = thisState.title ?: ""
-        thisState.serializedValue?.let {
-            setSerializedValue(it)
-        }
-    }
-
-    override fun onSaveInstanceState(): Parcelable {
-        val superState = super.onSaveInstanceState()
-        val thisState = SavedState(superState)
-        thisState.title = title.toString()
-        thisState.serializedValue = getSerializedValue()
-        return thisState
-    }
-
-    open class SavedState : BaseSavedState {
-
-        var title: String? = null
-        var serializedValue: String? = null
-
-        constructor(source: Parcel) : super(source) {
-            title = source.readString()
-            serializedValue = source.readString()
-        }
-
-        constructor(superState: Parcelable) : super(superState)
-
-        override fun writeToParcel(out: Parcel, flags: Int) {
-            super.writeToParcel(out, flags)
-            out.writeString(title)
-            out.writeString(serializedValue)
-        }
     }
 }

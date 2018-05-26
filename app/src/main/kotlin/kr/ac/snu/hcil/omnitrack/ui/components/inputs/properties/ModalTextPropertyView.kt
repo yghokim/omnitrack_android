@@ -1,8 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 
 import android.content.Context
-import android.os.Parcel
-import android.os.Parcelable
 import android.text.InputType
 import android.util.AttributeSet
 import android.view.View
@@ -65,37 +63,6 @@ class ModalTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
     }
 
     override fun focus() {
-
-    }
-
-    override fun onSaveInstanceState(): Parcelable {
-        val superState = super.onSaveInstanceState()
-        val thisState = SavedState(superState)
-        return thisState
-    }
-
-    override fun onRestoreInstanceState(state: Parcelable?) {
-        val thisState = state as SavedState
-        super.onRestoreInstanceState(thisState.superState)
-    }
-
-    class SavedState : APropertyView.SavedState {
-
-        constructor(source: Parcel) : super(source)
-
-        constructor(superState: Parcelable) : super(superState)
-
-
-        val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
-
-            override fun createFromParcel(source: Parcel): SavedState {
-                return SavedState(source)
-            }
-
-            override fun newArray(size: Int): Array<SavedState?> {
-                return arrayOfNulls(size)
-            }
-        }
 
     }
 }
