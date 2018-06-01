@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import kotlinx.android.synthetic.main.component_hour_range_picker.view.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
+import kr.ac.snu.hcil.omnitrack.ui.components.common.INumericUpDown
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 
 /**
@@ -70,7 +70,7 @@ class HourRangePicker : ConstraintLayout {
         ui_picker_from.formatter = oClockFormatter
         ui_picker_to.formatter = oClockFormatter
 
-        val handler = { sender: Any, args: NumericUpDown.ChangeArgs ->
+        val handler = { sender: Any, args: INumericUpDown.ChangeArgs ->
             onRangeChanged.invoke(this, Pair(fromHourOfDay, toHourOfDay))
 
             ui_description.text = if (ui_picker_to.value == ui_picker_from.value || (ui_picker_from.value == 0 && ui_picker_to.value == 24)) {

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:parentTag="android.support.constraint.ConstraintLayout">
+
+    <TextView
+        android:id="@+id/ui_title"
+        style="@style/PropertyHeaderStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/msg_reminder_expiry_time" />
+
+    <EditText
+        android:id="@+id/ui_digit_input"
+        style="@style/numberPropertyDigitViewStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:digits="0123456789"
+        android:inputType="number"
+        android:text="5"
+        android:textAlignment="textEnd"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/ui_unit_spinner"
+        app:layout_constraintTop_toBottomOf="@+id/ui_title" />
+
+    <com.jaredrummler.materialspinner.MaterialSpinner
+        android:id="@+id/ui_unit_spinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/form_rounded"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@id/ui_digit_input"
+        app:layout_constraintLeft_toRightOf="@id/ui_digit_input"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/ui_digit_input" />
+</merge>

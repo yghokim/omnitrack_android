@@ -2,16 +2,21 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:parentTag="android.widget.LinearLayout">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:parentTag="android.support.constraint.ConstraintLayout">
 
     <android.support.v7.widget.AppCompatImageButton
         android:id="@+id/ui_button_plus"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height_small"
         android:background="@drawable/button_background_formlike"
-        android:minWidth="@dimen/number_button_width"
         android:tint="@color/buttonIconColorDark"
-        app:srcCompat="@drawable/up_dark" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_min="@dimen/number_button_width"
+        app:srcCompat="@drawable/up_dark"
+
+        />
     <!--
         <EditText
             android:id="@+id/valueField"
@@ -35,9 +40,11 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
-
+        android:textSize="20sp"
         android:textAlignment="center"
-        android:textSize="20sp" />
+        app:layout_constraintBottom_toTopOf="@id/ui_button_minus"
+        app:layout_constraintTop_toBottomOf="@id/ui_button_plus"
+        tools:text="40" />
 
 
     <android.support.v7.widget.AppCompatImageButton
@@ -45,7 +52,8 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height_small"
         android:background="@drawable/button_background_formlike"
-        android:minWidth="@dimen/number_button_width"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:tint="@color/buttonIconColorDark"
+        app:layout_constraintWidth_min="@dimen/number_button_width"
         app:srcCompat="@drawable/down" />
 </merge>

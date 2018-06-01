@@ -22,6 +22,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
 import io.realm.Realm
 import kotlinx.android.synthetic.main.layout_home_sidebar.view.*
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
@@ -36,6 +37,7 @@ import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.research.ResearchActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
@@ -223,8 +225,16 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                     val intent = Intent(parentActivity, ResearchActivity::class.java)
                     parentActivity.startActivity(intent)
                 }, true)
-
-        )
+        ).apply {
+            if (BuildConfig.DEBUG == true) {
+                //get access to the console log screen on debug mode
+                add(
+                        RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_clipnote, "Debug Logs", null, {
+                            val intent = Intent(parentActivity, SystemLogActivity::class.java)
+                            parentActivity.startActivity(intent)
+                        }, true))
+            }
+        }
 
         init {
         }

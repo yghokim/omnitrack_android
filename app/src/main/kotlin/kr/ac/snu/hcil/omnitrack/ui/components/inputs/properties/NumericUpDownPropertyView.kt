@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 import android.content.Context
 import android.util.AttributeSet
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.ui.components.common.INumericUpDown
 import kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
 
 /**
@@ -13,7 +14,7 @@ class NumericUpDownPropertyView(context: Context, attrs: AttributeSet?) : APrope
     override var value: Int
         get() = picker.value
         set(value) {
-            picker.setValue(value, NumericUpDown.ChangeType.MANUAL)
+            picker.setValue(value, INumericUpDown.ChangeType.MANUAL)
         }
 
 
