@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ShortDurationPicker">
+        <attr name="durationUnit" format="string" />
+        <attr name="durationValue" format="integer" />
+        <attr name="rawDurationSeconds" format="integer" />
+        <attr name="maxDurationSeconds" format="integer" />
+
+    </declare-styleable>
+</resources>
