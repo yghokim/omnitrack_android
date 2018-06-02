@@ -119,21 +119,26 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                     } else trackerAssignPanelContainer?.visibility = View.GONE
 
                     if (interfaceOptions.defaultActionType == OTTriggerDAO.ACTION_TYPE_REMIND) {
-                        //if remind, show reminder expiry
+                        //if remind, show reminder durationSeconds
                         ui_reminder_config_view.visibility = View.VISIBLE
-
 
                         val currentAction = viewModel.actionInstance.value as? OTReminderAction
                         if (currentAction != null) {
-                            println("apply current action's expiry: ${currentAction.expirySeconds}")
                             ui_reminder_config_view.expiry = currentAction.expirySeconds
+                            ui_reminder_config_view.message = currentAction.message
                         }
 
                         creationSubscriptions.add(ui_reminder_config_view.expirySubject.subscribe { expiry ->
-                            println("expiry seconds changed: ${expiry}")
                             val currentAction = viewModel.actionInstance.value as? OTReminderAction
                             if (currentAction != null && currentAction.expirySeconds != expiry) {
-                                viewModel.actionInstance.onNext((currentAction.clone() as OTReminderAction).apply { expirySeconds = expiry })
+                                viewModel.actionInstance.onNext((currentAction.clone() as OTReminderAction).apply { this.expirySeconds = expiry })
+                            }
+                        })
+
+                        creationSubscriptions.add(ui_reminder_config_view.messageSubject.subscribe { (message) ->
+                            val currentAction = viewModel.actionInstance.value as? OTReminderAction
+                            if (currentAction != null && currentAction.message != message) {
+                                viewModel.actionInstance.onNext((currentAction.clone() as OTReminderAction).apply { this.message = message })
                             }
                         })
 

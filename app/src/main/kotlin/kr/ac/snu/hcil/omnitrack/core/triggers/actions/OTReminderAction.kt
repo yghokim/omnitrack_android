@@ -36,7 +36,7 @@ class OTReminderAction : OTTriggerAction() {
             if (value.message?.isNotBlank() == true)
                 out.name("message").value(value.message)
 
-            out.name("expiry").value(value.expirySeconds)
+            out.name("durationSeconds").value(value.expirySeconds)
 
             out.endObject()
         }
@@ -58,7 +58,7 @@ class OTReminderAction : OTTriggerAction() {
                             reader.skipValue()
                         }
                     }
-                    "expiry" -> {
+                    "durationSeconds" -> {
                         if (reader.peek() != JsonToken.NULL) {
                             action.expirySeconds = reader.nextInt()
                         } else {

@@ -6,9 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.support.v4.app.AlarmManagerCompat
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -35,6 +38,8 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ConfigurableWakefulService
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
+import kr.ac.snu.hcil.omnitrack.utils.toDatetimeString
 import org.jetbrains.anko.alarmManager
 import org.jetbrains.anko.notificationManager
 import org.jetbrains.anko.runOnUiThread
@@ -104,6 +109,10 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
         }
     }
 
+    private val mainHandler: Handler by lazy {
+        Handler(Looper.getMainLooper())
+    }
+
     inner class ConfiguredTask(startId: Int, configuredContext: ConfiguredContext) : AConfiguredTask(startId, configuredContext) {
 
 
@@ -133,7 +142,7 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
         }
 
         override fun onStartCommand(intent: Intent, flags: Int): Int {
-
+            OTApp.logger.writeSystemLog("Start OTReminderService with command ${intent.action}", TAG)
             val completable = when (intent.action) {
                 ACTION_REMIND -> remind(
                         startId,
@@ -170,9 +179,12 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                             .doOnTerminate {
                                 finishSelf()
                             }
-                            .subscribe {
+                            .subscribe({
                                 OTApp.logger.writeSystemLog("Successfully handled reminder service action.", TAG)
-                            }
+                            }, { error ->
+                                OTApp.logger.writeSystemLog("Error while handling the reminder service action - ${intent.action},\n${Log.getStackTraceString(error)}", TAG)
+                                error.printStackTrace()
+                            })
             )
 
             return START_NOT_STICKY
@@ -264,7 +276,7 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                                     val notiBuilder = makeReminderNotificationBuilderBase(notificationId, entry.triggerId!!, trackerId, tracker.name, entry.id, entry.intrinsicTriggerTime, entries.first().autoExpireAt, entries.size)
                                     notiBuilder.setContentTitle(OTApp.getString(R.string.msg_reminder_omitted))
 
-                                    if (entry.autoExpireAt < Long.MAX_VALUE) registerAutoExpiryAlarm(entry)
+                                    if (entry.autoExpireAt < Long.MAX_VALUE) reserveAutoExpiry(entry)
 
                                     runOnUiThread {
                                         notificationManager.notify(TAG, notificationId, notiBuilder.build())
@@ -326,9 +338,12 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                                         notiBuilder.setContentTitle(action.message)
                                     } else notiBuilder.setContentTitle(String.format(OTApp.getString(R.string.msg_format_reminder_noti_title), tracker.name))
 
-                                    if (entry.autoExpireAt < Long.MAX_VALUE) registerAutoExpiryAlarm(entry)
+                                    if (entry.autoExpireAt < Long.MAX_VALUE) reserveAutoExpiry(entry)
 
-                                    runOnUiThread { notificationManager.notify(TAG, notificationId, notiBuilder.build()) }
+                                    runOnUiThread {
+                                        OTApp.logger.writeSystemLog("Show reminder notification of trigger", TAG)
+                                        notificationManager.notify(TAG, notificationId, notiBuilder.build())
+                                    }
                                 }
                             }
                         }
@@ -388,20 +403,42 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
             return entry
         }
 
-        private fun registerAutoExpiryAlarm(entry: OTTriggerReminderEntry) {
-            println("register auto expiry alarm")
+
+        private fun reserveAutoExpiry(entry: OTTriggerReminderEntry) {
+            OTApp.logger.writeSystemLog("Reserve auto expiry at - ${entry.autoExpireAt.toDatetimeString()}", TAG)
             val dismissIntent = makeReminderDismissedIntent(this@OTReminderService, configuredContext.configuration.id, entry.triggerId!!, entry.id)
+            val alarmPendingIntent = PendingIntent.getBroadcast(this@OTReminderService, entry.systemIntrinsicId,
+                    Intent(this@OTReminderService, TimeTriggerAlarmReceiver::class.java).apply {
+                        action = OTApp.BROADCAST_ACTION_REMINDER_EXPIRY_ALARM
+                        putExtras(dismissIntent)
+                    }, PendingIntent.FLAG_CANCEL_CURRENT)
 
             AlarmManagerCompat.setExactAndAllowWhileIdle(
                     this@OTReminderService.alarmManager,
                     AlarmManager.RTC_WAKEUP,
                     entry.autoExpireAt,
-                    PendingIntent.getBroadcast(this@OTReminderService, entry.systemIntrinsicId,
-                            Intent(this@OTReminderService, TimeTriggerAlarmReceiver::class.java).apply {
-                                action = OTApp.BROADCAST_ACTION_REMINDER_EXPIRY_ALARM
-                                putExtras(dismissIntent)
-                            }, PendingIntent.FLAG_UPDATE_CURRENT))
+                    alarmPendingIntent
+            )
+
+            if (entry.autoExpireAt - System.currentTimeMillis() < 5 * TimeHelper.minutesInMilli) {
+                //do with handler
+                val entryId = entry.id
+                val expireAt = entry.autoExpireAt
+                mainHandler.postDelayed({
+                    subscriptions.add(
+                            this.dismiss(entryId).observeOn(AndroidSchedulers.mainThread()).subscribe({
+                                println("successfully dismissed reminder.")
+                                OTApp.logger.writeSystemLog("Notification successfully autoexpired by Handler - ${expireAt.toDatetimeString()}", TAG)
+                                alarmManager.cancel(alarmPendingIntent)
+                            }, { error ->
+                                OTApp.logger.writeSystemLog("Notification autoexpiry error - ${expireAt.toDatetimeString()}\n${Log.getStackTraceString(error)}", TAG)
+                                error.printStackTrace()
+                            })
+                    )
+                }, expireAt - System.currentTimeMillis())
+            }
         }
+
 
         private fun makeReminderNotificationBuilderBase(notiId: Int, triggerId: String, trackerId: String, trackerName: String, entryId: Long, reminderTime: Long, expireAt: Long, dismissedCount: Int): NotificationCompat.Builder {
 
