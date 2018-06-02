@@ -45,8 +45,8 @@ object TimeHelper {
         return timestamp + days * daysInMilli
     }
 
-    fun getTodayRange(): Pair<Long, Long> {
-        val cal = Calendar.getInstance()
+    fun getTodayRange(now: Long = System.currentTimeMillis()): Pair<Long, Long> {
+        val cal = Calendar.getInstance().apply { timeInMillis = now }
         cal.set(Calendar.MILLISECOND, 0)
         cal.set(Calendar.SECOND, 0)
         cal.set(Calendar.MINUTE, 0)

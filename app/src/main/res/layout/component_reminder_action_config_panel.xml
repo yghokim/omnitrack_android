@@ -10,47 +10,27 @@
     android:paddingStart="@dimen/activity_horizontal_margin"
     tools:parentTag="android.support.constraint.ConstraintLayout">
 
+    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ModalTextPropertyView
+        android:id="@+id/ui_reminder_message_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/message_displayed_on_reminders"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
         android:id="@+id/ui_use_reminder_expiry"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/msg_use_reminder_expiry"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ui_reminder_message_input"
 
         />
 
-    <TextView
-        android:id="@+id/ui_expiry_title"
-        style="@style/PropertyHeaderStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.time.ShortDurationPicker
+        android:id="@+id/ui_expiry_duration_picker"
         android:text="@string/msg_reminder_expiry_time"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ui_use_reminder_expiry" />
-
-    <EditText
-        android:id="@+id/ui_expiry_digit_input"
-        style="@style/numberPropertyDigitViewStyle"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
+        app:layout_constraintTop_toBottomOf="@id/ui_use_reminder_expiry"
         android:layout_height="wrap_content"
-        android:digits="0123456789"
-        android:inputType="number"
-        android:text="5"
-        android:textAlignment="textEnd"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/ui_expiry_unit_spinner"
-        app:layout_constraintTop_toBottomOf="@id/ui_expiry_title" />
-
-    <com.jaredrummler.materialspinner.MaterialSpinner
-        android:id="@+id/ui_expiry_unit_spinner"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:background="@drawable/form_rounded"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="@id/ui_expiry_digit_input"
-        app:layout_constraintLeft_toRightOf="@id/ui_expiry_digit_input"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/ui_expiry_digit_input" />
-
+        app:rawDurationSeconds="300" />
 </merge>

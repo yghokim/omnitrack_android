@@ -109,7 +109,7 @@
         android:id="@+id/ui_ema_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="ui_ema_count,ui_ema_use_sampling_range,ui_ema_range_wrapper,ui_ema_group_config_bottom_separator" />
+        app:constraint_referenced_ids="ui_ema_count,ui_ema_use_sampling_range,ui_ema_range_wrapper,ui_ema_minimum_interval_picker,ui_ema_group_config_bottom_separator" />
 
     <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.NumericUpDownPropertyView
         android:id="@+id/ui_ema_count"
@@ -149,11 +149,21 @@
             android:visibility="gone" />
     </FrameLayout>
 
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.time.ShortDurationPicker
+        android:id="@+id/ui_ema_minimum_interval_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:text="Minimum Interval Gauranteed"
+        app:layout_constraintTop_toBottomOf="@id/ui_ema_range_wrapper" />
 
     <View
         android:id="@+id/ui_ema_group_config_bottom_separator"
         style="@style/HorizontalSeparator.OfConstraintLayout.Light"
-        app:layout_constraintTop_toBottomOf="@id/ui_ema_range_wrapper" />
+        app:layout_constraintTop_toBottomOf="@id/ui_ema_minimum_interval_picker" />
 
 
     <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView

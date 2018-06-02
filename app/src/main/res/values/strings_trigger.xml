@@ -44,5 +44,6 @@
     <string name="msg_time_trigger_sampling_count_unit_text">times/day</string>
     <string name="msg_trigger_ema_display_next_alert_format">Next on %1$s</string>
     <string name="msg_trigger_alerts_per_day">Count per day</string>
+    <string name="message_displayed_on_reminders">Message Displayed on Reminders</string>
 
 </resources>

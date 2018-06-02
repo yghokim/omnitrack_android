@@ -80,7 +80,8 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
                 startWakefulService(context, serviceIntent)
             }
             OTApp.BROADCAST_ACTION_REMINDER_EXPIRY_ALARM -> {
-                println("reminder auto expiry alarm")
+                println("reminder auto durationSeconds alarm")
+                OTApp.logger.writeSystemLog("Received reminder auto expiry alarm", TAG)
                 val dismissIntent = Intent(context, OTReminderService::class.java).apply {
                     this.action = OTReminderService.ACTION_ON_USER_DISMISS
                     this.putExtras(intent)

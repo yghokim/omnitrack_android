@@ -38,7 +38,7 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
 
                     "esmStartHr" -> condition.samplingHourStart = reader.nextInt().toByte()
                     "esmEndHr" -> condition.samplingHourEnd = reader.nextInt().toByte()
-                    "esmIntervalMin" -> condition.samplingMinIntervalMinutes = reader.nextInt().toShort()
+                    "esmIntervalSec" -> condition.samplingMinIntervalSeconds = reader.nextInt().toShort()
                     "esmCount" -> condition.samplingCount = reader.nextInt().toShort()
                     "esmRanged" -> condition.samplingRangeUsed = reader.nextBoolean()
 
@@ -71,7 +71,7 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
 
             out.name("esmStartHr").value(value.samplingHourStart)
             out.name("esmEndHr").value(value.samplingHourEnd)
-            out.name("esmIntervalMin").value(value.samplingMinIntervalMinutes)
+            out.name("esmIntervalSec").value(value.samplingMinIntervalSeconds)
             out.name("esmCount").value(value.samplingCount)
             out.name("esmRanged").value(value.samplingRangeUsed)
 
@@ -106,7 +106,7 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
     var samplingHourStart: Byte = 9 // 0~23
     var samplingHourEnd: Byte = 23 // 0~23
     var samplingCount: Short = 10
-    var samplingMinIntervalMinutes: Short = 30
+    var samplingMinIntervalSeconds: Short = 60 * 30
     var samplingRangeUsed: Boolean = false
 
     var isRepeated: Boolean = false
@@ -144,7 +144,7 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
                     && samplingHourEnd == other.samplingHourEnd
                     && samplingHourStart == other.samplingHourStart
                     && samplingRangeUsed == other.samplingRangeUsed
-                    && samplingMinIntervalMinutes == other.samplingMinIntervalMinutes
+                    && samplingMinIntervalSeconds == other.samplingMinIntervalSeconds
         } else false
     }
 }

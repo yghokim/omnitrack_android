@@ -151,6 +151,13 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
         ui_ema_count.picker.minValue = 1
         ui_ema_count.picker.maxValue = 144
 
+        ui_ema_minimum_interval_picker.durationChanged += { sender, duration ->
+            if (currentCondition?.samplingMinIntervalSeconds != duration.toShort()) {
+                currentCondition?.samplingMinIntervalSeconds = duration.toShort()
+                notifyConditionChanged()
+            }
+        }
+
         InterfaceHelper.removeButtonTextDecoration(endDateButton)
         endDateButton.setOnClickListener(this)
         isEndSpecifiedCheckBox.setOnCheckedChangeListener(this)
@@ -365,6 +372,8 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
 
             ui_ema_count.value = condition.samplingCount.toInt()
             ui_ema_use_sampling_range.isChecked = condition.samplingRangeUsed
+
+            ui_ema_minimum_interval_picker.durationSeconds = condition.samplingMinIntervalSeconds.toInt()
 
             ui_ema_range_picker.fromHourOfDay = condition.samplingHourStart.toInt()
             ui_ema_range_picker.toHourOfDay = condition.samplingHourEnd.toInt()

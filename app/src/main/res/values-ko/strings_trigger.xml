@@ -45,5 +45,6 @@
 
     <string name="msg_trigger_ema_display_next_alert_format">다음 발동: %1$s 중</string>
     <string name="msg_trigger_alerts_per_day">일일 발동횟수</string>
+    <string name="message_displayed_on_reminders">리마인더 표시 메시지</string>
 
 </resources>

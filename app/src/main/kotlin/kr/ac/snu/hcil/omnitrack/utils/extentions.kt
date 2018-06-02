@@ -29,6 +29,7 @@ import io.reactivex.disposables.Disposables
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.util.*
@@ -60,6 +61,14 @@ fun dipSize(value: Float): Float {
 
 fun dipSize(value: Int): Float {
     return value * OTApp.instance.resourcesWrapped.displayMetrics.density
+}
+
+fun Long.toDatetimeString(): String {
+    return TimeHelper.FORMAT_DATETIME.format(Date(this))
+}
+
+fun Long.toDateString(): String {
+    return TimeHelper.FORMAT_DAY.format(Date(this))
 }
 
 fun Boolean.toInt(): Int {
