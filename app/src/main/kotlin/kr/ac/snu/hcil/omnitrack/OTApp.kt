@@ -1,18 +1,19 @@
 package kr.ac.snu.hcil.omnitrack
 
-import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
 import android.os.Build
-import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
 import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
 import android.support.v7.app.AppCompatDelegate
 import com.jakewharton.threetenabp.AndroidThreeTen
+import com.jenzz.appstate.AppState
+import com.jenzz.appstate.adapter.rxjava2.RxAppStateMonitor
 import com.squareup.leakcanary.LeakCanary
+import io.reactivex.Observable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
@@ -24,7 +25,7 @@ import org.jetbrains.anko.telephonyManager
 import rx_activity_result2.RxActivityResult
 import java.nio.charset.Charset
 import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * Created by Young-Ho Kim on 2016-07-11.
@@ -119,6 +120,10 @@ class OTApp : MultiDexApplication() {
         return wrappedContext ?: this
     }
 
+    val appState: Observable<AppState> by lazy {
+        RxAppStateMonitor.monitor(this)
+    }
+
     val deviceId: String by lazy {
         val deviceUUID: UUID
         val cached: String = applicationComponent.defaultPreferences().getString("cached_device_id", "")
@@ -150,13 +155,9 @@ class OTApp : MultiDexApplication() {
         }
     }
 
-    val isAppInForeground: Boolean get() {
-        return numActivitiesActive.get() > 0
-    }
-
-    private val numActivitiesActive = AtomicInteger(0)
-
     private var wrappedContext: Context? = null
+
+    private val foregroundTime = AtomicLong(0)
 
     //Dependency Injection
 
@@ -267,40 +268,32 @@ class OTApp : MultiDexApplication() {
             }
         }
 
-        registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
-            override fun onActivityPaused(activity: Activity?) {
-
-            }
-
-            override fun onActivityResumed(activity: Activity?) {
-
-            }
-
-            override fun onActivityStarted(activity: Activity?) {
-                numActivitiesActive.incrementAndGet()
-            }
-
-            override fun onActivityDestroyed(activity: Activity?) {
-
-            }
-
-            override fun onActivitySaveInstanceState(activity: Activity?, outState: Bundle?) {
-
-            }
-
-            override fun onActivityStopped(activity: Activity?) {
-                numActivitiesActive.decrementAndGet()
-            }
-
-            override fun onActivityCreated(activity: Activity?, savedInstanceState: Bundle?) {
-
-            }
-        })
-
         //TODO start service in job controller
         //startService(this.binaryUploadServiceController.makeResumeUploadIntent())
 
         applicationComponent.configurationController().currentConfiguredContext.activateOnSystem()
+
+
+        appState.subscribe { appState ->
+            when (appState) {
+                AppState.FOREGROUND -> {
+                    println("App Screen State: FOREGROUND")
+                    foregroundTime.set(System.currentTimeMillis())
+                }
+                AppState.BACKGROUND -> {
+                    println("App Screen State: BACKGROUND")
+                    if (foregroundTime.get() != Long.MIN_VALUE) {
+                        val finishedAt = System.currentTimeMillis()
+                        val duration = finishedAt - foregroundTime.getAndSet(Long.MIN_VALUE)
+                        if (duration > 100) {
+                            println("App Screen Session duration : ${duration.toFloat() / 1000} seconds")
+                            applicationComponent.configurationController().currentConfiguredContext.configuredAppComponent.getEventLogger()
+                                    .logSession("engagement_foreground", "application", duration, finishedAt, null)
+                        }
+                    }
+                }
+            }
+        }
 
         println("creation took ${SystemClock.elapsedRealtime() - startedAt}")
     }

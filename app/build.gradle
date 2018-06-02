@@ -171,6 +171,9 @@ dependencies {
     implementation project(':TedBottomPicker:tedbottompicker')
     implementation project(':AppUpdater:appupdater')
 
+    implementation 'com.jenzz.appstate:appstate:3.0.1'
+    implementation 'com.jenzz.appstate:adapter-rxjava2:3.0.1'
+
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation files('libs/opencsv-3.9.jar')

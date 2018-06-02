@@ -4,6 +4,8 @@ import android.content.Context
 import android.support.v4.app.Fragment
 import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
+import com.jenzz.appstate.AppState
+import com.jenzz.appstate.adapter.rxjava2.RxAppStateMonitor
 import dagger.Lazy
 import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -17,8 +19,6 @@ import javax.inject.Inject
  */
 open class OTFragment : Fragment() {
 
-    private var shownAt: Long? = null
-
     protected val startSubscriptions = CompositeDisposable()
     protected val creationSubscriptions = CompositeDisposable()
     protected val createViewSubscriptions = CompositeDisposable()
@@ -28,6 +28,8 @@ open class OTFragment : Fragment() {
 
     @Inject
     protected lateinit var configuredContext: ConfiguredContext
+
+    private var shownAt: Long? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -48,42 +50,68 @@ open class OTFragment : Fragment() {
         createViewSubscriptions.clear()
     }
 
-    override fun onPause() {
-        super.onPause()
-
-        if (userVisibleHint) {
-            logSession(true)
-        }
-    }
-
     override fun onStop() {
         super.onStop()
         startSubscriptions.clear()
+
+        if (userVisibleHint) {
+            logSession()
+            shownAt = null
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        startSubscriptions.add(
+                RxAppStateMonitor.monitor(OTApp.instance).subscribe { appState ->
+                    when (appState) {
+                        AppState.FOREGROUND -> {
+                            if (shownAt == null && userVisibleHint) {
+                                shownAt = System.currentTimeMillis()
+                                println("start ${this.javaClass.name} session - AppState")
+                            }
+                        }
+                        AppState.BACKGROUND -> {
+                            if (shownAt != null) {
+                                logSession()
+                                shownAt = null
+                            }
+                        }
+                    }
+                }
+        )
+
+        if (shownAt == null && userVisibleHint) {
+            shownAt = System.currentTimeMillis()
+            println("start ${this.javaClass.name} session - OnStart")
+        }
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
-
         if (isVisibleToUser) {
             shownAt = System.currentTimeMillis()
+            println("start ${this.javaClass.name} session - setUserVisible")
         } else {
             if (shownAt != null) {
-                logSession(activityPausing = false)
+                logSession()
+                shownAt = null
             }
         }
     }
 
-    private fun logSession(activityPausing: Boolean) {
+    private fun logSession() {
         if (shownAt != null) {
 
-
-            val elapsed = System.currentTimeMillis() - shownAt!!
-
             val now = System.currentTimeMillis()
-            eventLogger.get().logSession(this.javaClass.name, IEventLogger.SUB_SESSION_TYPE_FRAGMENT, elapsed, now, null) { content ->
-                content["caused_by_activity_pause"] = activityPausing
-                content["parent"] = act.localClassName
-                onSessionLogContent(content)
+            val elapsed = now - shownAt!!
+            println("end ${this.javaClass.name} session - ${elapsed.toFloat() / 1000} seconds")
+            if (elapsed > 100) {
+                eventLogger.get().logSession(this.javaClass.name, IEventLogger.SUB_SESSION_TYPE_FRAGMENT, elapsed, now, null) { content ->
+                    content["parent"] = act.localClassName
+                    onSessionLogContent(content)
+                }
             }
         }
     }
