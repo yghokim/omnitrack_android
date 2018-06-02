@@ -17,6 +17,8 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
  */
 class SplashScreenActivity : OTActivity(checkRefreshingCredential = true, checkUpdateAvailable = false) {
 
+    override val isSessionLoggingEnabled: Boolean = false
+
     private val LOG_TAG = SplashScreenActivity::class.java.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
