@@ -17,13 +17,14 @@
         android:text="@string/message_displayed_on_reminders"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+    <android.support.v7.widget.AppCompatCheckBox
         android:id="@+id/ui_use_reminder_expiry"
+        style="@style/checkboxTextStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/button_height_normal"
         android:text="@string/msg_use_reminder_expiry"
         app:layout_constraintTop_toBottomOf="@id/ui_reminder_message_input"
-
+        android:layout_marginLeft="-8dp"
         />
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.time.ShortDurationPicker
