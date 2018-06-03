@@ -157,6 +157,11 @@ dependencies {
     implementation "com.google.firebase:firebase-messaging:17.0.0"
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
     implementation 'android.arch.lifecycle:extensions:1.1.1'
+    def work_version = "1.0.0-alpha02"
+    implementation "android.arch.work:work-runtime-ktx:$work_version" // use -ktx for Kotlin
+    // optional - Firebase JobDispatcher support
+    implementation "android.arch.work:work-firebase:$work_version"
+
     kapt "android.arch.lifecycle:compiler:1.1.1"
     implementation 'org.jetbrains.anko:anko:0.10.5'
     implementation "com.google.dagger:dagger:$rootProject.ext.dagger_version"
