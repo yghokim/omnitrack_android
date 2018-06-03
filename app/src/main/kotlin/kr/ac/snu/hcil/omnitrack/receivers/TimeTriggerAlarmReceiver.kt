@@ -12,7 +12,6 @@ import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.triggers.ITriggerAlarmController
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerAlarmManager
-import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import javax.inject.Inject
 
 /**
@@ -78,15 +77,6 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
                 serviceIntent.putExtras(intent)
                 OTApp.logger.writeSystemLog("Start wakeful service", TAG)
                 startWakefulService(context, serviceIntent)
-            }
-            OTApp.BROADCAST_ACTION_REMINDER_EXPIRY_ALARM -> {
-                println("reminder auto durationSeconds alarm")
-                OTApp.logger.writeSystemLog("Received reminder auto expiry alarm", TAG)
-                val dismissIntent = Intent(context, OTReminderService::class.java).apply {
-                    this.action = OTReminderService.ACTION_ON_USER_DISMISS
-                    this.putExtras(intent)
-                }
-                context.startService(dismissIntent)
             }
         }
     }

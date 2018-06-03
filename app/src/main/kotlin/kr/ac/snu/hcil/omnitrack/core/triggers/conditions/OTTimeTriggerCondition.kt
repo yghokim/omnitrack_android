@@ -109,7 +109,7 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
     var samplingMinIntervalSeconds: Short = 60 * 30
     var samplingRangeUsed: Boolean = false
 
-    var isRepeated: Boolean = false
+    var isRepeated: Boolean = true
 
     var dayOfWeekFlags: Byte = 0b1111111
     var endAt: Long? = null

@@ -5,8 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
+import android.os.Build
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
@@ -104,7 +103,7 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
         }
 
         val dateFormat: DateFormat by lazy {
-            SimpleDateFormat("hh:mm")
+            SimpleDateFormat("hh:mm:ss")
         }
 
         internal fun handleEntrySyncImpl(entryId: Long, realm: Realm, handler: (OTTriggerReminderEntry) -> Unit) {
@@ -117,7 +116,9 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
 
         internal fun dismissSyncImpl(entryId: Long, realm: Realm, context: Context) {
             handleEntrySyncImpl(entryId, realm) { entry ->
-                WorkManager.getInstance().cancelAllWorkByTag(entry.id.toString())
+                if (Build.VERSION.SDK_INT < 26) {
+                    WorkManager.getInstance().cancelAllWorkByTag(entry.id.toString())
+                }
                 entry.realm.executeTransaction { realm ->
                     entry.dismissed = true
                 }
@@ -128,10 +129,6 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                 }
             }
         }
-    }
-
-    private val mainHandler: Handler by lazy {
-        Handler(Looper.getMainLooper())
     }
 
     inner class ConfiguredTask(startId: Int, configuredContext: ConfiguredContext) : AConfiguredTask(startId, configuredContext) {
@@ -423,9 +420,9 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
          * reserve auto expiry. Don't need it from android O.
          */
         private fun reserveAutoExpiry(entry: OTTriggerReminderEntry) {
-            /*if (Build.VERSION.SDK_INT >= 26) {
+            if (Build.VERSION.SDK_INT >= 26) {
                 return
-            }*/
+            }
 
             if (entry.timeoutDuration != null) {
                 WorkManager.getInstance().enqueue(OneTimeWorkRequestBuilder<ReminderDismissWorker>()
@@ -477,7 +474,7 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                     .setContentText(contentText)
                     .setAutoCancel(false)
                     .setOngoing(true)
-                    //.apply { if (durationMs != null) this.setTimeoutAfter(durationMs) }
+                    .apply { if (durationMs != null) this.setTimeoutAfter(durationMs) }
                     .addAction(NotificationCompat.Action.Builder(0, OTApp.getString(R.string.msg_reminder_open_input), accessPendingIntent).build())
                     .addAction(NotificationCompat.Action.Builder(0, OTApp.getString(R.string.msg_reminder_skip), dismissIntent).build())
                     .setDeleteIntent(dismissIntent)

@@ -17,14 +17,14 @@ import kr.ac.snu.hcil.omnitrack.utils.setPaddingRight
 class ReminderActionConfigurationPanel : ConstraintLayout {
 
     var expiry: Int
-        get() = if (!ui_use_reminder_expiry.value) {
+        get() = if (!ui_use_reminder_expiry.isChecked) {
             OTReminderAction.EXPIRY_INDEFINITE
         } else ui_expiry_duration_picker.durationSeconds
         set(value) {
             if (value == OTReminderAction.EXPIRY_INDEFINITE || value < 0) {
-                ui_use_reminder_expiry.value = false
+                ui_use_reminder_expiry.isChecked = false
             } else {
-                ui_use_reminder_expiry.value = true
+                ui_use_reminder_expiry.isChecked = true
                 ui_expiry_duration_picker.durationSeconds = value
             }
         }
@@ -63,11 +63,11 @@ class ReminderActionConfigurationPanel : ConstraintLayout {
         ui_reminder_message_input.dialogTitle = "Insert custom message"
 
 
-        ui_use_reminder_expiry.value = true
+        ui_use_reminder_expiry.isChecked = true
         ui_expiry_duration_picker.isEnabled = true
 
-        ui_use_reminder_expiry.valueChanged += { sender, use ->
-            ui_expiry_duration_picker.isEnabled = use
+        ui_use_reminder_expiry.setOnCheckedChangeListener { buttonView, isChecked ->
+            ui_expiry_duration_picker.isEnabled = isChecked
         }
 
         ui_expiry_duration_picker.durationChanged += { sender, duration ->

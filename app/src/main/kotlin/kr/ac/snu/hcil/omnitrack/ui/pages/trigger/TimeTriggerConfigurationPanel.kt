@@ -219,6 +219,7 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
 
                 if (currentCondition?.isRepeated != true) {
                     currentCondition?.isRepeated = true
+                    applyIsRepeated(true, false)
                     notifyConditionChanged()
                 }
                 isRepeatedView.locked = true
