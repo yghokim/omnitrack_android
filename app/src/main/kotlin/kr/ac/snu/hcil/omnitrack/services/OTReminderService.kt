@@ -105,55 +105,12 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
         val dateFormat: DateFormat by lazy {
             SimpleDateFormat("hh:mm:ss")
         }
-
-        internal fun handleEntrySyncImpl(entryId: Long, realm: Realm, handler: (OTTriggerReminderEntry) -> Unit) {
-            val entry = realm.where(OTTriggerReminderEntry::class.java)
-                    .equalTo("id", entryId).findFirst()
-            if (entry != null) {
-                handler.invoke(entry)
-            }
-        }
-
-        internal fun dismissSyncImpl(entryId: Long, realm: Realm, context: Context) {
-            handleEntrySyncImpl(entryId, realm) { entry ->
-                if (Build.VERSION.SDK_INT < 26) {
-                    WorkManager.getInstance().cancelAllWorkByTag(entry.id.toString())
-                }
-                entry.realm.executeTransaction { realm ->
-                    entry.dismissed = true
-                }
-                val notificationId = entry.systemIntrinsicId //to avoid
-
-                context.runOnUiThread {
-                    notificationManager.cancel(TAG, notificationId)
-                }
-            }
-        }
     }
 
     inner class ConfiguredTask(startId: Int, configuredContext: ConfiguredContext) : AConfiguredTask(startId, configuredContext) {
 
-
-        private val entryIdGenerator = ConcurrentUniqueLongGenerator()
-
-
-        @field:[Inject ReminderNotification]
-        lateinit var notificationIdSeed: AtomicInteger
-
-        @field:[Inject Default]
-        protected lateinit var pref: SharedPreferences
-
-        @field:[Inject Backend]
-        protected lateinit var realmProvider: Factory<Realm>
-
-        @Inject
-        protected lateinit var dbManager: BackendDbManager
-
+        private val commands = OTReminderCommands(configuredContext, this@OTReminderService)
         private val subscriptions = CompositeDisposable()
-
-        init {
-            configuredContext.configuredAppComponent.inject(this)
-        }
 
         override fun dispose() {
             subscriptions.clear()
@@ -162,13 +119,13 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
         override fun onStartCommand(intent: Intent, flags: Int): Int {
             OTApp.logger.writeSystemLog("Start OTReminderService with command ${intent.action}", TAG)
             val completable = when (intent.action) {
-                ACTION_REMIND -> remind(
+                ACTION_REMIND -> commands.remind(
                         startId,
                         intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER),
                         intent.getLongExtra(OTApp.INTENT_EXTRA_TRIGGER_TIME, System.currentTimeMillis())
                 )
                 ACTION_ON_USER_ACCESS -> {
-                    onUserAccessed(startId,
+                    commands.onUserAccessed(startId,
                             intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER),
                             intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER),
                             intent.getLongExtra(INTENT_EXTRA_ENTRY_ID, 0),
@@ -176,18 +133,18 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                     )
                 }
                 ACTION_ON_USER_DISMISS -> {
-                    onUserDismissed(startId,
+                    commands.onUserDismissed(startId,
                             intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER),
                             intent.getLongExtra(INTENT_EXTRA_ENTRY_ID, 0)
                     )
                 }
                 ACTION_ON_USER_LOGGED -> {
-                    onUserLogged(startId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER),
+                    commands.onUserLogged(startId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER),
                             intent.getLongExtra(INTENT_EXTRA_LOGGED_AT, System.currentTimeMillis())
                     )
                 }
                 ACTION_ON_SYSTEM_REBOOTED -> {
-                    onSystemRebooted(startId)
+                    commands.onSystemRebooted()
                 }
                 else -> Completable.complete()
             }
@@ -208,7 +165,33 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
             return START_NOT_STICKY
         }
 
-        private fun onUserLogged(startId: Int, trackerId: String, loggedAt: Long): Completable {
+    }
+
+    class OTReminderCommands(val configuredContext: ConfiguredContext, val context: Context) {
+
+        private val entryIdGenerator = ConcurrentUniqueLongGenerator()
+
+        @field:[Inject ReminderNotification]
+        lateinit var notificationIdSeed: AtomicInteger
+
+        @field:[Inject Default]
+        protected lateinit var pref: SharedPreferences
+
+        @field:[Inject Backend]
+        protected lateinit var realmProvider: Factory<Realm>
+
+        fun getNewRealm(): Realm {
+            return realmProvider.get()
+        }
+
+        @Inject
+        protected lateinit var dbManager: BackendDbManager
+
+        init {
+            configuredContext.configuredAppComponent.inject(this)
+        }
+
+        internal fun onUserLogged(startId: Int, trackerId: String, loggedAt: Long): Completable {
             return Completable.defer {
                 val realm = realmProvider.get()
 
@@ -220,7 +203,7 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                 entries.forEach { entry ->
                     when (entry.level) {
                         OTReminderAction.NotificationLevel.Noti -> {
-                            notificationManager.cancel(TAG, entry.systemIntrinsicId)
+                            context.notificationManager.cancel(TAG, entry.systemIntrinsicId)
                         }
                         OTReminderAction.NotificationLevel.Popup -> {
 
@@ -240,7 +223,7 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
             }.subscribeOn(Schedulers.io())
         }
 
-        private fun onUserAccessed(startId: Int, triggerId: String, trackerId: String, entryId: Long, triggerTime: Long): Completable {
+        internal fun onUserAccessed(startId: Int, triggerId: String, trackerId: String, entryId: Long, triggerTime: Long): Completable {
             return handleEntry(entryId) { entry ->
                 entry.realm.executeTransaction {
                     entry.accessedAt = System.currentTimeMillis()
@@ -250,10 +233,10 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                 val trigger = dbManager.getTriggerQueryWithId(triggerId, realm).findFirst()
                 if (trigger != null) {
                     trigger.liveTrackersQuery.equalTo(BackendDbManager.FIELD_OBJECT_ID, trackerId).findFirst()?.let {
-                        ItemDetailActivity.makeReminderOpenIntent(it.objectId!!, triggerTime, this@OTReminderService)
+                        ItemDetailActivity.makeReminderOpenIntent(it.objectId!!, triggerTime, context)
                     }?.let {
                         it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                        this@OTReminderService.startActivity(it)
+                        context.startActivity(it)
                     }
                 }
                 realm.close()
@@ -261,68 +244,24 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
             })
         }
 
-        private fun onUserDismissed(startId: Int, triggerId: String, entryId: Long): Completable {
+        internal fun onUserDismissed(startId: Int, triggerId: String, entryId: Long): Completable {
             return dismiss(entryId)
         }
 
-        private fun onSystemRebooted(startId: Int): Completable {
+        internal fun onSystemRebooted(): Completable {
             return Completable.defer {
                 val realm = realmProvider.get()
 
                 //handle all omitted reminders.
 
-                val pendingEntries = realm.where(OTTriggerReminderEntry::class.java)
-                        .equalTo("dismissed", false)
-                        .sort("autoExpireAt", Sort.DESCENDING)
-                        .findAll()
-                val entriesByTracker = pendingEntries.groupBy { entry -> entry.trackerId!! }
-                realm.executeTransactionIfNotIn { realm ->
-                    entriesByTracker.forEach { trackerId, entries ->
-                        if (entries.isNotEmpty()) {
-                            if (entries.first().autoExpireAt >= System.currentTimeMillis() + 5000) {
-                                val tracker = dbManager.getTrackerQueryWithId(trackerId, realm).findFirst()
-                                if (tracker != null) {
-                                    val entry = realm.createObject(OTTriggerReminderEntry::class.java, entryIdGenerator.getNewUniqueLong(System.currentTimeMillis()))
-                                    entry.level = OTReminderAction.NotificationLevel.Noti
-                                    entry.triggerId = entries.first().triggerId
-                                    entry.trackerId = trackerId
-                                    entry.autoExpireAt = entries.first().autoExpireAt
-
-                                    if (entries.first().autoExpireAt != Long.MAX_VALUE) {
-                                        entry.timeoutDuration = (entries.first().autoExpireAt - System.currentTimeMillis()).toInt()
-                                    }
-
-                                    entry.intrinsicTriggerTime = entries.first().intrinsicTriggerTime
-                                    entry.notifiedAt = System.currentTimeMillis()
-                                    val notificationId = notificationIdSeed.incrementAndGet()
-                                    entry.systemIntrinsicId = notificationId
-                                    val notiBuilder = makeReminderNotificationBuilderBase(notificationId, entry.triggerId!!, trackerId, tracker.name, entry.id, entry.intrinsicTriggerTime, entries.first().autoExpireAt, entry.timeoutDuration?.toLong(), entries.size)
-                                    notiBuilder.setContentTitle(OTApp.getString(R.string.msg_reminder_omitted))
-
-                                    if (entry.autoExpireAt < Long.MAX_VALUE) reserveAutoExpiry(entry)
-
-                                    runOnUiThread {
-                                        notificationManager.notify(TAG, notificationId, notiBuilder.build())
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                }
-
-                println("Before reboot, ${pendingEntries.size} reminders from ${entriesByTracker.keys.size} trackers were omitted.")
-
-                realm.executeTransactionIfNotIn {
-                    pendingEntries.deleteAllFromRealm()
-                }
+                handlSystemRebootSyncImpl(realm)
 
                 realm.close()
                 return@defer Completable.complete()
             }.subscribeOn(Schedulers.io())
         }
 
-        private fun remind(startId: Int, triggerId: String, triggerTime: Long): Completable {
+        internal fun remind(startId: Int, triggerId: String, triggerTime: Long): Completable {
             return Completable.defer {
                 val realm = realmProvider.get()
 
@@ -341,9 +280,9 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                                         .equalTo("trackerId", tracker.objectId!!)
                                         .findAll()
                                 val notificationIds = pendingEntries.map { it.systemIntrinsicId }
-                                runOnUiThread {
+                                context.runOnUiThread {
                                     notificationIds.forEach {
-                                        notificationManager.cancel(TAG, it)
+                                        context.notificationManager.cancel(TAG, it)
                                     }
                                 }
 
@@ -363,9 +302,9 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
 
                                     if (entry.autoExpireAt < Long.MAX_VALUE) reserveAutoExpiry(entry)
 
-                                    runOnUiThread {
+                                    context.runOnUiThread {
                                         OTApp.logger.writeSystemLog("Show reminder notification of trigger", TAG)
-                                        notificationManager.notify(TAG, notificationId, notiBuilder.build())
+                                        context.notificationManager.notify(TAG, notificationId, notiBuilder.build())
                                     }
                                 }
                             }
@@ -397,10 +336,83 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
         private fun dismiss(entryId: Long): Completable {
             return Completable.defer {
                 val realm = realmProvider.get()
-                dismissSyncImpl(entryId, realm, this@OTReminderService)
+                dismissSyncImpl(entryId, realm)
                 realm.close()
                 return@defer Completable.complete()
             }.subscribeOn(Schedulers.io())
+        }
+
+
+        internal fun handleEntrySyncImpl(entryId: Long, realm: Realm, handler: (OTTriggerReminderEntry) -> Unit) {
+            val entry = realm.where(OTTriggerReminderEntry::class.java)
+                    .equalTo("id", entryId).findFirst()
+            if (entry != null) {
+                handler.invoke(entry)
+            }
+        }
+
+        internal fun dismissSyncImpl(entryId: Long, realm: Realm) {
+            handleEntrySyncImpl(entryId, realm) { entry ->
+                if (Build.VERSION.SDK_INT < 26) {
+                    WorkManager.getInstance().cancelAllWorkByTag(entry.id.toString())
+                }
+                entry.realm.executeTransaction { realm ->
+                    entry.dismissed = true
+                }
+                val notificationId = entry.systemIntrinsicId //to avoid
+
+                context.runOnUiThread {
+                    notificationManager.cancel(TAG, notificationId)
+                }
+            }
+        }
+
+        internal fun handlSystemRebootSyncImpl(realm: Realm) {
+            val pendingEntries = realm.where(OTTriggerReminderEntry::class.java)
+                    .equalTo("dismissed", false)
+                    .sort("autoExpireAt", Sort.DESCENDING)
+                    .findAll()
+            val entriesByTracker = pendingEntries.groupBy { entry -> entry.trackerId!! }
+            realm.executeTransactionIfNotIn { realm ->
+                entriesByTracker.forEach { trackerId, entries ->
+                    if (entries.isNotEmpty()) {
+                        if (entries.first().autoExpireAt >= System.currentTimeMillis() + 5000) {
+                            val tracker = dbManager.getTrackerQueryWithId(trackerId, realm).findFirst()
+                            if (tracker != null) {
+                                val entry = realm.createObject(OTTriggerReminderEntry::class.java, entryIdGenerator.getNewUniqueLong(System.currentTimeMillis()))
+                                entry.level = OTReminderAction.NotificationLevel.Noti
+                                entry.triggerId = entries.first().triggerId
+                                entry.trackerId = trackerId
+                                entry.autoExpireAt = entries.first().autoExpireAt
+
+                                if (entries.first().autoExpireAt != Long.MAX_VALUE) {
+                                    entry.timeoutDuration = (entries.first().autoExpireAt - System.currentTimeMillis()).toInt()
+                                }
+
+                                entry.intrinsicTriggerTime = entries.first().intrinsicTriggerTime
+                                entry.notifiedAt = System.currentTimeMillis()
+                                val notificationId = notificationIdSeed.incrementAndGet()
+                                entry.systemIntrinsicId = notificationId
+                                val notiBuilder = makeReminderNotificationBuilderBase(notificationId, entry.triggerId!!, trackerId, tracker.name, entry.id, entry.intrinsicTriggerTime, entries.first().autoExpireAt, entry.timeoutDuration?.toLong(), entries.size)
+                                notiBuilder.setContentTitle(OTApp.getString(R.string.msg_reminder_omitted))
+
+                                if (entry.autoExpireAt < Long.MAX_VALUE) reserveAutoExpiry(entry)
+
+                                context.runOnUiThread {
+                                    context.notificationManager.notify(TAG, notificationId, notiBuilder.build())
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            println("Before reboot, ${pendingEntries.size} reminders from ${entriesByTracker.keys.size} trackers were omitted.")
+
+            realm.executeTransactionIfNotIn {
+                pendingEntries.deleteAllFromRealm()
+            }
         }
 
         private fun insertNewReminderEntry(trigger: OTTriggerDAO, trackerId: String, action: OTReminderAction, triggerTime: Long, realm: Realm): OTTriggerReminderEntry {
@@ -450,20 +462,20 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
             val resultPendingIntent = stackBuilder.getPendingIntent(0,
                     PendingIntent.FLAG_UPDATE_CURRENT)
     */
-            val accessPendingIntent = PendingIntent.getService(this@OTReminderService, notiId, makeReminderAccessedIntent(this@OTReminderService, configuredContext.configuration.id, triggerId, trackerId, entryId, reminderTime), PendingIntent.FLAG_UPDATE_CURRENT)
-            val dismissIntent = PendingIntent.getService(this@OTReminderService, notiId,
-                    makeReminderDismissedIntent(this@OTReminderService, configuredContext.configuration.id, triggerId, entryId),
+            val accessPendingIntent = PendingIntent.getService(context, notiId, makeReminderAccessedIntent(context, configuredContext.configuration.id, triggerId, trackerId, entryId, reminderTime), PendingIntent.FLAG_UPDATE_CURRENT)
+            val dismissIntent = PendingIntent.getService(context, notiId,
+                    makeReminderDismissedIntent(context, configuredContext.configuration.id, triggerId, entryId),
                     PendingIntent.FLAG_UPDATE_CURRENT)
 
             val ringtone = pref.getString(SettingsActivity.PREF_REMINDER_NOTI_RINGTONE, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.toString())
-            val lightColor = pref.getInt(SettingsActivity.PREF_REMINDER_LIGHT_COLOR, ContextCompat.getColor(this@OTReminderService, R.color.colorPrimary))
+            val lightColor = pref.getInt(SettingsActivity.PREF_REMINDER_LIGHT_COLOR, ContextCompat.getColor(context, R.color.colorPrimary))
             val contentTextBase = String.format(OTApp.getString(R.string.msg_noti_tap_for_tracking_format), trackerName)
 
             val contentText: String = if (expireAt < Long.MAX_VALUE) {
                 contentTextBase + " (${String.format(OTApp.getString(R.string.msg_noti_reminder_until), dateFormat.format(Date(expireAt)))})"
             } else contentTextBase
 
-            return OTTrackingNotificationFactory.makeBaseBuilder(this@OTReminderService, reminderTime, OTNotificationManager.CHANNEL_ID_IMPORTANT)
+            return OTTrackingNotificationFactory.makeBaseBuilder(context, reminderTime, OTNotificationManager.CHANNEL_ID_IMPORTANT)
                     .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setSound(Uri.parse(
@@ -495,9 +507,6 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
 
     class ReminderDismissWorker : Worker() {
 
-        @field:[Inject Backend]
-        protected lateinit var realmProvider: Factory<Realm>
-
         override fun doWork(): WorkerResult {
             return try {
                 val triggerId = inputData.getString(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER, "")
@@ -505,11 +514,12 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                 val configId = inputData.getString(OTApp.INTENT_EXTRA_CONFIGURATION_ID, "")
 
                 val configuredContext = (applicationContext as OTApp).applicationComponent.configurationController().getConfiguredContextOf(configId)
-                configuredContext?.configuredAppComponent?.inject(this)
                 if (configuredContext != null) {
                     //this.applicationContext.startService(OTReminderService.makeReminderDismissedIntent(this.applicationContext, configId, triggerId, entryId))
-                    val realm = realmProvider.get()
-                    OTReminderService.dismissSyncImpl(entryId, realm, applicationContext)
+                    val commands = OTReminderCommands(configuredContext, applicationContext)
+
+                    val realm = commands.getNewRealm()
+                    commands.dismissSyncImpl(entryId, realm)
                     realm.close()
                     OTApp.logger.writeSystemLog("Successfully dismissed reminder by Worker. entryId: $entryId", "ReminderDismissWorker")
                     WorkerResult.SUCCESS
@@ -517,6 +527,28 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
             } catch (ex: Exception) {
                 OTApp.logger.writeSystemLog("ReminderDismissWorker doWork error: \n${Log.getStackTraceString(ex)}", "ReminderDismissWorker")
                 WorkerResult.FAILURE
+            }
+        }
+    }
+
+    class SystemRebootWorker : Worker() {
+        override fun doWork(): WorkerResult {
+            return try {
+                val configId = inputData.getString(OTApp.INTENT_EXTRA_CONFIGURATION_ID, "")
+
+                val configuredContext = (applicationContext as OTApp).applicationComponent.configurationController().getConfiguredContextOf(configId)
+                if (configuredContext != null) {
+                    //this.applicationContext.startService(OTReminderService.makeReminderDismissedIntent(this.applicationContext, configId, triggerId, entryId))
+                    val commands = OTReminderCommands(configuredContext, applicationContext)
+                    val realm = commands.getNewRealm()
+                    commands.handlSystemRebootSyncImpl(realm)
+                    realm.close()
+                    OTApp.logger.writeSystemLog("Successfully handled reboot for reminder by Worker.", "OTReminderService.SystemRebootWorker")
+                    WorkerResult.SUCCESS
+                } else WorkerResult.FAILURE
+            } catch (ex: Exception) {
+                OTApp.logger.writeSystemLog("Reminder Reboot Handling failed: \n ${Log.getStackTraceString(ex)}", "OTReminderService.SystemRebootWorker")
+                WorkerResult.RETRY
             }
         }
     }

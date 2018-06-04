@@ -208,7 +208,5 @@ interface ConfiguredAppComponent {
     fun inject(service: OTBinaryUploadService)
 
     fun inject(task: OTBinaryUploadService.ConfiguredTask)
-    fun inject(task: OTReminderService.ConfiguredTask)
-
-    fun inject(worker: OTReminderService.ReminderDismissWorker)
+    fun inject(task: OTReminderService.OTReminderCommands)
 }
