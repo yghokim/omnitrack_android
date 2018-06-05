@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
+import android.os.PowerManager
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
@@ -38,7 +39,9 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ConfigurableWakefulService
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
+import kr.ac.snu.hcil.omnitrack.utils.isInteractiveCompat
 import org.jetbrains.anko.notificationManager
+import org.jetbrains.anko.powerManager
 import org.jetbrains.anko.runOnUiThread
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -305,6 +308,15 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                                     context.runOnUiThread {
                                         OTApp.logger.writeSystemLog("Show reminder notification of trigger", TAG)
                                         context.notificationManager.notify(TAG, notificationId, notiBuilder.build())
+
+                                        if (!context.powerManager.isInteractiveCompat) {
+                                            //turn on screen when turned off
+                                            val wakelock = context.powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP or PowerManager.ON_AFTER_RELEASE, "ReminderScreenLock")
+                                            wakelock.acquire(1000)
+                                            val cpuWakelock = context.powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ReminderScreenLockCpu")
+                                            cpuWakelock.acquire(1000)
+
+                                        }
                                     }
                                 }
                             }
