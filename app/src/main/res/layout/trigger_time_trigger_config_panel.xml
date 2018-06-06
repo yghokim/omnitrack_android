@@ -11,12 +11,16 @@
     <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
         android:id="@+id/ui_time_trigger_type"
         style="@style/propertyGroupSinglelineStyle"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:background="@drawable/bottom_separator_light"
-        android:text="@string/msg_trigger_time_config_type" />
+        android:text="@string/msg_trigger_time_config_type"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+
+        />
 
     <android.support.constraint.Group
         android:id="@+id/ui_group_interval"
@@ -36,29 +40,35 @@
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
         android:id="@+id/ui_duration_picker"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ui_interval_group_config_header" />
 
 
     <CheckBox
         android:id="@+id/ui_checkbox_interval_use_timespan"
         style="@style/checkboxTextStyle"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:text="@string/msg_trigger_time_use_time_range"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ui_duration_picker" />
 
     <FrameLayout
 
         android:id="@+id/ui_trigger_interval_timespan_picker_wrapper"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="15dp"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ui_checkbox_interval_use_timespan">
 
         <kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourRangePicker
@@ -93,15 +103,17 @@
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.time.DateTimePicker
         android:id="@+id/ui_time_picker"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="8dp"
         android:background="@drawable/bottom_separator_light"
         android:numbersBackgroundColor="@color/colorSecondary"
         android:numbersSelectorColor="@color/colorSecondary"
         android:paddingBottom="@dimen/activity_vertical_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ui_alarm_group_config_header" />
 
 
@@ -113,33 +125,38 @@
 
     <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.NumericUpDownPropertyView
         android:id="@+id/ui_ema_count"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:text="@string/msg_trigger_alerts_per_day"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ui_time_picker" />
 
     <CheckBox
         android:id="@+id/ui_ema_use_sampling_range"
         style="@style/checkboxTextStyle"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:text="Sample within a specific time period"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ui_ema_count" />
 
     <FrameLayout
         android:id="@+id/ui_ema_range_wrapper"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:paddingEnd="@dimen/activity_horizontal_margin"
         android:paddingStart="@dimen/activity_horizontal_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ui_ema_use_sampling_range">
 
         <kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourRangePicker
@@ -151,12 +168,14 @@
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.time.ShortDurationPicker
         android:id="@+id/ui_ema_minimum_interval_picker"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:paddingEnd="@dimen/activity_horizontal_margin"
 
         android:paddingStart="@dimen/activity_horizontal_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:text="Minimum Interval Gauranteed"
         app:layout_constraintTop_toBottomOf="@id/ui_ema_range_wrapper" />
 
@@ -168,12 +187,13 @@
 
     <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
         android:id="@+id/ui_is_repeated"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingEnd="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:text="@string/msg_trigger_time_is_repeated"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ui_ema_group_config_bottom_separator" />
 
     <android.support.constraint.Group
@@ -186,11 +206,13 @@
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.time.DayOfWeekSelector
         android:id="@+id/ui_day_of_week_selector"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="6dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ui_is_repeated" />
 
     <CheckBox
