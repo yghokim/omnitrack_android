@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.app.DatePickerDialog
 import android.content.Context
 import android.support.constraint.ConstraintLayout
-import android.transition.TransitionManager
+import android.support.transition.*
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -69,6 +69,22 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
     override val onConditionChanged: Observable<ATriggerCondition>
         get() = conditionChanged
 
+    private val modeChangeTransition: Transition by lazy {
+        TransitionSet()
+                .setOrdering(TransitionSet.ORDERING_TOGETHER)
+                .addTransition(Fade(Fade.MODE_OUT).setDuration(200))
+                .addTransition(ChangeBounds().setDuration(400))
+                .addTransition(Fade(Fade.MODE_IN).setDuration(500).setStartDelay(300))
+    }
+
+    private val toggleTransition: Transition by lazy {
+        TransitionSet()
+                .setOrdering(TransitionSet.ORDERING_TOGETHER)
+                .addTransition(Fade(Fade.MODE_OUT).setDuration(200))
+                .addTransition(ChangeBounds().setDuration(150))
+                .addTransition(Fade(Fade.MODE_IN).setDuration(200))
+    }
+
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
@@ -78,6 +94,7 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
 
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.trigger_time_trigger_config_panel, this, true)
+
         repeatEndDate = GregorianCalendar(2016, 1, 1)
 
         configTypePropertyView.adapter = IconNameEntryArrayAdapter(context,
@@ -165,7 +182,7 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
 
     private fun applyIsRepeated(isRepeated: Boolean, animate: Boolean) {
         isRepeatedView.value = isRepeated
-        if (animate) TransitionManager.beginDelayedTransition(this)
+        if (animate) TransitionManager.beginDelayedTransition(this, toggleTransition)
         if (isRepeated) {
             repetitionConfigGroup.visibility = View.VISIBLE
             timeSpanCheckBox.isChecked = currentCondition?.intervalIsHourRangeUsed ?: false
@@ -186,7 +203,7 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
     private fun applyConfigMode(mode: Byte, animate: Boolean) {
         refreshingViews = true
         if (animate) {
-            TransitionManager.beginDelayedTransition(this)
+            TransitionManager.beginDelayedTransition(this, modeChangeTransition)
         }
 
         when (mode) {
@@ -286,7 +303,7 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
 
     override fun onCheckedChanged(view: CompoundButton, isChecked: Boolean) {
         if (view === timeSpanCheckBox) {
-            TransitionManager.beginDelayedTransition(this)
+            TransitionManager.beginDelayedTransition(this, toggleTransition)
             if (currentCondition?.intervalIsHourRangeUsed != timeSpanCheckBox.isChecked) {
                 currentCondition?.intervalIsHourRangeUsed = timeSpanCheckBox.isChecked
                 notifyConditionChanged()
@@ -299,7 +316,7 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
             }
 
         } else if (view === isEndSpecifiedCheckBox) {
-            TransitionManager.beginDelayedTransition(this)
+            TransitionManager.beginDelayedTransition(this, toggleTransition)
             if (isEndSpecifiedCheckBox.isChecked) {
                 endDateButton.visibility = View.VISIBLE
 
@@ -317,7 +334,7 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
                 }
             }
         } else if (view === ui_ema_use_sampling_range) {
-            TransitionManager.beginDelayedTransition(this)
+            TransitionManager.beginDelayedTransition(this, toggleTransition)
             if (isChecked) {
                 ui_ema_range_picker.visibility = View.VISIBLE
             } else {

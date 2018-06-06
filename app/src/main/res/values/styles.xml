@@ -79,6 +79,7 @@
     </style>
 
     <style name="HorizontalSeparator.OfConstraintLayout" parent="HorizontalSeparator">
+        <item name="android:layout_width">0dp</item>
         <item name="layout_constraintStart_toStartOf">parent</item>
         <item name="layout_constraintEnd_toEndOf">parent</item>
         <item name="android:layout_marginLeft">@dimen/activity_horizontal_margin</item>

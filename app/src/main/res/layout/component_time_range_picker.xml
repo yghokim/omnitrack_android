@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:background="@color/frontalBackground"
     tools:padding="@dimen/activity_horizontal_margin"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     tools:parentTag="android.support.constraint.ConstraintLayout">
 
     <View

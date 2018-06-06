@@ -33,7 +33,8 @@
         app:layout_constraintBottom_toTopOf="@id/ui_description"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText" />
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
         android:id="@+id/ui_picker_to"
