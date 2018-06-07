@@ -232,12 +232,7 @@ open class OTTriggerDAO : RealmObject() {
     fun isValidToTurnOn(): TriggerConfigInvalidException? {
         val containsTracker = liveTrackerCount > 0
 
-        val isConditionValid = when (conditionType) {
-            CONDITION_TYPE_DATA -> {
-                true
-            }
-            else -> true
-        }
+        val isConditionValid = condition?.isConfigurationValid(null) ?: false
 
         return if (containsTracker && isConditionValid) null else {
             val invalids = ArrayList<TriggerValidationComponent>()

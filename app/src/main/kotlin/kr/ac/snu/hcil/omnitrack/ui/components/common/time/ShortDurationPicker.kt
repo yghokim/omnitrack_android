@@ -19,7 +19,7 @@ class ShortDurationPicker : ConstraintLayout {
         const val UNIT_MINUTE = 1
         const val UNIT_SECOND = 2
 
-        fun getExpiryMultiplier(unit: Int): Int = when (unit) {
+        fun getTimeMultiplier(unit: Int): Int = when (unit) {
             UNIT_HOUR -> 3600
             UNIT_MINUTE -> 60
             UNIT_SECOND -> 1
@@ -28,26 +28,28 @@ class ShortDurationPicker : ConstraintLayout {
     }
 
     var durationSeconds: Int
-        get() = ui_digit_input.text.toString().toInt() * getExpiryMultiplier(ui_unit_spinner.selectedIndex)
+        get() = ui_digit_input.text.toString().toInt() * getTimeMultiplier(ui_unit_spinner.selectedIndex)
         set(value) {
             if (durationSeconds != value) {
                 println("duration seconds : $value")
                 var idealUnit: Int = UNIT_SECOND
                 for (unit in 0..2) {
-                    val multiplier = getExpiryMultiplier(unit)
+                    val multiplier = getTimeMultiplier(unit)
                     if (value / multiplier > 0 && (value / multiplier) * multiplier == value) {
                         idealUnit = unit
                         break
                     }
                 }
                 ui_unit_spinner.selectedIndex = idealUnit
-                ui_digit_input.setText((value / getExpiryMultiplier(idealUnit)).toString(), TextView.BufferType.NORMAL)
+                ui_digit_input.setText((value / getTimeMultiplier(idealUnit)).toString(), TextView.BufferType.NORMAL)
 
                 durationChanged.invoke(this, value)
             }
         }
 
     val durationChanged = Event<Int>()
+
+    var max: Int = Int.MAX_VALUE
 
     constructor(context: Context) : super(context) {
         initialize(context, null)
@@ -76,8 +78,10 @@ class ShortDurationPicker : ConstraintLayout {
 
         ui_digit_input.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {
-                if (s.toString() == "0" || s.toString().isBlank()) {
+                if (s.toString() == "0" || (s.toString().toIntOrNull() ?: -1 < 0) || s.toString().isBlank()) {
                     ui_digit_input.setText("1", TextView.BufferType.NORMAL)
+                } else if (s.toString().toInt() * getTimeMultiplier(ui_unit_spinner.selectedIndex) > max) {
+                    ui_digit_input.setText((max / getTimeMultiplier(ui_unit_spinner.selectedIndex)).toInt().toString(), TextView.BufferType.NORMAL)
                 } else {
                     durationChanged.invoke(this, durationSeconds)
                 }

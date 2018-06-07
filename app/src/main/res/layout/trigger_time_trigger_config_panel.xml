@@ -177,7 +177,7 @@
         android:paddingStart="@dimen/activity_horizontal_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="Minimum Interval Gauranteed"
+        android:text="Minimum Interval Guaranteed"
         app:layout_constraintTop_toBottomOf="@id/ui_ema_range_wrapper" />
 
     <View

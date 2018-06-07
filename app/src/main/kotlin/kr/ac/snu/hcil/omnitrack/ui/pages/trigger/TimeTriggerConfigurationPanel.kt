@@ -28,6 +28,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxProperty
 import kr.ac.snu.hcil.omnitrack.utils.*
 import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
 import kr.ac.snu.hcil.omnitrack.utils.time.Time
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import org.jetbrains.anko.backgroundResource
 import java.text.SimpleDateFormat
 import java.util.*
@@ -167,6 +168,8 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
         }
         ui_ema_count.picker.minValue = 1
         ui_ema_count.picker.maxValue = 144
+
+        ui_ema_minimum_interval_picker.max = (3 * TimeHelper.hoursInMilli / 1000).toInt()
 
         ui_ema_minimum_interval_picker.durationChanged += { sender, duration ->
             if (currentCondition?.samplingMinIntervalSeconds != duration.toShort()) {
