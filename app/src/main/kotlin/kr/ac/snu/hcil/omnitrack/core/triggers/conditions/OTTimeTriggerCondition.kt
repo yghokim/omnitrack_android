@@ -9,6 +9,7 @@ import com.google.gson.stream.JsonWriter
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 
 /**
  * Created by younghokim on 2017. 10. 18..
@@ -123,6 +124,25 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
         if (timeConditionType == TIME_CONDITION_INTERVAL && intervalSeconds <= 0.toShort()) {
             validationErrorMessages?.add(OTApp.getString(R.string.msg_trigger_error_interval_not_0))
             return false
+        } else if (timeConditionType == TIME_CONDITION_SAMPLING) {
+            if (samplingCount <= 0) {
+                validationErrorMessages?.add(OTApp.getString(R.string.msg_trigger_alerts_per_day) + " must be higher than zero.")
+                return false
+            }
+
+            val lengthMillis = (if (samplingHourStart == samplingHourEnd) {
+                24
+            } else if (samplingHourStart > samplingHourEnd) {
+                samplingHourEnd + 24 - samplingHourStart
+            } else samplingHourEnd - samplingHourStart) * TimeHelper.hoursInMilli
+
+            val maximumMinInterval = lengthMillis / (samplingCount - 1)
+            if (maximumMinInterval <= samplingMinIntervalSeconds * 1000) {
+                validationErrorMessages?.add("The minimum alert interval must be shorter than ${maximumMinInterval / (1000 * 60)} minutes.")
+                return false
+            }
+
+            return true
         } else return true
     }
 
