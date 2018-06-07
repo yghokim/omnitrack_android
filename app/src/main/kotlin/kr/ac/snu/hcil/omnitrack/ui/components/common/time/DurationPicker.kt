@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.time
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
+import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v4.graphics.ColorUtils
@@ -10,38 +11,43 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
-import android.widget.FrameLayout
 import android.widget.TextView
 import butterknife.bindView
 import butterknife.bindViews
+import kotlinx.android.synthetic.main.component_duration_picker.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
+import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 
 /**
  * Created by younghokim on 16. 8. 23..
  */
-class DurationPicker : FrameLayout, View.OnClickListener {
+class DurationPicker : ConstraintLayout, View.OnClickListener {
 
     companion object {
         const val MAX_DURATION_SECONDS = 99 * 3600 + 99 * 60 + 99
     }
 
-    private val display: View by bindView(R.id.ui_duration_picker_display)
+    private val display: View by bindView(R.id.ui_digit_area)
     private val hourView: TextView by bindView(R.id.ui_digit_hour)
     private val minuteView: TextView by bindView(R.id.ui_digit_minute)
     private val secondView: TextView by bindView(R.id.ui_digit_second)
     private val backspaceButton: View by bindView(R.id.ui_button_backspace)
-
-    private val keyPad: ViewGroup by bindView(R.id.ui_keypad)
 
     private val digitButtons: List<View> by bindViews(
             R.id.ui_keypad_0, R.id.ui_keypad_1, R.id.ui_keypad_2, R.id.ui_keypad_3, R.id.ui_keypad_4, R.id.ui_keypad_5, R.id.ui_keypad_6, R.id.ui_keypad_7, R.id.ui_keypad_8, R.id.ui_keypad_9
     )
     private val digitButton00: View by bindView(R.id.ui_keypad_00)
     private val digitButtonUp: View by bindView(R.id.ui_keypad_up)
+
+    private val buttons: List<View> by lazy {
+        digitButtons + listOf<View>(
+                digitButton00, digitButtonUp
+        )
+    }
 
 
     private val digits = Array<Byte>(6) { 0 }
@@ -111,11 +117,13 @@ class DurationPicker : FrameLayout, View.OnClickListener {
         val value = animator.animatedValue as Float
 
         this.backspaceButton.alpha = value
-        this.keyPad.alpha = value
+        buttons.forEach {
+            it.alpha = value
+        }
 
         this.setBackgroundColor(ColorUtils.setAlphaComponent(highlightBackgroundColor, (255 * value).toInt()))
 
-        this.layoutParams.height = (displayHeight + keyPadHeight * value + 0.5f).toInt()
+        this.layoutParams.height = (displayHeight + (ui_keypad_1.layoutParams as ConstraintLayout.LayoutParams).topMargin + keyPadHeight * value + 0.5f).toInt()
 
         this.requestLayout()
     }
@@ -132,8 +140,12 @@ class DurationPicker : FrameLayout, View.OnClickListener {
                 override fun onAnimationEnd(p0: Animator?) {
                     layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
                     backspaceButton.visibility = View.VISIBLE
-                    keyPad.visibility = View.VISIBLE
-                    keyPad.alpha = 1f
+                    ui_keypad_group.visibility = View.VISIBLE
+
+                    buttons.forEach {
+                        it.alpha = 1f
+                    }
+
                     backspaceButton.alpha = 1f
                     requestLayout()
                 }
@@ -141,14 +153,18 @@ class DurationPicker : FrameLayout, View.OnClickListener {
                 override fun onAnimationCancel(p0: Animator?) {
                     layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
                     backspaceButton.visibility = View.VISIBLE
-                    keyPad.visibility = View.VISIBLE
-                    keyPad.alpha = 1f
+                    ui_keypad_group.visibility = View.VISIBLE
+
+                    buttons.forEach {
+                        it.alpha = 1f
+                    }
+
                     backspaceButton.alpha = 1f
                     requestLayout()
                 }
 
                 override fun onAnimationStart(p0: Animator?) {
-                    keyPad.visibility = View.VISIBLE
+                    ui_keypad_group.visibility = View.VISIBLE
                     backspaceButton.visibility = View.VISIBLE
                 }
             })
@@ -168,8 +184,10 @@ class DurationPicker : FrameLayout, View.OnClickListener {
                 override fun onAnimationEnd(p0: Animator?) {
                     layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
                     backspaceButton.visibility = View.GONE
-                    keyPad.visibility = View.GONE
-                    keyPad.alpha = 1f
+                    ui_keypad_group.visibility = View.GONE
+                    buttons.forEach {
+                        it.alpha = 1f
+                    }
                     backspaceButton.alpha = 1f
                     background = null
                     requestLayout()
@@ -178,15 +196,17 @@ class DurationPicker : FrameLayout, View.OnClickListener {
                 override fun onAnimationCancel(p0: Animator?) {
                     layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
                     backspaceButton.visibility = View.GONE
-                    keyPad.visibility = View.GONE
-                    keyPad.alpha = 1f
+                    ui_keypad_group.visibility = View.GONE
+                    buttons.forEach {
+                        it.alpha = 1f
+                    }
                     backspaceButton.alpha = 1f
                     background = null
                     requestLayout()
                 }
 
                 override fun onAnimationStart(p0: Animator?) {
-                    keyPad.visibility = View.VISIBLE
+                    ui_keypad_group.visibility = View.VISIBLE
                 }
             })
         }
@@ -197,7 +217,7 @@ class DurationPicker : FrameLayout, View.OnClickListener {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     init {
-        inflate(context, R.layout.component_duration_picker, this)
+        inflateContent(R.layout.component_duration_picker, true)
 
         display.setOnClickListener(this)
 
@@ -232,11 +252,11 @@ class DurationPicker : FrameLayout, View.OnClickListener {
                 if (mode) {
                     setBackgroundColor(ResourcesCompat.getColor(resources, R.color.editTextFormBackground, null))
                     backspaceButton.visibility = View.VISIBLE
-                    keyPad.visibility = View.VISIBLE
+                    ui_keypad_group.visibility = View.VISIBLE
                 } else {
                     background = null
                     backspaceButton.visibility = View.GONE
-                    keyPad.visibility = View.GONE
+                    ui_keypad_group.visibility = View.GONE
                 }
             }
         }
@@ -335,24 +355,12 @@ class DurationPicker : FrameLayout, View.OnClickListener {
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        measureComponentHeights()
 
+        ui_digit_hour.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+        ui_keypad_0.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
 
-        displayHeight = display.measuredHeight
-        keyPadHeight = keyPad.measuredHeight
-
-        for (i in 0..keyPad.childCount - 1) {
-            keyPad.getChildAt(i).run {
-                layoutParams.width = w
-                requestLayout()
-            }
-        }
-    }
-
-    private fun measureComponentHeights() {
-        display.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-        keyPad.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-
+        displayHeight = ui_digit_hour.measuredHeight
+        keyPadHeight = ui_keypad_0.measuredHeight * 4
     }
 
 }

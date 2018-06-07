@@ -157,6 +157,10 @@ class OTReminderAction : OTTriggerAction() {
             return intrinsicNotificationLevel
         }
 
+    val expiryMilliSeconds: Int?
+        get() {
+            return if (expirySeconds == EXPIRY_INDEFINITE || expirySeconds < 0 || expirySeconds == Int.MAX_VALUE) null else (expirySeconds * 1000)
+        }
 
     /*
     var localNotificationLevel: NotificationLevel?

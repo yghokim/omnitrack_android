@@ -319,13 +319,14 @@
 
     <style name="durationPickerUnitViewStyle">
         <item name="android:textSize">20sp</item>
-        <item name="android:layout_marginEnd">15dp</item>
-        <item name="android:layout_marginStart">2dp</item>
+        <item name="android:paddingEnd">15dp</item>
+        <item name="android:paddingStart">2dp</item>
         <item name="android:textColor">@color/textColorMid</item>
     </style>
 
     <style name="durationPickerKeyPadStyle">
         <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
         <item name="android:layout_height">@dimen/button_height_normal</item>
         <item name="android:background">@drawable/transparent_button_background</item>
         <item name="android:textColor">@color/buttonIconColorDark</item>
