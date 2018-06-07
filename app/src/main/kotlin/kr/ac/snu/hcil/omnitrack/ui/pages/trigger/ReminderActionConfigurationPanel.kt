@@ -68,6 +68,7 @@ class ReminderActionConfigurationPanel : ConstraintLayout {
 
         ui_use_reminder_expiry.setOnCheckedChangeListener { buttonView, isChecked ->
             ui_expiry_duration_picker.isEnabled = isChecked
+            _expirySubject.onNext(expiry)
         }
 
         ui_expiry_duration_picker.durationChanged += { sender, duration ->

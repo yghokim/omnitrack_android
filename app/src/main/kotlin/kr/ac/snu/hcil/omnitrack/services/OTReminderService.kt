@@ -433,8 +433,8 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
             entry.triggerId = trigger.objectId
             entry.trackerId = trackerId
             entry.intrinsicTriggerTime = triggerTime
-            entry.autoExpireAt = (trigger.action as? OTReminderAction)?.expirySeconds?.let { (it * 1000) + System.currentTimeMillis() } ?: Long.MAX_VALUE
-            entry.timeoutDuration = (trigger.action as? OTReminderAction)?.expirySeconds?.let { it * 1000 }
+            entry.autoExpireAt = (trigger.action as? OTReminderAction)?.expiryMilliSeconds?.let { it + System.currentTimeMillis() } ?: Long.MAX_VALUE
+            entry.timeoutDuration = (trigger.action as? OTReminderAction)?.expiryMilliSeconds
             entry.notifiedAt = System.currentTimeMillis()
 
             return entry

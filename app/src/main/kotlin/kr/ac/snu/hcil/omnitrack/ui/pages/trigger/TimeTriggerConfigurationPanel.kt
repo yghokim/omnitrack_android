@@ -80,9 +80,9 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
     private val toggleTransition: Transition by lazy {
         TransitionSet()
                 .setOrdering(TransitionSet.ORDERING_TOGETHER)
-                .addTransition(Fade(Fade.MODE_OUT).setDuration(200))
-                .addTransition(ChangeBounds().setDuration(150))
-                .addTransition(Fade(Fade.MODE_IN).setDuration(200))
+                .addTransition(Fade(Fade.MODE_OUT).setDuration(300))
+                .addTransition(ChangeBounds().setDuration(250))
+                .addTransition(Fade(Fade.MODE_IN).setDuration(300))
     }
 
     constructor(context: Context?) : super(context)
