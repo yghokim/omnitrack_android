@@ -169,33 +169,34 @@ class ExperienceSamplingTimeScheduleCalculator(
         }
 
         cacheCal.timeInMillis = finalRangeStart
-
-        while (!isAvailableDayOfWeek(cacheCal.getDayOfWeek())) {
-            finalRangeStart += TimeHelper.daysInMilli
-            cacheCal.timeInMillis = finalRangeStart
-        }
-
-        if (rangeStart < finalRangeStart) {
-            currentRandomPoints = generateRandomPoints(finalRangeStart, randomSeedBase, numAlerts, rangeLength, minIntervalMillis)
-        }
-
         var result: Triple<Long, Int, Long>? = null
 
-        for (i in currentRandomPoints.indices) {
-            if (currentRandomPoints[i] > now && (last == null || currentRandomPoints[i] > last)) {
-                result = Triple(currentRandomPoints[i], i, finalRangeStart)
-                break
-            } else continue
-        }
+        //we can get into a situation where we are at near end of the day, and the last random point is earlier than the time.
+
+        do {
+            while (!isAvailableDayOfWeek(cacheCal.getDayOfWeek())) {
+                cacheCal.add(Calendar.DAY_OF_YEAR, 1)
+            }
+            finalRangeStart = cacheCal.timeInMillis
+
+            if (rangeStart < finalRangeStart) {
+                currentRandomPoints = generateRandomPoints(finalRangeStart, randomSeedBase, numAlerts, rangeLength, minIntervalMillis)
+            }
+
+
+            for (i in currentRandomPoints.indices) {
+                if (currentRandomPoints[i] > now && (last == null || currentRandomPoints[i] > last)) {
+                    result = Triple(currentRandomPoints[i], i, finalRangeStart)
+                    break
+                } else continue
+            }
+
+            cacheCal.add(Calendar.DAY_OF_YEAR, 1)
+        } while (result == null)
 
         OTApp.logger.writeSystemLog("EMA trigger calculation: Last: ${last?.let { TimeHelper.FORMAT_DATETIME.format(Date(it)) }
                 ?: "null"}, now: ${TimeHelper.FORMAT_DATETIME.format(Date(now))} " +
-                "EMA trigger timestamp list: \n" + currentRandomPoints.map { TimeHelper.FORMAT_DATETIME.format(Date(it)) }.joinToString("\n") + "\npicked timestamp: " + (result?.second
-                ?: "Null"), TAG)
-
-        if (result == null) {
-
-        }
+                "EMA trigger timestamp list: \n" + currentRandomPoints.map { TimeHelper.FORMAT_DATETIME.format(Date(it)) }.joinToString("\n") + "\npicked timestamp: " + result.second, TAG)
 
         return result
     }

@@ -21,8 +21,9 @@ abstract class TimeScheduleCalculator<T> where T : TimeScheduleCalculator<T> {
 
     fun setAvailableDaysOfWeekFlag(flags: Int = 0b1111111): T {
         for (i in (0..6)) {
-            availableDaysOfWeek[i] = BitwiseOperationHelper.getBooleanAt(flags, 6 - i)
-
+            if (flags == 0) {
+                availableDaysOfWeek[i] = true
+            } else availableDaysOfWeek[i] = BitwiseOperationHelper.getBooleanAt(flags, 6 - i)
         }
 
         return this as T
