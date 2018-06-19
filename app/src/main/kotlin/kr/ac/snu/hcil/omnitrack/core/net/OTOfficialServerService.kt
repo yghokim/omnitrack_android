@@ -22,8 +22,8 @@ interface OTOfficialServerService {
     @POST("api/user/role")
     fun postUserRoleConsentResult(@Body data: OTUserRolePOJO): Single<Boolean>
 
-    @PUT("api/user/device")
-    fun putDeviceInfo(@Body info: OTDeviceInfo): Single<ISynchronizationServerSideAPI.DeviceInfoResult>
+    @POST("api/user/device")
+    fun postDeviceInfo(@Body info: OTDeviceInfo): Single<ISynchronizationServerSideAPI.DeviceInfoResult>
 
     @POST("api/user/report")
     fun postUserReport(@Body data: JsonObject): Single<Boolean>
@@ -37,8 +37,8 @@ interface OTOfficialServerService {
     @POST("api/usage_logs/batch/insert")
     fun uploadUsageLogs(@Body logs: List<String>): Single<List<Long>>
 
-    @PUT("api/user/name")
-    fun putUserName(@Body nameAndTimestamp: ValueWithTimestamp<String>): Single<ISynchronizationServerSideAPI.InformationUpdateResult>
+    @POST("api/user/name")
+    fun postUserName(@Body nameAndTimestamp: ValueWithTimestamp<String>): Single<ISynchronizationServerSideAPI.InformationUpdateResult>
 
     //Research
     @POST("api/research/invitation/approve")
