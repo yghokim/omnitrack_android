@@ -31,7 +31,7 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
     }
 
     override fun putDeviceInfo(info: OTDeviceInfo): Single<ISynchronizationServerSideAPI.DeviceInfoResult> {
-        return service.putDeviceInfo(info).subscribeOn(Schedulers.io())
+        return service.postDeviceInfo(info).subscribeOn(Schedulers.io())
     }
 
     override fun sendUserReport(inquiryData: JsonObject): Single<Boolean> {
@@ -77,7 +77,7 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
     }
 
     override fun putUserName(name: String, timestamp: Long): Single<ISynchronizationServerSideAPI.InformationUpdateResult> {
-        return service.putUserName(ValueWithTimestamp(name, timestamp))
+        return service.postUserName(ValueWithTimestamp(name, timestamp))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

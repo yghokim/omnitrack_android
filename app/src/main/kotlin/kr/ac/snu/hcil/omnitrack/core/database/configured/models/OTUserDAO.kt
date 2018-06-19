@@ -21,16 +21,4 @@ open class OTUserDAO : RealmObject() {
     var nameSynchronizedAt: Long? = null
     var nameUpdatedAt: Long = System.currentTimeMillis()
 
-    fun toPojo(): OTUserInfoPOJO {
-        return OTUserInfoPOJO(uid, name, photoServerPath, email, consentApproved, thisDeviceLocalKey)
-    }
-
-    data class OTUserInfoPOJO(
-            val uid: String,
-            val name: String,
-            val photoServerPath: String,
-            val email: String,
-            val consentApproved: Boolean,
-            val thisDeviceLocalKey: String
-    )
 }
