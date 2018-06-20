@@ -519,7 +519,7 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
 
     class ReminderDismissWorker : Worker() {
 
-        override fun doWork(): WorkerResult {
+        override fun doWork(): Result {
             return try {
                 val triggerId = inputData.getString(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER, "")
                 val entryId = inputData.getLong(INTENT_EXTRA_ENTRY_ID, 0)
@@ -534,17 +534,17 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                     commands.dismissSyncImpl(entryId, realm)
                     realm.close()
                     OTApp.logger.writeSystemLog("Successfully dismissed reminder by Worker. entryId: $entryId", "ReminderDismissWorker")
-                    WorkerResult.SUCCESS
-                } else WorkerResult.FAILURE
+                    Result.SUCCESS
+                } else Result.FAILURE
             } catch (ex: Exception) {
                 OTApp.logger.writeSystemLog("ReminderDismissWorker doWork error: \n${Log.getStackTraceString(ex)}", "ReminderDismissWorker")
-                WorkerResult.FAILURE
+                Result.FAILURE
             }
         }
     }
 
     class SystemRebootWorker : Worker() {
-        override fun doWork(): WorkerResult {
+        override fun doWork(): Result {
             return try {
                 val configId = inputData.getString(OTApp.INTENT_EXTRA_CONFIGURATION_ID, "")
 
@@ -556,11 +556,11 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                     commands.handlSystemRebootSyncImpl(realm)
                     realm.close()
                     OTApp.logger.writeSystemLog("Successfully handled reboot for reminder by Worker.", "OTReminderService.SystemRebootWorker")
-                    WorkerResult.SUCCESS
-                } else WorkerResult.FAILURE
+                    Result.SUCCESS
+                } else Result.FAILURE
             } catch (ex: Exception) {
                 OTApp.logger.writeSystemLog("Reminder Reboot Handling failed: \n ${Log.getStackTraceString(ex)}", "OTReminderService.SystemRebootWorker")
-                WorkerResult.RETRY
+                Result.RETRY
             }
         }
     }

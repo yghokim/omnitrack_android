@@ -333,9 +333,7 @@ fun applyTint(drawable: Drawable, color: Int): Drawable {
 
 val PowerManager.isInteractiveCompat: Boolean get() {
 
-    if (Build.VERSION.SDK_INT <= 19) {
-        return this.isScreenOn
-    } else {
+    if (Build.VERSION.SDK_INT <= 19) return this.isScreenOn else {
         return this.isInteractive
     }
 }
