@@ -190,7 +190,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'com.google.android:flexbox:0.3.2'
     implementation "com.google.code.gson:gson:$rootProject.ext.gson_version"
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.14'
+    implementation "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxjava_version"
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
     implementation 'com.github.pwittchen:reactivenetwork-rx2:0.12.3'
     implementation 'jp.wasabeef:recyclerview-animators:2.2.7'
@@ -198,10 +198,10 @@ dependencies {
     implementation 'org.apmem.tools:layouts:1.10@aar'
     implementation 'com.beloo.widget:ChipsLayoutManager:0.3.7@aar'
     implementation 'com.github.ybq:Android-SpinKit:1.1.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
-    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
+    implementation "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttp_version"
+    implementation "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$rootProject.ext.retrofit_version"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$rootProject.ext.retrofit_version"
     implementation 'com.airbnb.android:lottie:2.2.5'
     implementation 'org.atteo:evo-inflector:1.2.2'
     implementation 'com.github.Epsiloni:android-target-tooltip:1.7'

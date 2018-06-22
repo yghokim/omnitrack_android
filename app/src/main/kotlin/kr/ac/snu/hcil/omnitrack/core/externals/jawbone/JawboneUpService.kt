@@ -22,9 +22,9 @@ import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import kr.ac.snu.hcil.omnitrack.utils.getYear
 import kr.ac.snu.hcil.omnitrack.utils.getZeroBasedMonth
-import retrofit.Callback
-import retrofit.RetrofitError
-import retrofit.client.Response
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import rx_activity_result2.RxActivityResult
 import java.util.*
 
@@ -87,11 +87,11 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
     override fun onDeactivate() {
         ApiManager.getRequestInterceptor().clearAccessToken()
         ApiManager.getRestApiInterface().revokeUser(UpPlatformSdkConstants.API_VERSION_STRING, object : Callback<Any> {
-            override fun failure(error: RetrofitError?) {
-
+            override fun onFailure(call: Call<Any>?, t: Throwable?) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
 
-            override fun success(t: Any?, response: Response?) {
+            override fun onResponse(call: Call<Any>?, response: Response<Any>?) {
                 println("successfully disconnected from UP server.")
             }
 
@@ -138,23 +138,23 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
                                                 CLIENT_SECRET,
                                                 code,
                                                 object : Callback<OauthAccessTokenResponse> {
-                                                    override fun failure(error: RetrofitError) {
-                                                        println("Jawbone Request failed. ${error.message}")
+                                                    override fun onFailure(call: Call<OauthAccessTokenResponse>?, t: Throwable?) {
+                                                        println("Jawbone Request failed. ${t?.message}")
                                                         if (!subscriber.isDisposed) {
                                                             subscriber.onSuccess(false)
                                                         }
                                                     }
 
-                                                    override fun success(result: OauthAccessTokenResponse, response: Response) {
-
-                                                        if (result.access_token != null) {
+                                                    override fun onResponse(call: Call<OauthAccessTokenResponse>, response: Response<OauthAccessTokenResponse>) {
+                                                        val res = response.body()!!
+                                                        if (res.access_token != null) {
                                                             val editor = preferences.edit()
-                                                            editor.putString(UpPlatformSdkConstants.UP_PLATFORM_ACCESS_TOKEN, result.access_token)
-                                                            editor.putString(UpPlatformSdkConstants.UP_PLATFORM_REFRESH_TOKEN, result.refresh_token)
+                                                            editor.putString(UpPlatformSdkConstants.UP_PLATFORM_ACCESS_TOKEN, res.access_token)
+                                                            editor.putString(UpPlatformSdkConstants.UP_PLATFORM_REFRESH_TOKEN, res.refresh_token)
                                                             editor.apply()
 
-                                                            println("accessToken:" + result.access_token)
-                                                            accessToken = result.access_token
+                                                            println("accessToken:" + res.access_token)
+                                                            accessToken = res.access_token
                                                             ApiManager.getRequestInterceptor().setAccessToken(accessToken)
                                                             if (!subscriber.isDisposed) {
                                                                 subscriber.onSuccess(true)

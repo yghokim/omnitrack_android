@@ -47,33 +47,14 @@
 
 -dontwarn sun.misc.**
 
--keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
-   long producerIndex;
-   long consumerIndex;
-}
-
--keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
-    rx.internal.util.atomic.LinkedQueueNode producerNode;
-}
-
--keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueConsumerNodeRef {
-    rx.internal.util.atomic.LinkedQueueNode consumerNode;
-}
-
--dontnote rx.internal.util.PlatformDependent
-
-# Class names are needed in reflection
--keepnames class com.amazonaws.**
-# Request handlers defined in request.handlers
--keep class com.amazonaws.services.**.*Handler
 # The following are referenced but aren't required to run
 -dontwarn com.fasterxml.jackson.**
 -dontwarn org.apache.commons.logging.**
-# Android 6.0 release removes support for the Apache HTTP client
--dontwarn org.apache.http.**
-# The SDK has several references of Apache HTTP client
--dontwarn com.amazonaws.http.**
--dontwarn com.amazonaws.metrics.**
+
+
+# Don't note duplicate definition (Legacy Apche Http Client)
+-dontnote android.net.http.*
+-dontnote org.apache.http.**
 
 
 # Platform calls Class.forName on types which do not exist on Android to determine platform.
@@ -91,10 +72,13 @@
 
 # Glide settings
 -keep public class * implements com.bumptech.glide.module.GlideModule
--keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
+-keep public class * extends com.bumptech.glide.module.AppGlideModule
+-keep class com.bumptech.glide.GeneratedAppGlideModuleImpl
+-keep public enum com.bumptech.glide.load.ImageHeaderParser$** {
   **[] $VALUES;
   public *;
 }
+-dontwarn com.bumptech.glide.load.resource.bitmap.VideoDecoder
 
 #For CameraKit >= 0.13.0
 -dontwarn com.google.android.gms.**
@@ -111,6 +95,8 @@
 -dontwarn io.reactivex.functions.Function
 -dontwarn rx.internal.util.**
 -dontwarn sun.misc.Unsafe
+
+-dontwarn androidx.work.impl.background.systemjob.SystemJobService
 
 # for DexGuard only
 #-keepresourcexmlelements manifest/application/meta-data@value=GlideModule
