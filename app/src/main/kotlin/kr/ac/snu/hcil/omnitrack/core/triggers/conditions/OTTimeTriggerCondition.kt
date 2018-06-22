@@ -115,9 +115,24 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
     var dayOfWeekFlags: Byte = 0b1111111
     var endAt: Long? = null
 
+    val isWholeDayUsed: Boolean
+        get() {
+            return !samplingRangeUsed || samplingHourEnd == samplingHourStart
+        }
+
     override fun getSerializedString(): String {
         return typeAdapter.toJson(this)
     }
+
+    override val isSticky: Boolean
+        get() {
+            return when (timeConditionType) {
+                TIME_CONDITION_SAMPLING -> true
+                TIME_CONDITION_ALARM -> true
+                TIME_CONDITION_INTERVAL -> false
+                else -> true
+            }
+        }
 
 
     override fun isConfigurationValid(validationErrorMessages: MutableList<CharSequence>?): Boolean {

@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.services
 
+import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -26,6 +27,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerReminderEntry
 import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
@@ -63,9 +65,6 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
         const val ACTION_ON_USER_DISMISS = "${ACTION_PREFIX}.dismissed"
         const val ACTION_ON_USER_LOGGED = "${ACTION_PREFIX}.user_logged"
 
-        const val ACTION_ON_SYSTEM_REBOOTED = "${ACTION_PREFIX}.system_rebooted"
-
-
         const val INTENT_EXTRA_ENTRY_ID = "entryId"
         const val INTENT_EXTRA_LOGGED_AT = "loggedAt"
 
@@ -99,10 +98,6 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
             return makeBaseIntent(context, configId, ACTION_ON_USER_LOGGED)
                     .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
                     .putExtra(INTENT_EXTRA_LOGGED_AT, loggedAt)
-        }
-
-        fun makeSystemRebootedIntent(context: Context, configId: String): Intent {
-            return makeBaseIntent(context, configId, ACTION_ON_SYSTEM_REBOOTED)
         }
 
         val dateFormat: DateFormat by lazy {
@@ -145,9 +140,6 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                     commands.onUserLogged(startId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER),
                             intent.getLongExtra(INTENT_EXTRA_LOGGED_AT, System.currentTimeMillis())
                     )
-                }
-                ACTION_ON_SYSTEM_REBOOTED -> {
-                    commands.onSystemRebooted()
                 }
                 else -> Completable.complete()
             }
@@ -296,27 +288,9 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                                     pendingEntries.forEach { it.dismissed = true }
 
                                     val entry = insertNewReminderEntry(trigger, tracker.objectId!!, action, triggerTime, realm)
-                                    val notificationId = notificationIdSeed.incrementAndGet()
-                                    entry.systemIntrinsicId = notificationId
-                                    val notiBuilder = makeReminderNotificationBuilderBase(notificationId, trigger.objectId!!, tracker.objectId!!, tracker.name, entry.id, triggerTime, entry.autoExpireAt, entry.timeoutDuration?.toLong(), dismissedNotificationCount)
-                                    if (action.message?.isNotBlank() == true) {
-                                        notiBuilder.setContentTitle(action.message)
-                                    } else notiBuilder.setContentTitle(String.format(OTApp.getString(R.string.msg_format_reminder_noti_title), tracker.name))
-
-                                    if (entry.autoExpireAt < Long.MAX_VALUE) reserveAutoExpiry(entry)
-
-                                    context.runOnUiThread {
-                                        OTApp.logger.writeSystemLog("Show reminder notification of trigger", TAG)
-                                        context.notificationManager.notify(TAG, notificationId, notiBuilder.build())
-
-                                        if (!context.powerManager.isInteractiveCompat) {
-                                            //turn on screen when turned off
-                                            val wakelock = context.powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP or PowerManager.ON_AFTER_RELEASE, "ReminderScreenLock")
-                                            wakelock.acquire(1000)
-                                            val cpuWakelock = context.powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ReminderScreenLockCpu")
-                                            cpuWakelock.acquire(1000)
-
-                                        }
+                                    val notiBuilder = buildNotificationFromEntry(entry, trigger, tracker)
+                                    if (notiBuilder != null) {
+                                        notifyNotification(entry, notiBuilder.build(), true)
                                     }
                                 }
                             }
@@ -354,6 +328,43 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
             }.subscribeOn(Schedulers.io())
         }
 
+        private fun buildNotificationFromEntry(entry: OTTriggerReminderEntry, cachedTrigger: OTTriggerDAO?, cachedTracker: OTTrackerDAO?): NotificationCompat.Builder? {
+            val tracker = cachedTracker
+                    ?: entry.realm.where(OTTrackerDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, entry.trackerId!!).findFirst()
+            val trigger = cachedTrigger
+                    ?: entry.realm.where(OTTriggerDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, entry.triggerId!!).findFirst()
+            if (tracker != null && trigger != null) {
+                val notificationId = notificationIdSeed.incrementAndGet()
+                entry.realm.executeTransactionIfNotIn {
+                    entry.systemIntrinsicId = notificationId
+                }
+                val notiBuilder = makeReminderNotificationBuilderBase(notificationId, entry.triggerId!!, entry.trackerId!!, tracker.name, entry.id, entry.intrinsicTriggerTime, entry.autoExpireAt, entry.timeoutDuration?.toLong(), 0)
+                val message = (trigger.action as OTReminderAction).message
+
+                return if (message?.isNotBlank() == true) {
+                    notiBuilder.setContentTitle(message)
+                } else notiBuilder.setContentTitle(String.format(OTApp.getString(R.string.msg_format_reminder_noti_title), tracker.name))
+            } else return null
+        }
+
+        private fun notifyNotification(entry: OTTriggerReminderEntry, notification: Notification, wakeScreen: Boolean) {
+            val notificationId = entry.systemIntrinsicId
+            val expireAt = entry.autoExpireAt
+            context.runOnUiThread {
+                OTApp.logger.writeSystemLog("Show reminder notification of trigger", TAG)
+                context.notificationManager.notify(TAG, notificationId, notification)
+
+                if (expireAt < Long.MAX_VALUE) reserveAutoExpiry(entry)
+
+                if (!context.powerManager.isInteractiveCompat && wakeScreen) {
+                    //turn on screen when turned off
+                    val wakelock = context.powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP or PowerManager.ON_AFTER_RELEASE, "ReminderScreenLock")
+                    wakelock.acquire(1000)
+                    val cpuWakelock = context.powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ReminderScreenLockCpu")
+                    cpuWakelock.acquire(1000)
+                }
+            }
+        }
 
         internal fun handleEntrySyncImpl(entryId: Long, realm: Realm, handler: (OTTriggerReminderEntry) -> Unit) {
             val entry = realm.where(OTTriggerReminderEntry::class.java)
@@ -377,6 +388,29 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                     notificationManager.cancel(TAG, notificationId)
                 }
             }
+        }
+
+        internal fun restoreReminderNotifications(realm: Realm): Completable {
+            return Completable.defer {
+                val pendingEntries = realm.where(OTTriggerReminderEntry::class.java)
+                        .equalTo("dismissed", false)
+                        .sort("autoExpireAt", Sort.DESCENDING)
+                        .findAll()
+                pendingEntries.groupBy { entry -> entry.trackerId!! }
+                        .forEach { trackerId, entries ->
+                            if (entries.isNotEmpty()) {
+                                if (entries.first().autoExpireAt >= System.currentTimeMillis()) {
+                                    val notiBuilder = buildNotificationFromEntry(entries.first(), null, null)
+                                    if (notiBuilder != null) {
+                                        notifyNotification(entries.first(), notiBuilder.build(), false)
+                                    }
+                                }
+                            }
+                        }
+
+                return@defer Completable.complete()
+            }
+
         }
 
         internal fun handlSystemRebootSyncImpl(realm: Realm) {

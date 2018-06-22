@@ -187,32 +187,7 @@ class OTReminderAction : OTTriggerAction() {
     override fun performAction(trigger: OTTriggerDAO, triggerTime: Long, configuredContext: ConfiguredContext): Completable {
         return Completable.defer {
             println("trigger fired - send notification")
-            /*
-            val triggerNotiManager = (context.applicationContext as OTApp).triggerSystemComponent.triggerNotificationManager()
-            when (notificationLevelForSystem) {
-                NotificationLevel.Noti -> {
-                    trigger.trackers.forEach { tracker ->
-                        //OTTrackingNotificationFactory.pushReminderNotification(context, tracker, triggerTime)
-                    }
-                }
-                NotificationLevel.Popup -> {
 
-                    val TAG = "ReminderPopup"
-
-                    if (popupTriggerQueueTime != triggerTime) {
-                        Log.d(TAG, "there are remaining triggers: ${popupTriggersQueue.size}. Clear.")
-                        popupTriggersQueue.clear()
-                    }
-
-                    Log.d(TAG, "add one trigger for ${triggerTime}}")
-                    //TODO
-                    // popupTriggersQueue.add(WeakReference(trigger))
-                    popupTriggerQueueTime = triggerTime
-                }
-                NotificationLevel.Impose -> {
-
-                }
-            }*/
             if (trigger.liveTrackerCount > 0) {
                 configuredContext.applicationContext.startService(OTReminderService.makeRemindIntent(configuredContext.applicationContext, configuredContext.configuration.id, trigger.objectId!!, triggerTime))
             }

@@ -10,9 +10,9 @@ import io.reactivex.Observable
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
-import retrofit.Callback
-import retrofit.RetrofitError
-import retrofit.client.Response
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.*
 
 /**
@@ -25,16 +25,15 @@ abstract class AJawboneMoveMeasure : OTMeasureFactory.OTRangeQueriedMeasure() {
             return Flowable.create<Nullable<out Any>>({
                 subscriber ->
                 ApiManager.getRestApiInterface().getMoveEventsList(UpPlatformSdkConstants.API_VERSION_STRING, HashMap<String, Long>().apply { this["date"] = JawboneUpService.makeFormattedDateInteger(start).toLong() }, object : Callback<Any> {
-                    override fun failure(error: RetrofitError) {
+                    override fun onFailure(call: Call<Any>?, t: Throwable) {
                         if (!subscriber.isCancelled) {
-                            subscriber.onError(error)
+                            subscriber.onError(t)
                         }
                     }
 
-                    override fun success(result: Any, response: Response) {
-
+                    override fun onResponse(call: Call<Any>?, response: Response<Any>) {
                         if (!subscriber.isCancelled) {
-                            subscriber.onNext(Nullable(extractValueFromResult(result)))
+                            subscriber.onNext(Nullable(extractValueFromResult(response.body()!!)))
                             subscriber.onComplete()
                         }
                     }
@@ -48,15 +47,15 @@ abstract class AJawboneMoveMeasure : OTMeasureFactory.OTRangeQueriedMeasure() {
                     Observable.create<Float> {
                         subscriber ->
                         ApiManager.getRestApiInterface().getMoveEventsList(UpPlatformSdkConstants.API_VERSION_STRING, JawboneUpService.makeIntraDayRequestQueryParams(it.first, it.second, null), object : Callback<Any> {
-                            override fun failure(error: RetrofitError) {
+                            override fun onFailure(call: Call<Any>?, t: Throwable) {
                                 if (!subscriber.isDisposed) {
-                                    subscriber.onError(error)
+                                    subscriber.onError(t)
                                 }
                             }
 
-                            override fun success(result: Any, response: Response) {
+                            override fun onResponse(call: Call<Any>?, response: Response<Any>) {
                                 if (!subscriber.isDisposed) {
-                                    subscriber.onNext(extractValueFromResult(result))
+                                    subscriber.onNext(extractValueFromResult(response.body()!!))
                                     subscriber.onComplete()
                                 }
                             }
