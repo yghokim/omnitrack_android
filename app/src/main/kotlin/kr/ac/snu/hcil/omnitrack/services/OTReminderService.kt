@@ -338,12 +338,16 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                 entry.realm.executeTransactionIfNotIn {
                     entry.systemIntrinsicId = notificationId
                 }
-                val notiBuilder = makeReminderNotificationBuilderBase(notificationId, entry.triggerId!!, entry.trackerId!!, tracker.name, entry.id, entry.intrinsicTriggerTime, entry.autoExpireAt, entry.timeoutDuration?.toLong(), 0)
-                val message = (trigger.action as OTReminderAction).message
+                val message = (trigger.action as OTReminderAction).message?.let {
+                    if (it.isNotBlank() == true) it
+                    else null
+                }
+                        ?: String.format(OTApp.getString(R.string.msg_format_reminder_noti_title), tracker.name)
 
-                return if (message?.isNotBlank() == true) {
-                    notiBuilder.setContentTitle(message)
-                } else notiBuilder.setContentTitle(String.format(OTApp.getString(R.string.msg_format_reminder_noti_title), tracker.name))
+                val notiBuilder = makeReminderNotificationBuilderBase(notificationId, entry.triggerId!!, entry.trackerId!!, tracker.name, entry.id, entry.intrinsicTriggerTime, entry.autoExpireAt, entry.timeoutDuration?.toLong(), 0, message)
+
+
+                return notiBuilder
             } else return null
         }
 
@@ -439,8 +443,7 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                                 entry.notifiedAt = System.currentTimeMillis()
                                 val notificationId = notificationIdSeed.incrementAndGet()
                                 entry.systemIntrinsicId = notificationId
-                                val notiBuilder = makeReminderNotificationBuilderBase(notificationId, entry.triggerId!!, trackerId, tracker.name, entry.id, entry.intrinsicTriggerTime, entries.first().autoExpireAt, entry.timeoutDuration?.toLong(), entries.size)
-                                notiBuilder.setContentTitle(OTApp.getString(R.string.msg_reminder_omitted))
+                                val notiBuilder = makeReminderNotificationBuilderBase(notificationId, entry.triggerId!!, trackerId, tracker.name, entry.id, entry.intrinsicTriggerTime, entries.first().autoExpireAt, entry.timeoutDuration?.toLong(), entries.size, OTApp.getString(R.string.msg_reminder_omitted))
 
                                 if (entry.autoExpireAt < Long.MAX_VALUE) reserveAutoExpiry(entry)
 
@@ -496,7 +499,7 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
         }
 
 
-        private fun makeReminderNotificationBuilderBase(notiId: Int, triggerId: String, trackerId: String, trackerName: String, entryId: Long, reminderTime: Long, expireAt: Long, durationMs: Long?, dismissedCount: Int): NotificationCompat.Builder {
+        private fun makeReminderNotificationBuilderBase(notiId: Int, triggerId: String, trackerId: String, trackerName: String, entryId: Long, reminderTime: Long, expireAt: Long, durationMs: Long?, dismissedCount: Int, title: CharSequence): NotificationCompat.Builder {
 
             println("reminderTime: $reminderTime, expireAt: $expireAt")
             /*
@@ -530,6 +533,10 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
                     .setLights(lightColor, 1000, 500)
                     //.setContentText(if(dismissedCount==0) contentTextBase else "$contentTextBase (${resources.getQuantityString(R.plurals.msg_reminder_omitted, dismissedCount)})")
                     .setContentText(contentText)
+                    .setStyle(NotificationCompat.BigTextStyle()
+                            .bigText(contentText)
+                            .setBigContentTitle(title))
+                    .setContentTitle(title)
                     .setAutoCancel(false)
                     .setOngoing(true)
                     .apply { if (durationMs != null) this.setTimeoutAfter(durationMs) }
