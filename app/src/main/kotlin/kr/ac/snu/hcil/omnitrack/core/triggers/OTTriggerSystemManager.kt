@@ -1,7 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
+import android.content.Context
 import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import javax.inject.Singleton
 
 /**
@@ -9,10 +11,12 @@ import javax.inject.Singleton
  */
 @Singleton
 class OTTriggerSystemManager(
-        val triggerAlarmManager: Lazy<ITriggerAlarmController>
-
-
+        val triggerAlarmManager: Lazy<ITriggerAlarmController>,
+        val context: Context
 ) {
+    private val settingsPrompter: OTExternalSettingsPrompter by lazy {
+        OTExternalSettingsPrompter(context)
+    }
 
     fun onSystemRebooted() {
         triggerAlarmManager.get().activateOnSystem()
@@ -42,7 +46,12 @@ class OTTriggerSystemManager(
         if (managedTrigger.isOn) {
             when (managedTrigger.conditionType) {
                 OTTriggerDAO.CONDITION_TYPE_TIME -> {
-                    return triggerAlarmManager.get().continueTriggerInChainIfPossible(managedTrigger)
+                    triggerAlarmManager.get().continueTriggerInChainIfPossible(managedTrigger)
+                    if (managedTrigger.isOn) {
+                        if (!settingsPrompter.isBatteryOptimizationWhiteListed()) {
+                            settingsPrompter.askUserBatterOptimizationWhitelist()
+                        }
+                    }
                 }
             }
         } else {

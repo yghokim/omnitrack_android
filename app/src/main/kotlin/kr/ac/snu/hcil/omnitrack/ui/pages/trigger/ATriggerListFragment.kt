@@ -37,6 +37,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.TriggerFireBroadcastReceiver
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
@@ -65,6 +66,10 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         const val VIEWTYPE_GHOST = 1
 
         val switchColorFilter: ColorFilter by lazy { ColorMatrixColorFilter(ColorMatrix().apply { this.setSaturation(0.1f) }) }
+    }
+
+    private val settingsPrompter: OTExternalSettingsPrompter by lazy {
+        OTExternalSettingsPrompter(this.requireContext())
     }
 
     private val triggerFireBroadcastReceiver: BroadcastReceiver by lazy {
@@ -196,6 +201,8 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                 viewModel.addNewTrigger(resultDao)
             }
         }
+
+        settingsPrompter.handleActivityResult(requestCode, resultCode, data)
     }
 
     inner class TriggerListAdapter : RecyclerView.Adapter<ATriggerViewHolder>() {
@@ -284,6 +291,11 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                                             content[IEventLogger.CONTENT_KEY_PROPERTY] = "switch"
                                             attachedViewModel?.triggerSwitch?.value?.let {
                                                 content[IEventLogger.CONTENT_KEY_NEWVALUE] = it
+                                            }
+                                        }
+                                        if (attachedViewModel?.triggerSwitch?.value == true && attachedViewModel?.triggerConditionType?.value == OTTriggerDAO.CONDITION_TYPE_TIME) {
+                                            if (!settingsPrompter.isBatteryOptimizationWhiteListed()) {
+                                                settingsPrompter.askUserBatterOptimizationWhitelist()
                                             }
                                         }
                                         println("trigger switch was successfully changed.")
