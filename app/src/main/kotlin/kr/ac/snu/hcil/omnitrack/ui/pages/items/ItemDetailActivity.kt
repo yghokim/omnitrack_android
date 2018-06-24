@@ -107,7 +107,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
     private var itemSaved: Boolean = false
 
     private val invalidOutsideDialogBuilder: MaterialDialog.Builder by lazy {
-        DialogHelper.makeSimpleAlertBuilder(this, "") {
+        DialogHelper.makeSimpleAlertBuilder(this, "", null) {
             finish()
         }
     }

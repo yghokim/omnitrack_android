@@ -394,6 +394,15 @@
     <string name="title_activity_settings">설정</string>
     <string name="msg_pref_reminder_noti_rington_title">리마인더 알림음</string>
     <string name="msg_pref_category_general">일반</string>
+
+    <string name="msg_pref_title_ignore_battery_optimization">앱 배터리 최적화 무시하기</string>
+    <string name="msg_pref_summary_ignore_battery_optimization">트리거, 리마인더 등의 시간 기반 기능의 정확도를 높이려면 이 설정을 켜세요. 이 설정을 켜도 OmniTrack은 많은 배터리를 소모하지 않습니다.</string>
+
+    <string name="msg_pref_dialog_content_ignore_battery_optimization_off">
+        배터리 사용량 최적화하지 않은 앱 중에서 &lt;b>%1$s&lt;/b> 앱을 찾아 최적화를 켜세요.
+        &lt;br>&lt;br>리스트에 &lt;b>%1$s&lt;/b> 앱이 없거나 이미 최적화가 켜져 있다면, 기기를 재부팅하고 다시 확인해 보세요.
+    </string>
+
     <string name="msg_checking">체크하는 중…</string>
     <string name="msg_go_to_store">스토어로 가기</string>
     <string name="msg_format_dependency_sign_in_passed"><b>%1$s</b> 서비스에 로그인되어 있습니다.</string>
