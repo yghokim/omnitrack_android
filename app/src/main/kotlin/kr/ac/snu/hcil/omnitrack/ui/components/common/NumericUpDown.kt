@@ -20,12 +20,12 @@ class NumericUpDown : ConstraintLayout, INumericUpDown {
     override var minValue: Int
         get() = impl.minValue
         set(value) {
-           impl.minValue = value
+            impl.minValue = value
         }
     override var maxValue: Int
         get() = impl.maxValue
         set(value) {
-           impl.maxValue = value
+            impl.maxValue = value
         }
     override val value: Int
         get() = impl.value
@@ -75,7 +75,7 @@ class NumericUpDown : ConstraintLayout, INumericUpDown {
         inflateContent(R.layout.component_number_picker_vertical, true)
     }
 
-   constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
         impl = NumericUpDownImpl(context, attrs, this)
 
         val a = context.theme.obtainStyledAttributes(
@@ -152,5 +152,4 @@ class NumericUpDown : ConstraintLayout, INumericUpDown {
             }
         }
     }
-
 }

@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.time
 import android.content.Context
 import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import kotlinx.android.synthetic.main.component_timepoint.view.*
 import kr.ac.snu.hcil.omnitrack.R
