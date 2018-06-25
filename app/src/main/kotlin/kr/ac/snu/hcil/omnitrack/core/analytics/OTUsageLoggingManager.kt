@@ -21,8 +21,10 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_TRACK
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.SUB_ADD
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.SUB_EDIT
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.SUB_REMOVE
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.TRIGGER_FIRED
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UsageLog
 import kr.ac.snu.hcil.omnitrack.core.di.configured.UsageLogger
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
@@ -81,6 +83,21 @@ class OTUsageLoggingManager(configuredContext: ConfiguredContext) : IEventLogger
         }
     }
 
+
+    override fun logTriggerFireEvent(triggerId: String, triggerFiredTime: Long, trigger: OTTriggerDAO, inject: ((JsonObject) -> Unit)?) {
+        val content = jsonObject(
+                "triggerId" to triggerId,
+                "conditionType" to trigger.conditionType,
+                "actionType" to trigger.actionType
+        )
+
+        trigger.condition?.writeEventLogContent(content)
+        trigger.action?.writeEventLogContent(trigger, content)
+
+        inject?.invoke(content)
+
+        logEvent(TRIGGER_FIRED, null, content, triggerFiredTime)
+    }
 
     override fun logAttributeChangeEvent(sub: String?, attributeLocalId: String, trackerId: String?, inject: ((JsonObject) -> Unit)?) {
         val content = jsonObject(

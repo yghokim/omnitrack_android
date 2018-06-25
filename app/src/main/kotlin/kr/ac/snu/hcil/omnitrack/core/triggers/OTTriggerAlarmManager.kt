@@ -25,8 +25,10 @@ import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import kr.ac.snu.hcil.omnitrack.utils.time.DesignatedTimeScheduleCalculator
+import kr.ac.snu.hcil.omnitrack.utils.time.ExperienceSamplingTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.IntervalTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
+import kr.ac.snu.hcil.omnitrack.utils.toDatetimeString
 import java.util.*
 
 /**
@@ -69,6 +71,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
     //==========================================================
 
     override fun activateOnSystem() {
+
         val realm = realmProvider.get()
         realm.use {
             realm.executeTransactionAsync({ realm ->
@@ -82,18 +85,27 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                 unManagedAlarms.forEach { alarm ->
                     if (alarm.reservedAlarmTime < now) {
                         //failed alarm.
+
                         alarm.skipped = true
                         alarm.triggerSchedules?.forEach {
-                            it.skipped = true
 
-                            if (it.oneShot) {
-                                //one-shot trigger was failed
-                                OTApp.logger.writeSystemLog("Trigger was missed at ${it.intrinsicAlarmTime}. It was one-shot so just ignored.", TAG)
+                            if (!it.stickyAlarm) {
+                                it.skipped = true
+                                if (it.oneShot) {
+                                    //one-shot trigger was failed
+                                    OTApp.logger.writeSystemLog("Trigger was missed at ${it.intrinsicAlarmTime.toDatetimeString()}. It was one-shot so just ignored.", TAG)
+                                } else {
+                                    //repeated trigger was failed.
+                                    it.trigger?.let { trigger ->
+                                        registerTriggerAlarm(it.intrinsicAlarmTime, trigger)
+                                        OTApp.logger.writeSystemLog("Trigger was missed at ${it.intrinsicAlarmTime.toDatetimeString()}. reserve next alarm - ${trigger.objectId}", TAG)
+                                    }
+                                }
                             } else {
-                                //repeated trigger was failed.
-                                it.trigger?.let { trigger ->
-                                    registerTriggerAlarm(it.intrinsicAlarmTime, trigger)
-                                    OTApp.logger.writeSystemLog("Trigger was missed at ${it.intrinsicAlarmTime}. reserve next alarm - ${trigger.objectId}", TAG)
+                                //sticky alarm
+                                if (it.trigger?.validateScriptIfExist(this.configuredContext) == true) {
+                                    it.trigger?.getPerformFireCompletable(it.intrinsicAlarmTime, configuredContext)?.blockingAwait()
+                                    OTApp.logger.writeSystemLog("Trigger was missed at ${it.intrinsicAlarmTime.toDatetimeString()}. But its sticky so perform immediately.", TAG)
                                 }
                             }
                         }
@@ -120,7 +132,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
 
     override fun registerTriggerAlarm(pivot: Long?, trigger: OTTriggerDAO): Boolean {
         val condition = retrieveTimeCondition(trigger)
-        val nextAlarmTime = calculateNextAlarmTime(pivot, condition)
+        val nextAlarmTime = calculateNextAlarmTime(pivot, condition, trigger.objectId!!)
         if (nextAlarmTime != null) {
             OTApp.logger.writeSystemLog("Next alarm time is ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(nextAlarmTime))}", TAG)
             reserveAlarm(trigger, nextAlarmTime, !condition.isRepeated)
@@ -170,7 +182,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
 
                                             OTApp.logger.writeSystemLog("Fire time trigger. schedule id: ${schedule.id}", TAG)
                                             if (trigger.validateScriptIfExist(configuredContext)) {
-                                                trigger.performFire(triggerTime, configuredContext)
+                                                trigger.getPerformFireCompletable(triggerTime, configuredContext)
                                             } else Completable.complete()
                                         }
                                         else -> {
@@ -202,6 +214,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                         .equalTo("trigger.objectId", trigger.objectId).findFirst() ?:
                         realm.createObject(OTTriggerSchedule::class.java, scheduleIdGenerator.getNewUniqueLong())).apply {
                     this.trigger = trigger
+                    this.stickyAlarm = trigger.condition?.isSticky ?: false
                     this.intrinsicAlarmTime = alarmTime
                     this.oneShot = oneShot
                     this.final = oneShot
@@ -383,14 +396,14 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
     }
 
 
-    fun calculateNextAlarmTime(pivot: Long?, condition: OTTimeTriggerCondition): Long? {
+    fun calculateNextAlarmTime(pivot: Long?, condition: OTTimeTriggerCondition, triggerId: String): Long? {
         val now = System.currentTimeMillis()
 
         val limitExclusive = if (condition.isRepeated && condition.endAt != null) {
             condition.endAt!!
         } else Long.MAX_VALUE
 
-        val nextTimeCalculator = when (condition.timeConditionType) {
+        when (condition.timeConditionType) {
             OTTimeTriggerCondition.TIME_CONDITION_ALARM -> {
 
                 val calculator = DesignatedTimeScheduleCalculator().setAlarmTime(condition.alarmTimeHour.toInt(), condition.alarmTimeMinute.toInt(), 0)
@@ -399,7 +412,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                             .setEndAt(limitExclusive)
                 }
 
-                calculator
+                return calculator.calculateNext(pivot, now)
             }
             OTTimeTriggerCondition.TIME_CONDITION_INTERVAL -> {
                 val intervalMillis = condition.intervalSeconds * 1000
@@ -418,12 +431,29 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                     calculator.setNoLimit()
                 }
 
-                calculator
+                return calculator.calculateNext(pivot, now)
             }
-            else -> throw Exception("Unsupported Time Config Type")
-        }
+            OTTimeTriggerCondition.TIME_CONDITION_SAMPLING -> {
+                val builder = ExperienceSamplingTimeScheduleCalculator.Builder()
+                        .setMinIntervalMillis(condition.samplingMinIntervalSeconds * TimeHelper.secondsInMilli)
+                        .setNumAlerts(condition.samplingCount)
+                        .setRandomSeedBase(triggerId)
 
-        return nextTimeCalculator.calculateNext(pivot, now)
+                if (condition.isRepeated) {
+                    builder.setAvailableDaysOfWeekFlag(condition.dayOfWeekFlags.toInt())
+                    builder.setEndAt(limitExclusive)
+                }
+
+                if (condition.isWholeDayUsed) {
+                    builder.setRangeToday(now)
+                } else {
+                    builder.setRangeWithStartEndHour(condition.samplingHourStart, condition.samplingHourEnd, now)
+                }
+
+                return builder.build().calculateNext(pivot, now)
+            }
+            else -> return null
+        }
     }
 
 }

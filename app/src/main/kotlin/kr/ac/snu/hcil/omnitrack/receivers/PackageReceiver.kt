@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import javax.inject.Inject
 
@@ -19,6 +20,12 @@ class PackageReceiver : BroadcastReceiver() {
         (context.applicationContext as OTApp).jobDispatcherComponent.inject(this)
 
         println("package broadcast receiver")
+
+        val reminderCommands = OTReminderService.OTReminderCommands((context.applicationContext as OTApp).currentConfiguredContext, context)
+        val realm = (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.backendRealmFactory().get()
+        reminderCommands.restoreReminderNotifications(realm).blockingAwait()
+        realm.close()
+
         when (intent.action) {
             Intent.ACTION_INSTALL_PACKAGE -> {
                 /*

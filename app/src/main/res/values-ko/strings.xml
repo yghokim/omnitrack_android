@@ -7,6 +7,12 @@
         <item quantity="other">%d개의 필드</item>
     </plurals>
 
+
+    <plurals name="msg_reminder_omitted">
+        <item quantity="zero">누락된 리마인더 없음</item>
+        <item quantity="other">%d개 누락</item>
+    </plurals>
+
     <string name="msg_sort">정렬</string>
 
     <string name="msg_confirm_order">변경된 순서를 적용하시겠습니까?</string>
@@ -177,7 +183,14 @@
 
     <string name="msg_format_login_to">%1$s에 로그인</string>
 
-    <string name="msg_noti_tap_for_tracking_format">%1$s 로그를 기록하려면 탭하세요.</string>
+    <string name="msg_noti_tap_for_tracking_format">탭해서 %1$s 기록</string>
+
+    <string name="msg_noti_reminder_until">%1$s까지</string>
+
+    <string name="msg_reminder_omitted">누락된 리마인더</string>
+
+    <string name="msg_reminder_open_input">응답 입력</string>
+    <string name="msg_reminder_skip">응답 건너뛰기</string>
 
     <string name="msg_format_removed_outside_return_home">%1$s이(가) 외부에서 삭제되었습니다. 스크린을 닫습니다.</string>
 
@@ -325,6 +338,7 @@
     <string name="msg_contacts_permission_required">주소록 접근 권한 필요</string>
     <string name="msg_permission_required">접근 권한 필요</string>
     <string name="msg_contacts_permission_rationale">디바이스에 로그인된 구글 계정을 선택하실 수 있도록 목록을 불러오는 데에만 사용됩니다.</string>
+    <string name="msg_contacts_permission_storage">새로운 버전의 앱을 설치할 수 있도록 외부 저장소에 접근 권한이 필요합니다.</string>
     <string name="msg_contacts_permission_denied_message">주소록 권한 없이는 구글 계정으로 로그인하실 수 없습니다 :(</string>
 
     <string name="msg_permission_request_of_tracker">하나 이상의 트래커가 추가적인 접근 권한이 필요한 필드를 포함하고 있습니다</string>
@@ -380,6 +394,15 @@
     <string name="title_activity_settings">설정</string>
     <string name="msg_pref_reminder_noti_rington_title">리마인더 알림음</string>
     <string name="msg_pref_category_general">일반</string>
+
+    <string name="msg_pref_title_ignore_battery_optimization">앱 배터리 최적화 무시하기</string>
+    <string name="msg_pref_summary_ignore_battery_optimization">트리거, 리마인더 등의 시간 기반 기능의 정확도를 높이려면 이 설정을 켜세요. 이 설정을 켜도 OmniTrack은 많은 배터리를 소모하지 않습니다.</string>
+
+    <string name="msg_pref_dialog_content_ignore_battery_optimization_off">
+        배터리 사용량 최적화하지 않은 앱 중에서 &lt;b>%1$s&lt;/b> 앱을 찾아 최적화를 켜세요.
+        &lt;br>&lt;br>리스트에 &lt;b>%1$s&lt;/b> 앱이 없거나 이미 최적화가 켜져 있다면, 기기를 재부팅하고 다시 확인해 보세요.
+    </string>
+
     <string name="msg_checking">체크하는 중…</string>
     <string name="msg_go_to_store">스토어로 가기</string>
     <string name="msg_format_dependency_sign_in_passed"><b>%1$s</b> 서비스에 로그인되어 있습니다.</string>
@@ -434,6 +457,7 @@
     <string name="msg_duplicate_choice_entry">중복된 항목 텍스트입니다.</string>
     <string name="msg_synchronized">동기화됨</string>
     <string name="msg_not_synchronized">동기화 대기중</string>
+    <string name="msg_sampling_range">샘플링 범위</string>
 
 
     <string-array name="purpose_entries">

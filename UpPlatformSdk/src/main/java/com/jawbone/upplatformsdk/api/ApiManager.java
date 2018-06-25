@@ -6,27 +6,26 @@ package com.jawbone.upplatformsdk.api;
 
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants;
 
-import retrofit.ErrorHandler;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
 
 /**
  * Main class that handles all the API calls
  */
 public class ApiManager {
 
-    private static RestAdapter restAdapter;
+    private static Retrofit restAdapter;
     private static RestApiInterface restApiInterface;
     private static ApiHeaders restApiHeaders;
 
-    private static RestAdapter getRestAdapter() {
+    private static Retrofit getRestAdapter() {
         if (restAdapter == null) {
-            restAdapter = new RestAdapter.Builder()
-                    .setRequestInterceptor(getRequestInterceptor())
-                    .setLogLevel(RestAdapter.LogLevel.FULL)
-                    .setErrorHandler(new CustomErrorHandler())
-                    .setEndpoint(UpPlatformSdkConstants.API_URL)
+            OkHttpClient httpClient = new OkHttpClient.Builder().addInterceptor(getRequestInterceptor()).build();
+
+            restAdapter = new Retrofit.Builder()
+                    .baseUrl(UpPlatformSdkConstants.API_URL)
+                    .client(httpClient)
+                    //.setErrorHandler(new CustomErrorHandler())
                     .build();
         }
         return restAdapter;
@@ -47,6 +46,7 @@ public class ApiManager {
         return restApiHeaders;
     }
 
+    /*
     //TODO make this more robust
     private static class CustomErrorHandler implements ErrorHandler {
         @Override
@@ -57,5 +57,5 @@ public class ApiManager {
             }
             return cause;
         }
-    }
+    }*/
 }

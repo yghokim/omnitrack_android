@@ -32,8 +32,8 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "com.google.code.gson:gson:$rootProject.ext.gson_version"
-    implementation 'com.squareup.okhttp:okhttp:2.7.5'
-    implementation 'com.squareup.okhttp:okhttp-urlconnection:2.7.5'
-    api 'com.squareup.retrofit:retrofit:1.9.0'
-    implementation 'com.squareup.okio:okio:1.13.0'
+    implementation "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttp_version"
+    implementation "com.squareup.okhttp3:okhttp-urlconnection:$rootProject.ext.okhttp_version"
+    implementation "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofit_version"
+    implementation 'com.squareup.okio:okio:1.14.0'
 }

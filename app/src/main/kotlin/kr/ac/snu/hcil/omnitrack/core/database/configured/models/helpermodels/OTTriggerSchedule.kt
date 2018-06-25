@@ -10,7 +10,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
  */
 open class OTTriggerSchedule : RealmObject() {
     companion object {
-        const val FIELD_TRIGGER_ID = "triggerId"
         const val FIELD_FIRED = "fired"
         const val FIELD_SKIPPED = "skipped"
         const val FIELD_INTRINSIC_ALARM_TIME = "intrinsicAlarmTime"
@@ -21,6 +20,11 @@ open class OTTriggerSchedule : RealmObject() {
 
     @Index
     var intrinsicAlarmTime: Long = 0L
+
+    /**
+     * retry alarm when skipped.
+     */
+    var stickyAlarm: Boolean = false
 
     /**
      * This flag is set true when the trigger was stopped by user or the system, breaking the chain.

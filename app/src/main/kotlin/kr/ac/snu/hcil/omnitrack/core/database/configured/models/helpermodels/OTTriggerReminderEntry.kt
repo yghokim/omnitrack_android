@@ -32,6 +32,8 @@ open class OTTriggerReminderEntry : RealmObject() {
     @Index
     var dismissed: Boolean = false
 
+    var autoExpireAt: Long = Long.MAX_VALUE
+    var timeoutDuration: Int? = null
 
     var intrinsicTriggerTime: Long = System.currentTimeMillis()
 

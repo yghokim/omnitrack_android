@@ -1,16 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    tools:parentTag="android.support.constraint.ConstraintLayout">
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourPicker
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
+
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:id="@+id/ui_picker_from"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        android:orientation="vertical"
+        android:textSize="17sp"
+        app:digitFontPath="fonts/Roboto-Thin.ttf"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/ui_separator"
+        app:layout_constraintWidth_min="@dimen/button_height_tall" />
 
     <TextView
+        android:id="@+id/ui_separator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
@@ -19,11 +29,32 @@
         android:text="~"
         android:textAlignment="center"
         android:textColor="@color/textColorMid"
-        android:textSize="24sp" />
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@id/ui_description"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourPicker
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
         android:id="@+id/ui_picker_to"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        android:orientation="vertical"
+        android:textSize="17sp"
+        app:digitFontPath="fonts/Roboto-Thin.ttf"
+        app:layout_constraintLeft_toRightOf="@id/ui_separator"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintWidth_min="@dimen/button_height_tall" />
+
+    <TextView
+        android:id="@+id/ui_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="06:00 PM - 11:00 AM next day (18 hours)"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ui_picker_from" />
 </merge>

@@ -75,7 +75,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     private val removedOutsideAlert: Dialog by lazy {
         DialogHelper.makeSimpleAlertBuilder(this,
-                String.format(OTApp.getString(R.string.msg_format_removed_outside_return_home), OTApp.getString(R.string.msg_text_tracker)))
+                String.format(OTApp.getString(R.string.msg_format_removed_outside_return_home), OTApp.getString(R.string.msg_text_tracker)), null)
         {
             finish()
         }.build()

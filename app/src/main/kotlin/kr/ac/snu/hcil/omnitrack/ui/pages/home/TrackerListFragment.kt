@@ -116,12 +116,16 @@ class TrackerListFragment : OTFragment() {
                 .negativeText(R.string.msg_cancel)
     }
 
+    private var permissionPromptingDialog: MaterialDialog? = null
+
     private val collapsedHeight = 0
     private val expandedHeight = OTApp.instance.resourcesWrapped.getDimensionPixelSize(R.dimen.button_height_normal)
 
     private val currentTrackerViewModelList = ArrayList<TrackerListViewModel.TrackerInformationViewModel>()
 
     private lateinit var viewModel: TrackerListViewModel
+
+    private val pendingPermissions = ArrayList<String>()
 
     companion object {
         const val CHANGE_TRACKER_SETTINGS = 0
@@ -185,12 +189,11 @@ class TrackerListFragment : OTFragment() {
 
         addTrackerFloatingButton = rootView.findViewById(R.id.fab)
         addTrackerFloatingButton.setOnClickListener { view ->
-            newTrackerNameDialog.input(null, viewModel.generateNewTrackerName(), false) {
-                    dialog, text ->
+            newTrackerNameDialog.input(null, viewModel.generateNewTrackerName(), false) { dialog, text ->
                 startActivityForResult(TrackerDetailActivity.makeNewTrackerIntent(text.toString(), act), REQUEST_CODE_NEW_TRACKER)
 
-                }.show()
-                //Toast.makeText(context,String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
+            }.show()
+            //Toast.makeText(context,String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
         }
 
         listView = rootView.findViewById(R.id.ui_recyclerview_with_fallback)
@@ -208,31 +211,50 @@ class TrackerListFragment : OTFragment() {
         return rootView
     }
 
+    private fun askPendingPermissions() {
+        if (pendingPermissions.isNotEmpty()) {
+            val rxPermissions = RxPermissions(act)
+            this.startSubscriptions.add(
+                    rxPermissions.request(*(pendingPermissions.toTypedArray())).subscribe { granted ->
+                        if (granted)
+                            println("permissions granted.")
+                        else println("permissions not granted.")
+                    }
+            )
+        }
+    }
+
+    private fun appendNewPermissions(vararg permissions: String) {
+        permissions.forEach {
+            if (!pendingPermissions.contains(it))
+                pendingPermissions.add(it)
+        }
+
+        if (permissions.isNotEmpty()) {
+            if (permissionPromptingDialog == null) {
+                permissionPromptingDialog = DialogHelper.makeYesNoDialogBuilder(act, resources.getString(R.string.msg_permission_required),
+                        String.format(resources.getString(R.string.msg_permission_request_of_tracker)),
+                        cancelable = false,
+                        onYes = {
+                            askPendingPermissions()
+                        },
+                        onCancel = null,
+                        yesLabel = R.string.msg_allow_permission,
+                        noLabel = R.string.msg_cancel
+                ).build()
+            }
+            if (permissionPromptingDialog?.isShowing == false) {
+                permissionPromptingDialog?.show()
+            }
+        }
+    }
+
     override fun onStart() {
         super.onStart()
         startSubscriptions.add(
                 viewModel.trackerViewModels.subscribe { trackerViewModelList ->
 
-                    val rxPermissions = RxPermissions(act)
-
-                    val permissions = viewModel.getPermissionsRequiredForFields().filter { ContextCompat.checkSelfPermission(act, it) != PackageManager.PERMISSION_GRANTED }
-
-                    if (permissions.isNotEmpty()) {
-                        DialogHelper.makeYesNoDialogBuilder(act, resources.getString(R.string.msg_permission_required),
-                                String.format(resources.getString(R.string.msg_permission_request_of_tracker)),
-                                cancelable = false,
-                                onYes = {
-                                    rxPermissions.request(*permissions.toTypedArray()).subscribe { granted ->
-                                        if (granted)
-                                            println("permissions granted.")
-                                        else println("permissions not granted.")
-                                    }
-                                },
-                                onCancel = null,
-                                yesLabel = R.string.msg_allow_permission,
-                                noLabel = R.string.msg_cancel
-                        ).show()
-                    }
+                    appendNewPermissions(*viewModel.getPermissionsRequiredForFields().filter { ContextCompat.checkSelfPermission(act, it) != PackageManager.PERMISSION_GRANTED }.toTypedArray())
 
                     val diffResult = DiffUtil.calculateDiff(
                             IReadonlyObjectId.DiffUtilCallback(currentTrackerViewModelList, trackerViewModelList)
@@ -313,7 +335,7 @@ class TrackerListFragment : OTFragment() {
                 return ViewHolder(view).apply {
                     viewHolders.add(this)
                 }
-            } catch(ex: Exception) {
+            } catch (ex: Exception) {
                 ex.printStackTrace()
                 throw Exception("Inflation failed")
             }
@@ -459,10 +481,10 @@ class TrackerListFragment : OTFragment() {
                     DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this@TrackerListFragment.act, trackerViewModel.trackerName.value
                             ?: "OmniTrack", getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove,
                             onYes = { dialog ->
-                        viewModel.removeTracker(trackerViewModel)
-                        listView.invalidateItemDecorations()
+                                viewModel.removeTracker(trackerViewModel)
+                                listView.invalidateItemDecorations()
                                 eventLogger.get().logTrackerChangeEvent(IEventLogger.SUB_REMOVE, trackerViewModel.objectId)
-                    }).show()
+                            }).show()
                 } else if (view === chartViewButton) {
                     startActivityOnDelay(ChartViewActivity.makeIntent(trackerId!!, this@TrackerListFragment.act))
 
@@ -526,8 +548,7 @@ class TrackerListFragment : OTFragment() {
 
                 subscriptions.clear()
                 subscriptions.add(
-                        viewModel.trackerName.subscribe {
-                            nameText ->
+                        viewModel.trackerName.subscribe { nameText ->
                             name.text = nameText
                         }
                 )
@@ -552,8 +573,7 @@ class TrackerListFragment : OTFragment() {
                 )
 
                 subscriptions.add(
-                        viewModel.trackerColor.subscribe {
-                            colorInt ->
+                        viewModel.trackerColor.subscribe { colorInt ->
                             color.setBackgroundColor(colorInt)
                         }
                 )
@@ -582,8 +602,7 @@ class TrackerListFragment : OTFragment() {
 
 
                 subscriptions.add(
-                        viewModel.trackerEditable.subscribe {
-                            editable ->
+                        viewModel.trackerEditable.subscribe { editable ->
 
                             editButton.isEnabled = editable
                             editButton.alpha =
@@ -607,8 +626,7 @@ class TrackerListFragment : OTFragment() {
                 )
 
                 subscriptions.add(
-                        viewModel.activeNotificationCount.subscribe {
-                            count ->
+                        viewModel.activeNotificationCount.subscribe { count ->
                             if (count > 0) {
                                 alarmIcon.visibility = View.VISIBLE
                                 alarmText.visibility = View.VISIBLE

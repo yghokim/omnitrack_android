@@ -8,7 +8,7 @@ import android.view.View
 import kotlinx.android.synthetic.main.component_timepoint.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
-import kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
+import kr.ac.snu.hcil.omnitrack.ui.components.common.INumericUpDown
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CalendarPickerDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.*
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
@@ -85,7 +85,7 @@ class DateTimePicker : ConstraintLayout {
         get() = calendar.getAmPm()
 
 
-    private val pickerValueChangedHandler = { picker: Any, changeArgs: NumericUpDown.ChangeArgs ->
+    private val pickerValueChangedHandler = { picker: Any, changeArgs: INumericUpDown.ChangeArgs ->
 
         val before = time
 
@@ -94,7 +94,7 @@ class DateTimePicker : ConstraintLayout {
                 when (picker) {
                     ui_left_picker -> //hour_of_day
                     {
-                        if (changeArgs.changeType == NumericUpDown.ChangeType.MANUAL)
+                        if (changeArgs.changeType == INumericUpDown.ChangeType.MANUAL)
                             calendar.set(Calendar.HOUR_OF_DAY, changeArgs.newValue)
                         else {
                             calendar.add(Calendar.HOUR_OF_DAY, changeArgs.delta)
@@ -103,7 +103,7 @@ class DateTimePicker : ConstraintLayout {
                     ui_middle_picker -> //minute
                     {
 
-                        if (changeArgs.changeType == NumericUpDown.ChangeType.MANUAL) {
+                        if (changeArgs.changeType == INumericUpDown.ChangeType.MANUAL) {
                             calendar.set(Calendar.MINUTE, changeArgs.newValue)
                         } else {
                             calendar.add(Calendar.MINUTE, changeArgs.delta)
@@ -111,7 +111,7 @@ class DateTimePicker : ConstraintLayout {
                     }
                     ui_right_picker -> //second
                     {
-                        if (changeArgs.changeType == NumericUpDown.ChangeType.MANUAL) {
+                        if (changeArgs.changeType == INumericUpDown.ChangeType.MANUAL) {
                             calendar.set(Calendar.SECOND, changeArgs.newValue)
                         } else {
                             calendar.add(Calendar.SECOND, changeArgs.delta)
@@ -124,7 +124,7 @@ class DateTimePicker : ConstraintLayout {
                 when (picker) {
                     ui_left_picker -> //hour
                     {
-                        if (changeArgs.changeType == NumericUpDown.ChangeType.MANUAL) {
+                        if (changeArgs.changeType == INumericUpDown.ChangeType.MANUAL) {
                             calendar.set(Calendar.HOUR_OF_DAY, (changeArgs.newValue % 12) + 12 * ui_right_picker.value)
                         } else {
                             calendar.add(Calendar.HOUR_OF_DAY, changeArgs.delta)
@@ -132,7 +132,7 @@ class DateTimePicker : ConstraintLayout {
                     }
                     ui_middle_picker -> //minute
                     {
-                        if (changeArgs.changeType == NumericUpDown.ChangeType.MANUAL) {
+                        if (changeArgs.changeType == INumericUpDown.ChangeType.MANUAL) {
                             calendar.set(Calendar.MINUTE, changeArgs.newValue)
                         } else {
                             calendar.add(Calendar.MINUTE, changeArgs.delta)

@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.ColorPaletteView
  */
 class ColorPalettePropertyView(context: Context, attrs: AttributeSet?) : APropertyView<Int>(R.layout.component_property_color_palette, context, attrs) {
 
-    private var paletteView: ColorPaletteView = findViewById(R.id.ui_value)
+    private var paletteView: ColorPaletteView = findViewById(R.id.ui_palette)
 
     override var value: Int
         get() = paletteView.selectedColor

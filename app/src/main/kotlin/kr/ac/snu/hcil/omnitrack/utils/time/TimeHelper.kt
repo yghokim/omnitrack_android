@@ -45,8 +45,8 @@ object TimeHelper {
         return timestamp + days * daysInMilli
     }
 
-    fun getTodayRange(): Pair<Long, Long> {
-        val cal = Calendar.getInstance()
+    fun getTodayRange(now: Long = System.currentTimeMillis()): Pair<Long, Long> {
+        val cal = Calendar.getInstance().apply { timeInMillis = now }
         cal.set(Calendar.MILLISECOND, 0)
         cal.set(Calendar.SECOND, 0)
         cal.set(Calendar.MINUTE, 0)
@@ -242,6 +242,10 @@ object TimeHelper {
             Length.SHORT -> DAY_OF_WEEK_SHORT_FORMAT.format(date)
             Length.SHORTEST -> DAY_OF_WEEK_SHORT_FORMAT.format(date)
         }
+    }
+
+    fun getDayOfWeekBooleanInFlag(dayOfWeek: Int, flags: Int): Boolean {
+        return BitwiseOperationHelper.getBooleanAt(flags, 6 - dayOfWeek)
     }
 
     fun loopForDays(from: Long, to: Long, loopHandler: (time: Long, start: Long, end: Long, dayOfYear: Int) -> Unit) {

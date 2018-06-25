@@ -90,21 +90,5 @@ class LoggingDbHelper(context: Context) : SQLiteOpenHelper(context, "logging.db"
         query.close()
     }
 
-    fun writeSessionLog(activity: Any, elapsed: Long, finishedAt: Long, from: String?, content: String?) {
-        val values = ContentValues()
-        values.put(SessionLogScheme.UPDATED_AT, finishedAt)
-        values.put(SessionLogScheme.LOGGED_AT, finishedAt)
-        values.put(SessionLogScheme.ACTIVITY, activity.javaClass.simpleName)
-        values.put(SessionLogScheme.ELAPSED_TIME, elapsed)
-
-        if (content != null)
-            values.put(SessionLogScheme.CONTENT, content)
-
-        if (from != null)
-            values.put(SessionLogScheme.FROM, from)
-
-        val newRowId = writableDatabase.insert(SessionLogScheme.tableName, null, values)
-    }
-
 
 }

@@ -410,7 +410,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                 }
 
                 //propView.value = attr.getPropertyValue(entry.first)
-                propView.valueChanged += {
+                propView.durationChanged += {
                     sender, value ->
                     if (sender is APropertyView<*>) {
                         if (sender.validate()) {

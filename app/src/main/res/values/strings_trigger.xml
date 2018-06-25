@@ -10,13 +10,14 @@
     <string name="trigger_desc_time">Fires by time-related conditions</string>
     <string name="trigger_desc_data">Fires when the data passes the threshold</string>
 
-    <string name="msg_trigger_time_config_type">Period Type</string>
+    <string name="msg_trigger_time_config_type">Condition Type</string>
 
     <string name="msg_trigger_time_config_interval">Interval</string>
     <string name="msg_trigger_time_config_alarm_time">Trigger time</string>
 
-    <string name="msg_trigger_time_config_desc_alarm">At specific time</string>
+    <string name="msg_trigger_time_config_desc_alarm">At specific time points</string>
     <string name="msg_trigger_time_config_desc_interval">Repeated with interval</string>
+    <string name="msg_trigger_time_config_desc_ema">At random moments</string>
 
     <string name="msg_trigger_time_is_repeated">Repeat</string>
 
@@ -36,5 +37,13 @@
 
     <string name='msg_trigger_event_msg_tap_to_configure'>Tap to configure</string>
     <string name="msg_trigger_time_finish_on_end_date">Finish on End Date</string>
+
+
+    <string name="msg_use_reminder_expiry">Expire when delayed</string>
+    <string name="msg_reminder_expiry_time">Expiry time limit</string>
+    <string name="msg_time_trigger_sampling_count_unit_text">times/day</string>
+    <string name="msg_trigger_ema_display_next_alert_format">Next on %1$s</string>
+    <string name="msg_trigger_alerts_per_day">Count per day</string>
+    <string name="message_displayed_on_reminders">Message Displayed on Reminders</string>
 
 </resources>

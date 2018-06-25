@@ -20,6 +20,12 @@
         <item quantity="other">%d fields</item>
     </plurals>
 
+    <plurals name="msg_reminder_omitted">
+        <item quantity="zero">No reminders omitted</item>
+        <item quantity="one">One omitted</item>
+        <item quantity="other">%d omitted</item>
+    </plurals>
+
     <string name="msg_sort">Sort by</string>
 
     <string name="msg_sort_method_timestamp">Logged Time</string>
@@ -53,6 +59,12 @@
     <string name="msg_tracker_empty">No trackers yet. \nStart tracking by adding a new tracker.</string>
     <string name="msg_trigger_empty">No triggers yet.\nAdd a trigger to log tracker items automatically.</string>
     <string name="msg_reminder_empty">No reminders yet.\nAdd a reminder to notice you not to forget tracking.</string>
+
+    <string name="msg_reminder_omitted">The omitted reminder</string>
+
+    <string name="msg_reminder_open_input">Respond Now</string>
+    <string name="msg_reminder_skip">Skip Response</string>
+
     <string name="msg_field_empty">Currently this tracker contains no fields.\nIt will log timestamp only.</string>
 
     <string name="msg_change_screen_name">Change your screen name</string>
@@ -193,7 +205,9 @@
 
     <string name="msg_format_login_to">Login to %1$s</string>
 
-    <string name="msg_noti_tap_for_tracking_format">Tap to log new %1$s record.</string>
+    <string name="msg_noti_tap_for_tracking_format">Tap to open %1$s</string>
+
+    <string name="msg_noti_reminder_until">Until %1$s</string>
 
     <string name="msg_no_trackers_are_assigned">No trackers are assigned.</string>
 
@@ -423,6 +437,7 @@
     <string name="msg_contacts_permission_required">Contacts permissions Required</string>
 
     <string name="msg_contacts_permission_rationale">The permissions are needed only to help you select a Google account.</string>
+    <string name="msg_contacts_permission_storage">The permissions are need to download a new version of app</string>
     <string name="msg_contacts_permission_denied_message">We can\'t sign you in without allowing the permission :(</string>
     <string name="msg_permission_request_of_tracker">One or more trackers contain fields which require additional permissions.</string>
     <string name="msg_format_permission_request_of_tracker_single">%1$s tracker contains fields which require additional permissions.</string>
@@ -480,6 +495,15 @@
     <string name="msg_pref_summary_show_shortcut_panel">Shows favorite trackers on notification bar</string>
     <string name="msg_pref_summary_notify_new_update">Notifies when new update available. We frequently release new features, so stay tuned!</string>
     <string name="msg_pref_title_notify_new_update">Notify New Update</string>
+
+    <string name="msg_pref_dialog_content_ignore_battery_optimization_off">
+        In the battery optimization whitelist, find &lt;b>%1$s&lt;/b> and turn on the optimization.
+        &lt;br>&lt;br>If you don't find the app in the list or it is already turned on, please reboot the device and check again.
+    </string>
+
+    <string name="msg_pref_title_ignore_battery_optimization">Ignore Battery Optimization for OmniTrack</string>
+    <string name="msg_pref_summary_ignore_battery_optimization">Turn on this to improve accuracy of time-based features including triggers and reminders. Note that this will not cause OmniTrack to consume much battery.</string>
+
     <string name="title_activity_settings">Settings</string>
     <string name="msg_settings">Settings</string>
 
@@ -609,5 +633,6 @@
     <string name="msg_duplicate_choice_entry">Duplicate choice entry</string>
     <string name="msg_synchronized">Synchronized</string>
     <string name="msg_not_synchronized">To be synchronized</string>
+    <string name="msg_sampling_range">Sampling Range</string>
 
 </resources>

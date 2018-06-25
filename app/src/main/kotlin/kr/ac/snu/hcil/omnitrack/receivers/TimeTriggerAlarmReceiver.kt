@@ -70,12 +70,14 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action == OTApp.BROADCAST_ACTION_TIME_TRIGGER_ALARM) {
-            println("time trigger alarm")
-            val serviceIntent = Intent(context, TimeTriggerWakefulHandlingService::class.java)
-            serviceIntent.putExtras(intent)
-            OTApp.logger.writeSystemLog("Start wakeful service", TAG)
-            startWakefulService(context, serviceIntent)
+        when (intent.action) {
+            OTApp.BROADCAST_ACTION_TIME_TRIGGER_ALARM -> {
+                println("time trigger alarm")
+                val serviceIntent = Intent(context, TimeTriggerWakefulHandlingService::class.java)
+                serviceIntent.putExtras(intent)
+                OTApp.logger.writeSystemLog("Start wakeful service", TAG)
+                startWakefulService(context, serviceIntent)
+            }
         }
     }
 
@@ -111,67 +113,6 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
             })
 
             return START_NOT_STICKY
-        }
-
-        fun onHandleIntent(intent: Intent) {
-            val alarmId = intent.getIntExtra(OTTriggerAlarmManager.INTENT_EXTRA_ALARM_ID, -1)
-
-            OTApp.logger.writeSystemLog("Wakeful Trigger Alarm Service handleIntent", TAG)
-
-            triggerAlarmController.onAlarmFired(alarmId).doAfterTerminate {
-            }.subscribe({
-                println("successfully handled fired alarm: ${alarmId}")
-                OTApp.logger.writeSystemLog("successfully handled fired alarm: ${alarmId}", TAG)
-                completeWakefulIntent(intent)
-                println("relaesed wake lock for AlarmReceiver.")
-            }, { err ->
-                println("trigger alarm handling error")
-                err.printStackTrace()
-                completeWakefulIntent(intent)
-                println("relaesed wake lock for AlarmReceiver.")
-            })
-
-
-            /*TODO trigger alarm service handling
-            OTApp.instance.currentUserObservable.first().flatMap {
-                user ->
-                println("Returned user")
-                val triggerSchedules = OTApp.instance.triggerAlarmManager.handleFiredAlarmAndGetTriggerInfo(user, alarmId, triggerTime, System.currentTimeMillis())
-                println("Handled system alarm and retrieved corresponding trigger schedules - ${triggerSchedules?.size}")
-
-                OTApp.logger.writeSystemLog("Handled system alarm and retrieved corresponding trigger schedules: ${triggerSchedules?.size}", TAG)
-                if (triggerSchedules != null) {
-
-                    OTApp.logger.writeSystemLog("${triggerSchedules.size} triggers will be fired.", TAG)
-
-                    Observable.merge(triggerSchedules.map {
-                        schedule ->
-                        user.getTriggerObservable(schedule.triggerId).onErrorReturn { err -> null }.flatMap {
-                            trigger: OTTrigger? ->
-                            trigger?.fire(triggerTime, this) ?: Observable.just(null)
-                        }.doOnNext {
-                            trigger: OTTrigger? ->
-                            if (trigger != null) {
-                                if (schedule.oneShot) {
-                                    trigger.isOn = false
-                                } else {
-                                    (trigger as OTTimeTrigger).reserveNextAlarmToSystem(triggerTime)
-                                }
-                            }
-                        }
-                    }).observeOn(Schedulers.immediate()).doOnCompleted {
-                        OTApp.logger.writeSystemLog("Every trigger firing was done. Release the wake lock.", TAG)
-
-                        println("every trigger was done. finish the wakeup")
-
-                        OTReminderAction.notifyPopupQueue(this)
-                    }
-                } else {
-                    Observable.just(null)
-                }
-            }.subscribe({
-
-            }, { }, { completeWakefulIntent(intent) })*/
         }
     }
 }

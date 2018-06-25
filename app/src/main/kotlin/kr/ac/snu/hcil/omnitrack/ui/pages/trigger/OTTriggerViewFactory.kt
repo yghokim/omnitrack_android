@@ -30,22 +30,39 @@ object OTTriggerViewFactory {
                 }
 
                 override fun getTriggerDisplayView(original: View?, trigger: OTTriggerDAO, uiContext: Context, configuredContext: ConfiguredContext): View {
-                    val displayView: TimeTriggerDisplayView = if (original is TimeTriggerDisplayView) {
-                        original
-                    } else TimeTriggerDisplayView(uiContext)
-
                     val condition = trigger.condition as OTTimeTriggerCondition
 
                     when (condition.timeConditionType) {
-                        OTTimeTriggerCondition.TIME_CONDITION_ALARM -> {
-                            val time = kr.ac.snu.hcil.omnitrack.utils.time.Time(condition.alarmTimeHour.toInt(), condition.alarmTimeMinute.toInt(), 0)
-                            displayView.setAlarmInformation(time.hour, time.minute, time.amPm)
-                        }
-                        OTTimeTriggerCondition.TIME_CONDITION_INTERVAL ->
-                            displayView.setIntervalInformation(condition.intervalSeconds.toInt())
-                    }
+                        OTTimeTriggerCondition.TIME_CONDITION_ALARM, OTTimeTriggerCondition.TIME_CONDITION_INTERVAL -> {
+                            val displayView: TimeTriggerDisplayView = if (original is TimeTriggerDisplayView) {
+                                original
+                            } else TimeTriggerDisplayView(uiContext)
 
-                    return displayView
+                            when (condition.timeConditionType) {
+                                OTTimeTriggerCondition.TIME_CONDITION_ALARM -> {
+                                    val time = kr.ac.snu.hcil.omnitrack.utils.time.Time(condition.alarmTimeHour.toInt(), condition.alarmTimeMinute.toInt(), 0)
+                                    displayView.setAlarmInformation(time.hour, time.minute, time.amPm)
+                                }
+                                OTTimeTriggerCondition.TIME_CONDITION_INTERVAL -> {
+                                    displayView.setIntervalInformation(condition.intervalSeconds.toInt())
+                                }
+                            }
+                            return displayView
+                        }
+                        OTTimeTriggerCondition.TIME_CONDITION_SAMPLING -> {
+                            val displayView: SamplingTimeConditionDisplayView = if (original is SamplingTimeConditionDisplayView) {
+                                original
+                            } else SamplingTimeConditionDisplayView(uiContext)
+
+                            displayView.samplingCount = condition.samplingCount
+                            if (condition.samplingRangeUsed) {
+                                displayView.setSamplingRange(condition.samplingHourStart, condition.samplingHourEnd)
+                            } else displayView.setSamplingFullDay()
+
+                            return displayView
+                        }
+                        else -> throw kotlin.IllegalArgumentException()
+                    }
                 }
 
                 override fun getTriggerConfigurationPanel(original: View?, uiContext: Context, configuredContext: ConfiguredContext): IConditionConfigurationView {
@@ -56,12 +73,20 @@ object OTTriggerViewFactory {
                 }
 
                 override fun connectViewModelToDisplayView(viewModel: ATriggerConditionViewModel, displayView: View, outSubscription: CompositeDisposable) {
-                    if (viewModel is TimeConditionViewModel && displayView is TimeTriggerDisplayView) {
-                        outSubscription.add(
-                                viewModel.nextAlarmTime.observeOn(AndroidSchedulers.mainThread()).subscribe { nextAlarmTime ->
-                                    displayView.nextTriggerTime = nextAlarmTime.datum
-                                }
-                        )
+                    if (viewModel is TimeConditionViewModel) {
+                        if (displayView is TimeTriggerDisplayView) {
+                            outSubscription.add(
+                                    viewModel.nextAlarmTime.observeOn(AndroidSchedulers.mainThread()).subscribe { nextAlarmTime ->
+                                        displayView.nextTriggerTime = nextAlarmTime.datum
+                                    }
+                            )
+                        } else if (displayView is SamplingTimeConditionDisplayView) {
+                            outSubscription.add(
+                                    viewModel.nextAlarmTime.observeOn(AndroidSchedulers.mainThread()).subscribe { nextAlarmTime ->
+                                        displayView.nextAlertTime = nextAlarmTime.datum
+                                    }
+                            )
+                        }
                     }
                 }
 

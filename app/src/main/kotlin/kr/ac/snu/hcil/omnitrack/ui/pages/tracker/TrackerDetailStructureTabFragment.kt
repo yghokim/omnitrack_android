@@ -125,6 +125,10 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         //set UI
         nameProperty.value = this.viewModel.name
         nameProperty.showEditedOnTitle = viewModel.isNameDirty
+        nameProperty.inputLengthMin = 1
+        nameProperty.inputLengthMax = 30
+        nameProperty.dialogTitle = String.format(OTApp.getString(R.string.msg_format_change_name), OTApp.getString(R.string.msg_text_tracker))
+
 
         isOnShortcutProperty.setToggleMode(this.viewModel.isBookmarked, false)
         isOnShortcutProperty.showEditedOnTitle = this.viewModel.isBookmarkedDirty

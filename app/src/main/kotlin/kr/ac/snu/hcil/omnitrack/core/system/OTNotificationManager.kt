@@ -30,6 +30,7 @@ object OTNotificationManager {
         widgetsChannel.lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
         widgetsChannel.enableVibration(false)
         widgetsChannel.enableLights(false)
+        widgetsChannel.setShowBadge(false)
 
         noticeChannel.enableVibration(false)
         noticeChannel.enableLights(true)

@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.container
 import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
+import android.annotation.TargetApi
 import android.content.Context
 import android.database.DataSetObserver
 import android.graphics.Color
@@ -400,6 +401,8 @@ class AdapterLinearLayout : DragLinearLayout {
         }
 
         constructor(source: Parcel?) : super(source)
+
+        @TargetApi(24)
         constructor(source: Parcel?, loader: ClassLoader?) : super(source, loader)
 
 

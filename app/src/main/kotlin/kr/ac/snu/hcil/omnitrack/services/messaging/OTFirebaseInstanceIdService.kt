@@ -105,7 +105,7 @@ class OTFirebaseInstanceIdService : FirebaseInstanceIdService() {
         if (token != null && authManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
             systemPreferences.edit().putString(OTApp.PREFERENCE_KEY_FIREBASE_INSTANCE_ID, token)
                     .apply()
-            return synchronizationServerController.putDeviceInfo(OTDeviceInfo()).flatMap { deviceInfoResult ->
+            return synchronizationServerController.postDeviceInfo(OTDeviceInfo()).flatMap { deviceInfoResult ->
                 authManager.handlePutDeviceInfoResult(deviceInfoResult)
             }
         } else {

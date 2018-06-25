@@ -4,11 +4,15 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
+import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -42,6 +46,11 @@ class RebootReceiver : BroadcastReceiver() {
         eventLogger.get().logEvent(IEventLogger.NAME_DEVICE_EVENT, "AfterBoot")
 
         triggerManager.onSystemRebooted()
+
+        WorkManager.getInstance().enqueue(OneTimeWorkRequestBuilder<OTReminderService.SystemRebootWorker>()
+                .setInputData(Data.Builder().putString(OTApp.INTENT_EXTRA_CONFIGURATION_ID, (context.applicationContext as OTApp).currentConfiguredContext.configuration.id).build())
+                .build())
+
         shortcutPanelManager.refreshNotificationShortcutViewsObservable(context).timeout(2, TimeUnit.SECONDS).doAfterTerminate {
             result.finish()
             wl.release()

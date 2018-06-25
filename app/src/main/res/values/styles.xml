@@ -78,6 +78,18 @@
         <item name="android:layout_marginBottom">0dp</item>
     </style>
 
+    <style name="HorizontalSeparator.OfConstraintLayout" parent="HorizontalSeparator">
+        <item name="android:layout_width">0dp</item>
+        <item name="layout_constraintStart_toStartOf">parent</item>
+        <item name="layout_constraintEnd_toEndOf">parent</item>
+        <item name="android:layout_marginLeft">@dimen/activity_horizontal_margin</item>
+        <item name="android:layout_marginRight">@dimen/activity_horizontal_margin</item>
+    </style>
+
+    <style name="HorizontalSeparator.OfConstraintLayout.Light" parent="HorizontalSeparator.OfConstraintLayout">
+        <item name="android:background">@color/editTextLine</item>
+    </style>
+
     <style name="ListElementTitle">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">18sp</item>
@@ -307,13 +319,14 @@
 
     <style name="durationPickerUnitViewStyle">
         <item name="android:textSize">20sp</item>
-        <item name="android:layout_marginEnd">15dp</item>
-        <item name="android:layout_marginStart">2dp</item>
+        <item name="android:paddingEnd">15dp</item>
+        <item name="android:paddingStart">2dp</item>
         <item name="android:textColor">@color/textColorMid</item>
     </style>
 
     <style name="durationPickerKeyPadStyle">
         <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
         <item name="android:layout_height">@dimen/button_height_normal</item>
         <item name="android:background">@drawable/transparent_button_background</item>
         <item name="android:textColor">@color/buttonIconColorDark</item>
@@ -379,7 +392,6 @@
     </style>
 
     <style name="hourPickerHourStyle">
-        <!--<item name="fontPath">fonts/Roboto-Light.ttf</item>-->
         <item name="android:textSize">@dimen/number_digit_size</item>
         <item name="android:textColor">@color/colorSecondary</item>
         <item name="android:background">@android:color/transparent</item>

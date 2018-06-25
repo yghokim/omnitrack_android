@@ -1,15 +1,17 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.settings
 
+import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.media.RingtoneManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.preference.ListPreference
-import android.preference.Preference
-import android.preference.PreferenceFragment
+import android.preference.*
 import android.widget.Toast
+import com.afollestad.materialdialogs.MaterialDialog
+import com.github.javiersantos.appupdater.AppUpdater
 import dagger.Lazy
 import dagger.internal.Factory
 import io.reactivex.disposables.CompositeDisposable
@@ -19,11 +21,14 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
+import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import org.jetbrains.anko.act
 import javax.inject.Inject
 import javax.inject.Provider
@@ -37,6 +42,7 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
     companion object {
         const val PREF_REMINDER_NOTI_RINGTONE = "pref_reminder_noti_ringtone"
         const val PREF_REMINDER_LIGHT_COLOR = "pref_reminder_light_color"
+        const val PREF_CATEGORY_GENERAL = "pref_key_category_general"
 
         const val FLAG_CONFIGURATION_CHANGED = "flag_configuration_changed"
 
@@ -93,6 +99,13 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
         @Inject
         protected lateinit var shortcutPanelManager: OTShortcutPanelManager
 
+        private var turnOnIgnoreBatteryOptimizationForwardingDialog: MaterialDialog? = null
+
+        @TargetApi(23)
+        private lateinit var ignoreBatteryOptimizationPreference: SwitchPreference
+
+        private lateinit var settingsPrompter: OTExternalSettingsPrompter
+
 
         private var languageOnCreation: String? = null
 
@@ -113,17 +126,61 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
 
             addPreferencesFromResource(R.xml.global_preferences)
 
+            settingsPrompter = OTExternalSettingsPrompter(this.activity)
+
+            if (Build.VERSION.SDK_INT >= 23) {
+                this.ignoreBatteryOptimizationPreference = SwitchPreference(context)
+                this.ignoreBatteryOptimizationPreference.key = OTExternalSettingsPrompter.KEY_IGNORE_BATTERY_OPTIMIZATION
+                this.ignoreBatteryOptimizationPreference.setTitle(R.string.msg_pref_title_ignore_battery_optimization)
+                this.ignoreBatteryOptimizationPreference.setSummary(R.string.msg_pref_summary_ignore_battery_optimization)
+                this.ignoreBatteryOptimizationPreference.isChecked = settingsPrompter.isBatteryOptimizationWhiteListed()
+
+                this.ignoreBatteryOptimizationPreference.setOnPreferenceClickListener {
+                    if (settingsPrompter.isBatteryOptimizationWhiteListed()) {
+                        //off
+                        if (turnOnIgnoreBatteryOptimizationForwardingDialog == null) {
+                            turnOnIgnoreBatteryOptimizationForwardingDialog = DialogHelper
+                                    .makeSimpleAlertBuilder(activity,
+                                            TextHelper.fromHtml(
+                                                    String.format(getString(R.string.msg_pref_dialog_content_ignore_battery_optimization_off), getString(R.string.app_name))
+                                            ),
+                                            R.string.msg_open) {
+                                        settingsPrompter.askUserBatterOptimizationWhitelist()
+                                    }
+                                    .cancelable(true)
+                                    .canceledOnTouchOutside(true)
+                                    .build()
+                        }
+
+                        turnOnIgnoreBatteryOptimizationForwardingDialog?.show()
+                    } else settingsPrompter.askUserBatterOptimizationWhitelist()
+                    return@setOnPreferenceClickListener true
+                }
+
+                val generalCategory = findPreference(PREF_CATEGORY_GENERAL) as PreferenceCategory
+                generalCategory.addPreference(this.ignoreBatteryOptimizationPreference)
+            }
+
             findPreference(PREF_REMINDER_NOTI_RINGTONE)?.run {
                 summary = getCurrentReminderNotificationRingtoneName()
                 onPreferenceChangeListener = this@SettingsFragment
             }
 
             findPreference(LocaleHelper.PREF_KEY_SELECTED_LANGUAGE)?.run {
-                (this as? ListPreference)?.let {
-                    pref ->
+                (this as? ListPreference)?.let { pref ->
                     summary = pref.entry
                 }
                 onPreferenceChangeListener = this@SettingsFragment
+            }
+        }
+
+        override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+            super.onActivityResult(requestCode, resultCode, data)
+            val result = settingsPrompter.handleActivityResult(requestCode, resultCode, data)
+            if (result?.first == OTExternalSettingsPrompter.KEY_IGNORE_BATTERY_OPTIMIZATION) {
+                if (Build.VERSION.SDK_INT >= 23) {
+                    this.ignoreBatteryOptimizationPreference.isChecked = settingsPrompter.isBatteryOptimizationWhiteListed()
+                }
             }
         }
 
@@ -144,6 +201,10 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
         override fun onResume() {
             super.onResume()
             preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+
+            if (Build.VERSION.SDK_INT >= 23) {
+                this.ignoreBatteryOptimizationPreference.isChecked = settingsPrompter.isBatteryOptimizationWhiteListed()
+            }
         }
 
         override fun onPause() {
@@ -174,7 +235,7 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
                 if (newValue is String) {
                     try {
                         preference.summary = preference.entries[preference.findIndexOfValue(newValue)]
-                    } catch(ex: Exception) {
+                    } catch (ex: Exception) {
                         preference.summary = newValue
                     }
                     return true
@@ -209,12 +270,10 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
                     }
                 }
 
-                "pref_check_updates" -> {
-                    if(sharedPreferences.getBoolean(key, false))
-                    {
+                AppUpdater.PREF_CHECK_UPDATES -> {
+                    if (sharedPreferences.getBoolean(key, false)) {
                         versionCheckServiceController.get().turnOnService()
-                    }
-                    else{
+                    } else {
                         versionCheckServiceController.get().turnOffService()
                     }
                 }

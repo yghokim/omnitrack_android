@@ -17,6 +17,8 @@ import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.Display
 import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
+import com.jenzz.appstate.AppState
+import com.jenzz.appstate.adapter.rxjava2.RxAppStateMonitor
 import dagger.Lazy
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -36,8 +38,10 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
+import org.jetbrains.anko.defaultSharedPreferences
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 import java.util.*
+import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 
 /**
@@ -115,9 +119,9 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     @Inject
     protected lateinit var eventLogger: Lazy<IEventLogger>
 
-    protected var isSessionLoggingEnabled = true
+    protected open val isSessionLoggingEnabled = true
 
-    private var resumedAt: Long = 0
+    private var sessionStartedAt = AtomicLong(Long.MAX_VALUE)
 
     val durationPickers = ArrayList<DurationPicker>()
 
@@ -181,6 +185,50 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         onInject(application as OTApp)
         processAuthorization()
         PreferenceManager.setDefaultValues(this, R.xml.global_preferences, false)
+        if (isSessionLoggingEnabled) {
+            creationSubscriptions.add(
+                    RxAppStateMonitor.monitor(OTApp.instance).subscribe { appState ->
+                        val now = System.currentTimeMillis()
+                        when (appState) {
+                            AppState.FOREGROUND -> {
+                                if (sessionStartedAt.get() == Long.MAX_VALUE) {
+                                    sessionStartedAt.set(now)
+                                }
+                            }
+                            AppState.BACKGROUND -> {
+                                logSession()
+                                sessionStartedAt.set(Long.MAX_VALUE)
+
+                            }
+                        }
+                    }
+            )
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (checkUpdateAvailable && defaultSharedPreferences.getBoolean(AppUpdater.PREF_CHECK_UPDATES, false)) {
+            try {
+                appUpdater.start()
+            } catch(ex: Exception) {
+                ex.printStackTrace()
+                println("failed to register update check receiver")
+            }
+        }
+
+        if (isSessionLoggingEnabled) {
+            sessionStartedAt.set(System.currentTimeMillis())
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        if (isSessionLoggingEnabled) {
+            logSession()
+            sessionStartedAt.set(Long.MAX_VALUE)
+        }
     }
 
     protected open fun processAuthorization() {
@@ -238,21 +286,6 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        resumedAt = System.currentTimeMillis()
-
-        if (checkUpdateAvailable) {
-            try {
-                appUpdater.start()
-            } catch(ex: Exception) {
-                ex.printStackTrace()
-                println("failed to register update check receiver")
-            }
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         durationPickers.clear()
@@ -263,20 +296,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         super.onPause()
         this.resumeSubscriptions.clear()
 
-        if (isSessionLoggingEnabled) {
-            val from = if (intent.hasExtra(OTApp.INTENT_EXTRA_FROM)) {
-                intent.getStringExtra(OTApp.INTENT_EXTRA_FROM)
-            } else null
-
-            val now = System.currentTimeMillis()
-
-            eventLogger.get().logSession(this.localClassName, IEventLogger.SUB_SESSION_TYPE_ACTIVITY, now - resumedAt, now, from) { content ->
-                content["isFinishing"] = isFinishing
-                onSessionLogContent(content)
-            }
-        }
-
-        if (checkUpdateAvailable) {
+        if (checkUpdateAvailable && defaultSharedPreferences.getBoolean(AppUpdater.PREF_CHECK_UPDATES, false)) {
             try {
                 appUpdater.stop()
             } catch(ex: Exception) {
@@ -296,6 +316,21 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     protected open fun onSignInProcessCompletelyFinished() {
 
+    }
+
+    private fun logSession(now: Long = System.currentTimeMillis()) {
+
+        val duration = now - sessionStartedAt.get()
+        if (duration > 100) {
+            val from = if (intent.hasExtra(OTApp.INTENT_EXTRA_FROM)) {
+                intent.getStringExtra(OTApp.INTENT_EXTRA_FROM)
+            } else null
+
+            eventLogger.get().logSession(this.localClassName, IEventLogger.SUB_SESSION_TYPE_ACTIVITY, duration, now, from) { content ->
+                content["isFinishing"] = isFinishing
+                onSessionLogContent(content)
+            }
+        }
     }
 
     protected open fun onSessionLogContent(contentObject: JsonObject) {

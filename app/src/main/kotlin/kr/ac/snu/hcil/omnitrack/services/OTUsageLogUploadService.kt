@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.services
 
+import android.util.Log
 import com.firebase.jobdispatcher.JobParameters
 import dagger.Lazy
 import dagger.internal.Factory
@@ -8,6 +9,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UsageLog
 import kr.ac.snu.hcil.omnitrack.core.di.configured.UsageLogger
@@ -68,6 +70,7 @@ class OTUsageLogUploadService : ConfigurableJobService() {
             } else {
                 subscriptions.add(
                         fetchPendingUsageLogsSerialized().flatMap { list ->
+                            OTApp.logger.writeSystemLog("Try uploading the usage logs. count: ${list.size}, average JSON length: ${list.map { it.length }.average()} bytes", "OTUsageLogUploadService")
                             return@flatMap usageLogUploadApi.get().uploadLocalUsageLogs(list)
                         }.doOnSuccess { storedIds ->
                             val realm = realmFactory.get()
@@ -84,11 +87,13 @@ class OTUsageLogUploadService : ConfigurableJobService() {
                         }.observeOn(AndroidSchedulers.mainThread()).subscribe({ list ->
                             if (!onStartJob(job)) {
                                 println("every logs were uploaded. finish the job.")
+                                OTApp.logger.writeSystemLog("Usage logs were successfully uploaded.", "OTUsageLogUploadService")
                                 jobFinished(job, false)
                             }
                         }, { error ->
                             error.printStackTrace()
                             println("every logs were not uploaded well. retry next time.")
+                            OTApp.logger.writeSystemLog("Failed to upload the usage logs.\n${Log.getStackTraceString(error)}", "OTUsageLogUploadService")
                             jobFinished(job, true)
                         })
                 )

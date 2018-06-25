@@ -2,15 +2,19 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.app.DatePickerDialog
 import android.content.Context
-import android.transition.TransitionManager
+import android.support.constraint.ConstraintLayout
+import android.support.transition.*
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.CompoundButton
+import android.widget.DatePicker
 import butterknife.bindView
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import kotlinx.android.synthetic.main.trigger_time_trigger_config_panel.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
@@ -24,6 +28,8 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxProperty
 import kr.ac.snu.hcil.omnitrack.utils.*
 import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
 import kr.ac.snu.hcil.omnitrack.utils.time.Time
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
+import org.jetbrains.anko.backgroundResource
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,12 +37,12 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-08-24
  */
-class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView, IEventListener<Int>, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
+class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationView, IEventListener<Int>, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
     private val dateFormat = SimpleDateFormat(resources.getString(R.string.dateformat_ymd))
 
     private val configTypePropertyView: ComboBoxPropertyView by bindView(R.id.ui_time_trigger_type)
-    private val intervalConfigGroup: ViewGroup by bindView(R.id.ui_interval_group)
-    private val alarmConfigGroup: ViewGroup by bindView(R.id.ui_alarm_group)
+    private val intervalConfigGroup: View by bindView(R.id.ui_group_interval)
+    private val alarmConfigGroup: View by bindView(R.id.ui_group_alarm)
     private val durationPicker: DurationPicker by bindView(R.id.ui_duration_picker)
     private val timePicker: DateTimePicker by bindView(R.id.ui_time_picker)
     private val dayOfWeekPicker: DayOfWeekSelector by bindView(R.id.ui_day_of_week_selector)
@@ -49,7 +55,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
     private val isEndSpecifiedCheckBox: CheckBox by bindView(R.id.ui_checkbox_range_specify_end)
     private val endDateButton: Button by bindView(R.id.ui_button_end_date)
 
-    private val repetitionConfigGroup: ViewGroup by bindView(R.id.ui_repetition_config_group)
+    private val repetitionConfigGroup: View by bindView(R.id.ui_group_repitition_config)
 
     private val repeatEndDate: Calendar
 
@@ -64,25 +70,40 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
     override val onConditionChanged: Observable<ATriggerCondition>
         get() = conditionChanged
 
+    private val modeChangeTransition: Transition by lazy {
+        TransitionSet()
+                .setOrdering(TransitionSet.ORDERING_TOGETHER)
+                .addTransition(Fade(Fade.MODE_OUT).setDuration(200))
+                .addTransition(ChangeBounds().setDuration(400))
+                .addTransition(Fade(Fade.MODE_IN).setDuration(500).setStartDelay(300))
+    }
+
+    private val toggleTransition: Transition by lazy {
+        TransitionSet()
+                .setOrdering(TransitionSet.ORDERING_TOGETHER)
+                .addTransition(Fade(Fade.MODE_OUT).setDuration(300))
+                .addTransition(ChangeBounds().setDuration(250))
+                .addTransition(Fade(Fade.MODE_IN).setDuration(300))
+    }
+
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     init {
-        //TODO change to merge
+        backgroundResource = R.drawable.bottom_separator_light
+
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        addView(inflater.inflate(R.layout.trigger_time_trigger_config_panel, this, false))
-        orientation = LinearLayout.VERTICAL
+        inflater.inflate(R.layout.trigger_time_trigger_config_panel, this, true)
+
         repeatEndDate = GregorianCalendar(2016, 1, 1)
 
         configTypePropertyView.adapter = IconNameEntryArrayAdapter(context,
-                arrayOf(
-                        IconNameEntryArrayAdapter.Entry(OTTriggerInformationHelper.getTimeConfigIconResId(OTTimeTriggerCondition.TIME_CONDITION_ALARM)!!,
-                                OTTriggerInformationHelper.getTimeConfigDescResId(OTTimeTriggerCondition.TIME_CONDITION_ALARM)!!),
-
-                        IconNameEntryArrayAdapter.Entry(OTTriggerInformationHelper.getTimeConfigIconResId(OTTimeTriggerCondition.TIME_CONDITION_INTERVAL)!!,
-                                OTTriggerInformationHelper.getTimeConfigDescResId(OTTimeTriggerCondition.TIME_CONDITION_INTERVAL)!!)
-                ))
+                arrayOf(OTTimeTriggerCondition.TIME_CONDITION_ALARM, OTTimeTriggerCondition.TIME_CONDITION_INTERVAL, OTTimeTriggerCondition.TIME_CONDITION_SAMPLING).map {
+                    IconNameEntryArrayAdapter.Entry(OTTriggerInformationHelper.getTimeConfigIconResId(it)!!,
+                            OTTriggerInformationHelper.getTimeConfigDescResId(it)!!)
+                }.toTypedArray()
+        )
 
         configTypePropertyView.valueChanged += this
 
@@ -130,6 +151,33 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
             }
         }
 
+        ui_ema_use_sampling_range.setOnCheckedChangeListener(this)
+        ui_ema_range_picker.onRangeChanged += { sender, range ->
+            if (currentCondition?.samplingHourStart != range.first.toByte()
+                    || currentCondition?.samplingHourEnd != range.second.toByte()) {
+                currentCondition?.samplingHourStart = range.first.toByte()
+                currentCondition?.samplingHourEnd = range.second.toByte()
+                notifyConditionChanged()
+            }
+        }
+        ui_ema_count.valueChanged += { sender, count ->
+            if (currentCondition?.samplingCount != count.toShort()) {
+                currentCondition?.samplingCount = count.toShort()
+                notifyConditionChanged()
+            }
+        }
+        ui_ema_count.picker.minValue = 1
+        ui_ema_count.picker.maxValue = 144
+
+        ui_ema_minimum_interval_picker.max = (3 * TimeHelper.hoursInMilli / 1000).toInt()
+
+        ui_ema_minimum_interval_picker.durationChanged += { sender, duration ->
+            if (currentCondition?.samplingMinIntervalSeconds != duration.toShort()) {
+                currentCondition?.samplingMinIntervalSeconds = duration.toShort()
+                notifyConditionChanged()
+            }
+        }
+
         InterfaceHelper.removeButtonTextDecoration(endDateButton)
         endDateButton.setOnClickListener(this)
         isEndSpecifiedCheckBox.setOnCheckedChangeListener(this)
@@ -137,14 +185,19 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
 
     private fun applyIsRepeated(isRepeated: Boolean, animate: Boolean) {
         isRepeatedView.value = isRepeated
-        if (animate) TransitionManager.beginDelayedTransition(this)
+        if (animate) TransitionManager.beginDelayedTransition(this, toggleTransition)
         if (isRepeated) {
             repetitionConfigGroup.visibility = View.VISIBLE
-            timeSpanCheckBox.isChecked = true
+            timeSpanCheckBox.isChecked = currentCondition?.intervalIsHourRangeUsed ?: false
             timeSpanCheckBox.isEnabled = true
+
         } else {
             repetitionConfigGroup.visibility = View.GONE
+            val rangeOriginallyUsed = currentCondition?.intervalIsHourRangeUsed ?: false
             timeSpanCheckBox.isChecked = false
+            if (rangeOriginallyUsed) {
+                currentCondition?.intervalIsHourRangeUsed = true
+            }
             timeSpanCheckBox.isEnabled = false
         }
     }
@@ -153,7 +206,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
     private fun applyConfigMode(mode: Byte, animate: Boolean) {
         refreshingViews = true
         if (animate) {
-            TransitionManager.beginDelayedTransition(this)
+            TransitionManager.beginDelayedTransition(this, modeChangeTransition)
         }
 
         when (mode) {
@@ -161,12 +214,36 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
                 configTypePropertyView.value = 0
                 alarmConfigGroup.visibility = VISIBLE
                 intervalConfigGroup.visibility = GONE
+                ui_ema_group.visibility = GONE
+
+                isRepeatedView.locked = false
+                isRepeatedView.alpha = 1.0f
             }
 
             OTTimeTriggerCondition.TIME_CONDITION_INTERVAL -> {
                 configTypePropertyView.value = 1
                 alarmConfigGroup.visibility = GONE
+                ui_ema_group.visibility = GONE
                 intervalConfigGroup.visibility = VISIBLE
+
+                isRepeatedView.locked = false
+                isRepeatedView.alpha = 1.0f
+            }
+
+            OTTimeTriggerCondition.TIME_CONDITION_SAMPLING -> {
+                configTypePropertyView.value = 2
+
+                alarmConfigGroup.visibility = GONE
+                intervalConfigGroup.visibility = GONE
+                ui_ema_group.visibility = View.VISIBLE
+
+                if (currentCondition?.isRepeated != true) {
+                    currentCondition?.isRepeated = true
+                    applyIsRepeated(true, false)
+                    notifyConditionChanged()
+                }
+                isRepeatedView.locked = true
+                isRepeatedView.alpha = 0.3f
             }
         }
         refreshingViews = false
@@ -188,6 +265,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
                 val conditionType = when (args) {
                     0 -> OTTimeTriggerCondition.TIME_CONDITION_ALARM
                     1 -> OTTimeTriggerCondition.TIME_CONDITION_INTERVAL
+                    2 -> OTTimeTriggerCondition.TIME_CONDITION_SAMPLING
                     else -> OTTimeTriggerCondition.TIME_CONDITION_ALARM
                 }
 
@@ -226,9 +304,9 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
         endDateButton.text = dateFormat.format(repeatEndDate.time)
     }
 
-    override fun onCheckedChanged(view: CompoundButton, p1: Boolean) {
+    override fun onCheckedChanged(view: CompoundButton, isChecked: Boolean) {
         if (view === timeSpanCheckBox) {
-            TransitionManager.beginDelayedTransition(this)
+            TransitionManager.beginDelayedTransition(this, toggleTransition)
             if (currentCondition?.intervalIsHourRangeUsed != timeSpanCheckBox.isChecked) {
                 currentCondition?.intervalIsHourRangeUsed = timeSpanCheckBox.isChecked
                 notifyConditionChanged()
@@ -241,7 +319,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
             }
 
         } else if (view === isEndSpecifiedCheckBox) {
-            TransitionManager.beginDelayedTransition(this)
+            TransitionManager.beginDelayedTransition(this, toggleTransition)
             if (isEndSpecifiedCheckBox.isChecked) {
                 endDateButton.visibility = View.VISIBLE
 
@@ -258,8 +336,18 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
                     notifyConditionChanged()
                 }
             }
+        } else if (view === ui_ema_use_sampling_range) {
+            TransitionManager.beginDelayedTransition(this, toggleTransition)
+            if (isChecked) {
+                ui_ema_range_picker.visibility = View.VISIBLE
+            } else {
+                ui_ema_range_picker.visibility = View.GONE
+            }
 
-
+            if (currentCondition?.samplingRangeUsed != isChecked) {
+                currentCondition?.samplingRangeUsed = isChecked
+                notifyConditionChanged()
+            }
         }
 
 
@@ -302,6 +390,14 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
                 timeSpanPicker.fromHourOfDay = condition.intervalHourRangeStart.toInt()
                 timeSpanPicker.toHourOfDay = condition.intervalHourRangeEnd.toInt()
             }
+
+            ui_ema_count.value = condition.samplingCount.toInt()
+            ui_ema_use_sampling_range.isChecked = condition.samplingRangeUsed
+
+            ui_ema_minimum_interval_picker.durationSeconds = condition.samplingMinIntervalSeconds.toInt()
+
+            ui_ema_range_picker.fromHourOfDay = condition.samplingHourStart.toInt()
+            ui_ema_range_picker.toHourOfDay = condition.samplingHourEnd.toInt()
 
             suspendConditionChangeEvent = false
         }

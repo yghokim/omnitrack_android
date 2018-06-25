@@ -56,10 +56,9 @@ object TutorialManager {
             }.filter { it != null }.map { it as Pair<MaterialTapTargetPrompt.Builder, String> }
 
             for (builder in list.withIndex()) {
-
                 builder.value.first.setPromptStateChangeListener(object : MaterialTapTargetPrompt.PromptStateChangeListener {
                     private var hideByTargetTap = false
-                    override fun onPromptStateChanged(prompt: MaterialTapTargetPrompt?, state: Int) {
+                    override fun onPromptStateChanged(prompt: MaterialTapTargetPrompt, state: Int) {
                         if (state == MaterialTapTargetPrompt.STATE_DISMISSED) {
                             setTutorialFlag(builder.value.second, true)
 
