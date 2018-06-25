@@ -260,6 +260,7 @@ class DateTimePicker : ConstraintLayout {
         ui_left_picker.displayedValues = null
         ui_middle_picker.displayedValues = null
         ui_right_picker.displayedValues = null
+
         when (mode) {
             SECOND -> {
                 //button shown, pickers are hour/minute/second

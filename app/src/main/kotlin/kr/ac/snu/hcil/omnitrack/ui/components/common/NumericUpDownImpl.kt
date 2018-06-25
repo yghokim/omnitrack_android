@@ -146,17 +146,22 @@ class NumericUpDownImpl(val context: Context, attrs: AttributeSet?, val view: Vi
                     field.setSelection(0, field.text.length)
                 }
             } else {
-                field.text.toString().toIntOrNull()?.let {
-                    value -> setValue(value, INumericUpDown.ChangeType.MANUAL)
+                val currValue = field.text.toString().toIntOrNull()
+                if (currValue == null) {
+                    setValue(minValue, INumericUpDown.ChangeType.MANUAL)
+                } else {
+                    setValue(currValue, INumericUpDown.ChangeType.MANUAL)
                 }
             }
         }
 
         field.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-
-                field.text.toString().toIntOrNull()?.let {
-                    value -> setValue(value, INumericUpDown.ChangeType.MANUAL)
+                val currValue = field.text.toString().toIntOrNull()
+                if (currValue == null) {
+                    setValue(minValue, INumericUpDown.ChangeType.MANUAL)
+                } else {
+                    setValue(currValue, INumericUpDown.ChangeType.MANUAL)
                 }
                 clearEditFocus()
                 true
