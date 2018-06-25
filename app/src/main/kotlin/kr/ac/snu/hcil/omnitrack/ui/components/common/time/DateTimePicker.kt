@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.time
 import android.content.Context
 import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import kotlinx.android.synthetic.main.component_timepoint.view.*
 import kr.ac.snu.hcil.omnitrack.R
@@ -260,7 +261,6 @@ class DateTimePicker : ConstraintLayout {
         ui_left_picker.displayedValues = null
         ui_middle_picker.displayedValues = null
         ui_right_picker.displayedValues = null
-
         when (mode) {
             SECOND -> {
                 //button shown, pickers are hour/minute/second

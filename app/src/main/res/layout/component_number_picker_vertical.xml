@@ -26,15 +26,16 @@
             android:textStyle="bold" />
     -->
 
-    <TextView
+    <EditText
         android:id="@+id/ui_value_field"
         style="@style/hourPickerHourStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
-
         android:textAlignment="center"
+        android:inputType="number"
+        android:maxLines="1"
         android:textSize="20sp" />
 
 

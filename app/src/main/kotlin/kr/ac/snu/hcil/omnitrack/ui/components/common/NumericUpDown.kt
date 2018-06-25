@@ -1,10 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.*
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -33,13 +39,11 @@ class NumericUpDown : LinearLayout, OnLongClickListener, OnClickListener, OnTouc
     var minValue: Int = Int.MIN_VALUE
         set(value) {
             field = Math.min(maxValue - 1, value)
-            this.value = this.value
         }
 
     var maxValue: Int = Int.MAX_VALUE
         set(value) {
             field = Math.max(minValue + 1, value)
-            this.value = this.value
         }
 
     var value: Int = 0
@@ -49,15 +53,17 @@ class NumericUpDown : LinearLayout, OnLongClickListener, OnClickListener, OnTouc
         val clamped = Math.max(minValue, Math.min(maxValue, newValue))
         if (value != clamped) {
             value = clamped
-            invalidateViews()
             valueChanged.invoke(this, ChangeArgs(clamped, changeType, delta))
         }
+        invalidateViews()
     }
 
     var displayedValues: Array<String>? = null
         set(value) {
             field = value
             invalidateViews()
+            this.field.isEnabled = value == null
+            this.field.isFocusableInTouchMode = value == null
         }
 
     var quantityResId: Int? = null
@@ -82,7 +88,7 @@ class NumericUpDown : LinearLayout, OnLongClickListener, OnClickListener, OnTouc
     private lateinit var upButton: ImageButton
     private lateinit var downButton: ImageButton
 
-    private lateinit var field: TextView
+    private lateinit var field: EditText
 
     var allowLongPress: Boolean = true
 
@@ -121,8 +127,68 @@ class NumericUpDown : LinearLayout, OnLongClickListener, OnClickListener, OnTouc
         downButton.setOnTouchListener(this)
 
         field = findViewById(R.id.ui_value_field)
+        field.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {
+                s.toString().toIntOrNull()?.let {
+                    value ->
 
+                    if (value == this@NumericUpDown.value) {
+                        return
+                    }
+
+                    val maxValueStringLength = maxValue.toString().length
+                    if (s.toString().length >= maxValueStringLength) {
+                        setValue(value, ChangeType.MANUAL)
+                        field.setSelection(0, field.text.length)
+                    }
+                }
+            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
+        })
+
+        field.setOnFocusChangeListener { v, hasFocus ->
+            if (hasFocus) {
+                field.post {
+                    field.setSelection(0, field.text.length)
+                }
+            } else {
+                field.text.toString().toIntOrNull()?.let {
+                    value -> setValue(value, ChangeType.MANUAL)
+                }
+            }
+        }
+
+        field.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+
+                field.text.toString().toIntOrNull()?.let {
+                    value -> setValue(value, ChangeType.MANUAL)
+                }
+                clearEditFocus()
+
+//                val nextView = if (direction == LinearLayout.HORIZONTAL) {
+//                    focusSearch(View.FOCUS_DOWN)
+//                } else {
+//                    focusSearch(View.FOCUS_RIGHT)
+//                }
+//
+//                if (nextView == null || !nextView.requestFocus(View.FOCUS_FORWARD)) {
+//                    clearEditFocus()
+//                }
+                true
+            } else {
+                false
+            }
+        }
         invalidateViews()
+    }
+
+    private fun clearEditFocus() {
+        clearFocus()
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(windowToken, 0)
     }
 
     override fun onClick(view: View) {
@@ -208,4 +274,5 @@ class NumericUpDown : LinearLayout, OnLongClickListener, OnClickListener, OnTouc
     private fun invalidateViews() {
         field.setText(getDisplayedValue(value), TextView.BufferType.NORMAL)
     }
+
 }
