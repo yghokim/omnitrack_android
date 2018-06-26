@@ -394,6 +394,7 @@
     <style name="hourPickerHourStyle">
         <item name="android:textSize">@dimen/number_digit_size</item>
         <item name="android:textColor">@color/colorSecondary</item>
+        <item name="android:background">@android:color/transparent</item>
     </style>
 
 

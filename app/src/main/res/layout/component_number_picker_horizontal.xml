@@ -28,7 +28,7 @@
         android:tint="@color/buttonIconColorDark"
         app:srcCompat="@drawable/left_dark" />
 
-    <TextView
+    <EditText
         android:id="@+id/ui_value_field"
         style="@style/hourPickerHourStyle"
         android:layout_width="0dp"
@@ -40,9 +40,10 @@
         android:gravity="center"
         android:minWidth="80dp"
         android:textAlignment="center"
+        android:inputType="number"
+        android:maxLines="1"
         android:textSize="20sp"
         app:layout_constraintLeft_toRightOf="@id/ui_button_minus" />
-
 
     <android.support.v7.widget.AppCompatImageButton
         android:id="@+id/ui_button_plus"
