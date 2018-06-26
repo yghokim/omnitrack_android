@@ -148,7 +148,7 @@ class NumericUpDownImpl(val context: Context, attrs: AttributeSet?, val view: Vi
             } else {
                 val currValue = field.text.toString().toIntOrNull()
                 if (currValue == null) {
-                    setValue(minValue, INumericUpDown.ChangeType.MANUAL)
+                    setValue(_value, INumericUpDown.ChangeType.MANUAL)
                 } else {
                     setValue(currValue, INumericUpDown.ChangeType.MANUAL)
                 }
@@ -159,7 +159,7 @@ class NumericUpDownImpl(val context: Context, attrs: AttributeSet?, val view: Vi
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 val currValue = field.text.toString().toIntOrNull()
                 if (currValue == null) {
-                    setValue(minValue, INumericUpDown.ChangeType.MANUAL)
+                    setValue(_value, INumericUpDown.ChangeType.MANUAL)
                 } else {
                     setValue(currValue, INumericUpDown.ChangeType.MANUAL)
                 }
