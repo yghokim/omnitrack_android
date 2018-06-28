@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.ui.activities
 
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.graphics.PointF
 import android.graphics.Rect
@@ -50,61 +49,6 @@ import javax.inject.Inject
 abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val checkUpdateAvailable: Boolean = true) : AppCompatActivity() {
 
     private val LOG_TAG = "OmniTrackActivity"
-
-    companion object {
-        val intentFilter: IntentFilter by lazy { IntentFilter(OTApp.BROADCAST_ACTION_NEW_VERSION_DETECTED) }
-
-        const val INTENT_KEY_LANGUAGE_AT_CREATION = "language_at_creation"
-    }
-
-    private inner class OmniTrackSignInResultsHandler : OTAuthManager.SignInResultsHandler {
-        /**
-         * Receives the successful sign-in result for an alraedy signed in user and starts the main
-         * activity.
-         * @param provider the identity provider used for sign-in.
-         */
-        override fun onSuccess() {
-
-            consentManager.startProcess(this@OTActivity, authManager.userId!!, object : ExperimentConsentManager.ResultListener {
-                override fun onConsentApproved() {
-                    performSignInProcessCompletelyFinished()
-                }
-
-                override fun onConsentFailed() {
-                    Log.d(LOG_TAG, "Consent process was failed. go Sign-in.")
-                    goSignIn()
-                }
-
-                override fun onConsentDenied() {
-                    Log.d(LOG_TAG, "Consent was denied by user. go Sign-in.")
-                    goSignIn()
-                }
-
-            })
-        }
-
-        /**
-         * For the case where the user previously was signed in, and an attempt is made to sign the
-         * user back in again, there is not an option for the user to cancel, so this is overriden
-         * as a stub.
-         * @param provider the identity provider with which the user attempted sign-in.
-         */
-        override fun onCancel() {
-            Log.wtf(LOG_TAG, "Cancel can't happen when handling a previously sign-in user.")
-        }
-
-        /**
-         * Receives the sign-in result that an error occurred signing in with the previously signed
-         * in provider and re-directs the user to the sign-in activity to sign in again.
-         * @param provider the identity provider with which the user attempted sign-in.
-         * *
-         * @param ex the exception that occurred.
-         */
-        override fun onError(e: Throwable) {
-            //goSignIn()
-            performSignInProcessCompletelyFinished()
-        }
-    }
 
     @Inject
     protected lateinit var consentManager: ExperimentConsentManager
@@ -169,7 +113,33 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         if (authManager.isUserSignedIn() && NetworkHelper.isConnectedToInternet()) {
             //println("${LOG_TAG} OMNITRACK Google is signed in.")
             if (NetworkHelper.isConnectedToInternet()) {
-                authManager.refreshCredentialWithFallbackSignIn(this, OmniTrackSignInResultsHandler())
+                this.creationSubscriptions.add(
+                        authManager.refreshCredentialWithFallbackSignIn(this).observeOn(AndroidSchedulers.mainThread())
+                                .subscribe({ ok ->
+                                    if (ok) {
+                                        consentManager.startProcess(this@OTActivity, authManager.userId!!, object : ExperimentConsentManager.ResultListener {
+                                            override fun onConsentApproved() {
+                                                performSignInProcessCompletelyFinished()
+                                            }
+
+                                            override fun onConsentFailed() {
+                                                Log.d(LOG_TAG, "Consent process was failed. go Sign-in.")
+                                                goSignIn()
+                                            }
+
+                                            override fun onConsentDenied() {
+                                                Log.d(LOG_TAG, "Consent was denied by user. go Sign-in.")
+                                                goSignIn()
+                                            }
+
+                                        })
+                                    } else {
+                                        Log.wtf(LOG_TAG, "Cancel can't happen when handling a previously sign-in user.")
+                                    }
+                                }, { e ->
+                                    performSignInProcessCompletelyFinished()
+                                })
+                )
             }
         } else {
             goSignInUnlessUserCached()

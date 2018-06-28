@@ -2,15 +2,11 @@ package kr.ac.snu.hcil.omnitrack.core.auth
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ApplicationInfo
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.View
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
@@ -18,10 +14,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.Lazy
 import dagger.internal.Factory
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposables
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
@@ -33,7 +29,8 @@ import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.configured.ForGeneralAuth
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
-import kr.ac.snu.hcil.omnitrack.utils.getActivity
+import org.jetbrains.anko.runOnUiThread
+import rx_activity_result2.RxActivityResult
 import javax.inject.Inject
 
 /**
@@ -57,17 +54,10 @@ class OTAuthManager @Inject constructor(
         NONE, CACHED, AUTHORIZED
     }
 
-    interface SignInResultsHandler {
-        fun onSuccess()
-        fun onError(e: Throwable)
-        fun onCancel()
-    }
-
     private val mGoogleApiClient: GoogleApiClient
 
     //is signIn process in progress
     private var mIntentInProgress = false
-    private var mResultsHandler: SignInResultsHandler? = null
 
     /*
     @field:[Inject Backend]
@@ -203,56 +193,44 @@ class OTAuthManager @Inject constructor(
         }
     }
 
-    private fun signInSilently(resultsHandler: SignInResultsHandler) {
-        loadGoogleSignInAccount().flatMapObservable { acc ->
+    private fun signInSilently(): Completable {
+        return loadGoogleSignInAccount().flatMapSingle { acc ->
             firebaseAuthWithGoogle(acc)
-        }.subscribe({ authResult ->
-                    notifySignedIn()
-            resultsHandler.onSuccess()
-        }, { ex ->
-            resultsHandler.onError(ex)
-        })
+        }.ignoreElement()
     }
 
-    fun refreshCredentialSilently(skipValidationIfCacheHit: Boolean, resultsHandler: SignInResultsHandler) {
-        if (isUserSignedIn()) {
-            if (skipValidationIfCacheHit) {
-                Log.d(LOG_TAG, "Skip sign in. use cached Firebase User.")
-                resultsHandler.onSuccess()
-            } else {
-                Log.d(LOG_TAG, "Reload Firebase User to check connection.")
-                firebaseAuth.currentUser!!.reload().addOnCompleteListener {
-                    task ->
-                    if (task.isSuccessful) {
-                        resultsHandler.onSuccess()
-                    } else {
-                        signInSilently(resultsHandler)
+    fun refreshCredentialSilently(skipValidationIfCacheHit: Boolean): Completable {
+        return Completable.defer {
+            if (isUserSignedIn()) {
+                if (skipValidationIfCacheHit) {
+                    Log.d(LOG_TAG, "Skip sign in. use cached Firebase User.")
+                    return@defer Completable.complete()
+                } else {
+                    Log.d(LOG_TAG, "Reload Firebase User to check connection.")
+                    return@defer Single.create<Task<Void>> {
+                        firebaseAuth.currentUser!!.reload().addOnCompleteListener { task ->
+                            if (!it.isDisposed) {
+                                it.onSuccess(task)
+                            }
+                        }
+                    }.flatMapCompletable { task ->
+                        if (task.isSuccessful) {
+                            return@flatMapCompletable Completable.complete()
+                        } else signInSilently()
                     }
                 }
+            } else {
+                Log.d(LOG_TAG, "Firebase user does not exist. Sign in silently")
+                return@defer signInSilently()
             }
-        } else {
-            Log.d(LOG_TAG, "Firebase user does not exist. Sign in silently")
-            signInSilently(resultsHandler)
         }
+
     }
 
-    fun refreshCredentialWithFallbackSignIn(activity: AppCompatActivity, resultsHandler: SignInResultsHandler) {
-
-        refreshCredentialSilently(false, object : SignInResultsHandler {
-            override fun onSuccess() {
-                resultsHandler.onSuccess()
-            }
-
-            override fun onError(e: Throwable) {
-                println("OMNITRACK FallbackSignIn Error")
-                startSignInProcess(activity, resultsHandler)
-            }
-
-            override fun onCancel() {
-                resultsHandler.onCancel()
-            }
-
-        })
+    fun refreshCredentialWithFallbackSignIn(activity: AppCompatActivity): Single<Boolean> {
+        return refreshCredentialSilently(false).toSingle { true }.onErrorResumeNext {
+            return@onErrorResumeNext startSignInProcess(activity)
+        }
     }
 
     fun getAuthStateRefreshObservable(): Observable<SignedInLevel> {
@@ -269,12 +247,41 @@ class OTAuthManager @Inject constructor(
         }
     }
 
-    fun startSignInProcess(activity: AppCompatActivity, resultsHandler: SignInResultsHandler) {
+    fun startSignInProcess(activity: AppCompatActivity): Single<Boolean> {
         println("OMNITRACK start sign in activity")
-        mResultsHandler = resultsHandler
         val signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient)
-        mIntentInProgress = true
-        activity.startActivityForResult(signInIntent, RC_SIGN_IN)
+        return RxActivityResult.on(activity).startIntent(signInIntent).singleOrError().doOnError { clearUserInfo() }.doOnSuccess { if (it.resultCode() == 0) clearUserInfo() }.flatMap { activityResult ->
+            if (activityResult.resultCode() == 0) {
+                return@flatMap Single.just(false)
+            } else {
+                val result = Auth.GoogleSignInApi.getSignInResultFromIntent(activityResult.data())
+                if (result.isSuccess) {
+                    //Signed in successfully.
+                    println("signed in google account: ${result.signInAccount}")
+                    firebaseAuthWithGoogle(result.signInAccount!!)
+                            .flatMap { authResult ->
+                                println("Signed in through Google account. try to push device info to server...")
+                                OTDeviceInfo.makeDeviceInfo(configuredContext.firebaseComponent)
+                            }
+                            .flatMap { deviceInfo -> synchronizationServerController.get().putDeviceInfo(deviceInfo) }
+                            .flatMap { deviceInfoResult ->
+                                handlePutDeviceInfoResult(deviceInfoResult).doOnError { ex ->
+                                    println("Failed to push device information to server.")
+                                    ex.printStackTrace()
+                                }
+                            }
+                            .doOnSuccess { success ->
+                                if (success)
+                                    activity.applicationContext.runOnUiThread { notifySignedIn() }
+                            }.doOnError { ex ->
+                                firebaseAuth.signOut()
+                                Auth.GoogleSignInApi.signOut(mGoogleApiClient)
+                            }
+                } else {
+                    return@flatMap Single.error<Boolean>(Exception("error on parsing the Google sign in activity result"))
+                }
+            }
+        }
     }
 
     fun handlePutDeviceInfoResult(result: ISynchronizationServerSideAPI.DeviceInfoResult): Single<Boolean> {
@@ -304,11 +311,9 @@ class OTAuthManager @Inject constructor(
         }
     }
 
+    /*
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == RC_SIGN_IN) {
-            mIntentInProgress = false
-            val resultHandler = mResultsHandler
-            mResultsHandler = null
 
             // if the user canceled
             if (resultCode == 0) {
@@ -323,17 +328,10 @@ class OTAuthManager @Inject constructor(
                 println("signed in google account: ${result.signInAccount}")
                 firebaseAuthWithGoogle(result.signInAccount!!).flatMap { authResult ->
                     println("Signed in through Google account. try to push device info to server...")
-                    OTDeviceInfo.makeDeviceInfo(configuredContext.firebaseComponent).flatMapObservable { deviceInfo ->
-                        synchronizationServerController.get().putDeviceInfo(deviceInfo).flatMap { result ->
-                            handlePutDeviceInfoResult(result)
-                        }
-                                .toObservable()
-                                .map { success ->
-                                    println("refreshed device info.")
-                                    if (success) {
-                                        authResult
-                                    } else throw Exception("Failed to push device info to server.")
-                                }
+                    OTDeviceInfo.makeDeviceInfo(configuredContext.firebaseComponent)
+                            .flatMap { deviceInfo -> synchronizationServerController.get().putDeviceInfo(deviceInfo)}
+                            .flatMap { result -> handlePutDeviceInfoResult(result) }
+                            .doOnSuccess {  }
                     }
                 }.observeOn(AndroidSchedulers.mainThread()).subscribe({ authResult ->
                     println("sign in succeeded.")
@@ -354,10 +352,10 @@ class OTAuthManager @Inject constructor(
                 return
             }
         }
-    }
+    }*/
 
-    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount): Observable<AuthResult> {
-        return Observable.create<AuthResult> { subscriber ->
+    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount): Single<AuthResult> {
+        return Single.create<AuthResult> { subscriber ->
             Log.d(LOG_TAG, "firebaseAuthWithGooogle:" + acct.id)
             val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
             firebaseAuth.signInWithCredential(credential)
@@ -373,15 +371,15 @@ class OTAuthManager @Inject constructor(
                             }
                         } else {
                             if (!subscriber.isDisposed) {
-                                subscriber.onNext(task.result)
-                                subscriber.onComplete()
+                                subscriber.onSuccess(task.result)
                             }
                         }
                     }
         }
     }
 
-    fun deleteUser(resultsHandler: SignInResultsHandler) {
+    /*
+    fun deleteUser() {
         firebaseAuth.currentUser?.delete()?.addOnCompleteListener {
             task ->
             if (task.isSuccessful) {
@@ -391,7 +389,7 @@ class OTAuthManager @Inject constructor(
                 resultsHandler.onError(task.exception!!)
             }
         } ?: resultsHandler.onError(Exception("Not signed in."))
-    }
+    }*/
 
     fun signOut() {
         clearUserInfo()
@@ -422,7 +420,12 @@ class OTAuthManager @Inject constructor(
         }
     }
 
-    fun initializeSignInButton(buttonView: View, resultsHandler: SignInResultsHandler): View.OnClickListener? {
+    /*
+    fun getGoogleServiceAvailableCode(): Int{
+        return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context)
+    }
+
+    fun initializeSignInButton(buttonView: View): View.OnClickListener? {
         val api = GoogleApiAvailability.getInstance()
         val code = api.isGooglePlayServicesAvailable(buttonView.context.applicationContext)
 
@@ -451,5 +454,5 @@ class OTAuthManager @Inject constructor(
             buttonView.setOnClickListener(listener)
             return listener
         } else return null
-    }
+    }*/
 }
