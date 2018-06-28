@@ -2,9 +2,14 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
 import android.os.Parcel
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
@@ -40,9 +45,9 @@ class NumericUpDownImpl(val context: Context, attrs: AttributeSet?, val view: Vi
         val clamped = getClampValue(newValue)
         if (_value != clamped) {
             _value = clamped
-            invalidateViews()
             valueChanged.invoke(view, INumericUpDown.ChangeArgs(_value, changeType, delta))
         }
+        invalidateViews()
     }
 
     override var displayedValues: Array<String>? = null
@@ -53,6 +58,8 @@ class NumericUpDownImpl(val context: Context, attrs: AttributeSet?, val view: Vi
                 formatter = null
                 suspendInvalidateValue = false
             }
+            this.field.isFocusableInTouchMode = value == null
+            this.field.isEnabled = value == null
             invalidateViews()
         }
 
@@ -91,7 +98,7 @@ class NumericUpDownImpl(val context: Context, attrs: AttributeSet?, val view: Vi
     private val upButton: ImageButton
     private val downButton: ImageButton
 
-    private val field: TextView
+    private val field: EditText
 
     override var allowLongPress: Boolean = true
 
@@ -112,7 +119,56 @@ class NumericUpDownImpl(val context: Context, attrs: AttributeSet?, val view: Vi
         downButton.setOnTouchListener(this)
 
         field = view.findViewById(R.id.ui_value_field)
+        field.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {
+                s.toString().toIntOrNull()?.let {
+                    value ->
 
+                    if (value == _value) {
+                        return
+                    }
+
+                    val maxValueStringLength = maxValue.toString().length
+                    if (s.toString().length >= maxValueStringLength) {
+                        setValue(value, INumericUpDown.ChangeType.MANUAL)
+                        field.setSelection(0, field.text.length)
+                    }
+                }
+            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
+        })
+
+        field.setOnFocusChangeListener { v, hasFocus ->
+            if (hasFocus) {
+                field.post {
+                    field.setSelection(0, field.text.length)
+                }
+            } else {
+                val currValue = field.text.toString().toIntOrNull()
+                if (currValue == null) {
+                    setValue(_value, INumericUpDown.ChangeType.MANUAL)
+                } else {
+                    setValue(currValue, INumericUpDown.ChangeType.MANUAL)
+                }
+            }
+        }
+
+        field.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                val currValue = field.text.toString().toIntOrNull()
+                if (currValue == null) {
+                    setValue(_value, INumericUpDown.ChangeType.MANUAL)
+                } else {
+                    setValue(currValue, INumericUpDown.ChangeType.MANUAL)
+                }
+                clearEditFocus()
+                true
+            } else {
+                false
+            }
+        }
         invalidateViews()
 
         val a = context.theme.obtainStyledAttributes(
@@ -137,6 +193,11 @@ class NumericUpDownImpl(val context: Context, attrs: AttributeSet?, val view: Vi
         }
     }
 
+    private fun clearEditFocus() {
+        view.clearFocus()
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
 
     override fun onClick(view: View) {
         if (view === downButton) {

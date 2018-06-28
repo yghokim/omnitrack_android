@@ -120,7 +120,6 @@ class NumericUpDown : ConstraintLayout, INumericUpDown {
         impl.applyStateData(thisState.state)
     }
 
-
     class SavedState : View.BaseSavedState {
 
         var state = NumericUpDownImpl.StateData()
