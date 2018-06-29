@@ -1,5 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.services.messaging
 
+import android.app.PendingIntent
+import android.content.Intent
+import android.support.v4.app.NotificationCompat
+import android.support.v4.content.ContextCompat
 import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -13,12 +17,17 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfigurationController
 import kr.ac.snu.hcil.omnitrack.core.database.global.OTAttachedConfigurationDao
 import kr.ac.snu.hcil.omnitrack.core.di.global.AppLevelDatabase
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
+import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
+import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
+import kr.ac.snu.hcil.omnitrack.utils.TextHelper
+import org.jetbrains.anko.notificationManager
 import java.lang.Exception
 import javax.inject.Inject
 
@@ -29,6 +38,8 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
 
     companion object {
         const val TAG = "OTFirebaseMessagingService"
+
+        const val COMMAND_TEXT_MESSAGE = "text_message"
 
         const val COMMAND_SYNC = "sync_down"
         const val COMMAND_SIGNOUT = "sign_out"
@@ -81,6 +92,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
                                                 COMMAND_SYNC -> handleSyncCommand(data, configuredContext)
                                                 COMMAND_SIGNOUT -> handleSignOutCommand(data, configuredContext)
                                                 COMMAND_DUMP_DB -> handleDumpCommand(data, configuredContext)
+                                                COMMAND_TEXT_MESSAGE -> handleMessageCommand(data, configuredContext)
                                             }
                                         } catch (ex: Exception) {
                                             ex.printStackTrace()
@@ -123,5 +135,22 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
 
     private fun handleSignOutCommand(data: Map<String, String>, configuredContext: ConfiguredContext) {
         configuredContext.configuredAppComponent.getAuthManager().signOut()
+    }
+
+    private fun handleMessageCommand(data: Map<String, String>, configuredContext: ConfiguredContext) {
+        val title = data.get("messageTitle")
+        val content = data.get("messageContent")
+        val contentHtml = TextHelper.fromHtml(content ?: "")
+
+        val notificationBuilder = NotificationCompat.Builder(this, OTNotificationManager.CHANNEL_ID_IMPORTANT)
+                .setAutoCancel(true)
+                .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                .setSmallIcon(R.drawable.icon_simple)
+                .setContentIntent(PendingIntent.getActivity(this, 0, Intent(this, HomeActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT))
+                .setContentTitle(title)
+                .setContentText(contentHtml)
+                .setStyle(NotificationCompat.BigTextStyle().setBigContentTitle(title).bigText(contentHtml))
+
+        notificationManager.notify(TAG, System.currentTimeMillis().toInt(), notificationBuilder.build())
     }
 }
