@@ -293,7 +293,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
             realm.executeTransactionIfNotIn {
                 trackerDao?.attributes?.add(newDao)
+                trackerDao?.synchronizedAt = null
             }
+            registerSyncJob()
         } else {
             currentAttributeViewModelList.add(AttributeInformationViewModel(newDao, realm, attributeManager.get()))
             attributeViewModelListObservable.onNext(currentAttributeViewModelList)
