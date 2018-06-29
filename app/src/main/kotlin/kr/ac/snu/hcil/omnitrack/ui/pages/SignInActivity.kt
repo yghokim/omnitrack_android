@@ -75,35 +75,33 @@ class SignInActivity : AppCompatActivity() {
                     return@OnClickListener
                 } else {
                     creationSubscription.add(
-                            authManager.startSignInProcess(this).observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe({ approved ->
-                                        if (approved) {
-                                            Log.d(LOG_TAG, String.format("User sign-in with Google succeeded"))
-
-                                            Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_succeeded)), Toast.LENGTH_LONG).show()
-
-                                            consentManager.startProcess(this@SignInActivity, authManager.userId!!, object : ExperimentConsentManager.ResultListener {
-                                                override fun onConsentApproved() {
-                                                    eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_CONSENT_APPROVED)
-                                                    goHomeActivity()
-                                                }
-
-                                                override fun onConsentFailed() {
-                                                    println("consent failed")
-                                                    toIdleMode()
-                                                }
-
-                                                override fun onConsentDenied() {
-                                                    println("consent was denied")
-                                                    eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_CONSENT_DENIED)
-                                                    toIdleMode()
-                                                }
-
-                                            })
+                            authManager.startSignInProcess(this)
+                                    .doOnSuccess {
+                                        if (it) {
+                                            this@SignInActivity.runOnUiThread {
+                                                Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_succeeded)), Toast.LENGTH_LONG).show()
+                                            }
                                         } else {
                                             Log.d(LOG_TAG, String.format("User sign-in with Google canceled."))
-                                            Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_canceled)), Toast.LENGTH_LONG).show()
-
+                                            this@SignInActivity.runOnUiThread {
+                                                Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_canceled)), Toast.LENGTH_LONG).show()
+                                            }
+                                        }
+                                    }
+                                    .flatMap { approved ->
+                                        consentManager.startProcess(this@SignInActivity).doOnSuccess {
+                                            if (it) {
+                                                eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_CONSENT_APPROVED)
+                                            } else {
+                                                eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_CONSENT_DENIED)
+                                            }
+                                        }
+                                    }
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe({ approved ->
+                                        if (approved) {
+                                            goHomeActivity()
+                                        } else {
                                             toIdleMode()
                                         }
                                     }, { e ->
@@ -145,11 +143,6 @@ class SignInActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        consentManager.handleActivityResult(requestCode, resultCode, data)
-    }
-
     private fun goHomeActivity() {
         eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_SIGNED_IN)
         Log.d(LOG_TAG, "Launching Main Activity...")
@@ -164,7 +157,6 @@ class SignInActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        consentManager.finishProcess()
         creationSubscription.clear()
     }
 

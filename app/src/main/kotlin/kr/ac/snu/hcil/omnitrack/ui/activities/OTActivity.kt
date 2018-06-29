@@ -20,6 +20,7 @@ import com.jenzz.appstate.AppState
 import com.jenzz.appstate.adapter.rxjava2.RxAppStateMonitor
 import dagger.Lazy
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -114,30 +115,23 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
             //println("${LOG_TAG} OMNITRACK Google is signed in.")
             if (NetworkHelper.isConnectedToInternet()) {
                 this.creationSubscriptions.add(
-                        authManager.refreshCredentialWithFallbackSignIn(this).observeOn(AndroidSchedulers.mainThread())
+                        authManager.refreshCredentialWithFallbackSignIn(this)
+                                .flatMap { ok ->
+                                    if (ok) {
+                                        consentManager.startProcess(this@OTActivity)
+                                    } else {
+                                        Single.just(false)
+                                    }
+                                }
+                                .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({ ok ->
                                     if (ok) {
-                                        consentManager.startProcess(this@OTActivity, authManager.userId!!, object : ExperimentConsentManager.ResultListener {
-                                            override fun onConsentApproved() {
-                                                performSignInProcessCompletelyFinished()
-                                            }
-
-                                            override fun onConsentFailed() {
-                                                Log.d(LOG_TAG, "Consent process was failed. go Sign-in.")
-                                                goSignIn()
-                                            }
-
-                                            override fun onConsentDenied() {
-                                                Log.d(LOG_TAG, "Consent was denied by user. go Sign-in.")
-                                                goSignIn()
-                                            }
-
-                                        })
+                                        performSignInProcessCompletelyFinished()
                                     } else {
-                                        Log.wtf(LOG_TAG, "Cancel can't happen when handling a previously sign-in user.")
+                                        goSignIn()
                                     }
                                 }, { e ->
-                                    performSignInProcessCompletelyFinished()
+                                    goSignIn()
                                 })
                 )
             }
@@ -244,10 +238,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
                 println("configuration was changed from settings")
                 recreate()
             }
-        } else {
-            consentManager.handleActivityResult(requestCode, resultCode, data)
         }
-
     }
 
     fun performOnActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

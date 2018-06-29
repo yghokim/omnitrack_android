@@ -1,13 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignInActivity
+import rx_activity_result2.RxActivityResult
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,136 +15,43 @@ import javax.inject.Singleton
  * Created by Young-Ho Kim on 2017-01-31.
  */
 @Singleton
-class ExperimentConsentManager @Inject constructor(val authManager: OTAuthManager, val systemPreferences: SharedPreferences, val synchronizationServerController: ISynchronizationServerSideAPI) {
+class ExperimentConsentManager @Inject constructor(val authManager: OTAuthManager, val synchronizationServerController: ISynchronizationServerSideAPI) {
 
-    companion object {
-        const val REQUEST_CODE_EXPERIMENT_SIGN_IN = 6550
-    }
+    fun startProcess(activity: AppCompatActivity): Single<Boolean> {
 
-    interface ResultListener {
-        fun onConsentApproved()
-        fun onConsentFailed()
-        fun onConsentDenied()
-    }
-
-    private var mActivity: AppCompatActivity? = null
-    private var mResultListener: ResultListener? = null
-
-    private val subscriptions = CompositeDisposable()
-
-    fun destroyProcess() {
-        subscriptions.clear()
-    }
-
-
-    fun startProcess(activity: AppCompatActivity, userId: String, resultListener: ResultListener? = null) {
-        mActivity = activity
-        mResultListener = resultListener
-
-
-
-        if (authManager.getIsConsentApproved()) {
-            mResultListener?.onConsentApproved()
-            finishProcess()
-        } else {
-            activity.startActivityForResult(Intent(activity, ExperimentSignInActivity::class.java), REQUEST_CODE_EXPERIMENT_SIGN_IN)
-/*
-            synchronizationServerController.getUserRoles().subscribe({ result ->
-                val userRole = result.find { it.role == "ServiceUser" }
-                if (userRole == null || !userRole.isConsentApproved) {
-                    println("consent form was not approved or is first-time login.")
-                    activity.startActivityForResult(Intent(activity, ExperimentSignInActivity::class.java), REQUEST_CODE_EXPERIMENT_SIGN_IN)
-                } else {
-                    println("consent form has been approved.")
-                    onApproved()
-                    finishProcess()
-                }
-            }, { error ->
-                error.printStackTrace()
-                mResultListener?.onConsentFailed()
-                finishProcess()
-            })*/
-
-        }
-
-        /*
-
-        DatabaseManager.experimentProfileRef?.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onCancelled(p0: DatabaseError?) {
-                println("Db Error: ${p0?.message}")
-                mResultListener?.onConsentFailed()
-                finishProcess()
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val profile = snapshot.getValue(ExperimentProfile::class.java)
-                if (profile == null || !profile.isConsentApproved) {
-                    println("consent form was not approved or is first-time login.")
-                    activity.startActivityForResult(Intent(activity, ExperimentSignInActivity::class.java), REQUEST_CODE_EXPERIMENT_SIGN_IN)
-                } else {
-                    println("consent form has been approved.")
-                    println(profile)
-                    mResultListener?.onConsentApproved()
-                    finishProcess()
-                }
-            }
-
-        })*/
-    }
-
-    private fun onApproved() {
-        authManager.setIsConsentApproved(true)
-        mResultListener?.onConsentApproved()
-    }
-
-    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_CODE_EXPERIMENT_SIGN_IN) {
-            if (resultCode != AppCompatActivity.RESULT_OK || data == null) {
-                mResultListener?.onConsentFailed()
-                finishProcess()
+        return Single.defer {
+            if (authManager.getIsConsentApproved()) {
+                return@defer Single.just(true)
             } else {
-                val profile = OTUserRolePOJO()
-                profile.role = "ServiceUser"
-                profile.isConsentApproved = true
-                val information = HashMap<String, Any>()
-                information["age"] = data.getStringExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP)
-                information["country"] = data.getStringExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY)
-                information["gender"] = data.getStringExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER)
-                information["purposes"] = data.getStringArrayListExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES)
-                profile.information = information
+                return@defer RxActivityResult.on(activity).startIntent(Intent(activity, ExperimentSignInActivity::class.java)).singleOrError()
+                        .flatMap { activityResult ->
 
-                synchronizationServerController.postUserRoleConsentResult(profile)
-                        .subscribe({ success ->
-                            if (success == true) {
-                                onApproved()
-                                finishProcess()
+                            if (activityResult.resultCode() == AppCompatActivity.RESULT_OK) {
+                                val data = activityResult.data()
+                                val profile = OTUserRolePOJO()
+                                profile.role = "ServiceUser"
+                                profile.isConsentApproved = true
+                                val information = HashMap<String, Any>()
+                                information["age"] = data.getStringExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP)
+                                information["country"] = data.getStringExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY)
+                                information["gender"] = data.getStringExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER)
+                                information["purposes"] = data.getStringArrayListExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES)
+                                profile.information = information
+
+                                return@flatMap synchronizationServerController.postUserRoleConsentResult(profile).map { success ->
+                                    if (success == true) {
+                                        authManager.setIsConsentApproved(true)
+                                        return@map true
+                                    } else {
+                                        throw Exception("postUserConsentRole failed")
+                                    }
+                                }
                             } else {
-                                mResultListener?.onConsentFailed()
-                                finishProcess()
+                                return@flatMap Single.just(false)
                             }
-                        }, { error ->
-                            error.printStackTrace()
-                            mResultListener?.onConsentFailed()
-                            finishProcess()
-                        })
-
-                /*
-                val currentExpRef = DatabaseManager.experimentProfileRef
-                currentExpRef?.setValue(profile, { databaseError, _ ->
-                    if (databaseError == null) {
-                        mResultListener?.onConsentApproved()
-                        finishProcess()
-                    } else {
-                        mResultListener?.onConsentFailed()
-                        finishProcess()
-                    }
-                })*/
+                        }
             }
         }
     }
 
-    fun finishProcess() {
-        mActivity = null
-        mResultListener = null
-    }
 }

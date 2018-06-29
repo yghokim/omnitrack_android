@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.di.configured
 
-import android.content.SharedPreferences
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import dagger.Module
 import dagger.Provides
@@ -9,7 +8,6 @@ import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfiguration
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
-import kr.ac.snu.hcil.omnitrack.core.di.global.Default
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import javax.inject.Qualifier
 
@@ -26,8 +24,8 @@ class AuthModule(val app: OTApp) {
 
     @Provides
     @Configured
-    fun getExperimentConsentManager(authManager: OTAuthManager, @Default systemPreferences: SharedPreferences, synchronizationServerController: ISynchronizationServerSideAPI): ExperimentConsentManager {
-        return ExperimentConsentManager(authManager, systemPreferences, synchronizationServerController)
+    fun getExperimentConsentManager(authManager: OTAuthManager, synchronizationServerController: ISynchronizationServerSideAPI): ExperimentConsentManager {
+        return ExperimentConsentManager(authManager, synchronizationServerController)
     }
 
     @Provides
