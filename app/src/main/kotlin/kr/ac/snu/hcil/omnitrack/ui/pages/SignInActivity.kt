@@ -13,6 +13,7 @@ import android.widget.Toast
 import com.google.android.gms.common.GoogleApiAvailability
 import com.tbruyelle.rxpermissions2.RxPermissions
 import dagger.Lazy
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_sign_in.*
@@ -88,14 +89,16 @@ class SignInActivity : AppCompatActivity() {
                                             }
                                         }
                                     }
-                                    .flatMap { approved ->
-                                        consentManager.startProcess(this@SignInActivity).doOnSuccess {
-                                            if (it) {
-                                                eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_CONSENT_APPROVED)
-                                            } else {
-                                                eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_CONSENT_DENIED)
+                                    .flatMap { googleSignInSucceed ->
+                                        if (googleSignInSucceed) {
+                                            consentManager.startProcess(this@SignInActivity).doOnSuccess {
+                                                if (it) {
+                                                    eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_CONSENT_APPROVED)
+                                                } else {
+                                                    eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_CONSENT_DENIED)
+                                                }
                                             }
-                                        }
+                                        } else Single.just(false)
                                     }
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe({ approved ->

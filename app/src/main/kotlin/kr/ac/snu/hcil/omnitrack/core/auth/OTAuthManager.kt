@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.auth
 
 import android.content.Context
 import android.content.Intent
+import android.support.annotation.StringRes
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.google.android.gms.auth.api.Auth
@@ -47,25 +48,16 @@ class OTAuthManager @Inject constructor(
 
     companion object {
         const val LOG_TAG = "OMNITRACK Auth Manager"
-        private const val RC_SIGN_IN = 9913
-        private val REQUEST_GOOGLE_PLAY_SERVICES = 1363
     }
     enum class SignedInLevel {
         NONE, CACHED, AUTHORIZED
     }
 
+    enum class AuthError(@StringRes messageResId: Int) {
+        NETWORK_NOT_CONNECTED(0), OMNITRACK_SERVER_NOT_RESPOND(0)
+    }
+
     private val mGoogleApiClient: GoogleApiClient
-
-    //is signIn process in progress
-    private var mIntentInProgress = false
-
-    /*
-    @field:[Inject Backend]
-    lateinit var realmFactory: Factory<Realm>
-
-    @field:[Inject ForGeneralAuth]
-    lateinit var googleSignInOptions: Lazy<GoogleSignInOptions>
-    */
 
     init {
         Log.d(LOG_TAG, "Initializing Google SDK...")
@@ -251,9 +243,7 @@ class OTAuthManager @Inject constructor(
         println("OMNITRACK start sign in activity")
         val signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient)
         return RxActivityResult.on(activity).startIntent(signInIntent).singleOrError().doOnError { clearUserInfo() }.doOnSuccess { if (it.resultCode() == 0) clearUserInfo() }.flatMap { activityResult ->
-            if (activityResult.resultCode() == 0) {
-                return@flatMap Single.just(false)
-            } else {
+
                 val result = Auth.GoogleSignInApi.getSignInResultFromIntent(activityResult.data())
                 if (result.isSuccess) {
                     //Signed in successfully.
@@ -278,9 +268,9 @@ class OTAuthManager @Inject constructor(
                                 Auth.GoogleSignInApi.signOut(mGoogleApiClient)
                             }
                 } else {
-                    return@flatMap Single.error<Boolean>(Exception("error on parsing the Google sign in activity result"))
+                    println("Google sign in failed")
+                    return@flatMap Single.error<Boolean>(Exception("Google login process was failed."))
                 }
-            }
         }
     }
 
@@ -310,49 +300,6 @@ class OTAuthManager @Inject constructor(
             } else return@defer Single.just(false)
         }
     }
-
-    /*
-    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == RC_SIGN_IN) {
-
-            // if the user canceled
-            if (resultCode == 0) {
-                resultHandler?.onCancel()
-                clearUserInfo()
-                return
-            }
-
-            val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-            if (result.isSuccess) {
-                //Signed in successfully.
-                println("signed in google account: ${result.signInAccount}")
-                firebaseAuthWithGoogle(result.signInAccount!!).flatMap { authResult ->
-                    println("Signed in through Google account. try to push device info to server...")
-                    OTDeviceInfo.makeDeviceInfo(configuredContext.firebaseComponent)
-                            .flatMap { deviceInfo -> synchronizationServerController.get().putDeviceInfo(deviceInfo)}
-                            .flatMap { result -> handlePutDeviceInfoResult(result) }
-                            .doOnSuccess {  }
-                    }
-                }.observeOn(AndroidSchedulers.mainThread()).subscribe({ authResult ->
-                    println("sign in succeeded.")
-                    notifySignedIn()
-                    resultHandler?.onSuccess()
-                }, {
-                    ex ->
-                    println("Failed to push device information to server.")
-                    ex.printStackTrace()
-                    firebaseAuth.signOut()
-                    Auth.GoogleSignInApi.signOut(mGoogleApiClient)
-                    resultHandler?.onError(ex)
-                })
-
-            } else {
-                resultHandler!!.onError(Exception("failed"))
-                clearUserInfo()
-                return
-            }
-        }
-    }*/
 
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount): Single<AuthResult> {
         return Single.create<AuthResult> { subscriber ->
@@ -419,40 +366,4 @@ class OTAuthManager @Inject constructor(
             }
         }
     }
-
-    /*
-    fun getGoogleServiceAvailableCode(): Int{
-        return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context)
-    }
-
-    fun initializeSignInButton(buttonView: View): View.OnClickListener? {
-        val api = GoogleApiAvailability.getInstance()
-        val code = api.isGooglePlayServicesAvailable(buttonView.context.applicationContext)
-
-        val activity = buttonView.getActivity()
-        if (activity != null) {
-            if (ConnectionResult.SUCCESS != code) {
-                if (api.isUserResolvableError(code)) {
-                    Log.w(LOG_TAG, "Google Play services recoverable error.")
-                    api.showErrorDialogFragment(activity, code, REQUEST_GOOGLE_PLAY_SERVICES)
-                } else {
-                    val isDebugBuild = 0 != activity
-                            .applicationContext
-                            .applicationInfo
-                            .flags and ApplicationInfo.FLAG_DEBUGGABLE
-
-                    if (!isDebugBuild) {
-                        buttonView.visibility = View.GONE
-                    } else {
-                        Log.w(LOG_TAG, "Google Play Services are not available, but we are showing the Google Sign-in Button, anyway, because this is a debug build.")
-                    }
-                }
-                return null
-            }
-
-            val listener = View.OnClickListener { startSignInProcess(activity, resultsHandler) }
-            buttonView.setOnClickListener(listener)
-            return listener
-        } else return null
-    }*/
 }
