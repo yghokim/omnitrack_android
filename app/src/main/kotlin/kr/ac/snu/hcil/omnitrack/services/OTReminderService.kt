@@ -118,7 +118,6 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
             OTApp.logger.writeSystemLog("Start OTReminderService with command ${intent.action}", TAG)
             val completable = when (intent.action) {
                 ACTION_REMIND -> commands.remind(
-                        startId,
                         intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER),
                         intent.getLongExtra(OTApp.INTENT_EXTRA_TRIGGER_TIME, System.currentTimeMillis())
                 )
@@ -256,7 +255,7 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
             }.subscribeOn(Schedulers.io())
         }
 
-        internal fun remind(startId: Int, triggerId: String, triggerTime: Long): Completable {
+        internal fun remind(triggerId: String, triggerTime: Long): Completable {
             return Completable.defer {
                 val realm = realmProvider.get()
 
