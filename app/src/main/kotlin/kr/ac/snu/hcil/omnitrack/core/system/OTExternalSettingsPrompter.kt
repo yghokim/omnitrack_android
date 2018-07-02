@@ -51,13 +51,14 @@ class OTExternalSettingsPrompter(private val context: Context) {
             } else {
                 //notification
                 println("$TAG show notification")
-                val notificationBuilder = NotificationCompat.Builder(context, OTNotificationManager.CHANNEL_ID_SYSTEM)
+                val notificationBuilder = NotificationCompat.Builder(context, OTNotificationManager.CHANNEL_ID_IMPORTANT)
                         .setColor(ContextCompat.getColor(context, R.color.colorRed))
                         .setSmallIcon(R.drawable.icon_simple)
                         .setStyle(NotificationCompat.BigTextStyle()
                                 .setBigContentTitle("Turn off battery optimization")
                                 .bigText("Don't optimize battery to improve accuracy of triggers and reminders."))
                         .setAutoCancel(true)
+                        .setOnlyAlertOnce(true)
                         .setContentTitle("Turn off battery optimization")
                         .setContentText("Don't optimize battery to improve accuracy of triggers and reminders.")
                         .setContentIntent(PendingIntent.getActivity(context, REQUEST_CODE_IGNORE_BATTERY_OPTIMIZATION, settingIntent, PendingIntent.FLAG_CANCEL_CURRENT))

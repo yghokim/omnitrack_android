@@ -26,10 +26,11 @@ object OTTaskNotificationManager {
     }
 
     fun makeTaskProgressNotificationBuilder(context: Context, title: String, content: String, progress: Int, largeIcon: Int? = R.drawable.icon_cloud_download, smallIcon: Int = android.R.drawable.stat_sys_download, dismissedIntent: PendingIntent? = null): NotificationCompat.Builder {
-        return NotificationCompat.Builder(context, OTNotificationManager.CHANNEL_ID_IMPORTANT)
+        return NotificationCompat.Builder(context, OTNotificationManager.CHANNEL_ID_SYSTEM)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setSmallIcon(smallIcon)
+                .setOngoing(true)
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .apply {
                     if (largeIcon != null) {

@@ -32,7 +32,12 @@ object OTNotificationManager {
         widgetsChannel.enableLights(false)
         widgetsChannel.setShowBadge(false)
 
-        noticeChannel.enableVibration(false)
+        systemChannel.lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
+        systemChannel.enableLights(false)
+        systemChannel.enableVibration(false)
+        systemChannel.setShowBadge(false)
+
+        noticeChannel.enableVibration(true)
         noticeChannel.enableLights(true)
 
         val channels = listOf(widgetsChannel, alertChannel, systemChannel, noticeChannel)
