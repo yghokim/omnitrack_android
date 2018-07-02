@@ -114,7 +114,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
                             }
                         }
                         realm.executeTransaction {
-                            realm.copyToRealmOrUpdate(itemBuilderDao)
+                            realm.insertOrUpdate(itemBuilderDao)
                         }
                         true
                     } else false

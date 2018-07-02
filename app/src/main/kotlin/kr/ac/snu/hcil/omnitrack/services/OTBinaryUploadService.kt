@@ -124,7 +124,7 @@ class OTBinaryUploadService : ConfigurableJobService() {
                                                 this@OTBinaryUploadService.runOnUiThread {
                                                     realm.executeTransaction {
                                                         dbObject.sessionUri = sessionUri
-                                                        realm.copyToRealmOrUpdate(dbObject)
+                                                        realm.insertOrUpdate(dbObject)
                                                     }
                                                 }
                                             }).doOnComplete {

@@ -82,8 +82,7 @@ class BackendDbManager @Inject constructor(
     }
 
 
-    fun makeBookmarkedTrackersQuery(userId: String, realm: Realm): RealmQuery<OTTrackerDAO>
-            = realm.where(OTTrackerDAO::class.java).equalTo(FIELD_REMOVED_BOOLEAN, false).equalTo(FIELD_USER_ID, userId).equalTo("isBookmarked", true)
+    fun makeBookmarkedTrackersQuery(userId: String, realm: Realm): RealmQuery<OTTrackerDAO> = realm.where(OTTrackerDAO::class.java).equalTo(FIELD_REMOVED_BOOLEAN, false).equalTo(FIELD_USER_ID, userId).equalTo("isBookmarked", true)
 
     fun makeBookmarkedTrackersObservable(userId: String, realm: Realm): Flowable<RealmResults<OTTrackerDAO>> {
         return realm.where(OTTrackerDAO::class.java).equalTo(FIELD_REMOVED_BOOLEAN, false).equalTo(FIELD_USER_ID, userId).equalTo("isBookmarked", true).sort("position", Sort.ASCENDING).findAllAsync()
@@ -183,13 +182,13 @@ class BackendDbManager @Inject constructor(
                 .beginsWith("value", "${TypeStringSerializationHelper.TYPENAME_TIMESPAN.length}${TypeStringSerializationHelper.TYPENAME_TIMESPAN}")
                 .endGroup()
                 .findAll().filter {
-            val time = TypeStringSerializationHelper.deserialize(it.value!!)
-            return@filter if (time is TimePoint) {
-                time.timestamp >= scope.from && time.timestamp < scope.to
-            } else if (time is TimeSpan) {
-                return@filter time.from < scope.to && scope.from < time.to
-            } else false
-        }.mapNotNull { it.items?.firstOrNull() }
+                    val time = TypeStringSerializationHelper.deserialize(it.value!!)
+                    return@filter if (time is TimePoint) {
+                        time.timestamp >= scope.from && time.timestamp < scope.to
+                    } else if (time is TimeSpan) {
+                        return@filter time.from < scope.to && scope.from < time.to
+                    } else false
+                }.mapNotNull { it.items?.firstOrNull() }
     }
 
     fun getItemCountDuring(trackerId: String?, realm: Realm, offsetFromToday: Int = 0, overrideTimeColumnLocalId: String?): Long {
@@ -279,7 +278,6 @@ class BackendDbManager @Inject constructor(
             triggerSystemManager.tryCheckInToSystem(dao)
         } else {
             if (realm.isInTransaction) {
-                realm.copyToRealmOrUpdate(dao)
                 val managedDao = realm.copyToRealmOrUpdate(dao)
                 triggerSystemManager.tryCheckInToSystem(managedDao)
             } else {
@@ -358,7 +356,8 @@ class BackendDbManager @Inject constructor(
                         if (value != null) {
                             if (value is OTServerFile && value.serverPath.isNotBlank()) {
                                 if (localCacheManager.isServerPathTemporal(value.serverPath)) {
-                                    val newServerPath = localCacheManager.replaceTemporalServerPath(value.serverPath, item.trackerId ?: "noTracker", item.objectId!!, entry.key)
+                                    val newServerPath = localCacheManager.replaceTemporalServerPath(value.serverPath, item.trackerId
+                                            ?: "noTracker", item.objectId!!, entry.key)
                                     if (newServerPath != null) {
                                         value.serverPath = newServerPath
                                         entry.value = TypeStringSerializationHelper.serialize(value)
@@ -426,8 +425,7 @@ class BackendDbManager @Inject constructor(
 
     //Item Sync APIs==========================================
 
-    override fun getLatestSynchronizedServerTimeOf(type: ESyncDataType): Long
-            = when (type) {
+    override fun getLatestSynchronizedServerTimeOf(type: ESyncDataType): Long = when (type) {
         ESyncDataType.ITEM -> getLatestSynchronizedServerTimeImpl(OTItemDAO::class.java)
         ESyncDataType.TRIGGER -> getLatestSynchronizedServerTimeImpl(OTTriggerDAO::class.java)
         ESyncDataType.TRACKER -> getLatestSynchronizedServerTimeImpl(OTTrackerDAO::class.java)
@@ -510,7 +508,7 @@ class BackendDbManager @Inject constructor(
     override fun applyServerRowsToSync(type: ESyncDataType, jsonList: List<JsonObject>): Completable {
         return when (type) {
             ESyncDataType.TRACKER -> applyServerRowsToSyncImpl(OTTrackerDAO::class.java, jsonList, { tracker -> tracker.synchronizedAt },
-                    { tracker, realm -> realm.copyToRealmOrUpdate(tracker) },
+                    { tracker, realm -> realm.insertOrUpdate(tracker) },
                     { tracker, realm -> removeTracker(tracker, true, realm) },
                     null,
                     { dao, serverPojo -> dao.userUpdatedAt < serverPojo.get(FIELD_UPDATED_AT_LONG).asLong }, serializationManager.serverTrackerTypeAdapter as Lazy<JsonObjectApplier<OTTrackerDAO>>)
@@ -527,7 +525,7 @@ class BackendDbManager @Inject constructor(
                     },
                     { dao, serverPojo -> dao.userUpdatedAt < serverPojo.get(FIELD_UPDATED_AT_LONG).asLong }, serializationManager.serverTriggerTypeAdapter as Lazy<JsonObjectApplier<OTTriggerDAO>>)
             ESyncDataType.ITEM -> applyServerRowsToSyncImpl(OTItemDAO::class.java, jsonList, { item -> item.synchronizedAt },
-                    { item, realm -> realm.copyToRealmOrUpdate(item) },
+                    { item, realm -> realm.insertOrUpdate(item) },
                     { item, realm -> removeItemImpl(item, true, realm) }, null, { dao, serverPojo -> dao.timestamp < serverPojo.get(FIELD_TIMESTAMP_LONG).asLong }, serializationManager.serverItemTypeAdapter as Lazy<JsonObjectApplier<OTItemDAO>>)
         }
     }
@@ -541,42 +539,38 @@ class BackendDbManager @Inject constructor(
             afterRowUpdatedFunc: ((T, Realm) -> Unit)?,
             isServerWinForResolutionFunc: (T, JsonObject) -> Boolean, applier: Lazy<JsonObjectApplier<T>>): Completable {
         return Completable.defer {
-            val realm = makeNewRealmInstance()
+            val r = makeNewRealmInstance()
             try {
-                for (serverPojo in serverRowJsonList.filter { it.has(FIELD_OBJECT_ID) }) {
-                    val match = realm.where(tableClass).equalTo(FIELD_OBJECT_ID, serverPojo.get(FIELD_OBJECT_ID).asString).findFirst()
-                    if (match == null) {
-                        if (serverPojo.get(FIELD_REMOVED_BOOLEAN)?.asBoolean != true) {
-                            //insert
-                            println("synchronization: server row not matched and is not a removed row. append new in local db.")
+                r.executeTransaction { realm ->
+                    for (serverPojo in serverRowJsonList.filter { it.has(FIELD_OBJECT_ID) }) {
+                        val match = realm.where(tableClass).equalTo(FIELD_OBJECT_ID, serverPojo.get(FIELD_OBJECT_ID).asString).findFirst()
+                        if (match == null) {
+                            if (serverPojo.get(FIELD_REMOVED_BOOLEAN)?.asBoolean != true) {
+                                //insert
+                                println("synchronization: server row not matched and is not a removed row. append new in local db.")
 
-                            try {
-                                realm.executeTransaction { realm ->
+                                try {
                                     saveRowInDbFunc.invoke(applier.get().decodeToDao(serverPojo), realm)
+                                } catch (ex: Exception) {
+                                    println("synchronization failed. skip object: $serverPojo")
+                                    ex.printStackTrace()
                                 }
-                            } catch (ex: Exception) {
-                                println("synchronization failed. skip object: $serverPojo")
-                                ex.printStackTrace()
                             }
-                        }
-                    } else if (synchronizedAtFunc(match) == null) {
-                        //found matched row, but it is dirty. Conflict!
-                        //late timestamp win policy
-                        println("conflict")
-                        if (isServerWinForResolutionFunc(match, serverPojo)) {
-                            //server win
-                            println("server win")
-                            realm.executeTransaction {
+                        } else if (synchronizedAtFunc(match) == null) {
+                            //found matched row, but it is dirty. Conflict!
+                            //late timestamp win policy
+                            println("conflict")
+                            if (isServerWinForResolutionFunc(match, serverPojo)) {
+                                //server win
+                                println("server win")
                                 removeRowInDbFunc(match, realm)
                                 //removeItemImpl(match, true, realm)
+                            } else {
+                                //client win
+                                println("client win")
                             }
                         } else {
-                            //client win
-                            println("client win")
-                        }
-                    } else {
-                        //update
-                        realm.executeTransaction {
+                            //update
                             if (serverPojo.get(FIELD_REMOVED_BOOLEAN)?.asBoolean == true) {
                                 removeRowInDbFunc(match, realm)
                                 //removeItemImpl(match, true, realm)
@@ -587,13 +581,13 @@ class BackendDbManager @Inject constructor(
                     }
                 }
 
-                realm.close()
+                r.close()
                 return@defer Completable.complete()
             } catch (ex: Exception) {
                 ex.printStackTrace()
                 return@defer Completable.error(ex)
             } finally {
-                realm.close()
+                r.close()
             }
         }
     }
