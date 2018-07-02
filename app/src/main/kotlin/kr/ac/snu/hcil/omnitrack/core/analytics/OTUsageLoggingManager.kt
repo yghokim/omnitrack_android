@@ -15,6 +15,7 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_CHANG
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_CHANGE_SERVICE
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_CHANGE_TRACKER
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_CHANGE_TRIGGER
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_DEVICE_STATUS_CHANGE
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_SESSION
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_TRACKER_DATA_EXPORT
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_TRACKER_REORDER
@@ -197,6 +198,16 @@ class OTUsageLoggingManager(configuredContext: ConfiguredContext) : IEventLogger
         inject?.invoke(content)
 
         logEvent(NAME_CHANGE_SERVICE, "ACTIVATION", content)
+    }
+
+
+    override fun logDeviceStatusChangeEvent(sub: String, batteryPercentage: Float, inject: ((JsonObject) -> Unit)?) {
+        val content = jsonObject(
+                IEventLogger.CONTENT_KEY_BATTERY_PERCENTAGE to batteryPercentage
+        )
+        inject?.invoke(content)
+
+        logEvent(NAME_DEVICE_STATUS_CHANGE, sub, content)
     }
 
 }

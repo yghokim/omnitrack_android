@@ -8,6 +8,7 @@ import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.Sort
@@ -29,6 +30,7 @@ import kr.ac.snu.hcil.omnitrack.utils.time.ExperienceSamplingTimeScheduleCalcula
 import kr.ac.snu.hcil.omnitrack.utils.time.IntervalTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.toDatetimeString
+import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
 /**
@@ -110,7 +112,8 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                             }
                         }
                     } else {
-                        registerSystemAlarm(alarm.reservedAlarmTime, alarm.userId ?: "", alarm.alarmId)
+                        registerSystemAlarm(alarm.reservedAlarmTime, alarm.userId
+                                ?: "", alarm.alarmId)
                     }
                 }
             }, {
@@ -195,9 +198,10 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                     )
                 } else {
                     Completable.complete()
-                }.doOnTerminate {
+                }.subscribeOn(AndroidSchedulers.mainThread()).doOnComplete {
                     OTApp.logger.writeSystemLog("System alarm fire was succesfully handled. alarmId: ${systemAlarmId}", TAG)
-                    realm.close()
+                }.doOnTerminate {
+                    context.runOnUiThread { realm.close() }
                 }
             }
         }
@@ -211,8 +215,8 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
             realm.executeTransactionIfNotIn {
                 val schedule = (realm.where(OTTriggerSchedule::class.java)
                         .equalTo(OTTriggerSchedule.FIELD_INTRINSIC_ALARM_TIME, alarmTime)
-                        .equalTo("trigger.objectId", trigger.objectId).findFirst() ?:
-                        realm.createObject(OTTriggerSchedule::class.java, scheduleIdGenerator.getNewUniqueLong())).apply {
+                        .equalTo("trigger.objectId", trigger.objectId).findFirst()
+                        ?: realm.createObject(OTTriggerSchedule::class.java, scheduleIdGenerator.getNewUniqueLong())).apply {
                     this.trigger = trigger
                     this.stickyAlarm = trigger.condition?.isSticky ?: false
                     this.intrinsicAlarmTime = alarmTime
@@ -334,8 +338,8 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                             return@map Nullable(list.first()!!.intrinsicAlarmTime)
                         }
                     }.doAfterTerminate {
-                realm.close()
-            }
+                        realm.close()
+                    }
         }
     }
 

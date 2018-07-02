@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
 import android.os.Build
@@ -20,6 +21,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.di.global.*
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
+import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import org.jetbrains.anko.telephonyManager
 import rx_activity_result2.RxActivityResult
@@ -293,6 +295,8 @@ class OTApp : MultiDexApplication() {
                 }
             }
         }
+
+        startService(Intent(this, OTDeviceStatusService::class.java))
 
         println("creation took ${SystemClock.elapsedRealtime() - startedAt}")
     }

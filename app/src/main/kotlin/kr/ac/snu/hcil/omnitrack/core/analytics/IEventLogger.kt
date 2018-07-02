@@ -24,6 +24,15 @@ interface IEventLogger {
 
         const val NAME_TRACKER_REORDER = "reorder_trackers"
 
+        const val NAME_DEVICE_STATUS_CHANGE = "device_status_change"
+
+        const val SUB_DEVICE_PLUGGED = "plugged"
+        const val SUB_DEVICE_UNPLUGGED = "unplugged"
+        const val SUB_DEVICE_BATTERY_LOW = "battery_row"
+        const val SUB_DEVICE_BATTERY_OKAY = "battery_okay"
+
+        const val CONTENT_KEY_BATTERY_PERCENTAGE = "battery_percentage"
+
         const val SUB_ADD = "add"
         const val SUB_REMOVE = "remove"
         const val SUB_EDIT = "edit"
@@ -70,4 +79,6 @@ interface IEventLogger {
     fun logTrackerReorderEvent()
 
     fun logServiceActivationChangeEvent(serviceCode: String, isActivated: Boolean, inject: ((JsonObject) -> Unit)? = null)
+
+    fun logDeviceStatusChangeEvent(sub: String, batteryPercentage: Float, inject: ((JsonObject) -> Unit)? = null)
 }
