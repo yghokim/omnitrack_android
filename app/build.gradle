@@ -158,10 +158,10 @@ dependencies {
     implementation "com.google.android.gms:play-services-auth:$rootProject.ext.google_play_version"
     implementation "com.google.firebase:firebase-core:16.0.1"
     implementation "com.google.firebase:firebase-auth:16.0.2"
-    implementation "com.google.firebase:firebase-messaging:17.0.0"
+    implementation "com.google.firebase:firebase-messaging:17.1.0"
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
     implementation 'android.arch.lifecycle:extensions:1.1.1'
-    def work_version = "1.0.0-alpha03"
+    def work_version = "1.0.0-alpha04"
     implementation "android.arch.work:work-runtime-ktx:$work_version" // use -ktx for Kotlin
     // optional - Firebase JobDispatcher support
     implementation "android.arch.work:work-firebase:$work_version"

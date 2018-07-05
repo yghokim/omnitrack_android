@@ -6,7 +6,7 @@ import dagger.internal.Factory
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.annotations.RealmModule
-import kr.ac.snu.hcil.omnitrack.BuildConfig
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendRealmMigration
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.*
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.*
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
@@ -31,11 +31,8 @@ class BackendDatabaseModule {
                 .directory(configDirectory)
                 .name("backend.db")
                 .modules(BackendRealmModule())
-                .run {
-                    if (BuildConfig.DEBUG) {
-                        this.deleteRealmIfMigrationNeeded()
-                    } else this
-                }
+                .schemaVersion(1)
+                .migration(BackendRealmMigration())
                 .build()
     }
 

@@ -62,7 +62,7 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
     }
 
     override fun applyEditingToDatabase(): Maybe<String> {
-        return if (isValid) {
+        if (isValid) {
             return isBusyObservable.filter { !it }.firstOrError().flatMapMaybe {
                 if (isViewModelsDirty()) {
                     return@flatMapMaybe Maybe.defer {

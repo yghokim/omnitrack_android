@@ -261,9 +261,12 @@ class OTAuthManager @Inject constructor(
                                 }
                             }
                             .doOnSuccess { success ->
-                                if (success)
+                                if (success) {
                                     activity.applicationContext.runOnUiThread { notifySignedIn() }
+                                    configuredContext.triggerSystemComponent.getTriggerSystemManager().get().checkInAllToSystem(userId!!)
+                                }
                             }.doOnError { ex ->
+                                ex.printStackTrace()
                                 firebaseAuth.signOut()
                                 Auth.GoogleSignInApi.signOut(mGoogleApiClient)
                             }
@@ -339,10 +342,16 @@ class OTAuthManager @Inject constructor(
     }*/
 
     fun signOut() {
-        clearUserInfo()
-        firebaseAuth.signOut()
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient)
-        notifySignedOut()
+        val lastUserId = userId
+        if (lastUserId != null) {
+            clearUserInfo()
+            firebaseAuth.signOut()
+            Auth.GoogleSignInApi.signOut(mGoogleApiClient)
+
+            configuredContext.triggerSystemComponent.getTriggerSystemManager().get().checkOutAllFromSystem(lastUserId)
+
+            notifySignedOut()
+        }
     }
 
     private fun notifySignedIn() {

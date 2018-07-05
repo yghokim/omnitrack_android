@@ -17,6 +17,7 @@ open class OTTriggerAlarmInstance : RealmObject() {
         const val FIELD_ALARM_ID = "alarmId"
         const val FIELD_FIRED = "fired"
         const val FIELD_SKIPPED = "skipped"
+        const val FIELD_RESERVED_WHEN_DEVICE_ACTIVE = "isReservedWhenDeviceActive"
         const val FIELD_TRIGGER_SCHEDULES = "triggerSchedules"
     }
 
@@ -34,6 +35,9 @@ open class OTTriggerAlarmInstance : RealmObject() {
     var fired: Boolean = false
     var skipped: Boolean = false
 
+
+    //added in schemaVersion 1
+    var isReservedWhenDeviceActive: Boolean = false
 
     @LinkingObjects("parentAlarm")
     val triggerSchedules: RealmResults<OTTriggerSchedule>? = null

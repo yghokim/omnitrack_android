@@ -25,7 +25,7 @@ class TriggerSystemModule {
 
     @Provides
     @Configured
-    fun provideTriggerSystemManager(triggerAlarmManager: Lazy<ITriggerAlarmController>, context: Context): OTTriggerSystemManager {
-        return OTTriggerSystemManager(triggerAlarmManager, context)
+    fun provideTriggerSystemManager(triggerAlarmManager: Lazy<ITriggerAlarmController>, @Backend realmProvider: Factory<Realm>, context: Context): OTTriggerSystemManager {
+        return OTTriggerSystemManager(triggerAlarmManager, realmProvider, context)
     }
 }

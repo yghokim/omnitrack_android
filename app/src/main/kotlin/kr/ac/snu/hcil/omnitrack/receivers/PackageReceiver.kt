@@ -19,12 +19,20 @@ class PackageReceiver : BroadcastReceiver() {
 
         (context.applicationContext as OTApp).jobDispatcherComponent.inject(this)
 
-        println("package broadcast receiver")
+        println("package broadcast receiver - ${intent.action}")
 
-        val reminderCommands = OTReminderService.OTReminderCommands((context.applicationContext as OTApp).currentConfiguredContext, context)
-        val realm = (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.backendRealmFactory().get()
-        reminderCommands.restoreReminderNotifications(realm).blockingAwait()
-        realm.close()
+        val authManager = (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.getAuthManager()
+        if (authManager.isUserSignedIn()) {
+
+            val reminderCommands = OTReminderService.OTReminderCommands((context.applicationContext as OTApp).currentConfiguredContext, context)
+            val realm = (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.backendRealmFactory().get()
+            reminderCommands.restoreReminderNotifications(realm).blockingAwait()
+            realm.close()
+
+            val triggerSystemManager = (context.applicationContext as OTApp).currentConfiguredContext.triggerSystemComponent.getTriggerSystemManager().get()
+            triggerSystemManager.checkInAllToSystem(authManager.userId!!)
+        }
+
 
         when (intent.action) {
             Intent.ACTION_INSTALL_PACKAGE -> {

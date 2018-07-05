@@ -22,14 +22,13 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTT
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
-import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
+import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
+import kr.ac.snu.hcil.omnitrack.utils.*
 import kr.ac.snu.hcil.omnitrack.utils.time.DesignatedTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.ExperienceSamplingTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.IntervalTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
-import kr.ac.snu.hcil.omnitrack.utils.toDatetimeString
+import org.jetbrains.anko.powerManager
 import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
@@ -116,6 +115,8 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                                 ?: "", alarm.alarmId)
                     }
                 }
+
+
             }, {
                 OTApp.logger.writeSystemLog("TriggerAlarmManager was successfully initialized the alarms", TAG)
             }, { err ->
@@ -136,17 +137,17 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
     override fun registerTriggerAlarm(pivot: Long?, trigger: OTTriggerDAO): Boolean {
         val condition = retrieveTimeCondition(trigger)
         val nextAlarmTime = calculateNextAlarmTime(pivot, condition, trigger.objectId!!)
-        if (nextAlarmTime != null) {
-            OTApp.logger.writeSystemLog("Next alarm time is ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(nextAlarmTime))}", TAG)
+        return if (nextAlarmTime != null) {
+            OTApp.logger.writeSystemLog("Next alarm time is ${nextAlarmTime.toDatetimeString()}", TAG)
             reserveAlarm(trigger, nextAlarmTime, !condition.isRepeated)
-            return true
+            true
         } else {
             realmProvider.get().use { realm ->
                 realm.executeTransactionIfNotIn {
                     trigger.isOn = false
                 }
             }
-            return false
+            false
         }
     }
 
@@ -252,8 +253,10 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                         schedule.parentAlarm = alarmInstance
                         alarmInstance.userId = trigger.userId
 
+                        alarmInstance.isReservedWhenDeviceActive = OTDeviceStatusService.isBatteryCharging(context) || context.powerManager.isInteractiveCompat
+
                         registerSystemAlarm(alarmTimeToReserve, trigger.userId!!, newAlarmId)
-                        OTApp.logger.writeSystemLog("The actual alarm was reserved at: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(alarmTimeToReserve))}", TAG)
+                        OTApp.logger.writeSystemLog("The actual alarm was reserved at: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(alarmTimeToReserve))}. \nReservedWhenDeviceActive: ${alarmInstance.isReservedWhenDeviceActive}", TAG)
 
                         result = alarmInstance.getInfo()
                     }
@@ -354,18 +357,18 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                     .findFirst()
 
             if (alarmInstance != null) {
+
+                val triggerSchedules = alarmInstance.triggerSchedules?.toList()
                 realm.executeTransactionIfNotIn {
-                    alarmInstance.triggerSchedules?.forEach { schedule ->
+                    triggerSchedules?.forEach { schedule ->
                         schedule.fired = true
                         schedule.skipped = false
                     }
 
-                    alarmInstance.fired = true
-                    alarmInstance.skipped = false
-
+                    alarmInstance.deleteFromRealm()
                 }
-                println("handled trigger schedules: ${alarmInstance.triggerSchedules?.size}")
-                return@defer Single.just(Nullable<List<OTTriggerSchedule>>(alarmInstance.triggerSchedules))
+                println("handled trigger schedules: ${triggerSchedules?.size}")
+                return@defer Single.just(Nullable<List<OTTriggerSchedule>>(triggerSchedules))
             } else return@defer Single.just(Nullable<List<OTTriggerSchedule>>(null))
         }
     }
@@ -457,6 +460,31 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                 return builder.build().calculateNext(pivot, now)
             }
             else -> return null
+        }
+    }
+
+
+    //this is a tweak method for Samsung devices.
+    override fun rearrangeSystemAlarms() {
+        if (OTDeviceStatusService.isBatteryCharging(context) || context.powerManager.isInteractiveCompat) {
+            val realm = realmProvider.get()
+            val alarms = realm.where(OTTriggerAlarmInstance::class.java)
+                    .equalTo(OTTriggerAlarmInstance.FIELD_FIRED, false)
+                    .equalTo(OTTriggerAlarmInstance.FIELD_RESERVED_WHEN_DEVICE_ACTIVE, false)
+                    .greaterThan("reservedAlarmTime", System.currentTimeMillis())
+                    .findAll()
+
+            OTApp.logger.writeSystemLog("rearrange ${alarms.size} trigger alarms.", TAG)
+
+            realm.executeTransaction {
+                alarms.forEach { alarm ->
+                    registerSystemAlarm(alarm.reservedAlarmTime, alarm.userId!!, alarm.alarmId)
+                    alarm.isReservedWhenDeviceActive = true
+                }
+            }
+
+
+            realm.close()
         }
     }
 

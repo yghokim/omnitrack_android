@@ -23,4 +23,6 @@ interface ITriggerAlarmController {
     fun getNearestAlarmTime(triggerId: String, now: Long): Single<Nullable<Long>>
 
     fun makeNextAlarmTimeObservable(triggerId: String): Flowable<Nullable<Long>>
+
+    fun rearrangeSystemAlarms()
 }

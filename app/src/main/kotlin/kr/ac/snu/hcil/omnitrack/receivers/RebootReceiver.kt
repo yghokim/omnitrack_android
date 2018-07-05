@@ -47,7 +47,7 @@ class RebootReceiver : BroadcastReceiver() {
 
         triggerManager.onSystemRebooted()
 
-        WorkManager.getInstance().enqueue(OneTimeWorkRequestBuilder<OTReminderService.SystemRebootWorker>()
+        WorkManager.getInstance()!!.enqueue(OneTimeWorkRequestBuilder<OTReminderService.SystemRebootWorker>()
                 .setInputData(Data.Builder().putString(OTApp.INTENT_EXTRA_CONFIGURATION_ID, (context.applicationContext as OTApp).currentConfiguredContext.configuration.id).build())
                 .build())
 

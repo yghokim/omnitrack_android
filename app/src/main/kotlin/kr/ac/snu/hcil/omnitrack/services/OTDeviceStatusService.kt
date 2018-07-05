@@ -6,12 +6,38 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import android.os.Build
 import android.os.IBinder
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 
 
 class OTDeviceStatusService : Service() {
+
+    companion object {
+
+        private val batteryStatusIntentFilter: IntentFilter by lazy {
+            IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        }
+
+        fun getBatteryStatus(context: Context): Intent = context.registerReceiver(null, batteryStatusIntentFilter)
+
+        fun isBatteryCharging(batteryStatus: Intent): Boolean {
+            val status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
+            return status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
+        }
+
+        fun isBatteryCharging(context: Context): Boolean {
+            return isBatteryCharging(getBatteryStatus(context))
+        }
+
+        fun getBatteryPercentage(batteryStatus: Intent): Float {
+            val level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+            val scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+
+            return level / scale.toFloat()
+        }
+    }
 
     private val receiver = PowerReceiver()
     private val intentFilter = IntentFilter()
@@ -48,15 +74,11 @@ class OTDeviceStatusService : Service() {
             const val TAG = "PowerReceiver"
         }
 
-        private val batteryStatusIntentFilter: IntentFilter by lazy {
-            IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-        }
-
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 Intent.ACTION_BATTERY_LOW -> {
-                    OTApp.logger.writeSystemLog("Battery Row", TAG)
-                    //Toast.makeText(context, "Battery is row", Toast.LENGTH_SHORT).show()
+                    OTApp.logger.writeSystemLog("Battery Low", TAG)
+                    //Toast.makeText(context, "Battery is low", Toast.LENGTH_SHORT).show()
                 }
                 Intent.ACTION_BATTERY_OKAY -> {
                     OTApp.logger.writeSystemLog("Battery Okay", TAG)
@@ -64,6 +86,7 @@ class OTDeviceStatusService : Service() {
                 }
                 Intent.ACTION_POWER_CONNECTED -> {
                     OTApp.logger.writeSystemLog("Power connected", TAG)
+                    onDeviceActive(context)
                     //Toast.makeText(context, "Power connected", Toast.LENGTH_SHORT).show()
                 }
                 Intent.ACTION_POWER_DISCONNECTED -> {
@@ -72,6 +95,7 @@ class OTDeviceStatusService : Service() {
                 }
                 Intent.ACTION_SCREEN_ON -> {
                     OTApp.logger.writeSystemLog("Screen on", TAG)
+                    onDeviceActive(context)
                     //Toast.makeText(context, "Screen on", Toast.LENGTH_SHORT).show()
                 }
 
@@ -84,8 +108,7 @@ class OTDeviceStatusService : Service() {
             when (intent.action) {
                 Intent.ACTION_BATTERY_LOW, Intent.ACTION_BATTERY_OKAY, Intent.ACTION_POWER_CONNECTED, Intent.ACTION_POWER_DISCONNECTED -> {
                     val eventLogger = (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.getEventLogger()
-                    val batteryStatus = getBatteryStatus(context,
-                            if (intent.action == Intent.ACTION_POWER_CONNECTED || intent.action == Intent.ACTION_POWER_DISCONNECTED) null else intent)
+                    val batteryStatus = getBatteryStatus(context)
 
                     val batteryPercentage = getBatteryPercentage(batteryStatus)
                     val isCharging = isBatteryCharging(batteryStatus)
@@ -103,19 +126,12 @@ class OTDeviceStatusService : Service() {
             }
         }
 
-        fun getBatteryStatus(context: Context, intent: Intent?): Intent =
-                intent ?: context.registerReceiver(null, batteryStatusIntentFilter)
-
-        fun isBatteryCharging(batteryStatus: Intent): Boolean {
-            val status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
-            return status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
-        }
-
-        fun getBatteryPercentage(batteryStatus: Intent): Float {
-            val level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-            val scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-
-            return level / scale.toFloat()
+        private fun onDeviceActive(context: Context) {
+            //Do Samsung-specific optimization tweaking
+            if (Build.MANUFACTURER == "samsung") {
+                val triggerSystemManager = (context.applicationContext as OTApp).currentConfiguredContext.triggerSystemComponent.getTriggerSystemManager()
+                triggerSystemManager.get().refreshReservedAlarms()
+            }
         }
     }
 

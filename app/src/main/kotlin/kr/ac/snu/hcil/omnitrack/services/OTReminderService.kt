@@ -380,7 +380,7 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
         internal fun dismissSyncImpl(entryId: Long, realm: Realm) {
             handleEntrySyncImpl(entryId, realm) { entry ->
                 if (Build.VERSION.SDK_INT < 26) {
-                    WorkManager.getInstance().cancelAllWorkByTag(entry.id.toString())
+                    WorkManager.getInstance()!!.cancelAllWorkByTag(entry.id.toString())
                 }
                 entry.realm.executeTransaction { realm ->
                     entry.dismissed = true
@@ -485,7 +485,7 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
             }
 
             if (entry.timeoutDuration != null) {
-                WorkManager.getInstance().enqueue(OneTimeWorkRequestBuilder<ReminderDismissWorker>()
+                WorkManager.getInstance()!!.enqueue(OneTimeWorkRequestBuilder<ReminderDismissWorker>()
                         .setInitialDelay(entry.timeoutDuration!!.toLong(), TimeUnit.MILLISECONDS)
                         .setInputData(Data.Builder()
                                 .putString(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER, entry.triggerId)
@@ -563,7 +563,7 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
             return try {
                 val triggerId = inputData.getString(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER, "")
                 val entryId = inputData.getLong(INTENT_EXTRA_ENTRY_ID, 0)
-                val configId = inputData.getString(OTApp.INTENT_EXTRA_CONFIGURATION_ID, "")
+                val configId = inputData.getString(OTApp.INTENT_EXTRA_CONFIGURATION_ID, "")!!
 
                 val configuredContext = (applicationContext as OTApp).applicationComponent.configurationController().getConfiguredContextOf(configId)
                 if (configuredContext != null) {
@@ -586,7 +586,7 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
     class SystemRebootWorker : Worker() {
         override fun doWork(): Result {
             return try {
-                val configId = inputData.getString(OTApp.INTENT_EXTRA_CONFIGURATION_ID, "")
+                val configId = inputData.getString(OTApp.INTENT_EXTRA_CONFIGURATION_ID, "")!!
 
                 val configuredContext = (applicationContext as OTApp).applicationComponent.configurationController().getConfiguredContextOf(configId)
                 if (configuredContext != null) {
