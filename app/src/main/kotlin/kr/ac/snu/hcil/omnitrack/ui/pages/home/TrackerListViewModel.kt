@@ -24,10 +24,7 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
-import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
-import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
+import kr.ac.snu.hcil.omnitrack.utils.*
 import java.util.*
 import javax.inject.Inject
 
@@ -144,12 +141,22 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
     }
 
     fun removeTracker(model: TrackerInformationViewModel) {
-        if (!realm.isInTransaction) {
-            realm.executeTransaction {
-                dbManager.get().removeTracker(model.trackerDao, false, realm)
+        var triggerRemoved = false
+        realm.executeTransactionIfNotIn {
+            dbManager.get().removeTracker(model.trackerDao, false, realm)
+
+            //remove associated reminders
+            model.trackerDao.liveTriggersQuery?.equalTo("actionType", OTTriggerDAO.ACTION_TYPE_REMIND)?.findAll()?.let { reminders ->
+                if (reminders.size > 0) triggerRemoved = true
+                reminders.forEach {
+                    dbManager.get().removeTrigger(it, false, realm)
+                }
             }
         }
         syncManager.get().registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
+        if (triggerRemoved) {
+            syncManager.get().registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
+        }
     }
 
     class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm, val researchRealm: Realm, dbManager: BackendDbManager) : IReadonlyObjectId, RealmChangeListener<OTTrackerDAO> {
