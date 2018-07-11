@@ -22,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import javax.inject.Inject
@@ -43,6 +44,10 @@ class SignInActivity : AppCompatActivity() {
         (application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
 
         setContentView(R.layout.activity_sign_in)
+
+        ui_button_settings.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
 
         val task = GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this)
         task.addOnCompleteListener {

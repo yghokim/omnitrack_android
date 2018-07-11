@@ -37,9 +37,9 @@ import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.research.ResearchActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import javax.inject.Inject
 import javax.inject.Provider
@@ -206,7 +206,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
         private val menus = arrayListOf(
                 RecyclerViewMenuAdapter.MenuItem(R.drawable.settings_dark, parentActivity.getString(R.string.msg_settings), null, {
                     val intent = Intent(parentActivity, SettingsActivity::class.java)
-                    parentActivity.startActivityForResult(intent, SettingsActivity.REQUEST_CODE)
+                    parentActivity.startActivity(intent)
                 }, true),
 
                 RecyclerViewMenuAdapter.MenuItem(R.drawable.help_dark, parentActivity.getString(R.string.msg_about), null, {

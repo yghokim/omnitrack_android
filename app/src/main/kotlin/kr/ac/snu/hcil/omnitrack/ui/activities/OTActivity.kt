@@ -35,7 +35,7 @@ import kr.ac.snu.hcil.omnitrack.core.di.global.Default
 import kr.ac.snu.hcil.omnitrack.core.system.OTAppVersionCheckManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import org.jetbrains.anko.defaultSharedPreferences

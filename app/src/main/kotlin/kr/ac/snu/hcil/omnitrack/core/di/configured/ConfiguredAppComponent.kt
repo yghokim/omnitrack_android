@@ -33,13 +33,13 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.SendReportActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.AttributeSelectionPage
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceWizardView
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.TrackerSelectionPage
-import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.FieldPresetSelectionBottomSheetFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailStructureTabFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailViewModel

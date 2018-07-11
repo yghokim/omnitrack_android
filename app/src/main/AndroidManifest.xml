@@ -273,6 +273,7 @@
         <activity
             android:name=".ui.pages.SignInActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
             android:label="@string/title_activity_sign_in" />
         <activity
             android:name=".ui.pages.experiment.ExperimentSignInActivity"
@@ -294,7 +295,7 @@
         </activity>
 
         <activity
-            android:name=".ui.pages.settings.SettingsActivity"
+            android:name=".ui.pages.configs.SettingsActivity"
             android:label="@string/title_activity_settings" />
 
 

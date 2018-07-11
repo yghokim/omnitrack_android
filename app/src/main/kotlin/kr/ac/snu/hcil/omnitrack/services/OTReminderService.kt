@@ -36,8 +36,8 @@ import kr.ac.snu.hcil.omnitrack.core.di.global.ReminderNotification
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTrackingNotificationFactory
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
+import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ConfigurableWakefulService
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn

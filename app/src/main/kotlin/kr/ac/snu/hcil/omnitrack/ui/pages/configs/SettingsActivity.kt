@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.pages.settings
+package kr.ac.snu.hcil.omnitrack.ui.pages.configs
 
 import android.annotation.TargetApi
 import android.app.Activity
@@ -9,6 +9,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.preference.*
+import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.javiersantos.appupdater.AppUpdater
@@ -16,6 +18,7 @@ import dagger.Lazy
 import dagger.internal.Factory
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
+import kotlinx.android.synthetic.main.common_toolbar_with_buttons.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
@@ -24,7 +27,6 @@ import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
-import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
@@ -37,7 +39,7 @@ import javax.inject.Provider
 /**
  * Created by younghokim on 2017. 5. 19..
  */
-class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibutton_single_fragment) {
+class SettingsActivity : AppCompatActivity() {
 
     companion object {
         const val PREF_REMINDER_NOTI_RINGTONE = "pref_reminder_noti_ringtone"
@@ -54,7 +56,10 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setActionBarButtonMode(Mode.Back)
+        setContentView(R.layout.activity_multibutton_single_fragment)
+        ui_appbar_title.text = title
+        ui_appbar_button_left.setOnClickListener { finish() }
+        ui_appbar_button_right.visibility = View.GONE
 
         fragment = fragmentManager.findFragmentById(R.id.ui_content_replace) as? SettingsFragment ?: SettingsFragment().apply {
             this@SettingsActivity.fragmentManager.beginTransaction()
@@ -72,14 +77,6 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
     override fun onBackPressed() {
         setResult(fragment?.resultCode ?: Activity.RESULT_CANCELED, fragment?.resultData)
         super.onBackPressed()
-    }
-
-    override fun onToolbarLeftButtonClicked() {
-        finish()
-    }
-
-    override fun onToolbarRightButtonClicked() {
-
     }
 
     class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceChangeListener {

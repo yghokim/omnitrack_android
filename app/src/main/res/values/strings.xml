@@ -498,7 +498,7 @@
 
     <string name="msg_pref_dialog_content_ignore_battery_optimization_off">
         In the battery optimization whitelist, find &lt;b>%1$s&lt;/b> and turn on the optimization.
-        &lt;br>&lt;br>If you don't find the app in the list or it is already turned on, please reboot the device and check again.
+        &lt;br>&lt;br>If you don\'t find the app in the list or it is already turned on, please reboot the device and check again.
     </string>
 
     <string name="msg_pref_title_ignore_battery_optimization">Ignore Battery Optimization for OmniTrack</string>
