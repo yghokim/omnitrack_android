@@ -1,5 +1,9 @@
 package kr.ac.snu.hcil.omnitrack
 
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleObserver
+import android.arch.lifecycle.OnLifecycleEvent
+import android.arch.lifecycle.ProcessLifecycleOwner
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -11,10 +15,7 @@ import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
 import android.support.v7.app.AppCompatDelegate
 import com.jakewharton.threetenabp.AndroidThreeTen
-import com.jenzz.appstate.AppState
-import com.jenzz.appstate.adapter.rxjava2.RxAppStateMonitor
 import com.squareup.leakcanary.LeakCanary
-import io.reactivex.Observable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
@@ -33,7 +34,7 @@ import java.util.concurrent.atomic.AtomicLong
  * Created by Young-Ho Kim on 2016-07-11.
  */
 
-class OTApp : MultiDexApplication() {
+class OTApp : MultiDexApplication(), LifecycleObserver {
 
     companion object {
         lateinit var instance: OTApp
@@ -85,6 +86,7 @@ class OTApp : MultiDexApplication() {
         const val BROADCAST_ACTION_TRIGGER_FIRED = "$PREFIX_ACTION.TRIGGER_FIRED"
 
         const val BROADCAST_ACTION_TIME_TRIGGER_ALARM = "$PREFIX_ACTION.ALARM"
+        const val BROADCAST_ACTION_REMINDER_AUTO_EXPIRY_ALARM = "$PREFIX_ACTION.ALARM_REMINDER_EXPIRY"
 
         const val BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM = "$PREFIX_ACTION.EVENT_TRIGGER_ALARM"
 
@@ -119,10 +121,6 @@ class OTApp : MultiDexApplication() {
 
     val contextCompat: Context get() {
         return wrappedContext ?: this
-    }
-
-    val appState: Observable<AppState> by lazy {
-        RxAppStateMonitor.monitor(this)
     }
 
     val deviceId: String by lazy {
@@ -275,31 +273,35 @@ class OTApp : MultiDexApplication() {
         applicationComponent.configurationController().currentConfiguredContext.activateOnSystem()
 
 
-        appState.subscribe { appState ->
-            when (appState) {
-                AppState.FOREGROUND -> {
-                    println("App Screen State: FOREGROUND")
-                    foregroundTime.set(System.currentTimeMillis())
-                }
-                AppState.BACKGROUND -> {
-                    println("App Screen State: BACKGROUND")
-                    if (foregroundTime.get() != Long.MIN_VALUE) {
-                        val finishedAt = System.currentTimeMillis()
-                        val duration = finishedAt - foregroundTime.getAndSet(Long.MIN_VALUE)
-                        if (duration > 100) {
-                            println("App Screen Session duration : ${duration.toFloat() / 1000} seconds")
-                            applicationComponent.configurationController().currentConfiguredContext.configuredAppComponent.getEventLogger()
-                                    .logSession("engagement_foreground", "application", duration, finishedAt, null)
-                        }
-                    }
-                }
-            }
-        }
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
         startService(Intent(this, OTDeviceStatusService::class.java))
 
         println("creation took ${SystemClock.elapsedRealtime() - startedAt}")
     }
+
+
+    //Lifecycle==========================================
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onAppDidEnterForeground() {
+        println("App Screen State: FOREGROUND")
+        foregroundTime.set(System.currentTimeMillis())
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onAppDidEnterBackground() {
+        println("App Screen State: BACKGROUND")
+        if (foregroundTime.get() != Long.MIN_VALUE) {
+            val finishedAt = System.currentTimeMillis()
+            val duration = finishedAt - foregroundTime.getAndSet(Long.MIN_VALUE)
+            if (duration > 100) {
+                println("App Screen Session duration : ${duration.toFloat() / 1000} seconds")
+                applicationComponent.configurationController().currentConfiguredContext.configuredAppComponent.getEventLogger()
+                        .logSession("engagement_foreground", "application", duration, finishedAt, null)
+            }
+        }
+    }
+    //====================================================
 
     fun unlinkUser() {
         applicationComponent.

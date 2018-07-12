@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.services.OTReminderService
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import javax.inject.Inject
 
@@ -24,7 +24,7 @@ class PackageReceiver : BroadcastReceiver() {
         val authManager = (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.getAuthManager()
         if (authManager.isUserSignedIn()) {
 
-            val reminderCommands = OTReminderService.OTReminderCommands((context.applicationContext as OTApp).currentConfiguredContext, context)
+            val reminderCommands = OTReminderCommands((context.applicationContext as OTApp).currentConfiguredContext, context)
             val realm = (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.backendRealmFactory().get()
             reminderCommands.restoreReminderNotifications(realm).blockingAwait()
             realm.close()

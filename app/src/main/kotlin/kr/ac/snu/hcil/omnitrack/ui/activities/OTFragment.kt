@@ -1,11 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.ui.activities
 
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleObserver
+import android.arch.lifecycle.OnLifecycleEvent
 import android.content.Context
 import android.support.v4.app.Fragment
 import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
-import com.jenzz.appstate.AppState
-import com.jenzz.appstate.adapter.rxjava2.RxAppStateMonitor
 import dagger.Lazy
 import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -17,7 +18,7 @@ import javax.inject.Inject
 /**
  * Created by younghokim on 2016. 11. 15..
  */
-open class OTFragment : Fragment() {
+open class OTFragment : Fragment(), LifecycleObserver {
 
     protected val startSubscriptions = CompositeDisposable()
     protected val creationSubscriptions = CompositeDisposable()
@@ -54,6 +55,8 @@ open class OTFragment : Fragment() {
         super.onStop()
         startSubscriptions.clear()
 
+        activity?.lifecycle?.removeObserver(this)
+
         if (userVisibleHint) {
             logSession()
             shownAt = null
@@ -63,28 +66,27 @@ open class OTFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        startSubscriptions.add(
-                RxAppStateMonitor.monitor(OTApp.instance).subscribe { appState ->
-                    when (appState) {
-                        AppState.FOREGROUND -> {
-                            if (shownAt == null && userVisibleHint) {
-                                shownAt = System.currentTimeMillis()
-                                println("start ${this.javaClass.name} session - AppState")
-                            }
-                        }
-                        AppState.BACKGROUND -> {
-                            if (shownAt != null) {
-                                logSession()
-                                shownAt = null
-                            }
-                        }
-                    }
-                }
-        )
+        activity?.lifecycle?.addObserver(this)
 
         if (shownAt == null && userVisibleHint) {
             shownAt = System.currentTimeMillis()
             println("start ${this.javaClass.name} session - OnStart")
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onActivityStarted() {
+        if (shownAt == null && userVisibleHint) {
+            shownAt = System.currentTimeMillis()
+            println("start ${this.javaClass.name} session - AppState")
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onActivityStopped() {
+        if (shownAt != null) {
+            logSession()
+            shownAt = null
         }
     }
 

@@ -17,7 +17,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.services.OTReminderService
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.ui.activities.ReminderPopupActivity
 import kr.ac.snu.hcil.omnitrack.utils.isDeviceLockedCompat
 import kr.ac.snu.hcil.omnitrack.utils.isInteractiveCompat
@@ -189,7 +189,7 @@ class OTReminderAction : OTTriggerAction() {
             println("trigger fired - send notification")
 
             if (trigger.liveTrackerCount > 0) {
-                val reminderCommands = OTReminderService.OTReminderCommands(configuredContext, configuredContext.applicationContext)
+                val reminderCommands = OTReminderCommands(configuredContext, configuredContext.applicationContext)
                 return@defer reminderCommands.remind(trigger.objectId!!, triggerTime)
             }
             return@defer Completable.complete()

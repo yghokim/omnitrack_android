@@ -4,6 +4,7 @@ import android.content.Context
 import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
@@ -14,7 +15,8 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 class OTTriggerSystemManager(
         val triggerAlarmManager: Lazy<ITriggerAlarmController>,
         val realmProvider: Factory<Realm>,
-        val context: Context
+        val context: Context,
+        val configuredContext: ConfiguredContext
 ) {
     private val settingsPrompter: OTExternalSettingsPrompter by lazy {
         OTExternalSettingsPrompter(context)
@@ -70,6 +72,10 @@ class OTTriggerSystemManager(
 
     fun refreshReservedAlarms() {
         triggerAlarmManager.get().rearrangeSystemAlarms()
+        val realm = realmProvider.get()
+        val commands = OTReminderCommands(configuredContext, context)
+        commands.rearrangeAutoExpiryAlarms(realm)
+        realm.close()
     }
 
     fun checkOutAllFromSystem(userId: String): Int {

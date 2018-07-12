@@ -19,6 +19,7 @@ import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
 import kr.ac.snu.hcil.omnitrack.receivers.RebootReceiver
 import kr.ac.snu.hcil.omnitrack.services.*
@@ -208,5 +209,5 @@ interface ConfiguredAppComponent {
     fun inject(service: OTBinaryUploadService)
 
     fun inject(task: OTBinaryUploadService.ConfiguredTask)
-    fun inject(task: OTReminderService.OTReminderCommands)
+    fun inject(task: OTReminderCommands)
 }

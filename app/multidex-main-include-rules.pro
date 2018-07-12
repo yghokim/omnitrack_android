@@ -1,0 +1,3 @@
+-keep class kr.ac.snu.hcil.omnitrack.core.system.** { *; } # all class in core package
+-keep class kr.ac.snu.hcil.omnitrack.receivers.** { *; } # all class in core package
+-keep class kr.ac.snu.hcil.omnitrack.core.triggers.** { *; } # all class in core package

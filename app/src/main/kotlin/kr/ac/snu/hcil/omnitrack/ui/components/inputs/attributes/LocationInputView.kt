@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 
 import android.content.Context
 import android.content.Intent
-import android.location.Address
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -302,14 +301,8 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
             addressBusyIndicator.visibility = View.VISIBLE
             addressConversionTaskSubscription.set(
                     Single.create<Nullable<String>> { subscriber ->
-                        var cancelled = false
-                        subscriber.setCancellable {
-                            cancelled = true
-                        }
-                        var googleAddress: Address? = null
-                        while (googleAddress == null && !cancelled) {
-                            googleAddress = location.getAddress(OTApp.instance)
-                        }
+
+                        val googleAddress = location.getAddress(OTApp.instance)
 
                         if (!subscriber.isDisposed) {
                             subscriber.onSuccess(

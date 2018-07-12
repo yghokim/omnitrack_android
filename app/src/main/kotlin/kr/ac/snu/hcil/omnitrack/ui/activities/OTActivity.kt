@@ -16,8 +16,6 @@ import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.Display
 import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
-import com.jenzz.appstate.AppState
-import com.jenzz.appstate.adapter.rxjava2.RxAppStateMonitor
 import dagger.Lazy
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -149,6 +147,8 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         onInject(application as OTApp)
         processAuthorization()
         PreferenceManager.setDefaultValues(this, R.xml.global_preferences, false)
+
+        /*
         if (isSessionLoggingEnabled) {
             creationSubscriptions.add(
                     RxAppStateMonitor.monitor(OTApp.instance).subscribe { appState ->
@@ -167,7 +167,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
                         }
                     }
             )
-        }
+        }*/
     }
 
     override fun onStart() {

@@ -9,6 +9,12 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
  * Created by younghokim on 2017-11-13.
  */
 open class OTTriggerReminderEntry : RealmObject() {
+
+    companion object {
+        const val FIELD_AUTO_EXPIRY_ALARM_ID = "autoExpiryAlarmId"
+        const val FIELD_IS_AUTO_EXPIRY_ALARM_RESERVED_WHEN_DEVICE_ACTIVE = "isAutoExpiryAlarmReservedWhenDeviceActive"
+    }
+
     @PrimaryKey
     var id: Long = 0
 
@@ -33,6 +39,14 @@ open class OTTriggerReminderEntry : RealmObject() {
     var dismissed: Boolean = false
 
     var autoExpireAt: Long = Long.MAX_VALUE
+
+    //added in schema 2. used only in API < 27
+    var autoExpiryAlarmId: Int? = null
+
+    //added in schema 2. used only in API < 27
+    @Index
+    var isAutoExpiryAlarmReservedWhenDeviceActive: Boolean = false
+
     var timeoutDuration: Int? = null
 
     var intrinsicTriggerTime: Long = System.currentTimeMillis()

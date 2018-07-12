@@ -35,6 +35,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         //multidex support
         multiDexEnabled true
+        multiDexKeepProguard file('multidex-main-include-rules.pro')
         vectorDrawables.useSupportLibrary = true
 
         def googleMapsKey = keystoreProperties.getProperty("GOOGLE_MAPS_API_KEY").toString()
@@ -178,9 +179,6 @@ dependencies {
     implementation project(':fancybuttons')
     implementation project(':TedBottomPicker:tedbottompicker')
     implementation project(':AppUpdater:appupdater')
-
-    implementation 'com.jenzz.appstate:appstate:3.0.1'
-    implementation 'com.jenzz.appstate:adapter-rxjava2:3.0.1'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
