@@ -17,20 +17,31 @@ println(googleServices.project_info)
 def gcmSenderId = googleServices.project_info.project_number
 def firebaseProjectId = googleServices.project_info.project_id
 
+//load buildConfig.json
+File buildConfigJsonFile = rootProject.file("omnitrackBuildConfig.json")
+def buildConfigJson = new groovy.json.JsonSlurper().parseText(buildConfigJsonFile.text)
+
+
+
 android {
-    signingConfigs {
-        sign_test {
-            storeFile file(RELEASE_KEYSTORE_LOCATION)
-            keyAlias RELEASE_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
-            storePassword RELEASE_STORE_PASSWORD
+
+    if(buildConfigJson.signing != null){
+        signingConfigs{
+            sign_test{
+                storeFile file(buildConfigJson.signing.releaseKeystoreLocation)
+                keyAlias buildConfigJson.signing.releaseAlias
+                keyPassword buildConfigJson.signing.releaseKeyPassword
+                storePassword buildConfigJson.signing.releaseStorePassword
+            }
         }
     }
 
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
-        applicationId "kr.ac.snu.hcil.omnitrack"
+        if(buildConfigJson.overridePackageName != null && buildConfigJson.overridePackageName.length() > 0) {
+            applicationId buildConfigJson.overridePackageName
+        }else applicationId "kr.ac.snu.hcil.omnitrack"
         minSdkVersion 19
         targetSdkVersion rootProject.ext.targetSdkVersion
         //multidex support
@@ -40,6 +51,19 @@ android {
 
         def googleMapsKey = keystoreProperties.getProperty("GOOGLE_MAPS_API_KEY").toString()
         manifestPlaceholders = [GOOGLE_MAPS_API_KEY: googleMapsKey.replaceAll("\"", "").trim()]
+
+
+        if(buildConfigJson.overrideAppName!=null && buildConfigJson.overrideAppName.length() > 0){
+            manifestPlaceholders.appName = buildConfigJson.overrideAppName
+            buildConfigField 'String', 'APP_NAME', "\"$buildConfigJson.overrideAppName\""
+        }else{
+            manifestPlaceholders.appName = "\"OmniTrack\""
+            buildConfigField 'String', 'APP_NAME', "\"OmniTrack\""
+        }
+
+        buildConfigField 'boolean', 'HIDE_TRIGGERS_TAB', "${buildConfigJson.hideTriggersTab ?: false}"
+        buildConfigField 'boolean', 'HIDE_SERVICES_TAB', "${buildConfigJson.hideServicesTab ?: false}"
+        buildConfigField 'boolean', 'SHOW_TUTORIALS', "${buildConfigJson.showTutorials == null? true : buildConfigJson.showTutorials}"
     }
 
     compileOptions {
@@ -72,18 +96,22 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.sign_test
+
+            manifestPlaceholders.appNameSuffix = ""
         }
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix '-Debug'
+
+            manifestPlaceholders.appNameSuffix = " Debug"
         }
     }
     buildTypes.each {
         buildType->
             def finalApplicationId = buildType.applicationIdSuffix ==null ? defaultConfig.applicationId : defaultConfig.applicationId + buildType.applicationIdSuffix
 
-            buildType.buildConfigField 'String', 'OMNITRACK_SYNCHRONIZATION_SERVER_URL', OMNITRACK_SYNCHRONIZATION_SERVER_URL
-            buildType.buildConfigField 'String', 'OMNITRACK_MEDIA_STORAGE_SERVER_URL', OMNITRACK_MEDIA_STORAGE_SERVER_URL
+            buildType.buildConfigField 'String', 'OMNITRACK_SYNCHRONIZATION_SERVER_URL', "\"$buildConfigJson.synchronizationServerUrl\""
+            buildType.buildConfigField 'String', 'OMNITRACK_MEDIA_STORAGE_SERVER_URL', "\"$buildConfigJson.mediaStorageUrl\""
 
             keystoreProperties.keySet().forEach{
                 buildType.buildConfigField 'String', it.toString(), keystoreProperties.getProperty(it)
@@ -109,6 +137,14 @@ android {
             buildType.buildConfigField 'String', 'FIREBASE_PROJECT_ID', "\"$firebaseProjectId\""
             buildType.buildConfigField 'String', 'FIREBASE_AUTH_CLIENT_ID', "\"$googleAuthClientId\""
             buildType.buildConfigField 'String', 'FIREBASE_CLIENT_ID', "\"$mobileSdkAppId\""
+
+            if(buildConfigJson.disableExternalEntities == true && buildConfigJson.defaultExperimentId != null && buildConfigJson.defaultExperimentId.length() > 0){
+                buildType.buildConfigField 'boolean', 'DISABLE_EXTERNAL_ENTITIES', "true"
+            }
+            else buildType.buildConfigField 'boolean', 'DISABLE_EXTERNAL_ENTITIES', "false"
+
+            buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "\"$buildConfigJson.defaultExperimentId\""
+
     }
 
     sourceSets {

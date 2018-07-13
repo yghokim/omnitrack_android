@@ -38,6 +38,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.tracker_list_element.view.*
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
@@ -167,7 +168,6 @@ class TrackerListFragment : OTFragment() {
         // user.trackerAdded += onTrackerAddedHandler
         //  user.trackerRemoved += onTrackerRemovedHandler
 
-
         trackerListAdapter = TrackerListAdapter()
         trackerListAdapter.currentlyExpandedIndex = savedInstanceState?.getInt(STATE_EXPANDED_TRACKER_INDEX, -1) ?: -1
     }
@@ -188,12 +188,18 @@ class TrackerListFragment : OTFragment() {
         val rootView = inflater.inflate(R.layout.fragment_recyclerview_and_fab, container, false)
 
         addTrackerFloatingButton = rootView.findViewById(R.id.fab)
-        addTrackerFloatingButton.setOnClickListener { view ->
-            newTrackerNameDialog.input(null, viewModel.generateNewTrackerName(), false) { dialog, text ->
-                startActivityForResult(TrackerDetailActivity.makeNewTrackerIntent(text.toString(), act), REQUEST_CODE_NEW_TRACKER)
 
-            }.show()
-            //Toast.makeText(context,String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
+        if (BuildConfig.DISABLE_EXTERNAL_ENTITIES) {
+            addTrackerFloatingButton.visibility = View.GONE
+            addTrackerFloatingButton.isEnabled = false
+        } else {
+            addTrackerFloatingButton.setOnClickListener { view ->
+                newTrackerNameDialog.input(null, viewModel.generateNewTrackerName(), false) { dialog, text ->
+                    startActivityForResult(TrackerDetailActivity.makeNewTrackerIntent(text.toString(), act), REQUEST_CODE_NEW_TRACKER)
+
+                }.show()
+                //Toast.makeText(context,String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
+            }
         }
 
         listView = rootView.findViewById(R.id.ui_recyclerview_with_fallback)

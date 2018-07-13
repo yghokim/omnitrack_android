@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.support.annotation.StringRes
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -30,9 +31,6 @@ import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), DrawerLayout.DrawerListener {
 
     companion object {
-        const val TAB_INDEX_TRACKERS = 0
-        const val TAB_INDEX_TRIGGERS = 1
-        const val TAB_INDEX_SERVICES = 2
 
         const val INTENT_EXTRA_INITIAL_LOGIN = "${BuildConfig.APPLICATION_ID}.extra.initial_login"
     }
@@ -52,6 +50,19 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
     private lateinit var viewModel: HomeScreenViewModel
 
+    private val homeTabInfos: Array<HomeTabInfo>
+
+    init {
+        val homeTabs = HomeTabInfo.values().toMutableList()
+        if (BuildConfig.HIDE_SERVICES_TAB) {
+            homeTabs.remove(HomeTabInfo.TAB_SERVICES)
+        }
+        if (BuildConfig.HIDE_TRIGGERS_TAB) {
+            homeTabs.remove(HomeTabInfo.TAB_TRIGGERS)
+        }
+        homeTabInfos = homeTabs.toTypedArray()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -64,6 +75,11 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
         // primary sections of the activity.
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
 
+        if (BuildConfig.HIDE_TRIGGERS_TAB && BuildConfig.HIDE_SERVICES_TAB) {
+            //only a tracker tab exists. hide tab bar.
+            tabLayout.visibility = View.GONE
+        }
+
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabReselected(tab: TabLayout.Tab) {
 
@@ -73,7 +89,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
             }
 
             override fun onTabSelected(tab: TabLayout.Tab) {
-                if (tab.position != TAB_INDEX_TRACKERS) {
+                if (homeTabInfos[tab.position] != HomeTabInfo.TAB_TRACKERS) {
                     if (BuildConfig.DEBUG) {
                         rightActionBarButton?.setImageResource(R.drawable.settings_dark)
                     } else {
@@ -104,28 +120,26 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
                     user ->
                     viewModel = ViewModelProviders.of(this).get(HomeScreenViewModel::class.java)
                     viewModel.userId = user
-                    println("OMNITRACK: signed in user instance received.")
                     //Ask permission if needed
-                    if (TutorialManager.hasShownTutorials(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER)) {
+                    if (BuildConfig.SHOW_TUTORIALS && TutorialManager.hasShownTutorials(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER)) {
                         val tabs = tabLayout.getChildAt(0) as ViewGroup
                         TutorialManager.checkAndShowSequence("home_main_tabs", true, this, false,
-                                listOf(
-                                        TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_trackers_primary,
+                                homeTabInfos.mapIndexed { index, info ->
+                                    when (info) {
+                                        HomeTabInfo.TAB_TRACKERS -> TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_trackers_primary,
                                                 R.string.msg_tutorial_home_tab_trackers_secondary,
                                                 ContextCompat.getColor(this, R.color.colorPointed),
-                                                tabs.getChildAt(TAB_INDEX_TRACKERS), 50
-                                        ),
-                                        TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_triggers_primary,
+                                                tabs.getChildAt(index), 50)
+                                        HomeTabInfo.TAB_TRIGGERS -> TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_triggers_primary,
                                                 R.string.msg_tutorial_home_tab_triggers_secondary,
                                                 ContextCompat.getColor(this, R.color.colorPointed),
-                                                tabs.getChildAt(TAB_INDEX_TRIGGERS), 50
-                                        ),
-                                        TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_services_primary,
+                                                tabs.getChildAt(index), 50)
+                                        HomeTabInfo.TAB_SERVICES -> TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_services_primary,
                                                 R.string.msg_tutorial_home_tab_services_secondary,
                                                 ContextCompat.getColor(this, R.color.colorPointed),
-                                                tabs.getChildAt(TAB_INDEX_SERVICES), 50
-                                        )
-                                ))
+                                                tabs.getChildAt(index), 50)
+                                    }
+                                })
                     }
 
                     if(intent.getBooleanExtra(INTENT_EXTRA_INITIAL_LOGIN, false))
@@ -149,7 +163,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     }
 
     override fun onToolbarRightButtonClicked() {
-        if (tabLayout.selectedTabPosition == TAB_INDEX_TRACKERS) {
+        if (homeTabInfos[tabLayout.selectedTabPosition] == HomeTabInfo.TAB_TRACKERS) {
             val intent = Intent(this, TrackerReorderActivity::class.java)
             startActivity(intent)
             overridePendingTransition(R.anim.anim_slide_up, R.anim.anim_noop)
@@ -201,6 +215,14 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
     }
 
+
+    enum class HomeTabInfo(@StringRes val labelRes: Int, val fragmentFunc: () -> Fragment) {
+        TAB_TRACKERS(R.string.msg_tab_trackers, { TrackerListFragment() }),
+        TAB_TRIGGERS(R.string.msg_tab_background_loggers, { LoggingTriggerListFragment() }),
+        TAB_SERVICES(R.string.msg_tab_services, { ServiceListFragment() }),
+
+    }
+
     /**
      * A [FragmentPagerAdapter] that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -208,26 +230,16 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
         override fun getItem(position: Int): Fragment {
-            when (position) {
-                TAB_INDEX_TRACKERS -> return TrackerListFragment()
-                TAB_INDEX_TRIGGERS -> return LoggingTriggerListFragment()
-                TAB_INDEX_SERVICES -> return ServiceListFragment()
-                else -> throw Exception("wrong tab index")
-            }
+            return homeTabInfos[position].fragmentFunc()
         }
 
         override fun getCount(): Int {
             // Show 3 total pages.
-            return 3
+            return homeTabInfos.size
         }
 
         override fun getPageTitle(position: Int): CharSequence? {
-            when (position) {
-                TAB_INDEX_TRACKERS -> return resources.getString(R.string.msg_tab_trackers)
-                TAB_INDEX_TRIGGERS -> return resources.getString(R.string.msg_tab_background_loggers)
-                TAB_INDEX_SERVICES -> return resources.getString(R.string.msg_tab_services)
-            }
-            return null
+            return resources.getString(homeTabInfos[position].labelRes)
         }
     }
 

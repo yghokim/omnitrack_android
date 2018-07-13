@@ -114,7 +114,12 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             setText(viewModel.emptyMessageResId)
         }
 
-        ui_button_new_trigger.setOnClickListener(this)
+        if (viewModel.defaultTriggerInterfaceOptions.allowAddNew) {
+            ui_button_new_trigger.setOnClickListener(this)
+            ui_button_new_trigger.visibility = View.VISIBLE
+        } else {
+            ui_button_new_trigger.visibility = View.GONE
+        }
 
         creationSubscriptions.add(
                 viewModel.currentTriggerViewModelListObservable.subscribe { newList ->

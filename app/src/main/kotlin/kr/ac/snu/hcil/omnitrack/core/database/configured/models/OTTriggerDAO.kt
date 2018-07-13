@@ -166,6 +166,9 @@ open class OTTriggerDAO : RealmObject() {
 
     var serializedCreationFlags: String = "{}"
 
+    @Index
+    var experimentIdInFlags: String? = null
+
     @Ignore
     private var _parsedLockedPropertyInfo: JsonObject? = null
 

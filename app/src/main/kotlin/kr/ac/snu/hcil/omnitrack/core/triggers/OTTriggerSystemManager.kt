@@ -4,6 +4,7 @@ import android.content.Context
 import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
@@ -47,19 +48,22 @@ class OTTriggerSystemManager(
 
     fun tryCheckInToSystem(managedTrigger: OTTriggerDAO): Boolean {
         println("TriggerSystemManager: tryCheckInToSystem: ${managedTrigger.objectId}")
-        if (managedTrigger.isOn) {
-            when (managedTrigger.conditionType) {
-                OTTriggerDAO.CONDITION_TYPE_TIME -> {
-                    triggerAlarmManager.get().continueTriggerInChainIfPossible(managedTrigger)
-                    if (managedTrigger.isOn) {
-                        if (!settingsPrompter.isBatteryOptimizationWhiteListed()) {
-                            settingsPrompter.askUserBatterOptimizationWhitelist()
+        if (BuildConfig.DISABLE_EXTERNAL_ENTITIES == false || managedTrigger.experimentIdInFlags == BuildConfig.DEFAULT_EXPERIMENT_ID) {
+            if (managedTrigger.isOn) {
+
+                when (managedTrigger.conditionType) {
+                    OTTriggerDAO.CONDITION_TYPE_TIME -> {
+                        triggerAlarmManager.get().continueTriggerInChainIfPossible(managedTrigger)
+                        if (managedTrigger.isOn) {
+                            if (!settingsPrompter.isBatteryOptimizationWhiteListed()) {
+                                settingsPrompter.askUserBatterOptimizationWhitelist()
+                            }
                         }
                     }
                 }
+            } else {
+                handleTriggerOff(managedTrigger)
             }
-        } else {
-            handleTriggerOff(managedTrigger)
         }
         return false
     }
@@ -99,11 +103,15 @@ class OTTriggerSystemManager(
 
         val triggers = realm.where(OTTriggerDAO::class.java)
                 .equalTo(BackendDbManager.FIELD_USER_ID, userId)
+                .equalTo(BackendDbManager.FIELD_REMOVED_BOOLEAN, false)
                 .equalTo("isOn", true)
                 .findAll()
+
         triggers.forEach { trigger ->
             if (trigger.liveTrackerCount > 0) {
-                tryCheckInToSystem(trigger)
+                if (BuildConfig.DISABLE_EXTERNAL_ENTITIES && trigger.experimentIdInFlags != BuildConfig.DEFAULT_EXPERIMENT_ID) {
+                    tryCheckOutFromSystem(trigger)
+                } else tryCheckInToSystem(trigger)
             }
         }
         val numTriggers = triggers.size

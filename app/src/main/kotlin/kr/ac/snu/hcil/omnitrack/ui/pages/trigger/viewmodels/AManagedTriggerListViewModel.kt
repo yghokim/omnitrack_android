@@ -5,7 +5,6 @@ import io.realm.OrderedCollectionChangeSet
 import io.realm.RealmQuery
 import io.realm.RealmResults
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
-import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
@@ -43,8 +42,8 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
 
     protected fun init() {
         onDispose()
-
-        currentTriggerRealmResults = hookTriggerQuery(realm.where(OTTriggerDAO::class.java).equalTo(BackendDbManager.FIELD_REMOVED_BOOLEAN, false))
+        currentTriggerRealmResults = hookTriggerQuery(
+                dbManager.get().makeTriggersOfUserQuery(authManager.userId!!, realm))
                 .findAllAsync()
 
         currentTriggerRealmResults?.addChangeListener { snapshot, changeSet ->

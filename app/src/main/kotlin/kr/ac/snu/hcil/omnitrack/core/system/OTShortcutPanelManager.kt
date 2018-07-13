@@ -19,6 +19,7 @@ import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
@@ -197,7 +198,7 @@ class OTShortcutPanelManager @Inject constructor(
                 val noti = NotificationCompat.Builder(context, OTNotificationManager.CHANNEL_ID_WIDGETS)
                         .setSmallIcon(R.drawable.icon_simple)
                         .setLargeIcon(VectorIconHelper.getConvertedBitmap(context, R.drawable.icon_simple))
-                        .setContentTitle(context.resources.getString(R.string.app_name))
+                        .setContentTitle(BuildConfig.APP_NAME)
                         .setCustomBigContentView(bigView)
                         .setCustomContentView(normalView)
                         .setOnlyAlertOnce(true)

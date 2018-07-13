@@ -7,6 +7,7 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
@@ -58,7 +59,9 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                 }
 
                 "flags" -> {
-                    dao.serializedCreationFlags = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
+                    val flagObject = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java)
+                    dao.serializedCreationFlags = flagObject.toString()
+                    dao.experimentIdInFlags = CreationFlagsHelper.getExperimentId(flagObject)
                 }
 
                 "trackers" -> {
@@ -188,6 +191,16 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                 }
                 "script" -> {
                     applyTo.additionalScript = json.getStringCompat(key)
+                }
+                "flags" -> {
+                    try {
+                        val flagObject = json.getAsJsonObject(key)
+                        applyTo.serializedCreationFlags = flagObject.toString()
+                        applyTo.experimentIdInFlags = CreationFlagsHelper.getExperimentId(flagObject)
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                        applyTo.serializedCreationFlags = "null"
+                    }
                 }
             }
         }

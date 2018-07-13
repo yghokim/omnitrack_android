@@ -13,6 +13,7 @@ google-services.json
 gradle.properties
 keystore.debug.properties
 keystore.properties
+omnitrackBuildConfig.json
 *.iml
 
 /.idea/

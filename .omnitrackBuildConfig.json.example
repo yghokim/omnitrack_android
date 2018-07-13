@@ -1,0 +1,17 @@
+{
+  "synchronizationServerUrl": null,
+  "mediaStorageUrl": null,
+  "defaultExperimentId": null,
+  "overridePackageName": null,
+  "overrideAppName": null,
+  "disableExternalEntities": false,
+  "signing": {
+    "releaseKeystoreLocation": null,
+    "releaseAlias": null,
+    "releaseKeyPassword": null,
+    "releaseStorePassword": null
+  },
+  "showTutorials": true,
+  "hideServicesTab": false,
+  "hideTriggersTab": false
+}

@@ -62,6 +62,9 @@ open class OTTrackerDAO : RealmObject() {
 
     var serializedCreationFlags: String = "{}"
 
+    @Index
+    var experimentIdInFlags: String? = null
+
     var serializedLockedPropertyInfo: String = "{}"
 
     var userCreatedAt: Long = System.currentTimeMillis()

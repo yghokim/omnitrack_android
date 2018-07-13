@@ -1,5 +1,6 @@
-cp -i .gradle.properties.example gradle.properties
 cp -i .keystore.properties.example keystore.properties
+cp -i .omnitrackBuildConfig.json.example omnitrackBuildConfig.json
+
 git submodule update --init --recursive
 git submodule foreach "(git checkout master; git pull)&"
 cd omnitrack_visualization_core && npm install

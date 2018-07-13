@@ -1,6 +1,8 @@
 @echo Generate properties with placeholder contents.
-COPY /-Y .gradle.properties.example gradle.properties
 COPY /-Y .keystore.properties.example keystore.properties
+COPY /-Y .omnitrackBuildConfig.json.example omnitrackBuildConfig.json
+
+
 
 @echo update git submodules.
 git submodule update --init --recursive

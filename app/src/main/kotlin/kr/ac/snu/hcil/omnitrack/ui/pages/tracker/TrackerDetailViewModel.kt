@@ -151,6 +151,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                     realm.executeTransactionIfNotIn {
                         trackerDao?.serializedCreationFlags = CreationFlagsHelper.Builder(trackerDao?.serializedCreationFlags
                                 ?: "{}").setExperiment(value).build()
+                        trackerDao?.experimentIdInFlags = value
                         trackerDao?.clearCreationFlagsCache()
                         trackerDao?.synchronizedAt = null
                     }

@@ -6,6 +6,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
@@ -39,7 +40,11 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
                 "color" -> dao.color = reader.nextInt()
                 "isBookmarked" -> dao.isBookmarked = reader.nextBoolean()
                 BackendDbManager.FIELD_LOCKED_PROPERTIES_SERIALIZED -> dao.serializedLockedPropertyInfo = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
-                "flags" -> dao.serializedCreationFlags = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
+                "flags" -> {
+                    val flagObject = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java)
+                    dao.serializedCreationFlags = flagObject.toString()
+                    dao.experimentIdInFlags = CreationFlagsHelper.getExperimentId(flagObject)
+                }
                 "attributes" -> {
                     reader.beginArray()
 
@@ -109,7 +114,16 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
                 "color" -> applyTo.color = json.getIntCompat(key) ?: OTApp.instance.colorPalette[0]
                 "isBookmarked" -> applyTo.isBookmarked = json.getBooleanCompat(key) ?: false
                 "lockedProperties"->applyTo.serializedLockedPropertyInfo = json[key]?.toString() ?: "null"
-                "flags"->applyTo.serializedCreationFlags = json[key]?.toString() ?: "null"
+                "flags" -> {
+                    try {
+                        val flagObject = json.getAsJsonObject(key)
+                        applyTo.serializedCreationFlags = flagObject.toString()
+                        applyTo.experimentIdInFlags = CreationFlagsHelper.getExperimentId(flagObject)
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                        applyTo.serializedCreationFlags = "null"
+                    }
+                }
                 "attributes"->{
                     val jsonList = try{json[key]?.asJsonArray}catch(ex:Exception){null}
                     if(jsonList!=null)

@@ -10,5 +10,6 @@ data class TriggerInterfaceOptions(
         val showAttachedTrackers: Boolean = true,
         val defaultAttachedTrackers: Array<String>? = null,
         val supportedConditionTypes: Array<Byte>? = null,
-        val defaultActionType: Byte = OTTriggerDAO.ACTION_TYPE_LOG
+        val defaultActionType: Byte = OTTriggerDAO.ACTION_TYPE_LOG,
+        val allowAddNew: Boolean = true
 ) : Serializable

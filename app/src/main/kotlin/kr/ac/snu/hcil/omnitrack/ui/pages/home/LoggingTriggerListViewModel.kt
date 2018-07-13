@@ -2,14 +2,20 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.app.Application
 import io.realm.RealmQuery
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerInterfaceOptions
 
 /**
  * Created by younghokim on 2017. 10. 21..
  */
 class LoggingTriggerListViewModel(app: Application) : AManagedTriggerListViewModel(app) {
+
+    override val defaultTriggerInterfaceOptions: TriggerInterfaceOptions = if (BuildConfig.DISABLE_EXTERNAL_ENTITIES) {
+        TriggerInterfaceOptions(allowAddNew = false)
+    } else TriggerInterfaceOptions()
 
     var userId: String? = null
         private set

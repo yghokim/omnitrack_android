@@ -3,11 +3,14 @@ package kr.ac.snu.hcil.omnitrack.core.database.configured
 import io.realm.DynamicRealm
 import io.realm.FieldAttribute
 import io.realm.RealmMigration
+import io.realm.RealmObjectSchema
+import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerAlarmInstance
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerReminderEntry
 
 
 class BackendRealmMigration : RealmMigration {
+
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
         val schema = realm.schema
 
@@ -32,6 +35,28 @@ class BackendRealmMigration : RealmMigration {
                     ?.transform {
                         it.setNull(OTTriggerReminderEntry.FIELD_AUTO_EXPIRY_ALARM_ID)
                         it.setBoolean(OTTriggerReminderEntry.FIELD_IS_AUTO_EXPIRY_ALARM_RESERVED_WHEN_DEVICE_ACTIVE, false)
+                    }
+
+            val entityTransform = RealmObjectSchema.Function { obj ->
+                obj.getString("serializedCreationFlags")?.let { serializedCreationFlags ->
+                    try {
+                        CreationFlagsHelper.getExperimentId(
+                                CreationFlagsHelper.parseFlags(serializedCreationFlags)
+                        )?.let { experimentId ->
+                            obj.setString(BackendDbManager.FIELD_EXPERIMENT_ID_IN_FLAGS, experimentId)
+                        } ?: obj.setNull(BackendDbManager.FIELD_EXPERIMENT_ID_IN_FLAGS)
+                    } catch (ex: Exception) {
+                        obj.setNull(BackendDbManager.FIELD_EXPERIMENT_ID_IN_FLAGS)
+                    }
+                } ?: obj.setNull(BackendDbManager.FIELD_EXPERIMENT_ID_IN_FLAGS)
+            }
+
+            arrayOf("OTTriggerDAO", "OTTrackerDAO")
+                    .forEach {
+                        schema.get(it)
+                                ?.addField(BackendDbManager.FIELD_EXPERIMENT_ID_IN_FLAGS, String::class.java)
+                                ?.setNullable(BackendDbManager.FIELD_EXPERIMENT_ID_IN_FLAGS, true)
+                                ?.transform(entityTransform)
                     }
 
             oldVersionPointer++

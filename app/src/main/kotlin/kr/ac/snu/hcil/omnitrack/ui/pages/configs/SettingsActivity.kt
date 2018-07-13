@@ -19,6 +19,7 @@ import dagger.internal.Factory
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import kotlinx.android.synthetic.main.common_toolbar_with_buttons.*
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
@@ -139,7 +140,7 @@ class SettingsActivity : AppCompatActivity() {
                             turnOnIgnoreBatteryOptimizationForwardingDialog = DialogHelper
                                     .makeSimpleAlertBuilder(activity,
                                             TextHelper.fromHtml(
-                                                    String.format(getString(R.string.msg_pref_dialog_content_ignore_battery_optimization_off), getString(R.string.app_name))
+                                                    String.format(getString(R.string.msg_pref_dialog_content_ignore_battery_optimization_off), BuildConfig.APP_NAME)
                                             ),
                                             R.string.msg_open) {
                                         settingsPrompter.askUserBatterOptimizationWhitelist()

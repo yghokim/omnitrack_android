@@ -34,7 +34,7 @@ class AboutActivity : MaterialAboutActivity() {
                 MaterialAboutCard.Builder()
                         .addItem(MaterialAboutTitleItem.Builder()
                                 .icon(R.drawable.icon)
-                                .text(R.string.app_name)
+                                .text(BuildConfig.APP_NAME)
                                 .build()
                         )
                         .addItem(MaterialAboutActionItem.Builder()

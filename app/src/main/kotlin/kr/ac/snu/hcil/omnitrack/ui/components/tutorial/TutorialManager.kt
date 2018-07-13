@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.view.View
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 
@@ -38,7 +39,7 @@ object TutorialManager {
     }
 
     fun checkAndShowSequence(tag: String, closeFlagAfterClose: Boolean, activity: Activity, stopWhenTappedTarget: Boolean, sequenceList: List<TapTargetInfo>): Boolean {
-        if (DEBUG_ALWAYS_SHOW_TUTORIAL || !hasShownTutorials(tag)) {
+        if ((DEBUG_ALWAYS_SHOW_TUTORIAL || !hasShownTutorials(tag)) && BuildConfig.SHOW_TUTORIALS) {
 
             val list = sequenceList.mapIndexed { index, sequence ->
                 val sequenceFlagKey = "${tag}_seq_${index}"
@@ -83,7 +84,7 @@ object TutorialManager {
     }
 
     fun checkAndShowTargetPrompt(tag: String, closeFlagAfterClose: Boolean, activity: Activity, target: View, primaryText: String?, secondaryText: String?, backgroundColor: Int, focalColorAlpha: Int = 255): Boolean {
-        if (DEBUG_ALWAYS_SHOW_TUTORIAL || !hasShownTutorials(tag)) {
+        if ((DEBUG_ALWAYS_SHOW_TUTORIAL || !hasShownTutorials(tag)) && BuildConfig.SHOW_TUTORIALS) {
             val builder = MaterialTapTargetPrompt.Builder(activity)
                     .setTarget(target)
                     .setFocalColour(Color.TRANSPARENT)
