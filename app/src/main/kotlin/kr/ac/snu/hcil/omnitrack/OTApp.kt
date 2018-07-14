@@ -62,6 +62,8 @@ class OTApp : MultiDexApplication(), LifecycleObserver {
         const val INTENT_EXTRA_OBJECT_ID_TRIGGER = "triggerObjectId"
         const val INTENT_EXTRA_OBJECT_ID_ITEM = "itemDbId"
 
+        const val INTENT_EXTRA_METADATA = "metadata"
+
         val INTENT_EXTRA_CONFIGURATION_ID = "${BuildConfig.APPLICATION_ID}.extra.configurationId"
 
         const val INTENT_EXTRA_TRIGGER_TIME = "triggerTime"

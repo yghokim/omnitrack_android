@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.items
 import android.app.Application
 import io.reactivex.Maybe
 import io.reactivex.Single
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
@@ -127,10 +128,13 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         if (isValid) {
             return isBusyObservable.filter { !it }.firstOrError().flatMapMaybe {
                 refreshDaoValues()
-                val item = builderWrapper.saveToItem(null, ItemLoggingSource.Manual)
+                val item = builderWrapper.saveToItem(null, ItemLoggingSource.Manual, metadataForItem)
 
                 return@flatMapMaybe Maybe.fromSingle<String>(dbManager.get().saveItemObservable(item, false, null, realm).map { it.second })
-                        .doAfterSuccess { syncItemToServer() }
+                        .doAfterSuccess {
+                            syncItemToServer()
+                            OTApp.logger.writeSystemLog("Logged new item in the page. metadata: \n${item.serializedMetadata}", "NewItemCreationViewModel")
+                        }
             }
         } else return Maybe.just(null)
     }

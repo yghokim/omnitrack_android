@@ -61,6 +61,21 @@ class BackendRealmMigration : RealmMigration {
 
             oldVersionPointer++
         }
+
+        if (oldVersionPointer == 2L) {
+
+            arrayOf("OTTriggerSchedule", "OTTriggerReminderEntry", "OTItemDAO")
+                    .forEach {
+                        schema.get(it)
+                                ?.addField(BackendDbManager.FIELD_METADATA_SERIALIZED, String::class.java)
+                                ?.setNullable(BackendDbManager.FIELD_METADATA_SERIALIZED, true)
+                                ?.transform {
+                                    it.setNull(BackendDbManager.FIELD_METADATA_SERIALIZED)
+                                }
+                    }
+
+            oldVersionPointer++
+        }
     }
 
     override fun hashCode(): Int {

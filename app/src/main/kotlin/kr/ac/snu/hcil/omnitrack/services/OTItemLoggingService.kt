@@ -119,7 +119,8 @@ class OTItemLoggingService : ConfigurableWakefulService(TAG) {
 
                             wrapper.makeAutoCompleteObservable(realmProvider, applyToBuilder = true)
                                     .ignoreElements().toSingleDefault(trackerId).flatMap {
-                                val item = wrapper.saveToItem(null, loggingSource)
+                                        //TODO put metadata
+                                        val item = wrapper.saveToItem(null, loggingSource, null)
                                 pushedItemDao = item
                                 dbManager.saveItemObservable(item, true, null, realm)
                             }.doOnSubscribe {

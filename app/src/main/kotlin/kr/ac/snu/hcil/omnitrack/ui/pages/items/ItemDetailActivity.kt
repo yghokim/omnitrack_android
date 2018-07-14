@@ -69,11 +69,12 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
             return intent
         }
 
-        fun makeReminderOpenIntent(trackerId: String, reminderTime: Long, context: Context): Intent {
+        fun makeReminderOpenIntent(trackerId: String, reminderTime: Long, metadata: JsonObject, context: Context): Intent {
             val intent = Intent(context, ItemDetailActivity::class.java)
             intent.action = INTENT_ACTION_NEW
             intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             intent.putExtra(INTENT_EXTRA_REMINDER_TIME, reminderTime)
+            intent.putExtra(OTApp.INTENT_EXTRA_METADATA, metadata.toString())
             intent.putExtra(INTENT_EXTRA_IGNORE_CACHED_INPUT, true)
             return intent
         }
@@ -235,10 +236,8 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         )
 
         val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
-        viewModel.init(trackerId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM))
-
+        viewModel.init(trackerId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM), intent.getStringExtra(OTApp.INTENT_EXTRA_METADATA)?.let { (application as OTApp).applicationComponent.genericGson().fromJson(it, JsonObject::class.java) })
     }
-
 
     override fun onPause() {
         super.onPause()

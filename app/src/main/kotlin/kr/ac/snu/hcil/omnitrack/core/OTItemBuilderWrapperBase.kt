@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core
 
+import com.google.gson.JsonObject
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -39,7 +40,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext:
         }
     }
 
-    fun saveToItem(itemDao: OTItemDAO?, loggingSource: ItemLoggingSource?): OTItemDAO {
+    fun saveToItem(itemDao: OTItemDAO?, loggingSource: ItemLoggingSource?, metadata: JsonObject?): OTItemDAO {
         val itemDaoToSave = itemDao ?: OTItemDAO()
         if (itemDao == null) {
             itemDaoToSave.deviceId = OTApp.instance.deviceId
@@ -57,6 +58,8 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext:
                 itemDaoToSave.setValueOf(it, builderFieldEntry.serializedValue)
             }
         }
+
+        itemDaoToSave.serializedMetadata = metadata?.toString()
 
         return itemDaoToSave
     }

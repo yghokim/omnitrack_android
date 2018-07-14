@@ -12,6 +12,8 @@ import android.os.PowerManager
 import android.support.v4.app.AlarmManagerCompat
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
@@ -26,6 +28,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerReminderEntry
 import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
+import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.di.global.ReminderNotification
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTrackingNotificationFactory
@@ -47,6 +50,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
+import javax.inject.Provider
 
 class OTReminderCommands(val configuredContext: ConfiguredContext, val context: Context) {
 
@@ -68,6 +72,9 @@ class OTReminderCommands(val configuredContext: ConfiguredContext, val context: 
 
     @field:[Inject Backend]
     protected lateinit var realmProvider: Factory<Realm>
+
+    @field:[Inject ForGeneric]
+    protected lateinit var gson: Provider<Gson>
 
     fun getNewRealm(): Realm {
         return realmProvider.get()
@@ -113,24 +120,35 @@ class OTReminderCommands(val configuredContext: ConfiguredContext, val context: 
     }
 
     internal fun onUserAccessed(startId: Int, triggerId: String, trackerId: String, entryId: Long, triggerTime: Long): Completable {
-        return handleEntry(entryId) { entry ->
-            entry.realm.executeTransaction {
-                entry.accessedAt = System.currentTimeMillis()
-            }
-        }.andThen(Completable.defer {
+        return Completable.defer {
             val realm = realmProvider.get()
-            val trigger = dbManager.getTriggerQueryWithId(triggerId, realm).findFirst()
-            if (trigger != null) {
-                trigger.liveTrackersQuery.equalTo(BackendDbManager.FIELD_OBJECT_ID, trackerId).findFirst()?.let {
-                    ItemDetailActivity.makeReminderOpenIntent(it.objectId!!, triggerTime, context)
-                }?.let {
-                    it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    context.startActivity(it)
+            val entry = realm.where(OTTriggerReminderEntry::class.java)
+                    .equalTo("id", entryId).findFirst()
+            if (entry != null) {
+                val metadata = entry.serializedMetadata?.let { gson.get().fromJson(it, JsonObject::class.java) }
+                        ?: JsonObject()
+                metadata.addProperty("accessedScreenAt", System.currentTimeMillis())
+                entry.realm.executeTransaction {
+                    entry.accessedAt = System.currentTimeMillis()
+                    entry.serializedMetadata = metadata.toString()
+                }
+
+                val trigger = dbManager.getTriggerQueryWithId(triggerId, realm).findFirst()
+                if (trigger != null) {
+                    trigger.liveTrackersQuery.equalTo(BackendDbManager.FIELD_OBJECT_ID, trackerId).findFirst()?.let {
+                        ItemDetailActivity.makeReminderOpenIntent(it.objectId!!, triggerTime, metadata, context)
+                    }?.let {
+                        it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                        context.runOnUiThread {
+                            startActivity(it)
+                        }
+                    }
                 }
             }
+
             realm.close()
             return@defer Completable.complete()
-        })
+        }.subscribeOn(Schedulers.io())
     }
 
     internal fun onUserDismissed(startId: Int, triggerId: String, entryId: Long): Completable {
@@ -150,7 +168,7 @@ class OTReminderCommands(val configuredContext: ConfiguredContext, val context: 
         }.subscribeOn(Schedulers.io())
     }
 
-    internal fun remind(triggerId: String, triggerTime: Long): Completable {
+    internal fun remind(triggerId: String, triggerTime: Long, metadata: JsonObject): Completable {
         return Completable.defer {
             val realm = realmProvider.get()
 
@@ -181,7 +199,7 @@ class OTReminderCommands(val configuredContext: ConfiguredContext, val context: 
 
                                 pendingEntries.forEach { it.dismissed = true }
 
-                                val entry = insertNewReminderEntry(trigger, tracker.objectId!!, action, triggerTime, realm)
+                                val entry = insertNewReminderEntry(trigger, tracker.objectId!!, action, triggerTime, metadata, realm)
                                 val notiBuilder = buildNotificationFromEntry(entry, trigger, tracker)
                                 if (notiBuilder != null) {
                                     notifyNotification(entry, notiBuilder.build(), true)
@@ -202,15 +220,6 @@ class OTReminderCommands(val configuredContext: ConfiguredContext, val context: 
         }
                 .subscribeOn(Schedulers.io())
 
-    }
-
-    private fun handleEntry(entryId: Long, handler: (OTTriggerReminderEntry) -> Unit): Completable {
-        return Completable.defer {
-            val realm = realmProvider.get()
-            handleEntrySyncImpl(entryId, realm, handler)
-            realm.close()
-            return@defer Completable.complete()
-        }.subscribeOn(Schedulers.io())
     }
 
     private fun dismiss(entryId: Long): Completable {
@@ -265,22 +274,17 @@ class OTReminderCommands(val configuredContext: ConfiguredContext, val context: 
 
     }
 
-    internal fun handleEntrySyncImpl(entryId: Long, realm: Realm, handler: (OTTriggerReminderEntry) -> Unit) {
+    internal fun dismissSyncImpl(entryId: Long, realm: Realm): Boolean {
         val entry = realm.where(OTTriggerReminderEntry::class.java)
                 .equalTo("id", entryId).findFirst()
         if (entry != null) {
-            handler.invoke(entry)
-        }
-    }
-
-    internal fun dismissSyncImpl(entryId: Long, realm: Realm) {
-        handleEntrySyncImpl(entryId, realm) { entry ->
-            entry.realm.executeTransaction { realm ->
+            realm.executeTransactionIfNotIn { realm ->
                 entry.dismissed = true
             }
             context.notificationManager.cancel(TAG, entry.systemIntrinsicId)
             cancelAutoExpiryAlarm(entry)
-        }
+            return true
+        } else return false
     }
 
     internal fun restoreReminderNotifications(realm: Realm): Completable {
@@ -307,6 +311,8 @@ class OTReminderCommands(val configuredContext: ConfiguredContext, val context: 
     }
 
     internal fun handlSystemRebootSyncImpl(realm: Realm) {
+
+
         val pendingEntries = realm.where(OTTriggerReminderEntry::class.java)
                 .equalTo("dismissed", false)
                 .sort("autoExpireAt", Sort.DESCENDING)
@@ -323,6 +329,7 @@ class OTReminderCommands(val configuredContext: ConfiguredContext, val context: 
                             entry.triggerId = entries.first().triggerId
                             entry.trackerId = trackerId
                             entry.autoExpireAt = entries.first().autoExpireAt
+                            entry.serializedMetadata = entries.first().serializedMetadata
 
                             if (entries.first().autoExpireAt != Long.MAX_VALUE) {
                                 entry.timeoutDuration = (entries.first().autoExpireAt - System.currentTimeMillis()).toInt()
@@ -353,7 +360,7 @@ class OTReminderCommands(val configuredContext: ConfiguredContext, val context: 
         }
     }
 
-    private fun insertNewReminderEntry(trigger: OTTriggerDAO, trackerId: String, action: OTReminderAction, triggerTime: Long, realm: Realm): OTTriggerReminderEntry {
+    private fun insertNewReminderEntry(trigger: OTTriggerDAO, trackerId: String, action: OTReminderAction, triggerTime: Long, metadata: JsonObject, realm: Realm): OTTriggerReminderEntry {
         val entry = realm.createObject(OTTriggerReminderEntry::class.java, entryIdGenerator.getNewUniqueLong(System.currentTimeMillis()))
         entry.level = action.notificationLevelForSystem
         entry.triggerId = trigger.objectId
@@ -361,6 +368,7 @@ class OTReminderCommands(val configuredContext: ConfiguredContext, val context: 
         entry.intrinsicTriggerTime = triggerTime
         entry.autoExpireAt = (trigger.action as? OTReminderAction)?.expiryMilliSeconds?.let { it + System.currentTimeMillis() } ?: Long.MAX_VALUE
         entry.timeoutDuration = (trigger.action as? OTReminderAction)?.expiryMilliSeconds
+        entry.serializedMetadata = metadata.toString()
 
         entry.notifiedAt = System.currentTimeMillis()
 
@@ -455,7 +463,7 @@ class OTReminderCommands(val configuredContext: ConfiguredContext, val context: 
             contentTextBase + " (${String.format(OTApp.getString(R.string.msg_noti_reminder_until), dateFormat.format(Date(expireAt)))})"
         } else contentTextBase
 
-        return OTTrackingNotificationFactory.makeBaseBuilder(context, reminderTime, OTNotificationManager.CHANNEL_ID_IMPORTANT)
+        return OTTrackingNotificationFactory.makeBaseBuilder(context, System.currentTimeMillis(), OTNotificationManager.CHANNEL_ID_IMPORTANT)
                 .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setSound(Uri.parse(

@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers.actions
 
+import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
@@ -49,7 +50,8 @@ class OTBackgroundLoggingTriggerAction : OTTriggerAction() {
 
     var notify: Boolean = true
 
-    override fun performAction(trigger: OTTriggerDAO, triggerTime: Long, configuredContext: ConfiguredContext): Completable {
+    //TODO toss metadata to item creation logic
+    override fun performAction(trigger: OTTriggerDAO, triggerTime: Long, metadata: JsonObject, configuredContext: ConfiguredContext): Completable {
         return Completable.defer {
             if (trigger.liveTrackerCount > 0) {
                 configuredContext.applicationContext.startService(

@@ -36,6 +36,8 @@ open class OTItemDAO : RealmObject() {
 
     var userUpdatedAt: Long = System.currentTimeMillis()
 
+    var serializedMetadata: String? = null
+
     @Index
     var removed: Boolean = false
 

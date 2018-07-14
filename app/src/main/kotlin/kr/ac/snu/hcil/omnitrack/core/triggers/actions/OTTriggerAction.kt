@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
  */
 abstract class OTTriggerAction {
 
-    abstract fun performAction(trigger: OTTriggerDAO, triggerTime: Long, configuredContext: ConfiguredContext): Completable
+    abstract fun performAction(trigger: OTTriggerDAO, triggerTime: Long, metadata: JsonObject, configuredContext: ConfiguredContext): Completable
 
     open fun writeEventLogContent(trigger: OTTriggerDAO, table: JsonObject) {
         table.add("trackers", jsonArray(*trigger.liveTrackersQuery.findAll().map { it.objectId!! }.toTypedArray()))

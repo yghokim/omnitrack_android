@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import android.app.Application
+import com.google.gson.JsonObject
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -35,6 +36,9 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
     @Inject
     protected lateinit var syncManager: OTSyncManager
+
+    var metadataForItem: JsonObject? = null
+        protected set
 
     var trackerDao: OTTrackerDAO? = null
         protected set
@@ -78,7 +82,8 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
         configuredContext.configuredAppComponent.inject(this)
     }
 
-    fun init(trackerId: String, itemId: String?) {
+    fun init(trackerId: String, itemId: String?, metadata: JsonObject?) {
+        this.metadataForItem = metadata
         isValid = true
         if (trackerDao?.objectId != trackerId) {
             trackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirst()
@@ -120,7 +125,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
         val trackerId = trackerDao?.objectId
         if (trackerId != null) {
             trackerDao = null
-            init(trackerId, null)
+            init(trackerId, null, metadataForItem)
         }
     }
 

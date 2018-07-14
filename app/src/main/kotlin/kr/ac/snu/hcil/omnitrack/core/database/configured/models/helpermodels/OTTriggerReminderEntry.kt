@@ -66,4 +66,6 @@ open class OTTriggerReminderEntry : RealmObject() {
         {
             levelOrdinal = value.ordinal
         }
+
+    var serializedMetadata: String? = null
 }

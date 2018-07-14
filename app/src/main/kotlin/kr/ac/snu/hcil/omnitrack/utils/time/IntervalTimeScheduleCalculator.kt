@@ -1,8 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.utils.time
 
 import android.text.format.DateUtils
+import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
+import kr.ac.snu.hcil.omnitrack.utils.WritablePair
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfWeek
 import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
 import kr.ac.snu.hcil.omnitrack.utils.setHourOfDay
@@ -11,7 +13,7 @@ import java.util.*
 /**
  * Created by Young-Ho on 5/31/2017.
  */
-class IntervalTimeScheduleCalculator : TimeScheduleCalculator<IntervalTimeScheduleCalculator>() {
+class IntervalTimeScheduleCalculator : TimeScheduleCalculator() {
 
     var intervalMillis: Long = 0
 
@@ -49,7 +51,7 @@ class IntervalTimeScheduleCalculator : TimeScheduleCalculator<IntervalTimeSchedu
         return pivot + (skipIntervalCount + 1) * interval
     }
 
-    override fun calculateInfiniteNextTime(last: Long?, now: Long): Long? {
+    override fun calculateInfiniteNextTime(last: Long?, now: Long): WritablePair<Long, JsonObject?>? {
 
         println("trigger time last: ${last}, now: ${now}")
         OTApp.logger.writeSystemLog("calc next alarm. last: ${last?.let { LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(last)) }}, now: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(now))}", "IntervalTimeScheduleCalculator")
@@ -71,14 +73,14 @@ class IntervalTimeScheduleCalculator : TimeScheduleCalculator<IntervalTimeSchedu
             val realPivotContainingRangeStart = checkTimePointWithinAvailableRange(realPivot, boundRangeOffset, boundRangeLength)
             if (realPivotContainingRangeStart == null) {
                 //return start point of the next available range
-                return getStartOfNextAvailableRange(now, boundRangeOffset, boundRangeLength)
+                return WritablePair(getStartOfNextAvailableRange(now, boundRangeOffset, boundRangeLength), null)
             } else {
                 val next = getNearestFutureNextIntervalTime(realPivot, now, intervalMillis)
                 if (checkTimePointWithinAvailableRange(next, boundRangeOffset, boundRangeLength) != null) {
-                    return next
+                    return WritablePair(next, null)
                 } else {
                     //return start point of the next available range
-                    return getStartOfNextAvailableRange(now, boundRangeOffset, boundRangeLength)
+                    return WritablePair(getStartOfNextAvailableRange(now, boundRangeOffset, boundRangeLength), null)
                 }
             }
 
@@ -93,10 +95,10 @@ class IntervalTimeScheduleCalculator : TimeScheduleCalculator<IntervalTimeSchedu
             }
 
             if (dayPlus == 0) {
-                return next
+                return WritablePair(next, null)
             } else {
                 //return 0:00 of next available dayOfWeek
-                return TimeHelper.addDays(TimeHelper.cutTimePartFromEpoch(next), dayPlus)
+                return WritablePair(TimeHelper.addDays(TimeHelper.cutTimePartFromEpoch(next), dayPlus), null)
             }
         }
     }

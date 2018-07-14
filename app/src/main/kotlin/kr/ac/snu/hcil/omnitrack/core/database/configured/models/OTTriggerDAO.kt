@@ -250,9 +250,9 @@ open class OTTriggerDAO : RealmObject() {
         }
     }
 
-    fun getPerformFireCompletable(triggerTime: Long, configuredContext: ConfiguredContext): Completable {
+    fun getPerformFireCompletable(triggerTime: Long, metadata: JsonObject, configuredContext: ConfiguredContext): Completable {
         val triggerId = objectId
-        return (action?.performAction(this, triggerTime, configuredContext)
+        return (action?.performAction(this, triggerTime, metadata, configuredContext)
                 ?: Completable.error(IllegalStateException("Not proper action instance is generated.")))
                 .doOnComplete {
                     configuredContext.applicationContext.runOnUiThread {

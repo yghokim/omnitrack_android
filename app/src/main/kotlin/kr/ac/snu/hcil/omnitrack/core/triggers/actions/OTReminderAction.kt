@@ -8,6 +8,7 @@ import android.os.Vibrator
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import android.util.Log
+import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
@@ -184,13 +185,13 @@ class OTReminderAction : OTTriggerAction() {
         }*/
 
 
-    override fun performAction(trigger: OTTriggerDAO, triggerTime: Long, configuredContext: ConfiguredContext): Completable {
+    override fun performAction(trigger: OTTriggerDAO, triggerTime: Long, metadata: JsonObject, configuredContext: ConfiguredContext): Completable {
         return Completable.defer {
             println("trigger fired - send notification")
 
             if (trigger.liveTrackerCount > 0) {
                 val reminderCommands = OTReminderCommands(configuredContext, configuredContext.applicationContext)
-                return@defer reminderCommands.remind(trigger.objectId!!, triggerTime)
+                return@defer reminderCommands.remind(trigger.objectId!!, triggerTime, metadata)
             }
             return@defer Completable.complete()
         }

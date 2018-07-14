@@ -1,6 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.utils.time
 
+import com.github.salomonbrys.kotson.jsonObject
+import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.utils.WritablePair
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfWeek
 import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
 import kr.ac.snu.hcil.omnitrack.utils.getYear
@@ -18,7 +21,8 @@ class ExperienceSamplingTimeScheduleCalculator(
         var rangeStart: Long = System.currentTimeMillis(),
         var rangeLength: Long = TimeHelper.daysInMilli,
         var minIntervalMillis: Long = 10 * TimeHelper.minutesInMilli
-) : TimeScheduleCalculator<ExperienceSamplingTimeScheduleCalculator>() {
+) : TimeScheduleCalculator() {
+
     class Builder {
 
         private var randomSeedBase: String = ""
@@ -154,9 +158,10 @@ class ExperienceSamplingTimeScheduleCalculator(
     }
 
 
-
-    override fun calculateInfiniteNextTime(last: Long?, now: Long): Long? {
-        return calculateInfiniteNextTimeInfo(last, now)?.first
+    override fun calculateInfiniteNextTime(last: Long?, now: Long): WritablePair<Long, JsonObject?>? {
+        return calculateInfiniteNextTimeInfo(last, now)?.let {
+            WritablePair(it.first, jsonObject("pingIndex" to it.second))
+        }
     }
 
     fun calculateInfiniteNextTimeInfo(last: Long?, now: Long): Triple<Long, Int, Long>? {
@@ -201,13 +206,13 @@ class ExperienceSamplingTimeScheduleCalculator(
         return result
     }
 
-    override fun calculateNext(last: Long?, now: Long): Long? {
+    override fun calculateNext(last: Long?, now: Long): WritablePair<Long, JsonObject?>? {
         val result = calculateInfiniteNextTimeInfo(last, now)
         if (result == null) return null
         else {
             if (result.third > endAt) {
                 return null
-            } else return result.first
+            } else return WritablePair(result.first, jsonObject("pingIndex" to result.second))
         }
     }
 }

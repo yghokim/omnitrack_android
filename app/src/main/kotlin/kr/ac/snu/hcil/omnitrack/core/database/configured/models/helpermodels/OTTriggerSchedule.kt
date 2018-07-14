@@ -47,4 +47,6 @@ open class OTTriggerSchedule : RealmObject() {
     var skipped: Boolean = false
 
     var parentAlarm: OTTriggerAlarmInstance? = null
+
+    var serializedMetadata: String? = null
 }

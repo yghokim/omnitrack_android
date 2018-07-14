@@ -4,6 +4,8 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import com.github.salomonbrys.kotson.jsonObject
+import com.google.gson.JsonObject
 import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -105,7 +107,9 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                             } else {
                                 //sticky alarm
                                 if (it.trigger?.validateScriptIfExist(this.configuredContext) == true) {
-                                    it.trigger?.getPerformFireCompletable(it.intrinsicAlarmTime, configuredContext)?.blockingAwait()
+                                    val metadata = buildMetadata(it, now)
+                                    metadata.addProperty("stickyDelayed", true)
+                                    it.trigger?.getPerformFireCompletable(it.intrinsicAlarmTime, metadata, configuredContext)?.blockingAwait()
                                     OTApp.logger.writeSystemLog("Trigger was missed at ${it.intrinsicAlarmTime.toDatetimeString()}. But its sticky so perform immediately.", TAG)
                                 }
                             }
@@ -136,10 +140,10 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
 
     override fun registerTriggerAlarm(pivot: Long?, trigger: OTTriggerDAO): Boolean {
         val condition = retrieveTimeCondition(trigger)
-        val nextAlarmTime = calculateNextAlarmTime(pivot, condition, trigger.objectId!!)
-        return if (nextAlarmTime != null) {
-            OTApp.logger.writeSystemLog("Next alarm time is ${nextAlarmTime.toDatetimeString()}", TAG)
-            reserveAlarm(trigger, nextAlarmTime, !condition.isRepeated)
+        val nextAlarmTimeInfo = calculateNextAlarmTime(pivot, condition, trigger.objectId!!)
+        return if (nextAlarmTimeInfo != null) {
+            OTApp.logger.writeSystemLog("Next alarm time is ${nextAlarmTimeInfo.first.toDatetimeString()}", TAG)
+            reserveAlarm(trigger, nextAlarmTimeInfo, !condition.isRepeated)
             true
         } else {
             realmProvider.get().use { realm ->
@@ -163,6 +167,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                                 val trigger = schedule.trigger
                                 if (trigger != null) {
                                     val triggerTime = schedule.intrinsicAlarmTime
+                                    val actualTriggeredTime = System.currentTimeMillis()
 
                                     if (!schedule.oneShot) {
                                         //reserve next alarm.
@@ -186,7 +191,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
 
                                             OTApp.logger.writeSystemLog("Fire time trigger. schedule id: ${schedule.id}", TAG)
                                             if (trigger.validateScriptIfExist(configuredContext)) {
-                                                trigger.getPerformFireCompletable(triggerTime, configuredContext)
+                                                trigger.getPerformFireCompletable(triggerTime, buildMetadata(schedule, actualTriggeredTime), configuredContext)
                                             } else Completable.complete()
                                         }
                                         else -> {
@@ -208,21 +213,30 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
         }
     }
 
-    private fun reserveAlarm(trigger: OTTriggerDAO, alarmTime: Long, oneShot: Boolean): OTTriggerAlarmInstance.AlarmInfo {
+    private fun buildMetadata(schedule: OTTriggerSchedule, actualTriggeredTime: Long): JsonObject {
+        val metadata: JsonObject = schedule.serializedMetadata?.let { configuredContext.applicationComponent.genericGson().fromJson(it, JsonObject::class.java) }
+                ?: JsonObject()
+        metadata.addProperty("reservedTime", schedule.intrinsicAlarmTime)
+        metadata.addProperty("actualFireTime", actualTriggeredTime)
+        return metadata
+    }
+
+    private fun reserveAlarm(trigger: OTTriggerDAO, alarmTimeInfo: Pair<Long, JsonObject?>, oneShot: Boolean): OTTriggerAlarmInstance.AlarmInfo {
 
         var result: OTTriggerAlarmInstance.AlarmInfo? = null
         realmProvider.get().use { realm ->
 
             realm.executeTransactionIfNotIn {
                 val schedule = (realm.where(OTTriggerSchedule::class.java)
-                        .equalTo(OTTriggerSchedule.FIELD_INTRINSIC_ALARM_TIME, alarmTime)
+                        .equalTo(OTTriggerSchedule.FIELD_INTRINSIC_ALARM_TIME, alarmTimeInfo.first)
                         .equalTo("trigger.objectId", trigger.objectId).findFirst()
                         ?: realm.createObject(OTTriggerSchedule::class.java, scheduleIdGenerator.getNewUniqueLong())).apply {
                     this.trigger = trigger
                     this.stickyAlarm = trigger.condition?.isSticky ?: false
-                    this.intrinsicAlarmTime = alarmTime
+                    this.intrinsicAlarmTime = alarmTimeInfo.first
                     this.oneShot = oneShot
                     this.final = oneShot
+                    this.serializedMetadata = alarmTimeInfo.second?.toString()
                 }
 
                 if (schedule.parentAlarm != null) {
@@ -232,7 +246,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                     }
                 } else {
 
-                    val appendableAlarm = findAppendableAlarmInstance(alarmTime, realm)
+                    val appendableAlarm = findAppendableAlarmInstance(alarmTimeInfo.first, realm)
                     if (appendableAlarm != null) {
                         schedule.parentAlarm = appendableAlarm
                         result = appendableAlarm.getInfo()
@@ -246,7 +260,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                         val alarmInstance = realm.createObject(OTTriggerAlarmInstance::class.java, alarmDbIdGenerator.getNewUniqueLong())
                         alarmInstance.alarmId = newAlarmId
 
-                        val alarmTimeToReserve = TimeHelper.roundToSeconds(alarmTime)
+                        val alarmTimeToReserve = TimeHelper.roundToSeconds(alarmTimeInfo.first)
 
 
                         alarmInstance.reservedAlarmTime = alarmTimeToReserve
@@ -403,14 +417,14 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
     }
 
 
-    fun calculateNextAlarmTime(pivot: Long?, condition: OTTimeTriggerCondition, triggerId: String): Long? {
+    fun calculateNextAlarmTime(pivot: Long?, condition: OTTimeTriggerCondition, triggerId: String): Pair<Long, JsonObject?>? {
         val now = System.currentTimeMillis()
 
         val limitExclusive = if (condition.isRepeated && condition.endAt != null) {
             condition.endAt!!
         } else Long.MAX_VALUE
 
-        when (condition.timeConditionType) {
+        val result = when (condition.timeConditionType) {
             OTTimeTriggerCondition.TIME_CONDITION_ALARM -> {
 
                 val calculator = DesignatedTimeScheduleCalculator().setAlarmTime(condition.alarmTimeHour.toInt(), condition.alarmTimeMinute.toInt(), 0)
@@ -419,7 +433,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                             .setEndAt(limitExclusive)
                 }
 
-                return calculator.calculateNext(pivot, now)
+                calculator.calculateNext(pivot, now)
             }
             OTTimeTriggerCondition.TIME_CONDITION_INTERVAL -> {
                 val intervalMillis = condition.intervalSeconds * 1000
@@ -438,7 +452,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                     calculator.setNoLimit()
                 }
 
-                return calculator.calculateNext(pivot, now)
+                calculator.calculateNext(pivot, now)
             }
             OTTimeTriggerCondition.TIME_CONDITION_SAMPLING -> {
                 val builder = ExperienceSamplingTimeScheduleCalculator.Builder()
@@ -457,10 +471,19 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                     builder.setRangeWithStartEndHour(condition.samplingHourStart, condition.samplingHourEnd, now)
                 }
 
-                return builder.build().calculateNext(pivot, now)
+                builder.build().calculateNext(pivot, now)
             }
-            else -> return null
+            else -> null
         }
+
+        if (result != null) {
+            if (result.second == null) {
+                result.second = jsonObject("conditionType" to OTTimeTriggerCondition.getConditionCodename(condition.timeConditionType))
+            } else {
+                result.second?.addProperty("conditionType", OTTimeTriggerCondition.getConditionCodename(condition.timeConditionType))
+            }
+            return Pair(result.first, result.second)
+        } else return null
     }
 
 

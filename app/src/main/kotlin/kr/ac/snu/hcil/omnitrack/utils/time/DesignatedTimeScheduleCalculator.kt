@@ -1,12 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.utils.time
 
+import com.google.gson.JsonObject
+import kr.ac.snu.hcil.omnitrack.utils.WritablePair
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfWeek
 import java.util.*
 
 /**
  * Created by younghokim on 2017-06-01.
  */
-class DesignatedTimeScheduleCalculator : TimeScheduleCalculator<DesignatedTimeScheduleCalculator>() {
+class DesignatedTimeScheduleCalculator : TimeScheduleCalculator() {
 
     private var alarmHourOfDay: Int = 0
     private var alarmMinute: Int = 0
@@ -19,7 +21,7 @@ class DesignatedTimeScheduleCalculator : TimeScheduleCalculator<DesignatedTimeSc
         return this
     }
 
-    override fun calculateInfiniteNextTime(last: Long?, now: Long): Long? {
+    override fun calculateInfiniteNextTime(last: Long?, now: Long): WritablePair<Long, JsonObject?>? {
         val cacheCalendar = GregorianCalendar.getInstance()
         cacheCalendar.timeInMillis = now
         cacheCalendar.set(Calendar.HOUR_OF_DAY, alarmHourOfDay)
@@ -32,7 +34,7 @@ class DesignatedTimeScheduleCalculator : TimeScheduleCalculator<DesignatedTimeSc
             cacheCalendar.add(Calendar.DAY_OF_YEAR, 1)
             val dow = cacheCalendar.getDayOfWeek()
             if (isAvailableDayOfWeek(dow) && cacheCalendar.timeInMillis >= now) {
-                return cacheCalendar.timeInMillis
+                return WritablePair(cacheCalendar.timeInMillis, null)
             }
         }
 

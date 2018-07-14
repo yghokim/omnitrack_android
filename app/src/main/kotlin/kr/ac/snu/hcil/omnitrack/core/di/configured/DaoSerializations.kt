@@ -63,15 +63,13 @@ class DaoSerializationModule {
     @Provides
     @Configured
     @ForItem
-    fun provideItemAdapter(): ServerCompatibleTypeAdapter<OTItemDAO>
-            = ItemTypeAdapter(false)
+    fun provideItemAdapter(@ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTItemDAO> = ItemTypeAdapter(false, gson)
 
 
     @Provides
     @Configured
     @ForServerItem
-    fun provideServerItemAdapter(): ServerCompatibleTypeAdapter<OTItemDAO>
-            = ItemTypeAdapter(true)
+    fun provideServerItemAdapter(@ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTItemDAO> = ItemTypeAdapter(true, gson)
 }
 
 @Configured

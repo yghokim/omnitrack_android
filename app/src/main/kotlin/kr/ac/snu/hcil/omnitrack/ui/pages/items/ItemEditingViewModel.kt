@@ -1,8 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import android.app.Application
+import com.google.gson.JsonObject
 import io.reactivex.Maybe
 import io.reactivex.Single
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
@@ -20,6 +22,9 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
             val itemDao = dbManager.get().makeSingleItemQuery(itemId, realm).findFirst()
             if (itemDao != null) {
                 originalUnmanagedItemDao = realm.copyFromRealm(itemDao)
+                this.metadataForItem = originalUnmanagedItemDao.serializedMetadata?.let {
+                    this.getApplication<OTApp>().applicationComponent.genericGson().fromJson(it, JsonObject::class.java)
+                }
                 subscriptions.add(
                         itemDao.asFlowable<OTItemDAO>().subscribe { dao ->
                             if (!dao.isValid) {

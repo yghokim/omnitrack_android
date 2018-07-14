@@ -90,6 +90,19 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
         const val TIME_CONDITION_ALARM: Byte = 0
         const val TIME_CONDITION_INTERVAL: Byte = 1
         const val TIME_CONDITION_SAMPLING: Byte = 2
+        const val TIME_CONDITION_CODENAME_ALARM = "alarm"
+        const val TIME_CONDITION_CODENAME_INTERVAL = "interval"
+        const val TIME_CONDITION_CODENAME_SAMPLING = "sampling"
+
+        fun getConditionCodename(condition: Byte): String {
+            return when (condition) {
+                TIME_CONDITION_INTERVAL -> TIME_CONDITION_CODENAME_INTERVAL
+                TIME_CONDITION_ALARM -> TIME_CONDITION_CODENAME_ALARM
+                TIME_CONDITION_SAMPLING -> TIME_CONDITION_CODENAME_SAMPLING
+                else -> "Unknown"
+            }
+        }
+
 
         val typeAdapter: TimeTriggerConditionTypeAdapter by lazy { TimeTriggerConditionTypeAdapter() }
     }

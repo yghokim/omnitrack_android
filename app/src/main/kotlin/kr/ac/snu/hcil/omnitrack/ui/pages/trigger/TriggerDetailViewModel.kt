@@ -6,6 +6,8 @@ import io.reactivex.subjects.BehaviorSubject
 import io.realm.OrderedCollectionChangeSet
 import io.realm.OrderedRealmCollectionChangeListener
 import io.realm.RealmResults
+import kr.ac.snu.hcil.omnitrack.BuildConfig
+import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
@@ -191,8 +193,30 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
                         } else {
                             dao.trackers.addAll(realm.copyFromRealm(trackers))
                         }
+
+                        if (dao.actionType == OTTriggerDAO.ACTION_TYPE_REMIND &&
+                                trackers.firstOrNull()?.experimentIdInFlags != null &&
+                                trackers.firstOrNull()?.experimentIdInFlags != dao.experimentIdInFlags) {
+                            //if the trigger is a reminder, set experiment flag following the tracker.
+                            dao.experimentIdInFlags = trackers.first()?.experimentIdInFlags
+                            dao.serializedCreationFlags = CreationFlagsHelper.Builder(trackers.first()?.experimentIdInFlags
+                                    ?: "{}")
+                                    .setExperiment(trackers.first()!!.experimentIdInFlags!!)
+                                    .build()
+                        }
                     }
+
                 }
+
+
+                if (BuildConfig.DEFAULT_EXPERIMENT_ID != null && dao.experimentIdInFlags == null) {
+                    dao.experimentIdInFlags = BuildConfig.DEFAULT_EXPERIMENT_ID
+                    dao.serializedCreationFlags = CreationFlagsHelper.Builder(dao.serializedCreationFlags)
+                            .setInjected(false)
+                            .setExperiment(BuildConfig.DEFAULT_EXPERIMENT_ID)
+                            .build()
+                }
+
                 dao.synchronizedAt = null
             }
 

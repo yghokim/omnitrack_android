@@ -1,9 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.core.database.configured.typeadapters
 
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemValueEntryDAO
@@ -15,7 +17,7 @@ import java.util.*
 /**
  * Created by younghokim on 2017. 11. 4..
  */
-class ItemTypeAdapter(isServerMode: Boolean) : ServerCompatibleTypeAdapter<OTItemDAO>(isServerMode) {
+class ItemTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerCompatibleTypeAdapter<OTItemDAO>(isServerMode) {
 
     override fun read(reader: JsonReader, isServerMode: Boolean): OTItemDAO {
         val dao = OTItemDAO()
@@ -31,6 +33,7 @@ class ItemTypeAdapter(isServerMode: Boolean) : ServerCompatibleTypeAdapter<OTIte
                 BackendDbManager.FIELD_TIMESTAMP_LONG -> dao.timestamp = reader.nextLong()
                 BackendDbManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
                 BackendDbManager.FIELD_TIMEZONE -> dao.timezone = reader.nextString()
+                "metadata" -> dao.serializedMetadata = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java)?.toString()
                 "deviceId"->dao.deviceId = reader.nextString()
                 "source"-> dao.source = reader.nextString()
                 "dataTable" ->{
@@ -82,7 +85,7 @@ class ItemTypeAdapter(isServerMode: Boolean) : ServerCompatibleTypeAdapter<OTIte
         writer.name(BackendDbManager.FIELD_TIMESTAMP_LONG).value(value.timestamp)
         writer.name(BackendDbManager.FIELD_TIMEZONE).value(value.timezone)
         writer.name(BackendDbManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
-
+        writer.name("metadata").jsonValue(value.serializedMetadata)
 
         if (!isServerMode)
             writer.name(BackendDbManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
@@ -114,6 +117,7 @@ class ItemTypeAdapter(isServerMode: Boolean) : ServerCompatibleTypeAdapter<OTIte
                 "deviceId" -> applyTo.deviceId = json.getStringCompat(key)
                 BackendDbManager.FIELD_TIMEZONE -> applyTo.timezone = json.getStringCompat(key)
                 "source" -> applyTo.source = json.getStringCompat(key)
+                "metadata" -> applyTo.serializedMetadata = json[key]?.toString()
                 "dataTable" -> {
                     val jsonList = try {
                         json[key]?.asJsonArray
