@@ -23,6 +23,15 @@ class ExperienceSamplingTimeScheduleCalculator(
         var minIntervalMillis: Long = 10 * TimeHelper.minutesInMilli
 ) : TimeScheduleCalculator() {
 
+    private data class CalculationResult(val alertTime: Long, val pingIndex: Int, val rangeStart: Long, val rangeDateString: String) {
+        fun toMetadata(): JsonObject {
+            return jsonObject(
+                    "pingIndex" to pingIndex,
+                    "pivotDate" to rangeDateString
+            )
+        }
+    }
+
     class Builder {
 
         private var randomSeedBase: String = ""
@@ -160,11 +169,11 @@ class ExperienceSamplingTimeScheduleCalculator(
 
     override fun calculateInfiniteNextTime(last: Long?, now: Long): WritablePair<Long, JsonObject?>? {
         return calculateInfiniteNextTimeInfo(last, now)?.let {
-            WritablePair(it.first, jsonObject("pingIndex" to it.second))
+            WritablePair(it.alertTime, it.toMetadata())
         }
     }
 
-    fun calculateInfiniteNextTimeInfo(last: Long?, now: Long): Triple<Long, Int, Long>? {
+    private fun calculateInfiniteNextTimeInfo(last: Long?, now: Long): CalculationResult? {
         val cacheCal = GregorianCalendar.getInstance()
         var finalRangeStart = rangeStart
 
@@ -174,7 +183,7 @@ class ExperienceSamplingTimeScheduleCalculator(
         }
 
         cacheCal.timeInMillis = finalRangeStart
-        var result: Triple<Long, Int, Long>? = null
+        var result: CalculationResult? = null
 
         //we can get into a situation where we are at near end of the day, and the last random point is earlier than the time.
 
@@ -191,7 +200,7 @@ class ExperienceSamplingTimeScheduleCalculator(
 
             for (i in currentRandomPoints.indices) {
                 if (currentRandomPoints[i] > now && (last == null || currentRandomPoints[i] > last)) {
-                    result = Triple(currentRandomPoints[i], i, finalRangeStart)
+                    result = CalculationResult(currentRandomPoints[i], i, finalRangeStart, TimeHelper.FORMAT_YYYY_MM_DD.format(Date(finalRangeStart)))
                     break
                 } else continue
             }
@@ -201,7 +210,7 @@ class ExperienceSamplingTimeScheduleCalculator(
 
         OTApp.logger.writeSystemLog("EMA trigger calculation: Last: ${last?.let { TimeHelper.FORMAT_DATETIME.format(Date(it)) }
                 ?: "null"}, now: ${TimeHelper.FORMAT_DATETIME.format(Date(now))} " +
-                "EMA trigger timestamp list: \n" + currentRandomPoints.map { TimeHelper.FORMAT_DATETIME.format(Date(it)) }.joinToString("\n") + "\npicked timestamp: " + result.second, TAG)
+                "EMA trigger timestamp list: \n" + currentRandomPoints.map { TimeHelper.FORMAT_DATETIME.format(Date(it)) }.joinToString("\n") + "\npicked timestamp: " + result.pingIndex, TAG)
 
         return result
     }
@@ -210,9 +219,9 @@ class ExperienceSamplingTimeScheduleCalculator(
         val result = calculateInfiniteNextTimeInfo(last, now)
         if (result == null) return null
         else {
-            if (result.third > endAt) {
+            if (result.rangeStart > endAt) {
                 return null
-            } else return WritablePair(result.first, jsonObject("pingIndex" to result.second))
+            } else return WritablePair(result.alertTime, result.toMetadata())
         }
     }
 }

@@ -28,6 +28,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.attribute_list_element.view.*
 import kotlinx.android.synthetic.main.fragment_tracker_detail_structure.*
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
@@ -155,44 +156,48 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 }
         )
 
-        val experimentListObservable: Observable<Pair<Boolean, List<ExperimentInfo>>> = Observable.combineLatest(this.viewModel.isInjectedObservable, this.viewModel.experimentListObservable, BiFunction { t1: Boolean, t2: List<ExperimentInfo> -> Pair(t1, t2) })
+        if (BuildConfig.DISABLE_EXTERNAL_ENTITIES) {
+            assignedExperimentProperty.visibility = View.GONE
+        } else {
+            val experimentListObservable: Observable<Pair<Boolean, List<ExperimentInfo>>> = Observable.combineLatest(this.viewModel.isInjectedObservable, this.viewModel.experimentListObservable, BiFunction { t1: Boolean, t2: List<ExperimentInfo> -> Pair(t1, t2) })
 
-        creationSubscriptions.add(
-                experimentListObservable.subscribe { (isInjected, experimentList) ->
-                    if (isInjected) {
-                        assignedExperimentProperty.visibility = View.GONE
-                    } else {
-                        assignedExperimentProperty.visibility = View.VISIBLE
-                        assignedExperimentProperty.setAdapter(ExperimentSelectionSpinnerAdapter(this@TrackerDetailStructureTabFragment.act, experimentList))
-                        viewModel.assignedExperimentId?.let { experimentId ->
-                            assignedExperimentProperty.value = experimentList.find { it.id == experimentId }
+            creationSubscriptions.add(
+                    experimentListObservable.subscribe { (isInjected, experimentList) ->
+                        if (isInjected) {
+                            assignedExperimentProperty.visibility = View.GONE
+                        } else {
+                            assignedExperimentProperty.visibility = View.VISIBLE
+                            assignedExperimentProperty.setAdapter(ExperimentSelectionSpinnerAdapter(this@TrackerDetailStructureTabFragment.act, experimentList))
+                            viewModel.assignedExperimentId?.let { experimentId ->
+                                assignedExperimentProperty.value = experimentList.find { it.id == experimentId }
+                            }
                         }
                     }
-                }
-        )
+            )
 
-        creationSubscriptions.add(
-                viewModel.experimentIdObservable.subscribe { (experimentId) ->
-                    val spinnerAdapter = (assignedExperimentProperty.adapter as? ExperimentSelectionSpinnerAdapter)
-                    if (spinnerAdapter != null) {
-                        val info = spinnerAdapter.items.find { it is ExperimentInfo && it.id == experimentId }
-                        if (info != null) {
-                            assignedExperimentProperty.value = info
+            creationSubscriptions.add(
+                    viewModel.experimentIdObservable.subscribe { (experimentId) ->
+                        val spinnerAdapter = (assignedExperimentProperty.adapter as? ExperimentSelectionSpinnerAdapter)
+                        if (spinnerAdapter != null) {
+                            val info = spinnerAdapter.items.find { it is ExperimentInfo && it.id == experimentId }
+                            if (info != null) {
+                                assignedExperimentProperty.value = info
+                            }
                         }
                     }
-                }
-        )
+            )
 
-        creationSubscriptions.add(
-                assignedExperimentProperty.valueChanged.observable.subscribe { (sender, args) ->
-                    println("Assigned Experiment Id was changed : ${args}")
-                    if (args is ExperimentInfo) {
-                        viewModel.assignedExperimentId = args.id
-                    } else {
-                        viewModel.assignedExperimentId = null
+            creationSubscriptions.add(
+                    assignedExperimentProperty.valueChanged.observable.subscribe { (sender, args) ->
+                        println("Assigned Experiment Id was changed : ${args}")
+                        if (args is ExperimentInfo) {
+                            viewModel.assignedExperimentId = args.id
+                        } else {
+                            viewModel.assignedExperimentId = null
+                        }
                     }
-                }
-        )
+            )
+        }
 
         creationSubscriptions.add(
                 nameProperty.valueChanged.observable.subscribe { result ->

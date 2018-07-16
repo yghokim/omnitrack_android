@@ -34,6 +34,10 @@ object TimeHelper {
         SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
     }
 
+    val FORMAT_YYYY_MM_DD: SimpleDateFormat by lazy {
+        SimpleDateFormat("yyyy-MM-dd")
+    }
+
     val FORMAT_DATETIME: SimpleDateFormat by lazy { SimpleDateFormat(OTApp.Companion.instance.resourcesWrapped.getString(R.string.dateformat_minute)) }
     val FORMAT_DAY: SimpleDateFormat by lazy { SimpleDateFormat(OTApp.Companion.instance.resourcesWrapped.getString(R.string.msg_date_format_scope_day)) }
     val FORMAT_MONTH: SimpleDateFormat by lazy { SimpleDateFormat(OTApp.Companion.instance.resourcesWrapped.getString(R.string.msg_date_format_scope_month)) }

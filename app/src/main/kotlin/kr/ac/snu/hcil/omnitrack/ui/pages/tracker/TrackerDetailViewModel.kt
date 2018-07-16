@@ -10,6 +10,7 @@ import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import io.realm.Realm
 import io.realm.RealmChangeListener
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
@@ -258,19 +259,21 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 isInjectedObservable.onNextIfDifferAndNotNull(false)
             }
 
-            subscriptions.add(
-                    researchRealm.where(OTExperimentDAO::class.java)
-                            .isNull("droppedAt")
-                            .findAllAsync().asFlowable()
-                            .filter {
-                                it.isValid && it.isLoaded
-                            }
-                            .subscribe { results ->
-                                this.experimentList.clear()
-                                this.experimentList.addAll(results.map { it.getInfo() })
-                                this.experimentListObservable.onNext(this.experimentList)
-                            }
-            )
+            if (BuildConfig.DISABLE_EXTERNAL_ENTITIES == false) {
+                subscriptions.add(
+                        researchRealm.where(OTExperimentDAO::class.java)
+                                .isNull("droppedAt")
+                                .findAllAsync().asFlowable()
+                                .filter {
+                                    it.isValid && it.isLoaded
+                                }
+                                .subscribe { results ->
+                                    this.experimentList.clear()
+                                    this.experimentList.addAll(results.map { it.getInfo() })
+                                    this.experimentListObservable.onNext(this.experimentList)
+                                }
+                )
+            }
 
             trackerIdObservable.onNext(Nullable(trackerId))
 
@@ -395,7 +398,10 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 trackerDao.isBookmarked = isBookmarkedObservable.value ?: false
                 trackerDao.color = colorObservable.value ?: 0
 
-                if (isInjectedObservable.value != true) {
+                if (BuildConfig.DISABLE_EXTERNAL_ENTITIES) {
+                    trackerDao.experimentIdInFlags = BuildConfig.DEFAULT_EXPERIMENT_ID
+                    trackerDao.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(BuildConfig.DEFAULT_EXPERIMENT_ID).build()
+                } else if (isInjectedObservable.value != true) {
                     trackerDao.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(assignedExperimentId).build()
                 }
 

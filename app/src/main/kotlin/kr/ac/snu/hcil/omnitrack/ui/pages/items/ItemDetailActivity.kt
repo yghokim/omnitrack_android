@@ -21,17 +21,23 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.airbnb.lottie.LottieAnimationView
 import com.github.salomonbrys.kotson.set
 import com.github.salomonbrys.kotson.toJson
+import com.google.gson.Gson
 import com.google.gson.JsonObject
+import dagger.internal.Factory
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_new_item.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerReminderEntry
+import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
@@ -44,6 +50,8 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import org.jetbrains.anko.notificationManager
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlin.properties.Delegates
 
 /**
@@ -87,6 +95,12 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
             return intent
         }
     }
+
+    @field:[Inject ForGeneric]
+    protected lateinit var genericGson: Provider<Gson>
+
+    @field:[Inject Backend]
+    protected lateinit var backendRealmFactory: Factory<Realm>
 
     private val attributeListAdapter = AttributeListAdapter()
 
@@ -236,7 +250,24 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         )
 
         val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
-        viewModel.init(trackerId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM), intent.getStringExtra(OTApp.INTENT_EXTRA_METADATA)?.let { (application as OTApp).applicationComponent.genericGson().fromJson(it, JsonObject::class.java) })
+
+        val metadata = if (intent.getStringExtra(OTApp.INTENT_EXTRA_METADATA) != null) {
+            val m = intent.getStringExtra(OTApp.INTENT_EXTRA_METADATA)?.let { genericGson.get().fromJson(it, JsonObject::class.java) }
+            m?.addProperty("accessedDirectlyFromReminder", true)
+            m
+        } else {
+            //if the tracker was manually opened, get metadata from current reminder.
+            val realm = backendRealmFactory.get()
+            val entries = realm.where(OTTriggerReminderEntry::class.java)
+                    .equalTo("dismissed", false)
+                    .equalTo("trackerId", trackerId)
+                    .findAll()
+            val m = entries.last()?.serializedMetadata?.let { genericGson.get().fromJson(it, JsonObject::class.java) }
+            m?.addProperty("accessedDirectlyFromReminder", false)
+            m
+        }
+
+        viewModel.init(trackerId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM), metadata)
     }
 
     override fun onPause() {

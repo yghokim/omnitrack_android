@@ -5,6 +5,9 @@
   "overridePackageName": null,
   "overrideAppName": null,
   "disableExternalEntities": false,
+  "disableTrackerCreation": false,
+  "disableTriggerCreation": false,
+
   "signing": {
     "releaseKeystoreLocation": null,
     "releaseAlias": null,

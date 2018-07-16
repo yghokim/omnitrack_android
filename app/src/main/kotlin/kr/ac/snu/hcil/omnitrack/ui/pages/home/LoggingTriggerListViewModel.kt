@@ -13,9 +13,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerInterfaceOpti
  */
 class LoggingTriggerListViewModel(app: Application) : AManagedTriggerListViewModel(app) {
 
-    override val defaultTriggerInterfaceOptions: TriggerInterfaceOptions = if (BuildConfig.DISABLE_EXTERNAL_ENTITIES) {
-        TriggerInterfaceOptions(allowAddNew = false)
-    } else TriggerInterfaceOptions()
+    override val defaultTriggerInterfaceOptions: TriggerInterfaceOptions = TriggerInterfaceOptions(allowAddNew = BuildConfig.DISABLE_TRIGGER_CREATION)
 
     var userId: String? = null
         private set

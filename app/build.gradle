@@ -61,6 +61,8 @@ android {
             buildConfigField 'String', 'APP_NAME', "\"OmniTrack\""
         }
 
+        buildConfigField 'boolean', 'DISABLE_TRACKER_CREATION', "${buildConfigJson.disableTrackerCreation ?: false}"
+        buildConfigField 'boolean', 'DISABLE_TRIGGER_CREATION', "${buildConfigJson.disableTriggerCreation ?: false}"
         buildConfigField 'boolean', 'HIDE_TRIGGERS_TAB', "${buildConfigJson.hideTriggersTab ?: false}"
         buildConfigField 'boolean', 'HIDE_SERVICES_TAB', "${buildConfigJson.hideServicesTab ?: false}"
         buildConfigField 'boolean', 'SHOW_TUTORIALS', "${buildConfigJson.showTutorials == null? true : buildConfigJson.showTutorials}"

@@ -189,7 +189,7 @@ class TrackerListFragment : OTFragment() {
 
         addTrackerFloatingButton = rootView.findViewById(R.id.fab)
 
-        if (BuildConfig.DISABLE_EXTERNAL_ENTITIES) {
+        if (BuildConfig.DISABLE_TRACKER_CREATION) {
             addTrackerFloatingButton.visibility = View.GONE
             addTrackerFloatingButton.isEnabled = false
         } else {
