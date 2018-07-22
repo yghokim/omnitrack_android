@@ -31,7 +31,7 @@ class BackendDatabaseModule {
                 .directory(configDirectory)
                 .name("backend.db")
                 .modules(BackendRealmModule())
-                .schemaVersion(3)
+                .schemaVersion(4)
                 .migration(BackendRealmMigration())
                 .build()
     }

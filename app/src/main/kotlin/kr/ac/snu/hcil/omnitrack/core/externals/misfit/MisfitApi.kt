@@ -57,7 +57,7 @@ object MisfitApi {
                 .addQueryParameter(AuthConstants.PARAM_REDIRECT_URI, AuthConstants.VALUE_REDIRECT_URI)
                 .addQueryParameter(AuthConstants.PARAM_SCOPE, "tracking,sleeps")
                 .build()
-        return RxActivityResult.on(activity).startIntent(WebServiceLoginActivity.makeIntent(uri.toString(), OTApp.getString(R.string.service_misfit_name), activity))
+        return RxActivityResult.on(activity).startIntent(WebServiceLoginActivity.makeIntent(uri.toString(), OTApp.getString(R.string.service_misfit_name), null, activity))
                 .firstOrError()
                 .flatMap {
                     result ->

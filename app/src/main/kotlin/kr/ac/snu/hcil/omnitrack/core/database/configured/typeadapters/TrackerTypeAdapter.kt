@@ -37,6 +37,7 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
                 BackendDbManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
                 BackendDbManager.FIELD_POSITION -> dao.position = reader.nextInt()
                 BackendDbManager.FIELD_NAME -> dao.name = reader.nextString()
+                BackendDbManager.FIELD_REDIRECT_URL -> dao.redirectUrl = reader.nextString()
                 "color" -> dao.color = reader.nextInt()
                 "isBookmarked" -> dao.isBookmarked = reader.nextBoolean()
                 BackendDbManager.FIELD_LOCKED_PROPERTIES_SERIALIZED -> dao.serializedLockedPropertyInfo = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
@@ -79,6 +80,7 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
         if (!isServerMode)
             writer.name(BackendDbManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
 
+        writer.name("redirectUrl").value(value.redirectUrl)
 
         writer.name("flags").jsonValue(value.serializedCreationFlags)
         writer.name("lockedProperties").jsonValue(value.serializedLockedPropertyInfo)
@@ -111,6 +113,7 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
                 BackendDbManager.FIELD_POSITION -> applyTo.position = json.getIntCompat(key) ?: 0
                 BackendDbManager.FIELD_SYNCHRONIZED_AT -> applyTo.synchronizedAt = json.getLongCompat(key)
                 BackendDbManager.FIELD_NAME -> applyTo.name = json.getStringCompat(key) ?: ""
+                BackendDbManager.FIELD_REDIRECT_URL -> applyTo.redirectUrl = json.getStringCompat(key)
                 "color" -> applyTo.color = json.getIntCompat(key) ?: OTApp.instance.colorPalette[0]
                 "isBookmarked" -> applyTo.isBookmarked = json.getBooleanCompat(key) ?: false
                 "lockedProperties"->applyTo.serializedLockedPropertyInfo = json[key]?.toString() ?: "null"

@@ -79,7 +79,8 @@ class OAuth2Client(val config: OAuth2Config) {
                 .build()
 
         return RxActivityResult.on(activity)
-                .startIntent(WebServiceLoginActivity.makeIntent(uri.toString(), serviceName ?: "Service", activity))
+                .startIntent(WebServiceLoginActivity.makeIntent(uri.toString(), serviceName
+                        ?: "Service", null, activity))
                 .flatMap {
                     result ->
                     println("RxActivityResult : activity result")

@@ -71,6 +71,8 @@ open class OTTrackerDAO : RealmObject() {
     var synchronizedAt: Long? = null // store server time of when synchronized perfectly.
     var userUpdatedAt: Long = System.currentTimeMillis()
 
+    var redirectUrl: String? = null
+
     @Index
     var removed: Boolean = false
 

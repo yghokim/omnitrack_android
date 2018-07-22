@@ -12,6 +12,8 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTT
 class BackendRealmMigration : RealmMigration {
 
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
+        println("migrate realm from ${oldVersion} to ${newVersion}")
+
         val schema = realm.schema
 
         var oldVersionPointer = oldVersion
@@ -55,7 +57,6 @@ class BackendRealmMigration : RealmMigration {
                     .forEach {
                         schema.get(it)
                                 ?.addField(BackendDbManager.FIELD_EXPERIMENT_ID_IN_FLAGS, String::class.java)
-                                ?.setNullable(BackendDbManager.FIELD_EXPERIMENT_ID_IN_FLAGS, true)
                                 ?.transform(entityTransform)
                     }
 
@@ -72,6 +73,16 @@ class BackendRealmMigration : RealmMigration {
                                 ?.transform {
                                     it.setNull(BackendDbManager.FIELD_METADATA_SERIALIZED)
                                 }
+                    }
+
+            oldVersionPointer++
+        }
+
+        if (oldVersionPointer == 3L) {
+            schema.get("OTTrackerDAO")
+                    ?.addField(BackendDbManager.FIELD_REDIRECT_URL, String::class.java)
+                    ?.transform {
+                        it.setNull(BackendDbManager.FIELD_REDIRECT_URL)
                     }
 
             oldVersionPointer++

@@ -12,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTI
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTItemBuilderFieldValueEntry
 import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import java.util.*
 
 /**
  * Created by Young-Ho on 10/9/2017.
@@ -20,6 +21,12 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
 
     private lateinit var itemBuilderDao: OTItemBuilderDAO
     private lateinit var builderWrapper: OTItemBuilderWrapperBase
+
+    private var reservedNewItemId: String? = null
+    fun generateNewItemId(): String {
+        this.reservedNewItemId = UUID.randomUUID().toString()
+        return this.reservedNewItemId!!
+    }
 
     override fun onInject(configuredContext: ConfiguredContext) {
         configuredContext.configuredAppComponent.inject(this)
@@ -129,9 +136,11 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
             return isBusyObservable.filter { !it }.firstOrError().flatMapMaybe {
                 refreshDaoValues()
                 val item = builderWrapper.saveToItem(null, ItemLoggingSource.Manual, metadataForItem)
+                item.objectId = reservedNewItemId
 
                 return@flatMapMaybe Maybe.fromSingle<String>(dbManager.get().saveItemObservable(item, false, null, realm).map { it.second })
                         .doAfterSuccess {
+                            reservedNewItemId = null
                             syncItemToServer()
                             OTApp.logger.writeSystemLog("Logged new item in the page. metadata: \n${item.serializedMetadata}", "NewItemCreationViewModel")
                         }

@@ -83,9 +83,14 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
     }
 
     fun init(trackerId: String, itemId: String?, metadata: JsonObject?) {
-        this.metadataForItem = metadata
         isValid = true
         if (trackerDao?.objectId != trackerId) {
+            this.metadataForItem = metadata
+            metadata?.let {
+                if (!it.has("screenAccessedAt")) {
+                    it.addProperty("screenAccessedAt", System.currentTimeMillis())
+                }
+            }
             trackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirst()
             if (trackerDao != null) {
                 trackerNameObservable.onNext(trackerDao?.name ?: "")

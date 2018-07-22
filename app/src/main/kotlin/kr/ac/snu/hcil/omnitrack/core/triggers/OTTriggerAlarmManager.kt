@@ -216,8 +216,8 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
     private fun buildMetadata(schedule: OTTriggerSchedule, actualTriggeredTime: Long): JsonObject {
         val metadata: JsonObject = schedule.serializedMetadata?.let { configuredContext.applicationComponent.genericGson().fromJson(it, JsonObject::class.java) }
                 ?: JsonObject()
-        metadata.addProperty("reservedTime", schedule.intrinsicAlarmTime)
-        metadata.addProperty("actualFireTime", actualTriggeredTime)
+        metadata.addProperty("reservedAt", schedule.intrinsicAlarmTime)
+        metadata.addProperty("actuallyFiredAt", actualTriggeredTime)
         return metadata
     }
 

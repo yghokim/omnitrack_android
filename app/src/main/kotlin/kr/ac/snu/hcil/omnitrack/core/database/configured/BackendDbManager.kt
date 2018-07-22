@@ -61,6 +61,7 @@ class BackendDbManager @Inject constructor(
 
         const val FIELD_METADATA_SERIALIZED = "serializedMetadata"
 
+        const val FIELD_REDIRECT_URL = "redirectUrl"
 
         const val FIELD_NAME = "name"
         const val FIELD_POSITION = "position"

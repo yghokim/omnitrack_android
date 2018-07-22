@@ -127,7 +127,7 @@ class OTReminderCommands(val configuredContext: ConfiguredContext, val context: 
             if (entry != null) {
                 val metadata = entry.serializedMetadata?.let { gson.get().fromJson(it, JsonObject::class.java) }
                         ?: JsonObject()
-                metadata.addProperty("accessedScreenAt", System.currentTimeMillis())
+                metadata.addProperty("screenAccessedAt", System.currentTimeMillis())
                 entry.realm.executeTransaction {
                     entry.accessedAt = System.currentTimeMillis()
                     entry.serializedMetadata = metadata.toString()

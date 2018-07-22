@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.activity
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -24,11 +23,15 @@ open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
 
         const val EXTRA_RESQUEST_URL = "requestUrl"
         const val EXTRA_SERVICE_NAME = "serviceName"
+        const val EXTRA_TITLE_OVERRIDE = "overrideTitle"
 
-        fun makeIntent(url: String, serviceName: String, context: Context, activityClass: Class<out WebServiceLoginActivity> = WebServiceLoginActivity::class.java): Intent {
+        fun makeIntent(url: String, serviceName: String, overrideTitle: String?, context: Context, activityClass: Class<out WebServiceLoginActivity> = WebServiceLoginActivity::class.java): Intent {
             val intent = Intent(context, activityClass)
             intent.putExtra(EXTRA_RESQUEST_URL, url)
             intent.putExtra(EXTRA_SERVICE_NAME, serviceName)
+            overrideTitle?.let {
+                intent.putExtra(EXTRA_TITLE_OVERRIDE, it)
+            }
             return intent
         }
     }
@@ -46,9 +49,6 @@ open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
 
         webView.settings.javaScriptEnabled = true
         webView.webViewClient = object : WebViewClient() {
-            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                super.onPageStarted(view, url, favicon)
-            }
 
             override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
                 super.onReceivedError(view, request, error)
@@ -62,20 +62,19 @@ open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
             }
 
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
 
         if (intent.hasExtra(EXTRA_RESQUEST_URL)) {
             val url = intent.getStringExtra(EXTRA_RESQUEST_URL)
             val serviceName = intent.getStringExtra(EXTRA_SERVICE_NAME)
-            titleView.text = String.format(resources.getString(R.string.msg_format_login_to), serviceName)
+            titleView.text = intent.getStringExtra(EXTRA_TITLE_OVERRIDE) ?: getTitleText(serviceName)
             loadingIndicator.visibility = View.VISIBLE
             webView.loadUrl(url)
         }
     }
 
+    open fun getTitleText(serviceName: String): String {
+        return String.format(resources.getString(R.string.msg_format_login_to), serviceName)
+    }
 
     open fun onPageFinished(url: String) {
         println("webView finished - $url")

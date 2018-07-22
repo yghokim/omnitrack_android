@@ -4,6 +4,7 @@ import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
@@ -19,6 +20,7 @@ import android.widget.Toast
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.airbnb.lottie.LottieAnimationView
+import com.github.salomonbrys.kotson.forEach
 import com.github.salomonbrys.kotson.set
 import com.github.salomonbrys.kotson.toJson
 import com.google.gson.Gson
@@ -41,6 +43,7 @@ import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
+import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -60,6 +63,7 @@ import kotlin.properties.Delegates
 class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_item) {
 
     class RequiredFieldsNotCompleteException(val inCompleteFieldLocalIds: Array<String>) : Exception("Required fields are not completed.")
+    class SurveyNotCompleteException : Exception("You did not complete the survey.")
 
     companion object {
 
@@ -262,9 +266,11 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                     .equalTo("dismissed", false)
                     .equalTo("trackerId", trackerId)
                     .findAll()
-            val m = entries.last()?.serializedMetadata?.let { genericGson.get().fromJson(it, JsonObject::class.java) }
-            m?.addProperty("accessedDirectlyFromReminder", false)
-            m
+            if (entries.size > 0) {
+                val m = entries.last()?.serializedMetadata?.let { genericGson.get().fromJson(it, JsonObject::class.java) }
+                m?.addProperty("accessedDirectlyFromReminder", false)
+                m
+            } else null
         }
 
         viewModel.init(trackerId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM), metadata)
@@ -307,7 +313,8 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         itemSaved = false
 
         if (mode == ItemEditionViewModelBase.ItemMode.New) {
-            val needToStoreBuilder = if (viewModel.isValid && viewModel.mode == ItemEditionViewModelBase.ItemMode.New) {
+            val needToStoreBuilder = if (viewModel.isValid
+                    && viewModel.trackerDao?.redirectUrl == null) {
 
                 if (viewModel.isViewModelsDirty()) {
                     true
@@ -354,6 +361,36 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                     if (incompleteFieldLocalIds.isNotEmpty()) {
                         throw RequiredFieldsNotCompleteException(incompleteFieldLocalIds.toTypedArray())
                     } else {
+                        /*
+                        if(viewModel.mode == ItemEditionViewModelBase.ItemMode.New
+                                && viewModel.trackerDao?.redirectUrl != null){
+                                val url = Uri.parse(viewModel.trackerDao!!.redirectUrl!!).buildUpon()
+                                        .appendQueryParameter("userId", authManager.userId)
+                                        .appendQueryParameter("itemId", (viewModel as? NewItemCreationViewModel)?.generateNewItemId())
+                                        .run{
+                                            viewModel.metadataForItem?.let {
+                                                it.forEach { key, value ->
+                                                    try {
+                                                        this.appendQueryParameter(key, value.asString)
+                                                    }catch(ex: Exception){
+                                                        this.appendQueryParameter(key, value.toString())
+                                                    }
+                                                }
+                                            }
+                                            this
+                                        }
+                                        .build().toString()
+                                println("redirect to ${url}")
+                                return@flatMapMaybe RxActivityResult.on(this@ItemDetailActivity)
+                                        .startIntent(WebServiceLoginActivity.makeIntent(url, "Qualtrics", "Complete A Survey", this))
+                                        .firstElement()
+                                        .flatMap {
+                                            surveyResult->
+                                            (if(surveyResult.resultCode() == RESULT_OK){
+                                                viewModel.applyEditingToDatabase()
+                                            }else Maybe.error<String>(SurveyNotCompleteException()))
+                                        }
+                        }else viewModel.applyEditingToDatabase()*/
                         viewModel.applyEditingToDatabase()
                     }
                 }.subscribe({ result ->
@@ -370,15 +407,39 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                                     content.add("pivotReminderTime", this.intent.getLongExtra(INTENT_EXTRA_REMINDER_TIME, 0).toJson())
                                 }
                             }
+
+                            if (viewModel.trackerDao?.redirectUrl != null) {
+                                val url = Uri.parse(viewModel.trackerDao!!.redirectUrl!!).buildUpon()
+                                        .appendQueryParameter("userId", authManager.userId)
+                                        .appendQueryParameter("itemId", (viewModel as? NewItemCreationViewModel)?.generateNewItemId())
+                                        .run {
+                                            viewModel.metadataForItem?.let {
+                                                it.forEach { key, value ->
+                                                    try {
+                                                        this.appendQueryParameter(key, value.asString)
+                                                    } catch (ex: Exception) {
+                                                        this.appendQueryParameter(key, value.toString())
+                                                    }
+                                                }
+                                            }
+                                            this
+                                        }
+                                        .build().toString()
+                                println("redirect to ${url}")
+                                startActivity(WebServiceLoginActivity.makeIntent(url, "Qualtrics", "Complete A Survey", this))
+                            } else {
+                                setResult(RESULT_OK, Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, result))
+                                finish()
+                            }
                         }
-                        ItemEditionViewModelBase.ItemMode.Edit ->
+                        ItemEditionViewModelBase.ItemMode.Edit -> {
                             eventLogger.get().logItemEditEvent(result) { content ->
                                 content[IEventLogger.CONTENT_IS_INDIVIDUAL] = false
                             }
+                            setResult(RESULT_OK, Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, result))
+                            finish()
+                        }
                     }
-
-                    setResult(RESULT_OK, Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, result))
-                    finish()
                 }, { ex ->
                     if (ex is RequiredFieldsNotCompleteException) {
                         val incompleteFields = currentAttributeViewModelList.mapIndexed { index, attributeInputViewModel -> Pair(index, attributeInputViewModel) }.filter { ex.inCompleteFieldLocalIds.contains(it.second.attributeLocalId) }
@@ -396,6 +457,8 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                         }
 
                         Toast.makeText(this@ItemDetailActivity, "${ex.inCompleteFieldLocalIds.size} required fields are not completed.", Toast.LENGTH_LONG).show()
+                    } else if (ex is SurveyNotCompleteException) {
+                        Toast.makeText(this@ItemDetailActivity, "The survey was not completed.", Toast.LENGTH_LONG).show()
                     }
                 }, {
                     println("storing item was failed. Null item id returned")
