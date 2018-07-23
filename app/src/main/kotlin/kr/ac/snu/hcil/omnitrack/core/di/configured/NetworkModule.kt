@@ -26,6 +26,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Provider
 import javax.inject.Qualifier
 
@@ -39,6 +40,10 @@ class NetworkModule {
     }
     private val gsonConverterFactory: GsonConverterFactory by lazy {
         GsonConverterFactory.create()
+    }
+
+    private val scalarsConverterFactory: ScalarsConverterFactory by lazy {
+        ScalarsConverterFactory.create()
     }
 
     @Provides
@@ -93,6 +98,7 @@ class NetworkModule {
                 .client(client)
                 .baseUrl(config.synchronizationServerUrl)
                 .addCallAdapterFactory(rxJava2CallAdapterFactory)
+                .addConverterFactory(scalarsConverterFactory)
                 .addConverterFactory(gsonConverterFactory)
                 .build()
     }

@@ -145,7 +145,11 @@ android {
             }
             else buildType.buildConfigField 'boolean', 'DISABLE_EXTERNAL_ENTITIES', "false"
 
-            buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "\"$buildConfigJson.defaultExperimentId\""
+            if(buildConfigJson.defaultExperimentId != null && buildConfigJson.defaultExperimentId.length > 0){
+                buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "\"$buildConfigJson.defaultExperimentId\""
+            }else{
+                buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "null"
+            }
 
     }
 
@@ -238,6 +242,7 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$rootProject.ext.retrofit_version"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$rootProject.ext.retrofit_version"
+    implementation "com.squareup.retrofit2:converter-scalars:$rootProject.ext.retrofit_version"
     implementation 'com.airbnb.android:lottie:2.2.5'
     implementation 'org.atteo:evo-inflector:1.2.2'
     implementation 'com.github.Epsiloni:android-target-tooltip:1.7'

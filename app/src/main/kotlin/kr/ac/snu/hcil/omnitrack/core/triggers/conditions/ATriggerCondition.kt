@@ -13,6 +13,8 @@ abstract class ATriggerCondition(val type: Byte) : Cloneable {
 
     abstract fun writeEventLogContent(table: JsonObject)
 
+    abstract fun makeInformationText(): CharSequence
+
     public override fun clone(): Any {
         return super.clone()
     }

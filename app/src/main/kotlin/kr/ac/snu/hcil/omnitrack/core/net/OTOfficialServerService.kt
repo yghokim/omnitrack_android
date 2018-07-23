@@ -55,4 +55,7 @@ interface OTOfficialServerService {
 
     @GET("api/research/invitations/public")
     fun getPublicInvitations(): Single<List<ExperimentInvitation>>
+
+    @GET("api/package/extract")
+    fun getExtractedTrackingPackage(@Query("trackerIds[]") trackerIds: Array<String>, @Query("triggerIds[]") triggerIds: Array<String>): Single<String>
 }

@@ -318,6 +318,11 @@
             android:label="@string/msg_title_research"
             android:parentActivityName=".ui.pages.home.HomeActivity" />
 
+        <activity
+            android:name=".ui.pages.export.PackageExportActivity"
+            android:label="Export Tracking Package"
+            android:parentActivityName=".ui.pages.home.HomeActivity" />
+
     </application>
 
 </manifest>

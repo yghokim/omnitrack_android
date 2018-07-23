@@ -39,6 +39,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMen
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.export.PackageExportActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.research.ResearchActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import javax.inject.Inject
@@ -162,7 +163,8 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                 if (newScreenName.isNotBlank()) {
                     if (authManager.userId != null) {
                         realmFactory.get().use { realm ->
-                            val user = realm.where(OTUserDAO::class.java).equalTo("uid", authManager.userId ?: "").findFirst()
+                            val user = realm.where(OTUserDAO::class.java).equalTo("uid", authManager.userId
+                                    ?: "").findFirst()
                             if (user != null) {
                                 if (user.name != newScreenName) {
                                     realm.executeTransaction {
@@ -171,7 +173,8 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                                         user.nameSynchronizedAt = null
                                     }
                                     jobDispatcher.mustSchedule(informationUploadJobProvider.setTag(
-                                            OTInformationUploadService.makeTag(authManager.userId ?: "", configuration.id, OTInformationUploadService.INFORMATION_USERNAME)
+                                            OTInformationUploadService.makeTag(authManager.userId
+                                                    ?: "", configuration.id, OTInformationUploadService.INFORMATION_USERNAME)
                                     ).build())
                                 }
                             }
@@ -219,14 +222,27 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                     syncManager.get().queueFullSync(ignoreFlags = false)
                     syncManager.get().reserveSyncServiceNow()
                     jobDispatcher.mustSchedule(researchSyncJob.get())
-                }, true),
-
-                RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_plask, "Research", null, {
-                    val intent = Intent(parentActivity, ResearchActivity::class.java)
-                    parentActivity.startActivity(intent)
                 }, true)
         ).apply {
-            if (BuildConfig.DEBUG == true) {
+
+            if (BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank() == true) {
+                add(
+                        RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_plask, "Research", null, {
+                            val intent = Intent(parentActivity, ResearchActivity::class.java)
+                            parentActivity.startActivity(intent)
+                        }, true)
+                )
+
+                add(
+                        RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_package_dark, "Export Tracking Package", null, {
+                            val intent = Intent(parentActivity, PackageExportActivity::class.java)
+                            parentActivity.startActivity(intent)
+                        }, true)
+                )
+            }
+
+
+            if (BuildConfig.BUILD_TYPE.toLowerCase() == "debug") {
                 //get access to the console log screen on debug mode
                 add(
                         RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_clipnote, "Debug Logs", null, {

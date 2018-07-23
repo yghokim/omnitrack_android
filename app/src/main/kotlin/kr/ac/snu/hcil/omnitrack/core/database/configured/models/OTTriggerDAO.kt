@@ -21,12 +21,15 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
+import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import org.jetbrains.anko.runOnUiThread
 
 /**
  * Created by Young-Ho on 10/9/2017.
  */
 open class OTTriggerDAO : RealmObject() {
+
+    data class SimpleTriggerInfo(override val objectId: String, val conditionType: Byte, val condition: ATriggerCondition?, val actionType: Byte, val action: OTTriggerAction?, val trackers: Array<OTTrackerDAO.SimpleTrackerInfo>?) : IReadonlyObjectId
 
     enum class TriggerValidationComponent { TRACKER_ATTACHED, CONDITION_VALID }
     class TriggerConfigInvalidException(vararg _causes: TriggerValidationComponent) : Exception() {
@@ -265,5 +268,21 @@ open class OTTriggerDAO : RealmObject() {
 
                     }
                 }
+    }
+
+    fun getSimpleInfo(populateTracker: Boolean = false): SimpleTriggerInfo {
+        val info = SimpleTriggerInfo(objectId!!, conditionType, condition, actionType, action,
+                if (populateTracker) {
+                    if (isManaged) {
+                        if (liveTrackerCount > 0) {
+                            liveTrackersQuery.findAll().map { it.getSimpleInfo() }.toTypedArray()
+                        } else emptyArray<OTTrackerDAO.SimpleTrackerInfo>()
+                    } else {
+                        trackers.filter { !it.removed }.map { it.getSimpleInfo() }.toTypedArray()
+                    }
+                } else null
+        )
+
+        return info
     }
 }

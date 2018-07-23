@@ -36,6 +36,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.export.PackageExportViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.AttributeSelectionPage
@@ -191,6 +192,8 @@ interface ConfiguredAppComponent {
     fun inject(viewModel: TimeSeriesPlotModel)
     fun inject(viewModel: DurationHeatMapModel)
     fun inject(viewModel: AttributeDetailViewModel)
+
+    fun inject(viewModel: PackageExportViewModel)
 
     fun inject(activity: ItemBrowserActivity)
     fun inject(activity: ItemDetailActivity)

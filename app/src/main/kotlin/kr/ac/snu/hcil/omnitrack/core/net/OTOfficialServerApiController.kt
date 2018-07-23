@@ -113,4 +113,11 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
+
+    override fun getTrackingPackageJson(trackerIds: Array<String>, triggerIds: Array<String>): Single<String> {
+        return service.getExtractedTrackingPackage(trackerIds, triggerIds)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 }
