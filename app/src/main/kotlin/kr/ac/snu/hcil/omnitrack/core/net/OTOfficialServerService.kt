@@ -58,4 +58,7 @@ interface OTOfficialServerService {
 
     @GET("api/package/extract")
     fun getExtractedTrackingPackage(@Query("trackerIds[]") trackerIds: Array<String>, @Query("triggerIds[]") triggerIds: Array<String>): Single<String>
+
+    @POST("api/package/temporary")
+    fun postTemporaryTrackingPackage(@Body data: JsonObject): Single<String>
 }

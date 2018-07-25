@@ -33,6 +33,7 @@ interface ISynchronizationServerSideAPI {
     fun putUserName(name: String, timestamp: Long): Single<InformationUpdateResult>
 
     fun getTrackingPackageJson(trackerIds: Array<String>, triggerIds: Array<String>): Single<String>
+    fun uploadTemporaryTrackingPackage(packageString: String): Single<String>
 
     //=================================================================================================================================
     //server returns server-side changes after designated timestamp.

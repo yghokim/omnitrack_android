@@ -97,6 +97,15 @@ class PackageHandlingBottomSheetFragment : DismissingBottomSheetDialogFragment(R
                             val chooser = Intent.createChooser(intent, "Export the JSON string")
                             startActivity(chooser)
                             dismissAllowingStateLoss()
+                        }),
+                RecyclerViewMenuAdapter.MenuItem(null,
+                        "Instant share to Research Kit",
+                        "Share the package content to research platform",
+                        {
+                            if (jsonString != null) {
+                                UploadTemporaryPackageDialogFragment.makeInstance(jsonString).show(act.supportFragmentManager, "InstantSharePackage")
+                                dismissAllowingStateLoss()
+                            }
                         })
         )
 

@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.net
 
+import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -117,6 +118,12 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
 
     override fun getTrackingPackageJson(trackerIds: Array<String>, triggerIds: Array<String>): Single<String> {
         return service.getExtractedTrackingPackage(trackerIds, triggerIds)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun uploadTemporaryTrackingPackage(packageString: String): Single<String> {
+        return service.postTemporaryTrackingPackage(jsonObject("data" to packageString))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

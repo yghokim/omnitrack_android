@@ -37,6 +37,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.export.PackageExportViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.export.UploadTemporaryPackageDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.AttributeSelectionPage
@@ -213,4 +214,6 @@ interface ConfiguredAppComponent {
 
     fun inject(task: OTBinaryUploadService.ConfiguredTask)
     fun inject(task: OTReminderCommands)
+
+    fun inject(viewModel: UploadTemporaryPackageDialogFragment.ViewModel)
 }
