@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appupdater_download_failure_description_toast">다운로드에 실패하였습니다. 인터넷 연결을 확인해주세요.</string>
+    <string name="appupdater_download_description_start_toast">새 버전의 설치 파일 다운로드를 시작합니다.</string>
+    <string name="appupdater_download_notification_title">새로운 버전의 앱</string>
+    <string name="appupdater_download_notification_content">새 버전이 다운로드 중입니다.</string>
+    <string name="appupdater_install_notification_title">새 버전 다운로드 완료</string>
+    <string name="appupdater_install_notification_content">새 버전의 앱을 설치하려면 터치하세요.</string>
+    <string name="appupdater_download_failure_notification_title">다운로드 실패</string>
+    <string name="appupdater_download_failure_notification_content">앱 다운로드에 실패하였습니다. 다시 시도하려면 터치하세요.</string>
+</resources>
