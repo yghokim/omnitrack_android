@@ -1,7 +1,3 @@
-@echo update git submodules.
-git submodule update --init --recursive
-git submodule foreach "(git checkout master; git pull)&"
-
 @echo setup visualization javascripts.
 cd omnitrack_visualization_core
 call npm install
