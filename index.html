@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Chart</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="built/visualization.js"></script>
+  <style type="text/css">
+    * {
+      margin: 0px;
+      padding: 0px;
+    }
+  </style>
+</head>
+
+<body>
+  This is a chart view.
+  <div id="text">This should be replaced.</div>
+  <canvas id="horizontalBar">
+
+  </canvas>
+
+  <canvas id="timeNumber">
+  </canvas>
+
+  <div id="durationHeatmapContainer">
+  <canvas id="durationHeatmap"></canvas>
+  </div>
+
+  <script language="JavaScript">
+    var chart = OTVis.OTChartFactory.makeChart("horizontal-bar");
+    chart.addOnResizedListener(function (width, height) {
+      console.log(width + ", " + height);
+    })
+    chart.setData({ data: [{ label: "A", value: 5, category: "a" }, { label: "B", value: 3, category: "b" }] });
+    chart.updateChartToCanvas("horizontalBar")
+
+    var scatter = OTVis.OTChartFactory.makeChart("time-number-plot");
+    scatter.setData({ "range": { "from": 1510412400000, "to": 1511622000000, "timezone": "Asia/Seoul" }, "labels": { "t": "Drank at", "y": "Caffeine" }, "data": [{ "t": 1510497667429, "y": 1.0 }, { "t": 1510536641571, "y": 1.0 }, { "t": 1510548345847, "y": 3.0 }, { "t": 1510563900379, "y": 2.0 }, { "t": 1510632198156, "y": 3.0 }, { "t": 1510939730997, "y": 2.0 }, { "t": 1510939732807, "y": 2.0 }, { "t": 1510977848237, "y": 3.0 }, { "t": 1511159510218, "y": 2.799999952316284 }, { "t": 1511241611190, "y": 2.0 }, { "t": 1511329821673, "y": 3.0 }] })
+    scatter.updateChartToCanvas("timeNumber")
+
+    var durationHeatmap = OTVis.OTChartFactory.makeChart("duration-value-plot");
+    durationHeatmap.setData({ "dates": [1510585200000, 1510671600000, 1510758000000, 1510844400000, 1510930800000, 1511017200000, 1511103600000, 1511190000000, 1511276400000, 1511362800000, 1511449200000, 1511535600000, 1511622000000, 1511708400000], "intrinsicValueRange": { "from": 1.0, "to": 7.0, "level": 6 }, "data": [{ "i": 11, "fromRatio": 0.54375, "toRatio": 0.5833333, "value": 5.900000095367432 }, { "i": 11, "fromRatio": 0.625, "toRatio": 0.70902777, "value": 3.299999952316284 }, { "i": 11, "fromRatio": 0.70902777, "toRatio": 0.8346441, "value": 2.0999999046325684 }, { "i": 10, "fromRatio": 0.95902777, "toRatio": 1.0, "value": 5.5 }, { "i": 11, "fromRatio": 0.0, "toRatio": 0.09861111, "value": 5.5 }, { "i": 10, "fromRatio": 0.4513889, "toRatio": 0.54791665, "value": 2.700000047683716 }, { "i": 10, "fromRatio": 0.54791665, "toRatio": 0.7277778, "value": 3.8999998569488525 }, { "i": 12, "fromRatio": 0.5625, "toRatio": 0.7277778, "value": 4.699999809265137 }] })
+    durationHeatmap.updateChartToCanvas("durationHeatmap")
+  </script>
+</body>
+
+</html>
