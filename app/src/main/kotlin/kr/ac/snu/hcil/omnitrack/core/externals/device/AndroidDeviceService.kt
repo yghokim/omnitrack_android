@@ -9,6 +9,10 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
  */
 object AndroidDeviceService : OTExternalService("AndroidDeviceService", 19) {
 
+    override fun isSupportedInSystem(): Boolean {
+        return true
+    }
+
     override fun onDeactivate() {
 
     }

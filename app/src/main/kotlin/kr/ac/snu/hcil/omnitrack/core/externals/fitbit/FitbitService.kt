@@ -13,6 +13,9 @@ import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
  * Created by younghokim on 16. 9. 2..
  */
 object FitbitService : OAuth2BasedExternalService("FitbitService", 0) {
+    override fun isSupportedInSystem(): Boolean {
+        return BuildConfig.FITBIT_CLIENT_ID != null && BuildConfig.FITBIT_CLIENT_SECRET != null
+    }
 
     const val SCOPE_ACTIVITY = "activity"
     const val SCOPE_HEARTRATE = "heartrate"

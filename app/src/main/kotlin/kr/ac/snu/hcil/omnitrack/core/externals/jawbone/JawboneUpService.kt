@@ -34,6 +34,10 @@ import java.util.*
  */
 object JawboneUpService : OTExternalService("JawboneUpService", 9) {
 
+    override fun isSupportedInSystem(): Boolean {
+        return BuildConfig.JAWBONE_CLIENT_ID != null && BuildConfig.JAWBONE_CLIENT_SECRET != null && BuildConfig.JAWBONE_REDIRECT_URI != null
+    }
+
     private const val CLIENT_ID = BuildConfig.JAWBONE_CLIENT_ID
     private const val CLIENT_SECRET = BuildConfig.JAWBONE_CLIENT_SECRET
     private const val REDIRECT_URI = BuildConfig.JAWBONE_REDIRECT_URI

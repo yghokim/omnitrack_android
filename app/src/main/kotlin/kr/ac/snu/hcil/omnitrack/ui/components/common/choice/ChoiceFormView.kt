@@ -62,7 +62,6 @@ class ChoiceFormView : LinearLayout {
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     init {
         orientation = LinearLayout.VERTICAL
@@ -117,7 +116,7 @@ class ChoiceFormView : LinearLayout {
 
         override fun getItemCount(): Int = entries?.size ?: 0
 
-        inner open class ViewHolder(view: View) : RecyclerView.ViewHolder(view), OnClickListener {
+        open inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), OnClickListener {
 
             protected val indicator: ImageView = view.findViewById(R.id.ui_checked)
 

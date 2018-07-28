@@ -24,6 +24,10 @@ import java.util.*
  */
 object GoogleFitService : OTExternalService("GoogleFitService", 19) {
 
+    override fun isSupportedInSystem(): Boolean {
+        return true
+    }
+
     override val nameResourceId: Int = R.string.service_googlefit_name
     override val descResourceId: Int = R.string.service_googlefit_desc
     override val thumbResourceId: Int = R.drawable.service_thumb_googlefit

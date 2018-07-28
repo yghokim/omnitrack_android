@@ -18,6 +18,10 @@ import java.util.*
  */
 object RescueTimeService : OAuth2BasedExternalService("RescueTimeService", 0) {
 
+    override fun isSupportedInSystem(): Boolean {
+        return BuildConfig.RESCUETIME_CLIENT_ID != null && BuildConfig.RESCUETIME_CLIENT_SECRET != null && BuildConfig.RESCUETIME_REDIRECT_URI != null
+    }
+
     //const val PREFERENCE_API_KEY = "rescuetime_api_key"
     //const val PREFERENCE_ACCESS_TOKEN = "rescuetime_access_token"
 

@@ -39,7 +39,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
                     , RescueTimeService
                     //,MicrosoftBandService
                     //,MiBandService
-            )
+            ).filter { service -> service.isSupportedInSystem() }.toTypedArray()
         }
 
         fun findServiceByIdentifier(identifier: String): OTExternalService? {
@@ -152,6 +152,8 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
 
         _dependencyList += onRegisterDependencies()
     }
+
+    protected abstract fun isSupportedInSystem(): Boolean
 
     protected abstract fun onRegisterMeasureFactories(): Array<OTMeasureFactory>
 

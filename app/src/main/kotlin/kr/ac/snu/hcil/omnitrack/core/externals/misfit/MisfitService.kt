@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 import android.app.Activity
 import android.content.Context
 import io.reactivex.Single
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
@@ -15,6 +16,10 @@ import kr.ac.snu.hcil.omnitrack.utils.TextHelper
  * Created by Young-Ho on 9/1/2016.
  */
 object MisfitService : OTExternalService("MisfitService", 0) {
+
+    override fun isSupportedInSystem(): Boolean {
+        return BuildConfig.MISFIT_APP_KEY != null && BuildConfig.MISFIT_APP_SECRET != null
+    }
 
     const val PREFERENCE_ACCESS_TOKEN = "misfit_access_token"
 
