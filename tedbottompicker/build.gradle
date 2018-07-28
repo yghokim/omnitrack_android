@@ -1,0 +1,51 @@
+apply plugin: 'com.android.library'
+
+
+android {
+
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+
+}
+
+
+
+configurations {
+    javadocDeps
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    testImplementation 'junit:junit:4.12'
+    implementation "com.android.support:appcompat-v7:$rootProject.ext.android_support_version"
+    implementation "com.android.support:design:$rootProject.ext.android_support_version"
+    implementation "com.android.support:support-annotations:$rootProject.ext.android_support_version"
+    javadocDeps "com.android.support:support-annotations:$rootProject.ext.android_support_version"
+    implementation "com.github.bumptech.glide:glide:$rootProject.ext.glide_version"
+}
+
+repositories {
+    jcenter()
+    maven { url 'https://maven.google.com' }
+}
+
+// Place it at the end of the file
+//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
