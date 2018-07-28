@@ -38,10 +38,6 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
         return BuildConfig.JAWBONE_CLIENT_ID != null && BuildConfig.JAWBONE_CLIENT_SECRET != null && BuildConfig.JAWBONE_REDIRECT_URI != null
     }
 
-    private const val CLIENT_ID = BuildConfig.JAWBONE_CLIENT_ID
-    private const val CLIENT_SECRET = BuildConfig.JAWBONE_CLIENT_SECRET
-    private const val REDIRECT_URI = BuildConfig.JAWBONE_REDIRECT_URI
-
     fun makeFormattedDateInteger(date: Long): Int {
         val cal = Calendar.getInstance()
         cal.timeInMillis = date
@@ -122,7 +118,7 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
 
         override fun tryResolve(activity: Activity): Single<Boolean> {
             return Single.defer {
-                val builder = OauthUtils.setOauthParameters(CLIENT_ID, REDIRECT_URI, SCOPES)
+                val builder = OauthUtils.setOauthParameters(BuildConfig.JAWBONE_CLIENT_ID, BuildConfig.JAWBONE_REDIRECT_URI, SCOPES)
 
                 val intent = Intent(activity, OauthWebViewActivity::class.java)
                 intent.putExtra(UpPlatformSdkConstants.AUTH_URI, builder.build())
@@ -138,8 +134,8 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
                                         ApiManager.getRequestInterceptor().clearAccessToken()
 
                                         ApiManager.getRestApiInterface().getAccessToken(
-                                                CLIENT_ID,
-                                                CLIENT_SECRET,
+                                                BuildConfig.JAWBONE_CLIENT_ID,
+                                                BuildConfig.JAWBONE_CLIENT_SECRET,
                                                 code,
                                                 object : Callback<OauthAccessTokenResponse> {
                                                     override fun onFailure(call: Call<OauthAccessTokenResponse>?, t: Throwable?) {
