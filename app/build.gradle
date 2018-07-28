@@ -160,7 +160,7 @@ android {
             }
             else buildType.buildConfigField 'boolean', 'DISABLE_EXTERNAL_ENTITIES', "false"
 
-            if(buildConfigJson.defaultExperimentId != null && buildConfigJson.defaultExperimentId.length > 0){
+            if(buildConfigJson.defaultExperimentId != null && buildConfigJson.defaultExperimentId.length() > 0){
                 buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "\"$buildConfigJson.defaultExperimentId\""
             }else{
                 buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "null"
