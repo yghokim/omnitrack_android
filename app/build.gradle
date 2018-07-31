@@ -10,19 +10,17 @@ def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
-
 //check unset keystore properties
 ["GOOGLE_MAPS_API_KEY",
  "FITBIT_CLIENT_ID", "FITBIT_CLIENT_SECRET",
  "MISFIT_APP_KEY", "MISFIT_APP_SECRET",
  "RESCUETIME_CLIENT_ID", "RESCUETIME_CLIENT_SECRET", "RESCUETIME_REDIRECT_URI",
- "JAWBONE_CLIENT_ID", "JAWBONE_CLIENT_SECRET", "JAWBONE_REDIRECT_URI"].forEach{
-    key->
-        if(!keystoreProperties.containsKey(key)){
+ "JAWBONE_CLIENT_ID", "JAWBONE_CLIENT_SECRET", "JAWBONE_REDIRECT_URI"].forEach {
+    key ->
+        if (!keystoreProperties.containsKey(key)) {
             keystoreProperties.setProperty(key, "null")
         }
 }
-
 
 //load google-services.json
 File googleServicesFile = rootProject.file("google-services.json")
@@ -39,9 +37,9 @@ def buildConfigJson = new groovy.json.JsonSlurper().parseText(buildConfigJsonFil
 
 android {
 
-    if(buildConfigJson.signing != null){
-        signingConfigs{
-            sign_test{
+    if (buildConfigJson.signing != null) {
+        signingConfigs {
+            sign_release {
                 storeFile file(buildConfigJson.signing.releaseKeystoreLocation)
                 keyAlias buildConfigJson.signing.releaseAlias
                 keyPassword buildConfigJson.signing.releaseKeyPassword
@@ -53,9 +51,9 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
-        if(buildConfigJson.overridePackageName != null && buildConfigJson.overridePackageName.length() > 0) {
+        if (buildConfigJson.overridePackageName != null && buildConfigJson.overridePackageName.length() > 0) {
             applicationId buildConfigJson.overridePackageName
-        }else applicationId "kr.ac.snu.hcil.omnitrack"
+        } else applicationId "kr.ac.snu.hcil.omnitrack"
         minSdkVersion 19
         targetSdkVersion rootProject.ext.targetSdkVersion
         //multidex support
@@ -67,10 +65,10 @@ android {
         manifestPlaceholders = [GOOGLE_MAPS_API_KEY: googleMapsKey.replaceAll("\"", "").trim()]
 
 
-        if(buildConfigJson.overrideAppName!=null && buildConfigJson.overrideAppName.length() > 0){
+        if (buildConfigJson.overrideAppName != null && buildConfigJson.overrideAppName.length() > 0) {
             manifestPlaceholders.appName = buildConfigJson.overrideAppName
             buildConfigField 'String', 'APP_NAME', "\"$buildConfigJson.overrideAppName\""
-        }else{
+        } else {
             manifestPlaceholders.appName = "\"OmniTrack\""
             buildConfigField 'String', 'APP_NAME', "\"OmniTrack\""
         }
@@ -79,7 +77,7 @@ android {
         buildConfigField 'boolean', 'DISABLE_TRIGGER_CREATION', "${buildConfigJson.disableTriggerCreation ?: false}"
         buildConfigField 'boolean', 'HIDE_TRIGGERS_TAB', "${buildConfigJson.hideTriggersTab ?: false}"
         buildConfigField 'boolean', 'HIDE_SERVICES_TAB', "${buildConfigJson.hideServicesTab ?: false}"
-        buildConfigField 'boolean', 'SHOW_TUTORIALS', "${buildConfigJson.showTutorials == null? true : buildConfigJson.showTutorials}"
+        buildConfigField 'boolean', 'SHOW_TUTORIALS', "${buildConfigJson.showTutorials == null ? true : buildConfigJson.showTutorials}"
     }
 
     compileOptions {
@@ -89,11 +87,9 @@ android {
 
     applicationVariants.all { variant ->
         println("variant name: ${variant.name}")
-        if(variant.name.toLowerCase().contains("release"))
-        {
+        if (variant.name.toLowerCase().contains("assembleRelease")) {
             variant.generateBuildConfig.dependsOn("refreshVersionsByIncreasingVersionCode")
-        }
-        else
+        } else
             variant.generateBuildConfig.dependsOn("refreshVersionsNotRelease")
     }
 
@@ -111,7 +107,7 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.sign_test
+            signingConfig signingConfigs.sign_release
 
             manifestPlaceholders.appNameSuffix = ""
         }
@@ -123,28 +119,30 @@ android {
         }
     }
     buildTypes.each {
-        buildType->
-            def finalApplicationId = buildType.applicationIdSuffix ==null ? defaultConfig.applicationId : defaultConfig.applicationId + buildType.applicationIdSuffix
+        buildType ->
+            def finalApplicationId = buildType.applicationIdSuffix == null ? defaultConfig.applicationId : defaultConfig.applicationId + buildType.applicationIdSuffix
 
             buildType.buildConfigField 'String', 'OMNITRACK_SYNCHRONIZATION_SERVER_URL', "\"$buildConfigJson.synchronizationServerUrl\""
             buildType.buildConfigField 'String', 'OMNITRACK_MEDIA_STORAGE_SERVER_URL', "\"$buildConfigJson.mediaStorageUrl\""
 
-            keystoreProperties.keySet().forEach{
+            keystoreProperties.keySet().forEach {
                 buildType.buildConfigField 'String', it.toString(), keystoreProperties.getProperty(it)
             }
 
             //type-specific properties
             File variantKeystorePropertiesFile = rootProject.file("keystore.${buildType.name}.properties")
-            if(variantKeystorePropertiesFile.exists()) {
+            if (variantKeystorePropertiesFile.exists()) {
                 def variantKeystoreProperties = new Properties()
                 variantKeystoreProperties.load(new FileInputStream(variantKeystorePropertiesFile))
-                variantKeystoreProperties.keySet().forEach{
+                variantKeystoreProperties.keySet().forEach {
                     buildType.buildConfigField 'String', it.toString(), variantKeystoreProperties.getProperty(it)
                 }
             }
 
 
-            def googleServiceClient = googleServices.client.find{it.client_info.android_client_info.package_name == finalApplicationId}
+            def googleServiceClient = googleServices.client.find {
+                it.client_info.android_client_info.package_name == finalApplicationId
+            }
             def googleAuthClientId = googleServiceClient.oauth_client[0].client_id
             def firebaseApiKey = googleServiceClient.api_key[0].current_key
             def mobileSdkAppId = googleServiceClient.client_info.mobilesdk_app_id
@@ -155,14 +153,13 @@ android {
             buildType.buildConfigField 'String', 'FIREBASE_AUTH_CLIENT_ID', "\"$googleAuthClientId\""
             buildType.buildConfigField 'String', 'FIREBASE_CLIENT_ID', "\"$mobileSdkAppId\""
 
-            if(buildConfigJson.disableExternalEntities == true && buildConfigJson.defaultExperimentId != null && buildConfigJson.defaultExperimentId.length() > 0){
+            if (buildConfigJson.disableExternalEntities == true && buildConfigJson.defaultExperimentId != null && buildConfigJson.defaultExperimentId.length() > 0) {
                 buildType.buildConfigField 'boolean', 'DISABLE_EXTERNAL_ENTITIES', "true"
-            }
-            else buildType.buildConfigField 'boolean', 'DISABLE_EXTERNAL_ENTITIES', "false"
+            } else buildType.buildConfigField 'boolean', 'DISABLE_EXTERNAL_ENTITIES', "false"
 
-            if(buildConfigJson.defaultExperimentId != null && buildConfigJson.defaultExperimentId.length() > 0){
+            if (buildConfigJson.defaultExperimentId != null && buildConfigJson.defaultExperimentId.length() > 0) {
                 buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "\"$buildConfigJson.defaultExperimentId\""
-            }else{
+            } else {
                 buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "null"
             }
 
@@ -193,7 +190,7 @@ configurations.all {
             if (!requested.name.startsWith("multidex")) {
                 details.useVersion rootProject.ext.android_support_version
             }
-        }else if(requested.group == "org.jetbrains.kotlin"){
+        } else if (requested.group == "org.jetbrains.kotlin") {
             details.useVersion rootProject.ext.kotlin_version
         }
     }
@@ -219,7 +216,7 @@ dependencies {
     implementation "com.google.firebase:firebase-messaging:17.1.0"
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
     implementation 'android.arch.lifecycle:extensions:1.1.1'
-    def work_version = "1.0.0-alpha04"
+    def work_version = "1.0.0-alpha05"
     implementation "android.arch.work:work-runtime-ktx:$work_version" // use -ktx for Kotlin
     // optional - Firebase JobDispatcher support
     implementation "android.arch.work:work-firebase:$work_version"
@@ -310,12 +307,12 @@ repositories {
 apply plugin: 'realm-android'
 
 ext.refreshVersion = {
-    increase->
-        println("refresh versions.")
+    increase ->
+        println(buildConfigJson.disableVersionAutoIncrement == true? "Use version properties without auto-increment." : "auto-increment version name.")
         def versionPropsFile = rootProject.file("version.properties")
         Properties versionProperties = new Properties()
         versionProperties.load(new FileInputStream(versionPropsFile))
-        def releaseIncrease = increase ? 1 : 0
+        def releaseIncrease = increase && buildConfigJson.disableVersionAutoIncrement != true ? 1 : 0
 
         def patternVersionNumber = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)(-[a-zA-Z0-9]+)?")
         def matcherVersionNumber = patternVersionNumber.matcher(versionProperties["versionName"])
@@ -326,16 +323,19 @@ ext.refreshVersion = {
         def buildVersion = Integer.parseInt(matcherVersionNumber.group(4))
         def suffix = matcherVersionNumber.group(5)
 
-        def versionName = majorVersion + "." + minorVersion + "." + (pointVersion + releaseIncrease) + "." + (buildVersion + 1) + suffix
+        def versionName = majorVersion + "." + minorVersion + "." + (pointVersion + releaseIncrease) + "." + (buildVersion + (buildConfigJson.disableVersionAutoIncrement == true ? 0 : 1)) + suffix
         def versionCode = versionProperties["versionCode"].toInteger() + releaseIncrease
         versionProperties.setProperty("versionName", versionName)
         versionProperties.setProperty("versionCode", versionCode.toString())
-        versionProperties.store(versionPropsFile.newWriter(), "auto-incremented version information.")
+
+        if(buildConfigJson.disableVersionAutoIncrement != true) {
+            versionProperties.store(versionPropsFile.newWriter(), "auto-incremented version information.")
+        }
 
         android.defaultConfig.versionName = versionName
         android.defaultConfig.versionCode = versionCode
         android.applicationVariants.all {
-            variant->
+            variant ->
                 variant.mergedFlavor.versionCode = versionCode
                 variant.mergedFlavor.versionName = versionName
 
@@ -346,8 +346,8 @@ ext.refreshVersion = {
         println("new versionName: ${versionName}, versionCode: ${versionCode}")
 
         android.applicationVariants.all {
-            variant->
-                variant.outputs.all{ output ->
+            variant ->
+                variant.outputs.all { output ->
                     outputFileName = "${variant.name}-${versionName}.apk"
                 }
 
@@ -355,10 +355,10 @@ ext.refreshVersion = {
         }
 }
 
-task("refreshVersionsNotRelease").doLast{
+task("refreshVersionsNotRelease").doLast {
     refreshVersion(false)
 }
 
-task("refreshVersionsByIncreasingVersionCode").doLast{
+task("refreshVersionsByIncreasingVersionCode").doLast {
     refreshVersion(true)
 }

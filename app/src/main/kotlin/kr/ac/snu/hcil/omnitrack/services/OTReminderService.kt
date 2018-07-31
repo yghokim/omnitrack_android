@@ -126,18 +126,19 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
             return try {
                 //val triggerId = inputData.getString(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER, "")
                 val entryId = inputData.getLong(INTENT_EXTRA_ENTRY_ID, 0)
-                val configId = inputData.getString(OTApp.INTENT_EXTRA_CONFIGURATION_ID, "")!!
+                val configId = inputData.getString(OTApp.INTENT_EXTRA_CONFIGURATION_ID)
+                if (configId != null) {
+                    val configuredContext = (applicationContext as OTApp).applicationComponent.configurationController().getConfiguredContextOf(configId)
+                    if (configuredContext != null) {
+                        //this.applicationContext.startService(OTReminderService.makeReminderDismissedIntent(this.applicationContext, configId, triggerId, entryId))
+                        val commands = OTReminderCommands(configuredContext, applicationContext)
 
-                val configuredContext = (applicationContext as OTApp).applicationComponent.configurationController().getConfiguredContextOf(configId)
-                if (configuredContext != null) {
-                    //this.applicationContext.startService(OTReminderService.makeReminderDismissedIntent(this.applicationContext, configId, triggerId, entryId))
-                    val commands = OTReminderCommands(configuredContext, applicationContext)
-
-                    val realm = commands.getNewRealm()
-                    commands.dismissSyncImpl(entryId, realm)
-                    realm.close()
-                    OTApp.logger.writeSystemLog("Successfully dismissed reminder by Worker. entryId: $entryId", "ReminderDismissWorker")
-                    Result.SUCCESS
+                        val realm = commands.getNewRealm()
+                        commands.dismissSyncImpl(entryId, realm)
+                        realm.close()
+                        OTApp.logger.writeSystemLog("Successfully dismissed reminder by Worker. entryId: $entryId", "ReminderDismissWorker")
+                        Result.SUCCESS
+                    } else Result.FAILURE
                 } else Result.FAILURE
             } catch (ex: Exception) {
                 OTApp.logger.writeSystemLog("ReminderDismissWorker doWork error: \n${Log.getStackTraceString(ex)}", "ReminderDismissWorker")
@@ -149,17 +150,18 @@ class OTReminderService : ConfigurableWakefulService(TAG) {
     class SystemRebootWorker : Worker() {
         override fun doWork(): Result {
             return try {
-                val configId = inputData.getString(OTApp.INTENT_EXTRA_CONFIGURATION_ID, "")!!
-
-                val configuredContext = (applicationContext as OTApp).applicationComponent.configurationController().getConfiguredContextOf(configId)
-                if (configuredContext != null) {
-                    //this.applicationContext.startService(OTReminderService.makeReminderDismissedIntent(this.applicationContext, configId, triggerId, entryId))
-                    val commands = OTReminderCommands(configuredContext, applicationContext)
-                    val realm = commands.getNewRealm()
-                    commands.handlSystemRebootSyncImpl(realm)
-                    realm.close()
-                    OTApp.logger.writeSystemLog("Successfully handled reboot for reminder by Worker.", "OTReminderService.SystemRebootWorker")
-                    Result.SUCCESS
+                val configId = inputData.getString(OTApp.INTENT_EXTRA_CONFIGURATION_ID)
+                if (configId != null) {
+                    val configuredContext = (applicationContext as OTApp).applicationComponent.configurationController().getConfiguredContextOf(configId)
+                    if (configuredContext != null) {
+                        //this.applicationContext.startService(OTReminderService.makeReminderDismissedIntent(this.applicationContext, configId, triggerId, entryId))
+                        val commands = OTReminderCommands(configuredContext, applicationContext)
+                        val realm = commands.getNewRealm()
+                        commands.handlSystemRebootSyncImpl(realm)
+                        realm.close()
+                        OTApp.logger.writeSystemLog("Successfully handled reboot for reminder by Worker.", "OTReminderService.SystemRebootWorker")
+                        Result.SUCCESS
+                    } else Result.FAILURE
                 } else Result.FAILURE
             } catch (ex: Exception) {
                 OTApp.logger.writeSystemLog("Reminder Reboot Handling failed: \n ${Log.getStackTraceString(ex)}", "OTReminderService.SystemRebootWorker")

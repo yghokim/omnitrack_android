@@ -1,6 +1,7 @@
 {
   "synchronizationServerUrl": null,
   "mediaStorageUrl": null,
+  "disableVersionAutoIncrement": false,
   "defaultExperimentId": null,
   "overridePackageName": null,
   "overrideAppName": null,
@@ -16,5 +17,5 @@
   },
   "showTutorials": true,
   "hideServicesTab": false,
-  "hideTriggersTab": false
+  "hideTriggersTab": false,
 }
