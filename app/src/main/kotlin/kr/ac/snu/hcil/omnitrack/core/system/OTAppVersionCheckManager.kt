@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.system
 
 import android.content.Context
+import android.net.Uri
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.AppUpdaterUtils
 import com.github.javiersantos.appupdater.enums.Display
@@ -14,9 +15,16 @@ import java.net.URLEncoder
  */
 object OTAppVersionCheckManager {
     val updateInfoUrl: String by lazy {
-        val result = BuildConfig.OMNITRACK_SYNCHRONIZATION_SERVER_URL +
-                "/api/clients/latest?platform=Android&host=${URLEncoder.encode(BuildConfig.OMNITRACK_SYNCHRONIZATION_SERVER_URL, "UTF-8")}"
-        result
+        Uri.parse(BuildConfig.OMNITRACK_SYNCHRONIZATION_SERVER_URL +
+                "/api/clients/latest").buildUpon()
+                .appendQueryParameter("platform", "Android")
+                .apply {
+                    if (BuildConfig.DEFAULT_EXPERIMENT_ID != null) {
+                        this.appendQueryParameter("experimentId", BuildConfig.DEFAULT_EXPERIMENT_ID)
+                    }
+                }
+                .appendQueryParameter("host", URLEncoder.encode(BuildConfig.OMNITRACK_SYNCHRONIZATION_SERVER_URL, "UTF-8"))
+                .build().path
     }
 
     fun makeAppUpdater(context: Context): AppUpdater {
