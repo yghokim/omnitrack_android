@@ -561,7 +561,7 @@ class TrackerListFragment : OTFragment() {
 
                 subscriptions.add(
                         viewModel.isForExperiment.subscribe { isForExperiment ->
-                            if (isForExperiment) {
+                            if (isForExperiment && BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
                                 itemView.ui_experiment_info.visibility = View.VISIBLE
                                 itemView.ui_experiment_info.ui_experiment_name.text = "Research"
                             } else {
