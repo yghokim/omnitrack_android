@@ -87,6 +87,13 @@ class BackendRealmMigration : RealmMigration {
 
             oldVersionPointer++
         }
+
+        if (oldVersionPointer == 4L) {
+            schema.get("OTUser")
+                    ?.removeField("consentApproved")
+
+            oldVersionPointer++
+        }
     }
 
     override fun hashCode(): Int {

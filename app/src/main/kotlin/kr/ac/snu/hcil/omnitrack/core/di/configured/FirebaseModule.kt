@@ -23,16 +23,17 @@ class FirebaseModule {
     @Configured
     fun provideFirebaseApp(context: Context, configuration: OTConfiguration): FirebaseApp {
 
-        return if (FirebaseApp.getApps(context).find { it.name == configuration.id } != null)
-            FirebaseApp.getInstance(configuration.id)
-        else
+        return try {
+            FirebaseApp.getInstance()!!
+        } catch (ex: Exception) {
             FirebaseApp.initializeApp(context, FirebaseOptions
-                .Builder()
+                    .Builder()
                     .setApiKey(configuration.firebaseGoogleApiKey)
-                .setApplicationId(BuildConfig.FIREBASE_CLIENT_ID)
-                .setGcmSenderId(configuration.firebaseCloudMessagingSenderId)
-                .setProjectId(configuration.firebaseProjectId)
-                    .build(), configuration.id)
+                    .setApplicationId(BuildConfig.FIREBASE_CLIENT_ID)
+                    .setGcmSenderId(configuration.firebaseCloudMessagingSenderId)
+                    .setProjectId(configuration.firebaseProjectId)
+                    .build())
+        }
     }
 
     @Provides
@@ -59,4 +60,5 @@ class FirebaseModule {
 
 
 @Qualifier
-@Retention(AnnotationRetention.RUNTIME) annotation class FirebaseInstanceIdToken
+@Retention(AnnotationRetention.RUNTIME)
+annotation class FirebaseInstanceIdToken

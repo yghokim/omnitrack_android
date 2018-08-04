@@ -124,26 +124,17 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
                 OTApp.BROADCAST_ACTION_REMINDER_AUTO_EXPIRY_ALARM -> {
                     OTApp.logger.writeSystemLog("Handle auto expiry alarm", TAG)
                     val entryId = intent.getLongExtra(OTReminderService.INTENT_EXTRA_ENTRY_ID, -1)
-                    val configId = intent.getStringExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID)
-                    if (configId != null) {
-                        val configuredContext = (applicationContext as OTApp).applicationComponent.configurationController().getConfiguredContextOf(configId)
-                        if (configuredContext != null) {
-                            //this.applicationContext.startService(OTReminderService.makeReminderDismissedIntent(this.applicationContext, configId, triggerId, entryId))
-                            val commands = OTReminderCommands(configuredContext, applicationContext)
+                    //this.applicationContext.startService(OTReminderService.makeReminderDismissedIntent(this.applicationContext, configId, triggerId, entryId))
+                    val commands = OTReminderCommands(applicationContext)
 
-                            val realm = commands.getNewRealm()
-                            commands.dismissSyncImpl(entryId, realm)
-                            realm.close()
-                            OTApp.logger.writeSystemLog("Successfully dismissed reminder by alarm. entryId: $entryId", TAG)
-                        } else {
-                            OTApp.logger.writeSystemLog("Configured context is null so did not expire the reminder. entryId: $entryId", TAG)
-                        }
+                    val realm = commands.getNewRealm()
+                    commands.dismissSyncImpl(entryId, realm)
+                    realm.close()
+                    OTApp.logger.writeSystemLog("Successfully dismissed reminder by alarm. entryId: $entryId", TAG)
 
-                        completeWakefulIntent(intent)
-                        OTApp.logger.writeSystemLog("Released wake lock for AlarmReceiver.", TAG)
-                        stopSelf(startId)
-                    }
-
+                    completeWakefulIntent(intent)
+                    OTApp.logger.writeSystemLog("Released wake lock for AlarmReceiver.", TAG)
+                    stopSelf(startId)
                 }
             }
 

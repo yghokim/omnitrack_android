@@ -3,6 +3,7 @@
   "mediaStorageUrl": null,
   "disableVersionAutoIncrement": false,
   "defaultExperimentId": null,
+  "defaultInvitationCode": null,
   "overridePackageName": null,
   "overrideAppName": null,
   "disableExternalEntities": false,

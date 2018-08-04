@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core.net
 import android.support.annotation.Keep
 import com.google.gson.JsonObject
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.core.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
@@ -13,9 +12,18 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
  */
 interface ISynchronizationServerSideAPI {
 
+    @Keep
+    data class ServerUserInfo(val _id: String, val name: String?, val email: String, val picture: String?, val nameUpdatedAt: Long?,
+                              val dataStore: JsonObject?)
 
     @Keep
-    data class DeviceInfoResult(var result: String, var deviceLocalKey: String?, val payloads: Map<String, String>? = null)
+    data class ExperimentConsentInfo(val receiveConsentInApp: Boolean, val consent: String?, val demographicFormSchema: JsonObject?)
+
+    @Keep
+    data class AuthenticationResult(val inserted: Boolean, val deviceLocalKey: String, val userInfo: ServerUserInfo?)
+
+    @Keep
+    data class DeviceInfoResult(var result: String, var deviceLocalKey: String?)
 
     @Keep
     data class InformationUpdateResult(var success: Boolean, var finalValue: String, val payloads: Map<String, String>? = null)
@@ -23,9 +31,13 @@ interface ISynchronizationServerSideAPI {
     @Keep
     data class DirtyRowBatchParameter(val type: ESyncDataType, val rows: Array<String>)
 
-    fun getUserRoles(): Single<List<OTUserRolePOJO>>
+    //New authentication APIs======================================
+    fun checkExperimentParticipationStatus(experimentId: String): Single<Boolean>
 
-    fun postUserRoleConsentResult(result: OTUserRolePOJO): Single<Boolean>
+    fun authenticate(deviceInfo: OTDeviceInfo, invitationCode: String?, demographicData: JsonObject?): Single<AuthenticationResult>
+    fun getExperimentConsentInfo(experimentId: String): Single<ExperimentConsentInfo>
+    fun verifyInvitationCode(invitationCode: String, experimentId: String): Single<Boolean>
+    //=============================================================
 
     fun putDeviceInfo(info: OTDeviceInfo): Single<DeviceInfoResult>
     fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean>

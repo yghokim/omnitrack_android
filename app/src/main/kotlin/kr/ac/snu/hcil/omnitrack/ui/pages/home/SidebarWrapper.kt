@@ -172,10 +172,8 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                                         user.nameUpdatedAt = System.currentTimeMillis()
                                         user.nameSynchronizedAt = null
                                     }
-                                    jobDispatcher.mustSchedule(informationUploadJobProvider.setTag(
-                                            OTInformationUploadService.makeTag(authManager.userId
-                                                    ?: "", configuration.id, OTInformationUploadService.INFORMATION_USERNAME)
-                                    ).build())
+                                    jobDispatcher.mustSchedule(informationUploadJobProvider.setTag(OTInformationUploadService.INFORMATION_USERNAME)
+                                            .build())
                                 }
                             }
                         }

@@ -12,7 +12,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.OTExper
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.net.IResearchServerAPI
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
-import java.io.File
 import javax.inject.Qualifier
 
 /**
@@ -28,9 +27,8 @@ class ResearchModule {
     @Provides
     @Configured
     @Research
-    fun researchDatabaseConfiguration(@ConfigurationDirectory configDirectory: File): RealmConfiguration {
+    fun researchDatabaseConfiguration(): RealmConfiguration {
         return RealmConfiguration.Builder()
-                .directory(configDirectory)
                 .name("research.db")
                 .modules(ResearchRealmModule())
                 .run {

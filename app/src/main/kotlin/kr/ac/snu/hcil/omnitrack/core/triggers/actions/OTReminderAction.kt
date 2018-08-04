@@ -190,7 +190,7 @@ class OTReminderAction : OTTriggerAction() {
             println("trigger fired - send notification")
 
             if (trigger.liveTrackerCount > 0) {
-                val reminderCommands = OTReminderCommands(configuredContext, configuredContext.applicationContext)
+                val reminderCommands = OTReminderCommands(configuredContext.applicationContext)
                 return@defer reminderCommands.remind(trigger.objectId!!, triggerTime, metadata)
             }
             return@defer Completable.complete()

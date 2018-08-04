@@ -24,7 +24,7 @@ class PackageReceiver : BroadcastReceiver() {
         val authManager = (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.getAuthManager()
         if (authManager.isUserSignedIn()) {
 
-            val reminderCommands = OTReminderCommands((context.applicationContext as OTApp).currentConfiguredContext, context)
+            val reminderCommands = OTReminderCommands(context)
             val realm = (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.backendRealmFactory().get()
             reminderCommands.restoreReminderNotifications(realm).blockingAwait()
             realm.close()

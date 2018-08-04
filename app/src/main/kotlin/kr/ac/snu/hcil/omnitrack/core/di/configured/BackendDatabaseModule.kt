@@ -10,7 +10,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendRealmMigration
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.*
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.*
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
-import java.io.File
 import javax.inject.Qualifier
 
 /**
@@ -26,12 +25,11 @@ class BackendDatabaseModule {
     @Provides
     @Configured
     @Backend
-    fun backendDatabaseConfiguration(@ConfigurationDirectory configDirectory: File): RealmConfiguration {
+    fun backendDatabaseConfiguration(): RealmConfiguration {
         return RealmConfiguration.Builder()
-                .directory(configDirectory)
                 .name("backend.db")
                 .modules(BackendRealmModule())
-                .schemaVersion(4)
+                .schemaVersion(5)
                 .migration(BackendRealmMigration())
                 .build()
     }

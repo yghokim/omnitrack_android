@@ -39,8 +39,6 @@ interface IEventLogger {
 
         const val SUB_SIGNED_IN = "signedIn"
         const val SUB_SIGNED_OUT = "signedOut"
-        const val SUB_CONSENT_DENIED = "consentDenied"
-        const val SUB_CONSENT_APPROVED = "consentApproved"
 
         const val CONTENT_IS_INDIVIDUAL = "isIndividual"
         const val CONTENT_KEY_PROPERTY = "property"

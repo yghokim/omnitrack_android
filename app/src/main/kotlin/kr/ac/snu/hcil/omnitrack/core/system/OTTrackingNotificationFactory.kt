@@ -33,7 +33,7 @@ object OTTrackingNotificationFactory {
         val resultPendingIntent = stackBuilder.getPendingIntent(0,
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val itemRemoveIntent = OTItemLoggingService.makeRemoveItemIntent(context, itemId, configuredContext.configuration.id)
+        val itemRemoveIntent = OTItemLoggingService.makeRemoveItemIntent(context, itemId)
                 .putExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID, notificationId)
                 .putExtra(OTApp.INTENT_EXTRA_NOTIFICATON_TAG, tag)
 

@@ -11,23 +11,21 @@ import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfigurationController
-import kr.ac.snu.hcil.omnitrack.core.database.global.OTAttachedConfigurationDao
-import kr.ac.snu.hcil.omnitrack.core.di.global.AppLevelDatabase
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
+import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import org.jetbrains.anko.notificationManager
+import java.io.IOException
 import java.lang.Exception
 import javax.inject.Inject
 
@@ -52,9 +50,6 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
     @Inject
     lateinit var configController: OTConfigurationController
 
-    @field:[Inject AppLevelDatabase]
-    lateinit var realmFactory: Factory<Realm>
-
     private val subscriptions = CompositeDisposable()
 
     override fun onCreate() {
@@ -67,6 +62,39 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
         subscriptions.clear()
     }
 
+    override fun onNewToken(newToken: String) {
+        super.onNewToken(newToken)
+        subscriptions.add(
+                Completable.merge(
+                        configController.map { config ->
+                            Completable.defer {
+                                val configuredContext = configController.currentConfiguredContext
+                                try {
+                                    val fbInstanceId = configuredContext.firebaseComponent.getFirebaseInstanceId()
+                                    val token = fbInstanceId.getToken(config.firebaseCloudMessagingSenderId, "FCM")
+                                    if (token != null) {
+                                        println("FirebaseInstanceId token - ${token}")
+                                        val currentUserId = configuredContext.configuredAppComponent.getAuthManager().userId
+                                        if (currentUserId != null) {
+                                            val jobBuilder = configuredContext.scheduledJobComponent.getInformationUploadJobBuilderProvider().get()
+                                            dispatcher.mustSchedule(jobBuilder.setTag(OTInformationUploadService.INFORMATION_DEVICE).build())
+                                        }
+                                    }
+                                } catch (ex: IOException) {
+                                    ex.printStackTrace()
+                                }
+                                return@defer Completable.complete()
+                            }
+                        }
+                ).subscribeOn(Schedulers.io())
+                        .subscribe({
+                            println("Firebase Instance Id Token was refreshed: onTokenRefresh")
+                        }, { ex ->
+                            ex.printStackTrace()
+                        })
+        )
+    }
+
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
         val senderId = remoteMessage.from
@@ -76,31 +104,20 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
         if (senderId != null) {
             subscriptions.add(
                     Completable.defer {
-                        realmFactory.get().use { realm ->
-                            val dao = realm.where(OTAttachedConfigurationDao::class.java)
-                                    .equalTo(OTAttachedConfigurationDao.FIELD_GCM_SENDER_ID, senderId).findFirst()
-                            if (dao != null) {
-                                println("OTFirebaseMessagingService: Found corresponding configuration context sent from: ${senderId}")
-                                val configuredContext = configController.getConfiguredContextOf(dao.staticConfiguration())
-                                if (configuredContext != null) {
-                                    val data = remoteMessage.data
-                                    if (data != null && data.size > 0) {
+                        val configuredContext = configController.currentConfiguredContext
+                        val data = remoteMessage.data
+                        if (data != null && data.size > 0) {
 
-                                        configuredContext.configuredAppComponent.getEventLogger().logEvent(TAG, "received_gcm_command", jsonObject("command" to data.get("command")))
-                                        try {
-                                            when (data.get("command")) {
-                                                COMMAND_SYNC -> handleSyncCommand(data, configuredContext)
-                                                COMMAND_SIGNOUT -> handleSignOutCommand(data, configuredContext)
-                                                COMMAND_DUMP_DB -> handleDumpCommand(data, configuredContext)
-                                                COMMAND_TEXT_MESSAGE -> handleMessageCommand(data, configuredContext)
-                                            }
-                                        } catch (ex: Exception) {
-                                            ex.printStackTrace()
-                                        }
-                                    }
+                            configuredContext.configuredAppComponent.getEventLogger().logEvent(TAG, "received_gcm_command", jsonObject("command" to data.get("command")))
+                            try {
+                                when (data.get("command")) {
+                                    COMMAND_SYNC -> handleSyncCommand(data, configuredContext)
+                                    COMMAND_SIGNOUT -> handleSignOutCommand(data, configuredContext)
+                                    COMMAND_DUMP_DB -> handleDumpCommand(data, configuredContext)
+                                    COMMAND_TEXT_MESSAGE -> handleMessageCommand(data, configuredContext)
                                 }
-                            } else {
-                                println("OTFirebaseMessagingService: Did not find any corresponding configuration with sender Id")
+                            } catch (ex: Exception) {
+                                ex.printStackTrace()
                             }
                         }
                         return@defer Completable.complete()

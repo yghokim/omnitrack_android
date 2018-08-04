@@ -77,7 +77,7 @@ class OTTriggerSystemManager(
     fun refreshReservedAlarms() {
         triggerAlarmManager.get().rearrangeSystemAlarms()
         val realm = realmProvider.get()
-        val commands = OTReminderCommands(configuredContext, context)
+        val commands = OTReminderCommands(context)
         commands.rearrangeAutoExpiryAlarms(realm)
         realm.close()
     }

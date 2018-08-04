@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
-import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import dagger.Lazy
@@ -48,7 +47,6 @@ class RebootReceiver : BroadcastReceiver() {
         triggerManager.onSystemRebooted()
 
         WorkManager.getInstance().enqueue(OneTimeWorkRequestBuilder<OTReminderService.SystemRebootWorker>()
-                .setInputData(Data.Builder().putString(OTApp.INTENT_EXTRA_CONFIGURATION_ID, (context.applicationContext as OTApp).currentConfiguredContext.configuration.id).build())
                 .build())
 
         shortcutPanelManager.refreshNotificationShortcutViewsObservable(context).timeout(2, TimeUnit.SECONDS).doAfterTerminate {

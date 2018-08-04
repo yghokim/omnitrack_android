@@ -33,7 +33,11 @@ class ItemTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerCompa
                 BackendDbManager.FIELD_TIMESTAMP_LONG -> dao.timestamp = reader.nextLong()
                 BackendDbManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
                 BackendDbManager.FIELD_TIMEZONE -> dao.timezone = reader.nextString()
-                "metadata" -> dao.serializedMetadata = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java)?.toString()
+                "metadata" -> if (reader.peek() == JsonToken.NULL) {
+                    reader.skipValue()
+                } else {
+                    dao.serializedMetadata = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java)?.toString()
+                }
                 "deviceId"->dao.deviceId = reader.nextString()
                 "source"-> dao.source = reader.nextString()
                 "dataTable" ->{

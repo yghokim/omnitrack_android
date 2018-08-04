@@ -55,44 +55,44 @@ class OTShortcutPanelWidgetUpdateService : Service() {
             return context.applicationContext.getSharedPreferences("shortcutPanelWidget", Context.MODE_PRIVATE)
         }
 
-        fun makePrefKey(keyPrefix: String, widgetId: Int, configId: String): String {
-            return "${keyPrefix}$DELIMITER${widgetId}$DELIMITER${configId}"
+        fun makePrefKey(keyPrefix: String, widgetId: Int): String {
+            return "${keyPrefix}$DELIMITER${widgetId}"
         }
 
-        fun removeVariables(widgetId: Int, configId: String, editor: SharedPreferences.Editor) {
+        fun removeVariables(widgetId: Int, editor: SharedPreferences.Editor) {
             editor
-                    .remove(makePrefKey(EXTRA_MODE, widgetId, configId))
-                    .remove(makePrefKey(EXTRA_TITLE, widgetId, configId))
-                    .remove(makePrefKey(EXTRA_SELECTED_TRACKER_IDS, widgetId, configId))
+                    .remove(makePrefKey(EXTRA_MODE, widgetId))
+                    .remove(makePrefKey(EXTRA_TITLE, widgetId))
+                    .remove(makePrefKey(EXTRA_SELECTED_TRACKER_IDS, widgetId))
         }
 
-        fun getMode(widgetId: Int, configId: String, pref: SharedPreferences): String {
-            return pref.getString(makePrefKey(EXTRA_MODE, widgetId, configId), MODE_ALL)
+        fun getMode(widgetId: Int, pref: SharedPreferences): String {
+            return pref.getString(makePrefKey(EXTRA_MODE, widgetId), MODE_ALL)
         }
 
-        fun setMode(widgetId: Int, configId: String, mode: String, editor: SharedPreferences.Editor) {
-            editor.putString(makePrefKey(EXTRA_MODE, widgetId, configId), mode)
+        fun setMode(widgetId: Int, mode: String, editor: SharedPreferences.Editor) {
+            editor.putString(makePrefKey(EXTRA_MODE, widgetId), mode)
         }
 
-        fun getTitle(widgetId: Int, configId: String, pref: SharedPreferences): String {
-            return pref.getString(makePrefKey(EXTRA_TITLE, widgetId, configId), "OmniTrack")
+        fun getTitle(widgetId: Int, pref: SharedPreferences): String {
+            return pref.getString(makePrefKey(EXTRA_TITLE, widgetId), "OmniTrack")
         }
 
-        fun setTitle(widgetId: Int, configId: String, title: String, editor: SharedPreferences.Editor) {
-            editor.putString(makePrefKey(EXTRA_TITLE, widgetId, configId), title)
+        fun setTitle(widgetId: Int, title: String, editor: SharedPreferences.Editor) {
+            editor.putString(makePrefKey(EXTRA_TITLE, widgetId), title)
         }
 
-        fun getSelectedTrackerIds(widgetId: Int, configId: String, pref: SharedPreferences): Set<String>? {
-            return pref.getStringSet(makePrefKey(EXTRA_SELECTED_TRACKER_IDS, widgetId, configId), HashSet<String>())
+        fun getSelectedTrackerIds(widgetId: Int, pref: SharedPreferences): Set<String>? {
+            return pref.getStringSet(makePrefKey(EXTRA_SELECTED_TRACKER_IDS, widgetId), HashSet<String>())
         }
 
-        fun setSelectedTrackerIds(widgetId: Int, configId: String, value: Set<String>, editor: SharedPreferences.Editor) {
-            editor.putStringSet(makePrefKey(EXTRA_SELECTED_TRACKER_IDS, widgetId, configId), value)
+        fun setSelectedTrackerIds(widgetId: Int, value: Set<String>, editor: SharedPreferences.Editor) {
+            editor.putStringSet(makePrefKey(EXTRA_SELECTED_TRACKER_IDS, widgetId), value)
         }
 
-        fun makeRemoteViewsForNormalMode(context: Context, widgetId: Int, configId: String, options: Bundle?): RemoteViews {
+        fun makeRemoteViewsForNormalMode(context: Context, widgetId: Int, options: Bundle?): RemoteViews {
             val pref = getPreferences(context)
-            val title = getTitle(widgetId, configId, pref)
+            val title = getTitle(widgetId, pref)
 
             val rv = RemoteViews(context.packageName, R.layout.remoteview_widget_shortcut_body)
             rv.setViewVisibility(R.id.ui_progress_bar, View.INVISIBLE)
@@ -105,14 +105,12 @@ class OTShortcutPanelWidgetUpdateService : Service() {
 
             val intent = Intent(context, OTShortcutPanelWidgetService::class.java)
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-            intent.putExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID, configId)
             intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME))
 
             rv.setRemoteAdapter(R.id.ui_recyclerview_with_fallback, intent)
 
             rv.setPendingIntentTemplate(R.id.ui_recyclerview_with_fallback, PendingIntent.getBroadcast(context, widgetId,
-                    Intent(OTShortcutPanelWidgetProvider.ACTION_TRACKER_CLICK_EVENT)
-                            .putExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID, configId), PendingIntent.FLAG_UPDATE_CURRENT))
+                    Intent(OTShortcutPanelWidgetProvider.ACTION_TRACKER_CLICK_EVENT), PendingIntent.FLAG_UPDATE_CURRENT))
 
             /*
             rv.setOnClickPendingIntent(R.id.ui_button_sync,
@@ -172,12 +170,11 @@ class OTShortcutPanelWidgetUpdateService : Service() {
             return rv
         }
 
-        fun makeNotifyDatesetChangedIntentToAllWidgets(context: Context, configId: String): Intent {
+        fun makeNotifyDatesetChangedIntentToAllWidgets(context: Context): Intent {
             val widgetIds = OTShortcutPanelWidgetProvider.getAppWidgetIds(context, null)
             val intent = Intent(context, OTShortcutPanelWidgetUpdateService::class.java)
             intent.action = ACTION_NOTIFY_DATA_CHANGED
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds)
-            intent.putExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID, configId)
             return intent
         }
     }
@@ -197,10 +194,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
 
         println("Widget update service action: ${intent.action}")
-        val configId = intent.getStringExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID)
-        if (configId != null) {
-            val currentSignedInLevel = configController.getConfiguredContextOf(configId)?.configuredAppComponent?.getAuthManager()?.currentSignedInLevel
-                    ?: OTAuthManager.SignedInLevel.NONE
+        val currentSignedInLevel = configController.currentConfiguredContext.configuredAppComponent.getAuthManager().currentSignedInLevel
             val appWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS) ?: intArrayOf()
             if (appWidgetIds.isNotEmpty()) {
                 println("widget ids: ${appWidgetIds.joinToString(", ")}")
@@ -211,7 +205,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
 
                             for (id in appWidgetIds) {
                                 val options = appWidgetManager.getAppWidgetOptions(id)
-                                val rv = makeRemoteViewsForNormalMode(this, id, configId, options)
+                                val rv = makeRemoteViewsForNormalMode(this, id, options)
                                 appWidgetManager.updateAppWidget(id, rv)
                                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.ui_recyclerview_with_fallback)
                             }
@@ -230,7 +224,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
 
                     ACTION_TO_MAIN_MODE -> {
                         for (id in appWidgetIds) {
-                            val rv = makeRemoteViewsForNormalMode(this, id, configId, appWidgetManager.getAppWidgetOptions(id))
+                            val rv = makeRemoteViewsForNormalMode(this, id, appWidgetManager.getAppWidgetOptions(id))
                             appWidgetManager.updateAppWidget(id, rv)
                         }
                     }
@@ -251,7 +245,6 @@ class OTShortcutPanelWidgetUpdateService : Service() {
                         }
                     }
                 }
-            }
         }
 
         return START_NOT_STICKY

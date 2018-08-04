@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.database.configured.typeadapters
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -37,7 +38,12 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
                 BackendDbManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
                 BackendDbManager.FIELD_POSITION -> dao.position = reader.nextInt()
                 BackendDbManager.FIELD_NAME -> dao.name = reader.nextString()
-                BackendDbManager.FIELD_REDIRECT_URL -> dao.redirectUrl = reader.nextString()
+                BackendDbManager.FIELD_REDIRECT_URL -> if (reader.peek() == JsonToken.NULL) {
+                    dao.redirectUrl = null
+                    reader.skipValue()
+                } else {
+                    dao.redirectUrl = reader.nextString()
+                }
                 "color" -> dao.color = reader.nextInt()
                 "isBookmarked" -> dao.isBookmarked = reader.nextBoolean()
                 BackendDbManager.FIELD_LOCKED_PROPERTIES_SERIALIZED -> dao.serializedLockedPropertyInfo = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()

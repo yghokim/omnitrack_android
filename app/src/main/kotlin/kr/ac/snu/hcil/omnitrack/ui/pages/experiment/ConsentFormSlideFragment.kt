@@ -5,25 +5,44 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
-import com.heinrichreimersoftware.materialintro.app.SlideFragment
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.ANDROID_ASSET_PATH
+import org.jetbrains.anko.bundleOf
 import us.feras.mdv.MarkdownView
 
 /**
  * Created by Young-Ho on 1/26/2017.
  */
-class ConsentFormSlideFragment : SlideFragment() {
+class ConsentFormSlideFragment : ExperimentSignUpActivity.SlideFragment(ExperimentSignUpActivity.ESlide.CONSENT_FORM) {
+
+    companion object {
+        fun getInstanceFromAsset(path: String): ConsentFormSlideFragment {
+            return ConsentFormSlideFragment().apply {
+                arguments = bundleOf("assetPath" to path)
+            }
+        }
+
+        fun getInstanceFromString(markdownString: String): ConsentFormSlideFragment {
+            return ConsentFormSlideFragment().apply {
+                arguments = bundleOf("markdownString" to markdownString)
+            }
+        }
+    }
+
     private lateinit var markdownView: MarkdownView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view = inflater.inflate(R.layout.slide_consent_form, container, false)
         markdownView = view.findViewById(R.id.ui_markdown)
 
-        markdownView.loadMarkdownFile(
-                "$ANDROID_ASSET_PATH/consent/${resources.getString(R.string.informed_consent_filename)}",
-                "$ANDROID_ASSET_PATH/consent/style.css"
-        )
+        if (arguments?.containsKey("assetPath") == true) {
+            markdownView.loadMarkdownFile(
+                    "$ANDROID_ASSET_PATH/${arguments?.getString("assetPath")}",
+                    "$ANDROID_ASSET_PATH/consent/style.css"
+            )
+        } else if (arguments?.containsKey("markdownString") == true) {
+            markdownView.loadMarkdown(arguments?.getString("markdownString"), "$ANDROID_ASSET_PATH/consent/style.css")
+        }
 
         markdownView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
         markdownView.isScrollbarFadingEnabled = false
@@ -31,7 +50,7 @@ class ConsentFormSlideFragment : SlideFragment() {
         return view
     }
 
-    override fun canGoBackward(): Boolean {
-        return false
+    override fun onNextTried() {
+        goNext()
     }
 }

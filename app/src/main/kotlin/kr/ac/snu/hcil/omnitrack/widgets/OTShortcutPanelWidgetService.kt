@@ -42,8 +42,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
     }
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        val configId = intent.getStringExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID)
-        return PanelWidgetElementFactory(this.applicationContext, configController.getConfiguredContextOf(configId)!!, intent)
+        return PanelWidgetElementFactory(this.applicationContext, configController.currentConfiguredContext, intent)
     }
 
     class PanelWidgetElementFactory(val context: Context, val configuredContext: ConfiguredContext, intent: Intent) : RemoteViewsFactory {
@@ -78,7 +77,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
         override fun onDataSetChanged() {
             val userId = authManager.userId
             val pref = OTShortcutPanelWidgetUpdateService.getPreferences(context)
-            mode = OTShortcutPanelWidgetUpdateService.getMode(widgetId, configuredContext.configuration.id, pref)
+            mode = OTShortcutPanelWidgetUpdateService.getMode(widgetId, pref)
             trackers.clear()
             val realm = dbManager.makeNewRealmInstance()
             if(userId!=null) {
@@ -86,7 +85,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
                     OTShortcutPanelWidgetUpdateService.MODE_ALL -> trackers.addAll(dbManager.makeTrackersOfUserQuery(userId, realm).findAll().map { it.getSimpleInfo() })
                     OTShortcutPanelWidgetUpdateService.MODE_SHORTCUT -> trackers.addAll(dbManager.makeTrackersOfUserQuery(userId, realm).equalTo("isBookmarked", true).findAll().map { it.getSimpleInfo() })
                     OTShortcutPanelWidgetUpdateService.MODE_SELECTIVE -> {
-                        val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(widgetId, configuredContext.configuration.id, pref)?.toTypedArray()
+                        val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(widgetId, pref)?.toTypedArray()
                         if (selectedTrackerIds?.isNotEmpty() == true) {
                             trackers.addAll(dbManager.makeTrackersOfUserQuery(userId, realm).`in`("objectId", selectedTrackerIds).findAll().map { it.getSimpleInfo() })
                         }

@@ -27,5 +27,5 @@ interface ResearchComponent {
     fun manager(): ResearchManager
 
     fun inject(viewModel: ResearchViewModel)
-    fun inject(service: OTResearchSynchronizationService.ConfiguredTask)
+    fun inject(service: OTResearchSynchronizationService)
 }

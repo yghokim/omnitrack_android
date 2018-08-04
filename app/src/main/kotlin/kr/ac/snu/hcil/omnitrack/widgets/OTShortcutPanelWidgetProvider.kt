@@ -40,7 +40,7 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
         super.onDeleted(context, appWidgetIds)
         val editor = OTShortcutPanelWidgetUpdateService.getPreferences(context).edit()
         for (id in appWidgetIds) {
-            OTShortcutPanelWidgetUpdateService.removeVariables(id, configController.currentConfiguredContext.configuration.id, editor)
+            OTShortcutPanelWidgetUpdateService.removeVariables(id, editor)
         }
         editor.apply()
     }
@@ -48,37 +48,32 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         (context.applicationContext as OTApp).applicationComponent.inject(this)
-        val configId = intent.getStringExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID)
-        if (configId != null) {
+        if (intent.action == OTApp.BROADCAST_ACTION_USER_SIGNED_IN || intent.action == OTApp.BROADCAST_ACTION_USER_SIGNED_OUT) {
+            val updateIntent = Intent(context, OTShortcutPanelWidgetUpdateService::class.java)
 
-            if (intent.action == OTApp.BROADCAST_ACTION_USER_SIGNED_IN || intent.action == OTApp.BROADCAST_ACTION_USER_SIGNED_OUT) {
-                val updateIntent = Intent(context, OTShortcutPanelWidgetUpdateService::class.java)
+            updateIntent.action = when (intent.action) {
+                OTApp.BROADCAST_ACTION_USER_SIGNED_IN -> OTShortcutPanelWidgetUpdateService.ACTION_TO_MAIN_MODE
+                OTApp.BROADCAST_ACTION_USER_SIGNED_OUT -> OTShortcutPanelWidgetUpdateService.ACTION_TO_SIGN_IN_MODE
+                else -> OTShortcutPanelWidgetUpdateService.ACTION_TO_SIGN_IN_MODE
+            }
+            val appWidgetManager = AppWidgetManager.getInstance(context)
 
-                updateIntent.action = when (intent.action) {
-                    OTApp.BROADCAST_ACTION_USER_SIGNED_IN -> OTShortcutPanelWidgetUpdateService.ACTION_TO_MAIN_MODE
-                    OTApp.BROADCAST_ACTION_USER_SIGNED_OUT -> OTShortcutPanelWidgetUpdateService.ACTION_TO_SIGN_IN_MODE
-                    else -> OTShortcutPanelWidgetUpdateService.ACTION_TO_SIGN_IN_MODE
-                }
-                val appWidgetManager = AppWidgetManager.getInstance(context)
+            updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, getAppWidgetIds(context, appWidgetManager))
 
-                updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, getAppWidgetIds(context, appWidgetManager))
-                updateIntent.putExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID, configId)
-
-                context.startService(updateIntent)
-            } else if (intent.action == ACTION_TRACKER_CLICK_EVENT) {
-                when (intent.getStringExtra(EXTRA_CLICK_COMMAND)) {
-                    CLICK_COMMAND_ROW -> {
-                        val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
-                        if (trackerId != null) {
-                            context.startActivity(ItemDetailActivity.makeNewItemPageIntent(trackerId, context).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
-                        }
+            context.startService(updateIntent)
+        } else if (intent.action == ACTION_TRACKER_CLICK_EVENT) {
+            when (intent.getStringExtra(EXTRA_CLICK_COMMAND)) {
+                CLICK_COMMAND_ROW -> {
+                    val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
+                    if (trackerId != null) {
+                        context.startActivity(ItemDetailActivity.makeNewItemPageIntent(trackerId, context).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
                     }
+                }
 
-                    CLICK_COMMAND_INSTANT_LOGGING -> {
-                        val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
-                        if (trackerId != null) {
-                            context.startService(OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, configId, true, trackerId))
-                        }
+                CLICK_COMMAND_INSTANT_LOGGING -> {
+                    val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
+                    if (trackerId != null) {
+                        context.startService(OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, trackerId))
                     }
                 }
             }

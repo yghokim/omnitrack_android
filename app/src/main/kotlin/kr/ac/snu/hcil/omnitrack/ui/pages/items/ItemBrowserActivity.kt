@@ -850,7 +850,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     if (exportUri != null) {
                         println(exportUri.toString())
                         viewModel.trackerDao.objectId?.let {
-                            val serviceIntent = OTTableExportService.makeIntent(act, configuredContext, it, exportUri.toString(), exportConfigIncludeFile, exportConfigTableFileType)
+                            val serviceIntent = OTTableExportService.makeIntent(act, it, exportUri.toString(), exportConfigIncludeFile, exportConfigTableFileType)
                             this@SettingsDialogFragment.dismiss()
                             activity?.startService(serviceIntent)
                         }

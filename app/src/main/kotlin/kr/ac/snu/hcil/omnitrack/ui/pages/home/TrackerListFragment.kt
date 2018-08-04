@@ -313,7 +313,7 @@ class TrackerListFragment : OTFragment() {
         if (tracker.makeAttributesQuery(false, false).count() == 0L) {
             emptyTrackerDialog
                     .onPositive { materialDialog, dialogAction ->
-                        activity?.startService(OTItemLoggingService.makeLoggingIntent(act, ItemLoggingSource.Manual, configuredContext.configuration.id, true, tracker.objectId!!))
+                        activity?.startService(OTItemLoggingService.makeLoggingIntent(act, ItemLoggingSource.Manual, true, tracker.objectId!!))
                         //OTBackgroundLoggingService.log(context, tracker, OTItem.ItemLoggingSource.Manual, notify = false).subscribe()
                     }
                     .onNeutral { materialDialog, dialogAction ->

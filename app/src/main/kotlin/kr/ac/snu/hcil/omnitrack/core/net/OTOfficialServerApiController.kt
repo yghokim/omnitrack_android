@@ -6,7 +6,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kr.ac.snu.hcil.omnitrack.core.OTUserRolePOJO
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
@@ -21,14 +21,6 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
 
     private val service: OTOfficialServerService by lazy {
         retrofit.create(OTOfficialServerService::class.java)
-    }
-
-    override fun getUserRoles(): Single<List<OTUserRolePOJO>> {
-        return service.getUserRoles().subscribeOn(Schedulers.io())
-    }
-
-    override fun postUserRoleConsentResult(result: OTUserRolePOJO): Single<Boolean> {
-        return service.postUserRoleConsentResult(result).subscribeOn(Schedulers.io())
     }
 
     override fun putDeviceInfo(info: OTDeviceInfo): Single<ISynchronizationServerSideAPI.DeviceInfoResult> {
@@ -124,6 +116,36 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
 
     override fun uploadTemporaryTrackingPackage(packageString: String): Single<String> {
         return service.postTemporaryTrackingPackage(jsonObject("data" to packageString))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun checkExperimentParticipationStatus(experimentId: String): Single<Boolean> {
+        return service.getExperimentParticipationStatus(experimentId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun authenticate(deviceInfo: OTDeviceInfo, invitationCode: String?, demographicData: JsonObject?): Single<ISynchronizationServerSideAPI.AuthenticationResult> {
+        return service.authenticate(
+                jsonObject(
+                        "experimentId" to BuildConfig.DEFAULT_EXPERIMENT_ID,
+                        "invitationCode" to invitationCode,
+                        "demographic" to demographicData,
+                        "deviceInfo" to deviceInfo.convertToJson()
+                ))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun getExperimentConsentInfo(experimentId: String): Single<ISynchronizationServerSideAPI.ExperimentConsentInfo> {
+        return service.getExperimentConsentInfo(experimentId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun verifyInvitationCode(invitationCode: String, experimentId: String): Single<Boolean> {
+        return service.verifyInvitationCode(experimentId, invitationCode)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

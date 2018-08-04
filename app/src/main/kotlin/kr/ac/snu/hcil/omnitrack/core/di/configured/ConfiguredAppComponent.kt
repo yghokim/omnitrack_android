@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.di.configured
 
-import android.content.SharedPreferences
 import com.udojava.evalex.Expression
 import dagger.Subcomponent
 import dagger.internal.Factory
@@ -36,6 +35,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.InvitationCodePromptSlideFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.export.PackageExportViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.export.UploadTemporaryPackageDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.*
@@ -113,9 +113,6 @@ interface ConfiguredAppComponent {
     fun getSyncManager(): OTSyncManager
 
     fun getAttributeManager(): OTAttributeManager
-
-    @ConfiguredObject
-    fun getConfiguredPreferences(): SharedPreferences
 
     fun inject(application: OTApp)
     fun inject(realmViewModel: RealmViewModel)
@@ -204,16 +201,15 @@ interface ConfiguredAppComponent {
 
     fun inject(expression: RealmLazyFunction)
 
-    fun inject(task: OTUsageLogUploadService.ConfiguredTask)
-    fun inject(task: OTInformationUploadService.ConfiguredTask)
-    fun inject(task: OTSynchronizationService.ConfiguredTask)
-    fun inject(task: OTItemLoggingService.ConfiguredTask)
-    fun inject(task: OTTableExportService.ConfiguredTask)
-
     fun inject(service: OTBinaryUploadService)
 
-    fun inject(task: OTBinaryUploadService.ConfiguredTask)
+    fun inject(service: OTUsageLogUploadService)
+
+    fun inject(service: OTInformationUploadService)
+
     fun inject(task: OTReminderCommands)
 
     fun inject(viewModel: UploadTemporaryPackageDialogFragment.ViewModel)
+
+    fun inject(slide: InvitationCodePromptSlideFragment)
 }

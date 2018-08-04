@@ -12,7 +12,6 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.OTUsageLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UsageLog
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
-import java.io.File
 import javax.inject.Qualifier
 
 /**
@@ -23,9 +22,8 @@ class UsageLoggingModule {
     @Provides
     @Configured
     @UsageLogger
-    fun usageLogDatabaseConfiguration(@ConfigurationDirectory directory: File): RealmConfiguration {
+    fun usageLogDatabaseConfiguration(): RealmConfiguration {
         return RealmConfiguration.Builder()
-                .directory(directory)
                 .name("usage_logs.db")
                 .modules(UsageLogsRealmModule())
                 .run {

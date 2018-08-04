@@ -166,10 +166,6 @@ class OTApp : MultiDexApplication(), LifecycleObserver {
         ApplicationModule(this)
     }
 
-    private val appLevelDatabaseModule: AppDatabaseModule by lazy {
-        AppDatabaseModule()
-    }
-
     private val serializationModule: SerializationModule by lazy {
         SerializationModule()
     }
@@ -185,7 +181,6 @@ class OTApp : MultiDexApplication(), LifecycleObserver {
     val applicationComponent: ApplicationComponent by lazy {
         DaggerApplicationComponent.builder()
                 .applicationModule(appModule)
-                .appDatabaseModule(appLevelDatabaseModule)
                 .jobDispatcherModule(jobDispatcherModule)
                 .serializationModule(serializationModule)
                 .systemIdentifierFactoryModule(systemIdentifierFactoryModule)

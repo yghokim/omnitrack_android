@@ -18,14 +18,12 @@ import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
 import dagger.Lazy
 import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
@@ -49,8 +47,6 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     private val LOG_TAG = "OmniTrackActivity"
 
-    @Inject
-    protected lateinit var consentManager: ExperimentConsentManager
     @Inject
     protected lateinit var authManager: OTAuthManager
     @Inject
@@ -114,13 +110,6 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
             if (NetworkHelper.isConnectedToInternet()) {
                 this.creationSubscriptions.add(
                         authManager.refreshCredentialWithFallbackSignIn(this)
-                                .flatMap { ok ->
-                                    if (ok) {
-                                        consentManager.startProcess(this@OTActivity)
-                                    } else {
-                                        Single.just(false)
-                                    }
-                                }
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({ ok ->
                                     if (ok) {

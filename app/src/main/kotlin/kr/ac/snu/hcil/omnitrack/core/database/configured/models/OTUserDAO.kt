@@ -14,8 +14,6 @@ open class OTUserDAO : RealmObject() {
     var photoServerPath: String = ""
     var email: String = ""
 
-    var consentApproved: Boolean = false
-
     var thisDeviceLocalKey: String = ""
 
     var nameSynchronizedAt: Long? = null

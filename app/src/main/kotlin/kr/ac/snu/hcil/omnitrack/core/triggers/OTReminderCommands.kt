@@ -21,7 +21,6 @@ import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
@@ -52,7 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import javax.inject.Provider
 
-class OTReminderCommands(val configuredContext: ConfiguredContext, val context: Context) {
+class OTReminderCommands(val context: Context) {
 
     companion object {
         const val TAG = "OTReminderCommands"
@@ -84,7 +83,7 @@ class OTReminderCommands(val configuredContext: ConfiguredContext, val context: 
     protected lateinit var dbManager: BackendDbManager
 
     init {
-        configuredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
     internal fun onUserLogged(startId: Int, trackerId: String, loggedAt: Long): Completable {
@@ -402,7 +401,6 @@ class OTReminderCommands(val configuredContext: ConfiguredContext, val context: 
                 intent.action = OTApp.BROADCAST_ACTION_REMINDER_AUTO_EXPIRY_ALARM
                 intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER, entry.triggerId)
                 intent.putExtra(OTReminderService.INTENT_EXTRA_ENTRY_ID, entry.id)
-                intent.putExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID, configuredContext.configuration.id)
                 val alarmIntent = PendingIntent.getBroadcast(context, entry.autoExpiryAlarmId!!, intent, PendingIntent.FLAG_UPDATE_CURRENT)
                 AlarmManagerCompat.setExactAndAllowWhileIdle(context.alarmManager, AlarmManager.RTC_WAKEUP, entry.notifiedAt + entry.timeoutDuration!!, alarmIntent)
             }
@@ -450,9 +448,9 @@ class OTReminderCommands(val configuredContext: ConfiguredContext, val context: 
         val resultPendingIntent = stackBuilder.getPendingIntent(0,
                 PendingIntent.FLAG_UPDATE_CURRENT)
 */
-        val accessPendingIntent = PendingIntent.getService(context, notiId, OTReminderService.makeReminderAccessedIntent(context, configuredContext.configuration.id, triggerId, trackerId, entryId, reminderTime), PendingIntent.FLAG_UPDATE_CURRENT)
+        val accessPendingIntent = PendingIntent.getService(context, notiId, OTReminderService.makeReminderAccessedIntent(context, triggerId, trackerId, entryId, reminderTime), PendingIntent.FLAG_UPDATE_CURRENT)
         val dismissIntent = PendingIntent.getService(context, notiId,
-                OTReminderService.makeReminderDismissedIntent(context, configuredContext.configuration.id, triggerId, entryId),
+                OTReminderService.makeReminderDismissedIntent(context, triggerId, entryId),
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
         val ringtone = pref.getString(SettingsActivity.PREF_REMINDER_NOTI_RINGTONE, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.toString())

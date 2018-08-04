@@ -179,14 +179,11 @@
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
-        <service android:name=".services.messaging.OTFirebaseMessagingService">
+        <service
+            android:name=".services.messaging.OTFirebaseMessagingService"
+            android:stopWithTask="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-        <service android:name=".services.messaging.OTFirebaseInstanceIdService">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
 
@@ -275,10 +272,6 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:launchMode="singleTop"
             android:label="@string/title_activity_sign_in" />
-        <activity
-            android:name=".ui.pages.experiment.ExperimentSignInActivity"
-            android:theme="@style/Theme.Intro"
-            android:windowSoftInputMode="adjustPan" />
 
         <activity
             android:name=".ui.pages.SendReportActivity"
@@ -322,6 +315,10 @@
             android:name=".ui.pages.export.PackageExportActivity"
             android:label="Export Tracking Package"
             android:parentActivityName=".ui.pages.home.HomeActivity" />
+
+        <activity
+            android:name=".ui.pages.experiment.ExperimentSignUpActivity"
+            android:windowSoftInputMode="adjustPan" />
 
     </application>
 

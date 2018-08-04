@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.auth
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.support.annotation.StringRes
@@ -13,6 +14,8 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import dagger.Lazy
 import dagger.internal.Factory
 import io.reactivex.Completable
@@ -22,6 +25,7 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposables
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
@@ -29,7 +33,9 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTUserDAO
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.configured.ForGeneralAuth
+import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
+import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignUpActivity
 import org.jetbrains.anko.runOnUiThread
 import rx_activity_result2.RxActivityResult
 import javax.inject.Inject
@@ -42,6 +48,7 @@ class OTAuthManager @Inject constructor(
         private val context: Context,
         private val configuredContext: ConfiguredContext,
         private val firebaseAuth: FirebaseAuth,
+        @ForGeneric private val gson: Gson,
         @Backend private val realmFactory: Factory<Realm>,
         @ForGeneralAuth private val googleSignInOptions: Lazy<GoogleSignInOptions>,
         private val synchronizationServerController: Lazy<ISynchronizationServerSideAPI>) {
@@ -79,55 +86,6 @@ class OTAuthManager @Inject constructor(
         } else return null
     }
 
-
-    fun getIsConsentApproved(): Boolean {
-        val uid = userId
-        if (uid != null) {
-            return realmFactory.get().use { realm ->
-                realm.where(OTUserDAO::class.java).equalTo("uid", uid)
-                        .findFirst()?.consentApproved ?: false
-            }
-        } else return false
-    }
-
-    fun setIsConsentApproved(approved: Boolean) {
-        val uid = userId
-        if (uid != null) {
-            return realmFactory.get().use { realm ->
-                realm.where(OTUserDAO::class.java).equalTo("uid", uid)
-                        .findFirst()?.let { user ->
-                    realm.executeTransaction {
-                        user.consentApproved = approved
-                    }
-                }
-            }
-        }
-    }
-
-    /*
-    val userIdObservable = Observable.create<String> {
-        subscriber ->
-        if (mFirebaseUser != null) {
-            mFirebaseUser!!.reload().addOnCompleteListener {
-                task ->
-                if (task.isSuccessful) {
-                    if (!subscriber.isUnsubscribed) {
-                        subscriber.onNext(mFirebaseUser!!.uid)
-                        subscriber.onCompleted()
-                    }
-                } else {
-                    if (!subscriber.isUnsubscribed) {
-                        subscriber.onError(Exception("Firebase refresh failed."))
-                    }
-                }
-            }
-        } else {
-            if (!subscriber.isUnsubscribed) {
-                subscriber.onError(Exception("User is not signed in."))
-            }
-        }
-    }.share().observeOn(Schedulers.io())
-    */
     val userId: String?
         get() {
             val id = firebaseAuth.currentUser?.uid
@@ -249,16 +207,48 @@ class OTAuthManager @Inject constructor(
                     //Signed in successfully.
                     println("signed in google account: ${result.signInAccount}")
                     firebaseAuthWithGoogle(result.signInAccount!!)
+
                             .flatMap { authResult ->
                                 println("Signed in through Google account. try to push device info to server...")
                                 OTDeviceInfo.makeDeviceInfo(configuredContext.firebaseComponent)
                             }
-                            .flatMap { deviceInfo -> synchronizationServerController.get().putDeviceInfo(deviceInfo) }
-                            .flatMap { deviceInfoResult ->
-                                handlePutDeviceInfoResult(deviceInfoResult).doOnError { ex ->
-                                    println("Failed to push device information to server.")
-                                    ex.printStackTrace()
+                            .flatMap { deviceInfo ->
+                                if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
+                                    synchronizationServerController.get()
+                                            .checkExperimentParticipationStatus(BuildConfig.DEFAULT_EXPERIMENT_ID)
+                                            .flatMap { isInExperiment ->
+                                                if (!isInExperiment) {
+                                                    synchronizationServerController.get().getExperimentConsentInfo(BuildConfig.DEFAULT_EXPERIMENT_ID)
+                                                            .flatMap {
+                                                                if (BuildConfig.DEFAULT_INVITATION_CODE != null && it.consent == null && it.demographicFormSchema == null) {
+                                                                    Single.just(Pair<String, JsonObject?>(BuildConfig.DEFAULT_INVITATION_CODE, null))
+                                                                } else RxActivityResult.on(activity)
+                                                                        .startIntent(ExperimentSignUpActivity.makeIntent(activity, BuildConfig.DEFAULT_INVITATION_CODE == null, it.consent, it.demographicFormSchema))
+                                                                        .firstOrError()
+                                                                        .map { result ->
+                                                                            if (result.resultCode() != Activity.RESULT_OK) {
+                                                                                throw Exception("Canceled the sign up process.")
+                                                                            } else {
+                                                                                Pair<String, JsonObject?>(
+                                                                                        BuildConfig.DEFAULT_INVITATION_CODE
+                                                                                                ?: result.data().getStringExtra(ExperimentSignUpActivity.INVITATION_CODE),
+                                                                                        result.data().getStringExtra(ExperimentSignUpActivity.DEMOGRAPHIC_SCHEMA)?.let {
+                                                                                            gson.fromJson(it, JsonObject::class.java)
+                                                                                        })
+                                                                            }
+                                                                        }
+                                                            }.flatMap {
+                                                                synchronizationServerController.get().authenticate(deviceInfo, it.first, it.second)
+                                                            }
+                                                } else synchronizationServerController.get().authenticate(deviceInfo, null, null)
+                                            }
+                                } else {
+                                    //Pure experiment-free authentication
+                                    synchronizationServerController.get().authenticate(deviceInfo, null, null)
                                 }
+                            }
+                            .flatMap { authenticationResult ->
+                                handleAuthenticationResult(authenticationResult)
                             }
                             .doOnSuccess { success ->
                                 if (success) {
@@ -277,29 +267,24 @@ class OTAuthManager @Inject constructor(
         }
     }
 
-    fun handlePutDeviceInfoResult(result: ISynchronizationServerSideAPI.DeviceInfoResult): Single<Boolean> {
+
+    fun handleAuthenticationResult(result: ISynchronizationServerSideAPI.AuthenticationResult): Single<Boolean> {
         return Single.defer {
-            val localKey = result.deviceLocalKey
-            if (localKey != null) {
-                userId?.let { uid ->
-                    realmFactory.get().use { realm ->
-                        realm.executeTransaction {
-                            val user = realm.where(OTUserDAO::class.java).equalTo("uid", uid).findFirst() ?: realm.createObject(OTUserDAO::class.java, uid)
-                            user.thisDeviceLocalKey = localKey
-
-                            if (result.payloads != null) {
-                                user.email = result.payloads["email"] ?: ""
-                                user.photoServerPath = result.payloads["picture"] ?: ""
-                                user.name = result.payloads["name"] ?: ""
-                                user.consentApproved = result.payloads["consentApproved"]?.toBoolean() ?: false
-                                user.nameUpdatedAt = result.payloads["nameUpdatedAt"]?.toLong() ?: System.currentTimeMillis()
-                                user.nameSynchronizedAt = user.nameUpdatedAt
-                            }
-                        }
+            val userInfo = result.userInfo
+            if (userInfo != null) {
+                realmFactory.get().use { realm ->
+                    realm.executeTransaction {
+                        val user = realm.where(OTUserDAO::class.java).equalTo("uid", userInfo._id).findFirst()
+                                ?: realm.createObject(OTUserDAO::class.java, userInfo._id)
+                        user.thisDeviceLocalKey = result.deviceLocalKey
+                        user.email = userInfo.email
+                        user.name = userInfo.name ?: ""
+                        user.photoServerPath = userInfo.picture ?: ""
+                        user.nameUpdatedAt = userInfo.nameUpdatedAt ?: System.currentTimeMillis()
+                        user.nameSynchronizedAt = user.nameUpdatedAt
                     }
-
-                    return@defer Single.just(true)
                 }
+                return@defer Single.just(true)
             } else return@defer Single.just(false)
         }
     }
@@ -356,13 +341,11 @@ class OTAuthManager @Inject constructor(
 
     private fun notifySignedIn() {
         OTApp.instance.sendBroadcast(Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_IN)
-                .putExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID, configuredContext.configuration.id)
                 .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId))
     }
 
     private fun notifySignedOut() {
         OTApp.instance.sendBroadcast(Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_OUT)
-                .putExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID, configuredContext.configuration.id)
                 .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId))
     }
 

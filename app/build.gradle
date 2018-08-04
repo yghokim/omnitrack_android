@@ -157,6 +157,12 @@ android {
                 buildType.buildConfigField 'boolean', 'DISABLE_EXTERNAL_ENTITIES', "true"
             } else buildType.buildConfigField 'boolean', 'DISABLE_EXTERNAL_ENTITIES', "false"
 
+            if (buildConfigJson.disableExternalEntities == true && buildConfigJson.defaultInvitationCode != null && buildConfigJson.defaultInvitationCode.length() > 0) {
+                buildType.buildConfigField 'String', 'DEFAULT_INVITATION_CODE', "\"$buildConfigJson.defaultInvitationCode\""
+            } else {
+                buildType.buildConfigField 'String', 'DEFAULT_INVITATION_CODE', "null"
+            }
+
             if (buildConfigJson.defaultExperimentId != null && buildConfigJson.defaultExperimentId.length() > 0) {
                 buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "\"$buildConfigJson.defaultExperimentId\""
             } else {
@@ -211,16 +217,18 @@ dependencies {
     implementation "com.google.android.gms:play-services-gcm:$rootProject.ext.google_play_version"
     implementation "com.google.android.gms:play-services-plus:$rootProject.ext.google_play_version"
     implementation "com.google.android.gms:play-services-auth:$rootProject.ext.google_play_version"
-    implementation "com.google.firebase:firebase-core:16.0.1"
-    implementation "com.google.firebase:firebase-auth:16.0.2"
-    implementation "com.google.firebase:firebase-messaging:17.1.0"
+    implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.google.firebase:firebase-auth:16.0.2'
+    implementation 'com.google.firebase:firebase-messaging:17.1.0'
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     def work_version = "1.0.0-alpha05"
-    implementation "android.arch.work:work-runtime-ktx:$work_version" // use -ktx for Kotlin
+    implementation "android.arch.work:work-runtime-ktx:$work_version"
+
+    // use -ktx for Kotlin
+
     // optional - Firebase JobDispatcher support
     implementation "android.arch.work:work-firebase:$work_version"
-
     kapt "android.arch.lifecycle:compiler:1.1.1"
     implementation 'org.jetbrains.anko:anko:0.10.5'
     implementation "com.google.dagger:dagger:$rootProject.ext.dagger_version"
@@ -236,11 +244,10 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation files('libs/opencsv-3.9.jar')
     implementation files('libs/jxl.jar')
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-    implementation 'com.google.android:flexbox:0.3.2'
+    implementation 'com.google.android:flexbox:1.0.0'
     implementation "com.google.code.gson:gson:$rootProject.ext.gson_version"
     implementation "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxjava_version"
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
@@ -259,7 +266,6 @@ dependencies {
     implementation 'org.atteo:evo-inflector:1.2.2'
     implementation 'com.github.Epsiloni:android-target-tooltip:1.7'
     implementation 'us.feras.mdv:markdownview:1.1.0'
-    implementation 'com.heinrichreimersoftware:material-intro:1.6.2'
     implementation 'com.jaredrummler:material-spinner:1.2.5'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation "com.github.bumptech.glide:glide:$rootProject.ext.glide_version"
@@ -282,6 +288,7 @@ dependencies {
     implementation 'com.github.salomonbrys.kotson:kotson:2.5.0'
     implementation 'org.nield:kotlin-statistics:1.0.0'
     implementation 'com.shawnlin:number-picker:2.4.4'
+    implementation 'com.opencsv:opencsv:4.2'
 }
 
 repositories {

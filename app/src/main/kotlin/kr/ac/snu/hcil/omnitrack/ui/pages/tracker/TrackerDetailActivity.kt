@@ -171,7 +171,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         super.onDestroy()
         if(viewModel.isDirty)
         {
-            OTApp.instance.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(this, configuredContext.configuration.id))
+            OTApp.instance.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(this))
         }
     }
 

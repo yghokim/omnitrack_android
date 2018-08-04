@@ -9,11 +9,6 @@ import kr.ac.snu.hcil.omnitrack.core.di.global.ApplicationComponent
  */
 class ConfiguredContext(val configuration: OTConfiguration, val applicationComponent: ApplicationComponent) {
 
-    val isActive: Boolean
-        get() {
-            return applicationComponent.configurationController().currentConfiguredContext == this
-        }
-
     val applicationContext: Context
         get() {
             return applicationComponent.applicationContext()

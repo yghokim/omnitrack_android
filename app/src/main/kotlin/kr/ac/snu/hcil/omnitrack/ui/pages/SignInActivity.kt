@@ -13,13 +13,11 @@ import android.widget.Toast
 import com.google.android.gms.common.GoogleApiAvailability
 import com.tbruyelle.rxpermissions2.RxPermissions
 import dagger.Lazy
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_sign_in.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
@@ -31,8 +29,6 @@ class SignInActivity : AppCompatActivity() {
 
     @Inject
     protected lateinit var authManager: OTAuthManager
-    @Inject
-    protected lateinit var consentManager: ExperimentConsentManager
 
     @Inject
     protected lateinit var eventLogger: Lazy<IEventLogger>
@@ -93,17 +89,6 @@ class SignInActivity : AppCompatActivity() {
                                                 Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_canceled)), Toast.LENGTH_LONG).show()
                                             }
                                         }
-                                    }
-                                    .flatMap { googleSignInSucceed ->
-                                        if (googleSignInSucceed) {
-                                            consentManager.startProcess(this@SignInActivity).doOnSuccess {
-                                                if (it) {
-                                                    eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_CONSENT_APPROVED)
-                                                } else {
-                                                    eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_CONSENT_DENIED)
-                                                }
-                                            }
-                                        } else Single.just(false)
                                     }
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe({ approved ->

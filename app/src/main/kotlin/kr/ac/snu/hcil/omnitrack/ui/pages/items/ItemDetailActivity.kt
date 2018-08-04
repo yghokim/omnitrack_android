@@ -396,7 +396,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                 }.subscribe({ result ->
                     viewModel.clearHistory()
                     if (viewModel.mode == ItemEditionViewModelBase.ItemMode.New) {
-                        startService(OTReminderService.makeUserLoggedIntent(this, configuredContext.configuration.id, viewModel.trackerDao?.objectId!!, System.currentTimeMillis()))
+                        startService(OTReminderService.makeUserLoggedIntent(this, viewModel.trackerDao?.objectId!!, System.currentTimeMillis()))
                     }
 
                     when (viewModel.mode) {

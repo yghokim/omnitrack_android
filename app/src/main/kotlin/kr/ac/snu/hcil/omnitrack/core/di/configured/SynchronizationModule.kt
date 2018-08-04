@@ -7,7 +7,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncQueueDbHelper
-import java.io.File
 
 /**
  * Created by younghokim on 2017. 11. 4..
@@ -17,10 +16,9 @@ class SynchronizationModule {
 
     @Provides
     @Configured
-    fun provideSyncDbHelper(appContext: Context,
-                            @ConfigurationDirectory configuredDirectory: File): SyncQueueDbHelper
+    fun provideSyncDbHelper(appContext: Context): SyncQueueDbHelper
     {
-        return SyncQueueDbHelper(appContext, File(configuredDirectory, "db_synchronization_queue.sqlite").toString())
+        return SyncQueueDbHelper(appContext, "db_synchronization_queue.sqlite")
     }
 
     @Provides

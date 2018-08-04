@@ -58,7 +58,6 @@ class OTBackgroundLoggingTriggerAction : OTTriggerAction() {
                         OTItemLoggingService
                                 .makeLoggingIntent(configuredContext.applicationContext,
                                         ItemLoggingSource.Trigger,
-                                        configuredContext.configuration.id,
                                         notify,
                                         *(trigger.liveTrackersQuery.findAll().map { it.objectId!! }.toTypedArray()))
                 )

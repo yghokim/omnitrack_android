@@ -68,6 +68,11 @@ class NetworkModule {
                             .addHeader("OTPackageName", BuildConfig.APPLICATION_ID)
                             .addHeader("OTRole", "ServiceUser")
                             .addHeader("OTLocale", LocaleHelper.getLanguageCode(context))
+                            .apply {
+                                if (BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank() != true) {
+                                    this.addHeader("OTExperiment", BuildConfig.DEFAULT_EXPERIMENT_ID)
+                                }
+                            }
                             .build()
                     println("Provide HTTP client bounding to " + newRequest.url().toString())
                     chain.proceed(newRequest)

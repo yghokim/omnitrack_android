@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core.net
 import com.google.gson.JsonObject
 import io.reactivex.Completable
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.core.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
@@ -16,13 +15,20 @@ import retrofit2.http.*
  * Retrofit service interface to communicate between OmniTrack Official server
  */
 interface OTOfficialServerService {
-    @GET("api/user/roles")
-    fun getUserRoles(): Single<List<OTUserRolePOJO>>
 
-    @POST("api/user/role")
-    fun postUserRoleConsentResult(@Body data: OTUserRolePOJO): Single<Boolean>
+    @GET("api/research/experiment/{experimentId}/consent")
+    fun getExperimentConsentInfo(@Path("experimentId") experimentId: String): Single<ISynchronizationServerSideAPI.ExperimentConsentInfo>
 
-    @POST("api/user/device")
+    @GET("api/research/experiment/{experimentId}/verify_invitation")
+    fun verifyInvitationCode(@Path("experimentId") experimentId: String, @Query("invitationCode") invitationCode: String): Single<Boolean>
+
+    @GET("api/user/auth/check_status/{experimentId}")
+    fun getExperimentParticipationStatus(@Path("experimentId") experimentId: String): Single<Boolean>
+
+    @POST("api/user/auth/authenticate")
+    fun authenticate(@Body data: JsonObject): Single<ISynchronizationServerSideAPI.AuthenticationResult>
+
+    @POST("api/user/auth/device")
     fun postDeviceInfo(@Body info: OTDeviceInfo): Single<ISynchronizationServerSideAPI.DeviceInfoResult>
 
     @POST("api/user/report")

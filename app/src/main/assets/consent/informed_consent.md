@@ -1,1 +1,0 @@
-The consent form of the study is handled via paper.
