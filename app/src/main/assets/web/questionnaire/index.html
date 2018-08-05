@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Client Questionnaire View</title>
+    <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" src="styles.js"></script>
+</head>
+<body>
+<form class="jsonform-container"></form>
+<script>
+    function init(schema){
+      window.initForm(schema)
+    }
+
+    function submit(){
+      $('form.jsonform-container').submit()
+    }
+
+</script>
+</body>
+</html>

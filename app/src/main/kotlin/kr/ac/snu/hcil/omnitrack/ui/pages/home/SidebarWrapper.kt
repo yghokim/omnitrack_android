@@ -27,7 +27,6 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfiguration
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTUserDAO
 import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.configured.InformationUpload
@@ -70,9 +69,6 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
 
     @field:[Inject ResearchSync]
     lateinit var researchSyncJob: Provider<Job>
-
-    @Inject
-    lateinit var configuration: OTConfiguration
 
     private lateinit var backendRealm: Realm
 

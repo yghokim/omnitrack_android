@@ -24,7 +24,6 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfiguration
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
@@ -43,7 +42,6 @@ import javax.inject.Inject
 class OTShortcutPanelManager @Inject constructor(
         val authManager: Lazy<OTAuthManager>,
         val dbManager: Lazy<BackendDbManager>,
-        val configuration: OTConfiguration,
         @Default val pref: SharedPreferences,
         @Backend val backendRealmProvider: Factory<Realm>
 ) {

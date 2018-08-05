@@ -49,7 +49,7 @@ class ExperimentSignUpActivity : AppCompatActivity() {
 
     private lateinit var slides: Array<ESlide>
     private lateinit var consentFormMarkdown: String
-    private lateinit var demographicSchema: JsonObject
+    private lateinit var demographicSchema: String
 
     private val creationSubscriptions = CompositeDisposable()
 
@@ -76,7 +76,8 @@ class ExperimentSignUpActivity : AppCompatActivity() {
         }
 
         if (intent.hasExtra(DEMOGRAPHIC_SCHEMA)) {
-            //TODO implement demographic slide
+            slideList.add(ESlide.DEMOGRAPHIC_QUESTIONNAIRE)
+            demographicSchema = intent.getStringExtra(DEMOGRAPHIC_SCHEMA)
         }
 
         slides = slideList.toTypedArray()
@@ -123,6 +124,7 @@ class ExperimentSignUpActivity : AppCompatActivity() {
             return when (slides[position]) {
                 ESlide.CONSENT_FORM -> ConsentFormSlideFragment.getInstanceFromString(consentFormMarkdown)
                 ESlide.INVITATION_CODE_PROMPT -> InvitationCodePromptSlideFragment()
+                ESlide.DEMOGRAPHIC_QUESTIONNAIRE -> DemographicQuestionnaireSlideFragment.getInstance(demographicSchema)
                 else -> throw Exception("Unsupported slide type")
             }
         }
