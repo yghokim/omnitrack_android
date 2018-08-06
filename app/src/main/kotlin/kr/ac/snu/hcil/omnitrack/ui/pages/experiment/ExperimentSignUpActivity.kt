@@ -114,7 +114,7 @@ class ExperimentSignUpActivity : AppCompatActivity() {
     fun onSendActivityResult(): Intent {
         return Intent().apply {
             putExtra(INVITATION_CODE, viewModel.verifiedInvitationCode)
-            //TODO put demographic data
+            putExtra(DEMOGRAPHIC_SCHEMA, viewModel.demographicAnswers?.toString())
         }
     }
 

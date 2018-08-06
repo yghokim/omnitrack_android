@@ -239,8 +239,8 @@ class OTAuthManager @Inject constructor(
                                                                                 Pair<String, JsonObject?>(
                                                                                         BuildConfig.DEFAULT_INVITATION_CODE
                                                                                                 ?: result.data().getStringExtra(ExperimentSignUpActivity.INVITATION_CODE),
-                                                                                        result.data().getStringExtra(ExperimentSignUpActivity.DEMOGRAPHIC_SCHEMA)?.let {
-                                                                                            gson.fromJson(it, JsonObject::class.java)
+                                                                                        result.data().getStringExtra(ExperimentSignUpActivity.DEMOGRAPHIC_SCHEMA)?.let { serializedSchema ->
+                                                                                            gson.fromJson(serializedSchema, JsonObject::class.java)
                                                                                         })
                                                                             }
                                                                         }
