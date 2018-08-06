@@ -94,19 +94,26 @@ class OTAuthManager @Inject constructor(
         }
 
     fun isUserSignedIn(): Boolean {
-        return firebaseAuth.currentUser != null
+        return firebaseAuth.currentUser != null && isUserInDb(firebaseAuth.currentUser!!.uid)
+    }
+
+    private fun isUserInDb(uid: String): Boolean {
+        realmFactory.get().use { realm ->
+            return realm.where(OTUserDAO::class.java).equalTo("uid", uid)
+                    .findFirst() != null
+        }
     }
 
     val currentSignedInLevel: SignedInLevel get() {
         val result = try {
             if (isUserSignedIn()) {
-                SignedInLevel.AUTHORIZED
+                return SignedInLevel.AUTHORIZED
             } else return SignedInLevel.NONE
         } catch(ex: Exception) {
             SignedInLevel.NONE
         }
 
-        println("Current signed in leve: ${result}")
+        println("Current signed in level: ${result}")
         return result
     }
 
@@ -354,6 +361,11 @@ class OTAuthManager @Inject constructor(
             realmFactory.get().use { realm ->
                 realm.executeTransaction { realm ->
                     realm.where(OTUserDAO::class.java).equalTo("uid", userId).findAll().deleteAllFromRealm()
+                    /*
+                    realm.where(OTTrackerDAO::class.java).equalTo("userId", userId).findAll().deleteAllFromRealm()
+                    realm.where(OTTriggerDAO::class.java).equalTo("userId", userId).findAll().deleteAllFromRealm()
+                    realm.where(OTItemDAO::class.java).equalTo("userId", userId).findAll().deleteAllFromRealm()*/
+
                 }
             }
         }
