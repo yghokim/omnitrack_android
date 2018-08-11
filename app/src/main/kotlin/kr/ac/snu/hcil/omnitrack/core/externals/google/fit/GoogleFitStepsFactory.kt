@@ -11,6 +11,7 @@ import com.google.gson.stream.JsonReader
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
@@ -74,14 +75,20 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             println("Requested Google Fit Step Measure")
+            OTApp.logger.writeSystemLog("Start Google Fit step measure", "GoogleFitStepsFactory")
             return if (service<GoogleFitService>().state == OTExternalService.ServiceState.ACTIVATED) {
-                service<GoogleFitService>().getConnectedClient().toFlowable(BackpressureStrategy.LATEST).map<Nullable<out Any>> { client ->
+                service<GoogleFitService>().getConnectedClient().toFlowable(BackpressureStrategy.LATEST).flatMap<Nullable<out Any>> { client ->
+                    Flowable.defer {
                         val request = DataReadRequest.Builder()
                                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                                 .bucketByTime(1, TimeUnit.DAYS)
                                 .setTimeRange(start, end, TimeUnit.MILLISECONDS)
                                 .build()
+
+                        OTApp.logger.writeSystemLog("Start read step data.", "GoogleFitStepsFactory")
                         val result = Fitness.HistoryApi.readData(client, request).await(10, TimeUnit.SECONDS)
+
+                        OTApp.logger.writeSystemLog("Read data. Parse the result.", "GoogleFitStepsFactory")
                         var steps = 0
                         for (bucket in result.buckets) {
                             for (dataset in bucket.dataSets) {
@@ -92,9 +99,12 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
                             }
                         }
 
-                    return@map Nullable(steps)
-                }.subscribeOn(Schedulers.io())
+                        return@defer Flowable.just(Nullable(steps))
+                    }.subscribeOn(Schedulers.io())
+                }
             } else {
+
+                OTApp.logger.writeSystemLog("Google Fit Service is not activated.", "GoogleFitStepsFactory")
                 Flowable.error<Nullable<out Any>>(Exception("Service is not activated."))
             }
         }
