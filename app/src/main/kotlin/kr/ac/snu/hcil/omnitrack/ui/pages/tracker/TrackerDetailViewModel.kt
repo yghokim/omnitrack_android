@@ -11,7 +11,6 @@ import io.reactivex.subjects.PublishSubject
 import io.realm.Realm
 import io.realm.RealmChangeListener
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.LockedPropertiesHelper
@@ -26,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.OTExperimentDAO
 import kr.ac.snu.hcil.omnitrack.core.di.configured.Research
+import kr.ac.snu.hcil.omnitrack.core.di.global.ColorPalette
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -58,8 +58,14 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     @Inject
     protected lateinit var syncManager: OTSyncManager
 
+    @Inject
+    protected lateinit var connectionTypeAdapter: Lazy<OTConnection.ConnectionTypeAdapter>
+
     @field:[Inject Research]
     protected lateinit var researchRealmFactory: Factory<Realm>
+
+    @field:[Inject ColorPalette]
+    protected lateinit var colorPalette: IntArray
 
     private lateinit var researchRealm: Realm
 
@@ -87,7 +93,10 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     val nameObservable = BehaviorSubject.createDefault<String>("")
     val isBookmarkedObservable = BehaviorSubject.createDefault<Boolean>(false)
-    val colorObservable = BehaviorSubject.createDefault<Int>(OTApp.instance.colorPalette[0])
+
+    lateinit var colorObservable: BehaviorSubject<Int>
+        private set
+
     val attributeViewModelListObservable = BehaviorSubject.create<List<AttributeInformationViewModel>>()
 
     val areAttributesRemovable = BehaviorSubject.createDefault<Boolean>(true)
@@ -175,6 +184,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     override fun onInject(configuredContext: ConfiguredContext) {
         configuredContext.configuredAppComponent.inject(this)
+        colorObservable = BehaviorSubject.createDefault<Int>(colorPalette[0])
         researchRealm = researchRealmFactory.get()
     }
 
@@ -209,7 +219,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                                                 if (changeset == null) {
                                                     //initial
                                                     clearCurrentAttributeList()
-                                                    currentAttributeViewModelList.addAll(changes.collection.map { AttributeInformationViewModel(it, realm, attributeManager.get()) })
+                                                    currentAttributeViewModelList.addAll(changes.collection.map { AttributeInformationViewModel(it, realm, attributeManager.get(), connectionTypeAdapter.get()) })
                                                 } else {
                                                     currentAttributeViewModelList.removeAll(
                                                             changeset.deletions.map { currentAttributeViewModelList[it].apply { this.unregister() } }
@@ -217,7 +227,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
                                                     changeset.insertions.forEach {
                                                         currentAttributeViewModelList.add(it,
-                                                                AttributeInformationViewModel(changes.collection[it]!!, realm, attributeManager.get())
+                                                                AttributeInformationViewModel(changes.collection[it]!!, realm, attributeManager.get(), connectionTypeAdapter.get())
                                                         )
                                                     }
                                                 }
@@ -301,7 +311,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             }
             registerSyncJob()
         } else {
-            currentAttributeViewModelList.add(AttributeInformationViewModel(newDao, realm, attributeManager.get()))
+            currentAttributeViewModelList.add(AttributeInformationViewModel(newDao, realm, attributeManager.get(), connectionTypeAdapter.get()))
             attributeViewModelListObservable.onNext(currentAttributeViewModelList)
         }
     }
@@ -459,7 +469,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         }
     }
 
-    class AttributeInformationViewModel(_attributeDAO: OTAttributeDAO, val realm: Realm, val attributeManager: OTAttributeManager) : IReadonlyObjectId, RealmChangeListener<OTAttributeDAO> {
+    class AttributeInformationViewModel(_attributeDAO: OTAttributeDAO, val realm: Realm, val attributeManager: OTAttributeManager, val connectionTypeAdapter: OTConnection.ConnectionTypeAdapter) : IReadonlyObjectId, RealmChangeListener<OTAttributeDAO> {
         override val objectId: String? = _attributeDAO.objectId
 
         var attributeDAO: OTAttributeDAO = _attributeDAO
@@ -570,7 +580,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                         || attributeDAO.isRequired != isRequired
                         || attributeDAO.fallbackValuePolicy != defaultValuePolicy
                         || attributeDAO.fallbackPresetSerializedValue != defaultValuePreset
-                        || attributeDAO.serializedConnection != connectionObservable.value?.datum?.getSerializedString()
+                        || attributeDAO.serializedConnection != connectionObservable.value?.datum?.getSerializedString(connectionTypeAdapter)
                         || attributeDAO.isHidden != isHidden
                         || arePropertiesDirty()
             }
@@ -593,7 +603,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 dao.setPropertySerializedValue(entry.key, entry.value.second)
             }
 
-            dao.serializedConnection = connectionObservable.value?.datum?.getSerializedString()
+            dao.serializedConnection = connectionObservable.value?.datum?.getSerializedString(connectionTypeAdapter)
 
             return dao
         }
@@ -613,7 +623,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
             println("serialized connection of dao: ${editedDao.serializedConnection}")
             editedDao.serializedConnection?.let {
-                val connection = OTConnection.fromJson(it)
+                val connection = connectionTypeAdapter.fromJson(it)
                 if (connectionObservable.value?.datum != connection) {
                     connectionObservable.onNext(Nullable(connection))
                 }
@@ -654,7 +664,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                     attributeDAO.setPropertySerializedValue(entry.key, entry.value.second)
                     println("get serialized value: ${attributeDAO.getPropertySerializedValue(entry.key)}")
                 }
-                attributeDAO.serializedConnection = connectionObservable.value?.datum?.getSerializedString()
+                attributeDAO.serializedConnection = connectionObservable.value?.datum?.getSerializedString(connectionTypeAdapter)
             }
         }
 

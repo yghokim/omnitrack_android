@@ -15,7 +15,7 @@ import com.github.salomonbrys.kotson.set
 import com.jaredrummler.materialspinner.MaterialSpinner
 import dagger.Lazy
 import kotlinx.android.synthetic.main.activity_attribute_detail.*
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -23,7 +23,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
@@ -56,24 +56,29 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     @Inject
     lateinit var serializationManager: Lazy<DaoSerializationManager>
 
+    @Inject
+    lateinit var externalServiceManager: OTExternalServiceManager
+
     private lateinit var viewModel: AttributeDetailViewModel
 
     private var propertyViewHorizontalMargin: Int = 0
 
-    private val currentSpinnerEntries = arrayListOf(
-            FallbackSpinnerEntry(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL, OTApp.getString(R.string.msg_attribute_fallback_policy_null)),
-            FallbackSpinnerEntry(OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM, OTApp.getString(R.string.msg_attribute_fallback_policy_last)),
-            FallbackSpinnerEntry(OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_PRESET, OTApp.getString(R.string.msg_attribute_fallback_policy_preset))
-    )
+    private lateinit var currentSpinnerEntries: ArrayList<FallbackSpinnerEntry>
 
     private val propertyViewList = ArrayList<ReadOnlyPair<String, View>>()
 
-    override fun onInject(app: OTApp) {
+    override fun onInject(app: OTAndroidApp) {
         app.currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        currentSpinnerEntries = arrayListOf(
+                FallbackSpinnerEntry(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL, getString(R.string.msg_attribute_fallback_policy_null)),
+                FallbackSpinnerEntry(OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM, getString(R.string.msg_attribute_fallback_policy_last)),
+                FallbackSpinnerEntry(OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_PRESET, getString(R.string.msg_attribute_fallback_policy_preset))
+        )
 
         viewModel = ViewModelProviders.of(this).get(AttributeDetailViewModel::class.java)
         if (!viewModel.isInitialized) {
@@ -150,7 +155,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                     refreshConnection(true)
 
                     if (viewModel.isConnectionDirty) {
-                        ui_property_title_value_connection.text = "${OTApp.getString(R.string.msg_value_autocompletion)}*"
+                        ui_property_title_value_connection.text = "${getString(R.string.msg_value_autocompletion)}*"
                     } else {
                         ui_property_title_value_connection.setText(R.string.msg_value_autocompletion)
                     }
@@ -169,7 +174,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                     ui_fallback_policy_spinner.selectedIndex = currentSpinnerEntries.indexOf(currentSpinnerEntries.find { it.id == policy })
 
                     if (viewModel.isDefaultValuePolicyDirty) {
-                        ui_title_fallback.text = "${OTApp.getString(R.string.msg_attribute_fallback_policy)}*"
+                        ui_title_fallback.text = "${getString(R.string.msg_attribute_fallback_policy)}*"
                     } else ui_title_fallback.setText(R.string.msg_attribute_fallback_policy)
                 }
         )
@@ -243,7 +248,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
                         val dao = viewModel.makeFrontalChangesToDao()
                         if (dao != null) {
-                            if (OTExternalService.getFilteredMeasureFactories {
+                            if (externalServiceManager.getFilteredMeasureFactories {
                                 it.isAttachableTo(dao)
                             }.isEmpty()) {
                                 ui_connection_group.visibility = View.GONE
@@ -306,7 +311,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     private fun askChangeAndFinish(backInsteadOfFinish: Boolean = false) {
         DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
-                String.format(OTApp.getString(R.string.msg_format_confirm_apply_change), OTApp.getString(R.string.msg_text_field)),
+                String.format(getString(R.string.msg_format_confirm_apply_change), getString(R.string.msg_text_field)),
                 yesLabel = R.string.msg_save,
                 noLabel = R.string.msg_do_not_save,
                 onYes = {

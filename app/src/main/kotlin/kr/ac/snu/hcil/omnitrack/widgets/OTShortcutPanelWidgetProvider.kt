@@ -6,6 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfigurationController
@@ -47,7 +48,7 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        (context.applicationContext as OTApp).applicationComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
         if (intent.action == OTApp.BROADCAST_ACTION_USER_SIGNED_IN || intent.action == OTApp.BROADCAST_ACTION_USER_SIGNED_OUT) {
             val updateIntent = Intent(context, OTShortcutPanelWidgetUpdateService::class.java)
 

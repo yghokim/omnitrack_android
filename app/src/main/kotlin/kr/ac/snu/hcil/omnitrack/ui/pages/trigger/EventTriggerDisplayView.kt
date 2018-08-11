@@ -50,8 +50,8 @@ class EventTriggerDisplayView : LinearLayout {
 
             comparedNumberView.setText(R.string.msg_trigger_event_msg_tap_to_configure)
 
-            comparedNumberView.setPaddingTop(dipRound(10f))
-            comparedNumberView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dipSize(20f))
+            comparedNumberView.setPaddingTop(dipRound(context, 10f))
+            comparedNumberView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dipSize(context, 20f))
         } else {
             symbolView.visibility = View.VISIBLE
             measureNameView.visibility = VISIBLE

@@ -10,7 +10,6 @@ import android.text.style.TypefaceSpan
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import android.widget.TextView
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
@@ -22,8 +21,9 @@ class StarScoreView : LinearLayout {
     companion object {
         val scoreTypeSpan: TypefaceSpan by lazy { TypefaceSpan("sans-serif") }
         val scoreSizeSpan: RelativeSizeSpan by lazy { RelativeSizeSpan(1.5f) }
-        val scoreColorSpan: ForegroundColorSpan by lazy { ForegroundColorSpan(ContextCompat.getColor(OTApp.instance, R.color.textColorMid)) }
     }
+
+    private val scoreColorSpan: ForegroundColorSpan by lazy { ForegroundColorSpan(ContextCompat.getColor(context, R.color.textColorMid)) }
 
     private val scoreView: TextView
 
@@ -31,7 +31,6 @@ class StarScoreView : LinearLayout {
 
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     init {
         orientation = HORIZONTAL

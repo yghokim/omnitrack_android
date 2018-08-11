@@ -9,7 +9,7 @@ import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
 import dagger.Lazy
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import org.jetbrains.anko.support.v4.act
@@ -34,7 +34,7 @@ open class OTFragment : Fragment(), LifecycleObserver {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        onInject((context.applicationContext as OTApp).currentConfiguredContext)
+        onInject((context.applicationContext as OTAndroidApp).currentConfiguredContext)
     }
 
     protected open fun onInject(configuredContext: ConfiguredContext) {

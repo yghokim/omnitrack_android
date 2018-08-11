@@ -26,7 +26,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.component_location_picker.view.*
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.contains
@@ -164,7 +163,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
     private fun setToMyLocation(animate: Boolean) {
         myLocationTaskSubscription.set(
                 Single.defer {
-                    val rxLocation = RxLocation(OTApp.instance)
+                    val rxLocation = RxLocation(context)
                     val request = LocationRequest.create() //standard GMS LocationRequest
                             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                             .setNumUpdates(2)
@@ -302,7 +301,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
             addressConversionTaskSubscription.set(
                     Single.create<Nullable<String>> { subscriber ->
 
-                        val googleAddress = location.getAddress(OTApp.instance)
+                        val googleAddress = location.getAddress(context)
 
                         if (!subscriber.isDisposed) {
                             subscriber.onSuccess(

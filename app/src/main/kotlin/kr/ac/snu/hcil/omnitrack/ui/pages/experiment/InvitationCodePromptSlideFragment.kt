@@ -11,7 +11,7 @@ import android.widget.Toast
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.slide_invitation_code_prompt.view.*
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import javax.inject.Inject
@@ -29,7 +29,7 @@ class InvitationCodePromptSlideFragment : ExperimentSignUpActivity.SlideFragment
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
     override fun onNextTried() {

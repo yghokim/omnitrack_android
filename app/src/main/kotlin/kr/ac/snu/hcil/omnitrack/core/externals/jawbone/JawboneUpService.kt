@@ -12,7 +12,6 @@ import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants.UP_PLATFORM_ACCESS
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants.UP_PLATFORM_REFRESH_TOKEN
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
@@ -32,7 +31,7 @@ import java.util.*
 /**
  * Created by younghokim on 2017. 1. 24..
  */
-object JawboneUpService : OTExternalService("JawboneUpService", 9) {
+class JawboneUpService(context: Context) : OTExternalService(context, "JawboneUpService", 9) {
 
     override fun isSupportedInSystem(): Boolean {
         return BuildConfig.JAWBONE_CLIENT_ID != null && BuildConfig.JAWBONE_CLIENT_SECRET != null && BuildConfig.JAWBONE_REDIRECT_URI != null
@@ -54,7 +53,7 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
         return result
     }
 
-    private val SCOPES: List<UpPlatformSdkConstants.UpPlatformAuthScope> by lazy {
+    val SCOPES: List<UpPlatformSdkConstants.UpPlatformAuthScope> by lazy {
         arrayListOf(
                 UpPlatformSdkConstants.UpPlatformAuthScope.MOVE_READ,
                 UpPlatformSdkConstants.UpPlatformAuthScope.WEIGHT_READ,
@@ -64,13 +63,15 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
 
 
     override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
-        return arrayOf(JawboneStepMeasureFactory, JawboneDistanceMeasureFactory)
+        return arrayOf(
+                JawboneStepMeasureFactory(context, this),
+                JawboneDistanceMeasureFactory(context, this))
     }
 
     override fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
         return super.onRegisterDependencies() + arrayOf(
-                JawboneAuthDependencyResolver(),
-                ThirdPartyAppDependencyResolver.Builder(OTApp.instance)
+                JawboneAuthDependencyResolver(this),
+                ThirdPartyAppDependencyResolver.Builder(context)
                         .setAppName("UP®")
                         .setPackageName("com.jawbone.upopen")
                         .isMandatory(false)
@@ -97,28 +98,28 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
 
         })
         accessToken = null
-        preferences.edit()
+        externalServiceManager.get().preferences.edit()
                 .remove(UP_PLATFORM_ACCESS_TOKEN)
                 .remove(UP_PLATFORM_REFRESH_TOKEN)
                 .apply()
     }
 
-    class JawboneAuthDependencyResolver : OTSystemDependencyResolver() {
+    class JawboneAuthDependencyResolver(val parentService: JawboneUpService) : OTSystemDependencyResolver() {
         override fun checkDependencySatisfied(context: Context, selfResolve: Boolean): Single<DependencyCheckResult> {
             return Single.defer {
-                val token = preferences.getString(UP_PLATFORM_ACCESS_TOKEN, null)
+                val token = parentService.externalServiceManager.get().preferences.getString(UP_PLATFORM_ACCESS_TOKEN, null)
                 if (token != null) {
                     ApiManager.getRequestInterceptor().setAccessToken(token)
-                    Single.just(DependencyCheckResult(DependencyState.Passed, TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_passed, nameResourceId), ""))
+                    Single.just(DependencyCheckResult(DependencyState.Passed, TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_passed, parentService.nameResourceId), ""))
                 } else {
-                    Single.just(DependencyCheckResult(DependencyState.FatalFailed, TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_failed, nameResourceId), context.getString(R.string.msg_sign_in)))
+                    Single.just(DependencyCheckResult(DependencyState.FatalFailed, TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_failed, parentService.nameResourceId), context.getString(R.string.msg_sign_in)))
                 }
             }
         }
 
         override fun tryResolve(activity: Activity): Single<Boolean> {
             return Single.defer {
-                val builder = OauthUtils.setOauthParameters(BuildConfig.JAWBONE_CLIENT_ID, BuildConfig.JAWBONE_REDIRECT_URI, SCOPES)
+                val builder = OauthUtils.setOauthParameters(BuildConfig.JAWBONE_CLIENT_ID, BuildConfig.JAWBONE_REDIRECT_URI, parentService.SCOPES)
 
                 val intent = Intent(activity, OauthWebViewActivity::class.java)
                 intent.putExtra(UpPlatformSdkConstants.AUTH_URI, builder.build())
@@ -148,14 +149,14 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
                                                     override fun onResponse(call: Call<OauthAccessTokenResponse>, response: Response<OauthAccessTokenResponse>) {
                                                         val res = response.body()!!
                                                         if (res.access_token != null) {
-                                                            val editor = preferences.edit()
+                                                            val editor = parentService.externalServiceManager.get().preferences.edit()
                                                             editor.putString(UpPlatformSdkConstants.UP_PLATFORM_ACCESS_TOKEN, res.access_token)
                                                             editor.putString(UpPlatformSdkConstants.UP_PLATFORM_REFRESH_TOKEN, res.refresh_token)
                                                             editor.apply()
 
                                                             println("accessToken:" + res.access_token)
-                                                            accessToken = res.access_token
-                                                            ApiManager.getRequestInterceptor().setAccessToken(accessToken)
+                                                            parentService.accessToken = res.access_token
+                                                            ApiManager.getRequestInterceptor().setAccessToken(parentService.accessToken)
                                                             if (!subscriber.isDisposed) {
                                                                 subscriber.onSuccess(true)
                                                             }

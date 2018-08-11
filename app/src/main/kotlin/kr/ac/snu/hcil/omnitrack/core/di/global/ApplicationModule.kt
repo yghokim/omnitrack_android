@@ -8,6 +8,7 @@ import android.content.res.Resources
 import android.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.di.configured.*
 import java.io.ByteArrayInputStream
@@ -35,7 +36,7 @@ class ApplicationModule(private val mApp: OTApp) {
 
     @Provides
     @Singleton
-    fun application(): OTApp {
+    fun application(): OTAndroidApp {
         return mApp
     }
 

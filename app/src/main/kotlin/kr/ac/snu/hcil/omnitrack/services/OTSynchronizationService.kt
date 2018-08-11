@@ -6,7 +6,7 @@ import com.github.salomonbrys.kotson.jsonObject
 import dagger.Lazy
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
@@ -46,7 +46,7 @@ class OTSynchronizationService : JobService() {
 
     override fun onCreate() {
         super.onCreate()
-        (application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
     override fun onDestroy() {

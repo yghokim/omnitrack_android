@@ -6,7 +6,6 @@ import android.support.v4.content.ContextCompat
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
@@ -29,13 +28,13 @@ import kr.ac.snu.hcil.omnitrack.utils.dipSize
 /**
  * Created by younghokim on 2017. 5. 8..
  */
-class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, configuredContext: ConfiguredContext, timeAttribute: OTAttributeDAO? = null) : TrackerChartModel<Pair<Long, Int>>(tracker, realm), INativeChartModel {
+class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, val configuredContext: ConfiguredContext, timeAttribute: OTAttributeDAO? = null) : TrackerChartModel<Pair<Long, Int>>(tracker, realm), INativeChartModel {
 
     override val name: String
         get() {
             return if (timeAttributeLocalId != null) {
-                String.format(OTApp.instance.getString(R.string.msg_vis_daily_count_title_format_with_time_attr), tracker.name, timeAttributeName)
-            } else String.format(OTApp.instance.getString(R.string.msg_vis_daily_count_title_format), tracker.name)
+                String.format(configuredContext.applicationContext.resources.getString(R.string.msg_vis_daily_count_title_format_with_time_attr), tracker.name, timeAttributeName)
+            } else String.format(configuredContext.applicationContext.resources.getString(R.string.msg_vis_daily_count_title_format), tracker.name)
         }
 
     val timeAttributeLocalId: String? = timeAttribute?.localId
@@ -54,7 +53,7 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, configuredContex
     override fun reloadData(): Single<List<Pair<Long, Int>>> {
         println("reload chart data. Scope:  ${getTimeScope()}")
 
-        val xScale = QuantizedTimeScale()
+        val xScale = QuantizedTimeScale(configuredContext.applicationContext)
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
@@ -81,21 +80,20 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, configuredContex
         return DailyCountChartDrawer()
     }
 
-    inner class DailyCountChartDrawer : ATimelineChartDrawer() {
+    inner class DailyCountChartDrawer : ATimelineChartDrawer(configuredContext.applicationContext) {
         override val aspectRatio: Float = 2f
 
-        private val yAxis = Axis(Axis.Pivot.LEFT)
+        private val yAxis = Axis(context, Axis.Pivot.LEFT)
         private val yScale = NumericScale()
 
         private val textPadding: Float
 
-        private val normalRectColor = ContextCompat.getColor(OTApp.instance, R.color.colorPointed)
-        private val todayRectColor = ContextCompat.getColor(OTApp.instance, R.color.colorAccent)
-        private val normalTextColor = ContextCompat.getColor(OTApp.instance, R.color.textColorMid)
-        private val todayTextColor = ContextCompat.getColor(OTApp.instance, R.color.colorAccent)
+        private val normalRectColor = ContextCompat.getColor(configuredContext.applicationContext, R.color.colorPointed)
+        private val todayRectColor = ContextCompat.getColor(configuredContext.applicationContext, R.color.colorAccent)
+        private val normalTextColor = ContextCompat.getColor(configuredContext.applicationContext, R.color.textColorMid)
+        private val todayTextColor = ContextCompat.getColor(configuredContext.applicationContext, R.color.colorAccent)
 
-        private val todayBackgroundColor = ContextCompat.getColor(OTApp.instance, R.color.editTextFormBackground)
-
+        private val todayBackgroundColor = ContextCompat.getColor(configuredContext.applicationContext, R.color.editTextFormBackground)
 
         private val counterBarGroups = DataEncodedDrawingList<Pair<Long, Int>, Void?>()
 
@@ -105,7 +103,7 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, configuredContex
         private val todayPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
         init {
-            paddingTop = dipSize(17)
+            paddingTop = dipSize(context, 17)
 
             yAxis.style = Axis.TickLabelStyle.Small
             yAxis.drawBar = false
@@ -114,7 +112,7 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, configuredContex
 
             horizontalAxis.drawGridLines = false
 
-            textPadding = dipSize(5)
+            textPadding = dipSize(context, 5)
 
             todayPaint.color = todayBackgroundColor
 
@@ -189,9 +187,9 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, configuredContex
 
             if (this@DailyCountChartModel.getCurrentScopeGranularity() <=
                     Granularity.WEEK_2_REL) {
-                bar.textPaint.textSize = dipSize(14)
+                bar.textPaint.textSize = dipSize(context, 14)
             } else {
-                bar.textPaint.textSize = dipSize(10)
+                bar.textPaint.textSize = dipSize(context, 10)
             }
         }
 

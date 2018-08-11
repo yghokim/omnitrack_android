@@ -15,7 +15,7 @@ import gun0912.tedbottompicker.TedBottomPicker
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
@@ -107,7 +107,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     }
 
     init {
-        (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
 
         picker.callback = this
 

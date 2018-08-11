@@ -28,8 +28,8 @@ import io.reactivex.Completable
 import io.reactivex.disposables.Disposables
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
+import org.jetbrains.anko.powerManager
 import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.util.*
@@ -41,34 +41,33 @@ import java.util.*
 const val ANDROID_ASSET_PATH = "file:///android_asset"
 
 @TargetApi(23)
-fun isInDozeMode(): Boolean {
-    val powerManager = OTApp.instance.getSystemService(PowerManager::class.java)
-    return powerManager.isDeviceIdleMode
+fun isInDozeMode(context: Context): Boolean {
+    return context.powerManager.isDeviceIdleMode
 }
 
-fun dipRound(value: Float): Int {
-    return (dipSize(value) + 0.5f).toInt()
+fun dipRound(context: Context, value: Float): Int {
+    return (dipSize(context, value) + 0.5f).toInt()
 }
 
-fun dipRound(value: Int): Int {
-    return (dipSize(value) + 0.5f).toInt()
+fun dipRound(context: Context, value: Int): Int {
+    return (dipSize(context, value) + 0.5f).toInt()
 }
 
 
-fun dipSize(value: Float): Float {
-    return value * OTApp.instance.resourcesWrapped.displayMetrics.density
+fun dipSize(context: Context, value: Float): Float {
+    return value * context.resources.displayMetrics.density
 }
 
-fun dipSize(value: Int): Float {
-    return value * OTApp.instance.resourcesWrapped.displayMetrics.density
+fun dipSize(context: Context, value: Int): Float {
+    return value * context.resources.displayMetrics.density
 }
 
 fun Long.toDatetimeString(): String {
-    return TimeHelper.FORMAT_DATETIME.format(Date(this))
+    return TimeHelper.FORMAT_ISO_8601.format(Date(this))
 }
 
 fun Long.toDateString(): String {
-    return TimeHelper.FORMAT_DAY.format(Date(this))
+    return TimeHelper.FORMAT_YYYY_MM_DD.format(Date(this))
 }
 
 fun Boolean.toInt(): Int {

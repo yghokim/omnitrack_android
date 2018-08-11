@@ -75,6 +75,9 @@ class TrackerListFragment : OTFragment() {
     @Inject
     lateinit var authManager: OTAuthManager
 
+    @Inject
+    lateinit var tutorialManager: TutorialManager
+
     private lateinit var listView: FallbackRecyclerView
 
     private lateinit var emptyMessageView: TextView
@@ -120,7 +123,7 @@ class TrackerListFragment : OTFragment() {
     private var permissionPromptingDialog: MaterialDialog? = null
 
     private val collapsedHeight = 0
-    private val expandedHeight = OTApp.instance.resourcesWrapped.getDimensionPixelSize(R.dimen.button_height_normal)
+    private var expandedHeight: Int = 0
 
     private val currentTrackerViewModelList = ArrayList<TrackerListViewModel.TrackerInformationViewModel>()
 
@@ -178,6 +181,8 @@ class TrackerListFragment : OTFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        expandedHeight = resources.getDimensionPixelSize(R.dimen.button_height_normal)
 
         viewModel = ViewModelProviders.of(this).get(TrackerListViewModel::class.java)
         viewModel.userId = authManager.userId
@@ -280,7 +285,7 @@ class TrackerListFragment : OTFragment() {
                 }
         )
 
-        TutorialManager.checkAndShowTargetPrompt(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER, true, this.act, addTrackerFloatingButton,
+        tutorialManager.checkAndShowTargetPrompt(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER, true, this.act, addTrackerFloatingButton,
                 R.string.msg_tutorial_add_tracker_primary,
                 R.string.msg_tutorial_add_tracker_secondary,
                 ContextCompat.getColor(act, R.color.colorPointed))
@@ -544,7 +549,7 @@ class TrackerListFragment : OTFragment() {
             }
 
             private fun setTotalItemCount(count: Long) {
-                val header = OTApp.instance.resourcesWrapped.getString(R.string.msg_tracker_list_stat_total).toUpperCase()
+                val header = resources.getString(R.string.msg_tracker_list_stat_total).toUpperCase()
                 putStatistics(totalItemCountView, header, count.toString())
             }
 

@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core.visualization.models
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
@@ -23,10 +22,10 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-08.
  */
-class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent: OTTrackerDAO, realm: Realm, configuredContext: ConfiguredContext)
+class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent: OTTrackerDAO, realm: Realm, val configuredContext: ConfiguredContext)
     : CompoundAttributeChartModel<ILineChartOnTime.TimeSeriesTrendData>(attributes, parent, realm), ILineChartOnTime, INativeChartModel {
 
-    override val name: String = OTApp.instance.resourcesWrapped.getString(R.string.msg_vis_numeric_line_timeline_title)
+    override val name: String = configuredContext.applicationContext.resources.getString(R.string.msg_vis_numeric_line_timeline_title)
 
     init{
         configuredContext.configuredAppComponent.inject(this)
@@ -36,7 +35,7 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
         val data = ArrayList<ILineChartOnTime.TimeSeriesTrendData>()
         val values = ArrayList<BigDecimal>()
 
-        val xScale = QuantizedTimeScale()
+        val xScale = QuantizedTimeScale(configuredContext.applicationContext)
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
@@ -110,12 +109,12 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
     }
 
     override fun getChartDrawer(): AChartDrawer {
-        val drawer = MultiLineChartDrawer()
+        val drawer = MultiLineChartDrawer(configuredContext.applicationContext)
 
 
 
         drawer.verticalAxis.labelPaint.isFakeBoldText = true
-        drawer.verticalAxis.labelPaint.textSize = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size)
+        drawer.verticalAxis.labelPaint.textSize = configuredContext.applicationContext.resources.getDimension(R.dimen.vis_axis_label_numeric_size)
         return drawer
     }
 }

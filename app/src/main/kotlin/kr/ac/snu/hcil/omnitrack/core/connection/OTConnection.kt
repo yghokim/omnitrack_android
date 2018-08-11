@@ -1,17 +1,17 @@
 package kr.ac.snu.hcil.omnitrack.core.connection
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
+import android.content.Context
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
@@ -21,7 +21,7 @@ import kr.ac.snu.hcil.omnitrack.utils.TextHelper
  */
 class OTConnection {
 
-    class ConnectionTypeAdapter : TypeAdapter<OTConnection>() {
+    class ConnectionTypeAdapter(val externalServiceManager: OTExternalServiceManager) : TypeAdapter<OTConnection>() {
         override fun read(reader: JsonReader): OTConnection {
             val connection = OTConnection()
             reader.beginObject()
@@ -31,7 +31,7 @@ class OTConnection {
                     "factory" -> {
                         reader.beginArray()
                         val factoryCode = reader.nextString()
-                        val factory = OTExternalService.getMeasureFactoryByCode(typeCode = factoryCode)
+                        val factory = externalServiceManager.getMeasureFactoryByCode(typeCode = factoryCode)
                         if (factory == null) {
                             println("$factoryCode is not supported in System.")
                             reader.skipValue()
@@ -78,17 +78,6 @@ class OTConnection {
 
     }
 
-    companion object {
-        val parser: Gson by lazy {
-            GsonBuilder().registerTypeAdapter(OTConnection::class.java, ConnectionTypeAdapter()).create()
-        }
-
-        fun fromJson(serialized: String): OTConnection {
-            println("serialized connection: ${serialized}")
-            return parser.fromJson(serialized, OTConnection::class.java)
-        }
-    }
-
     var source: OTMeasureFactory.OTMeasure? = null
         set(value) {
             if (field != value) {
@@ -111,9 +100,6 @@ class OTConnection {
     var rangedQuery: OTTimeRangeQuery? = null
 
 
-    constructor() : super()
-
-
     fun getRequestedValue(builder: OTItemBuilderWrapperBase): Flowable<Nullable<out Any>> {
         return Flowable.defer {
             if (source != null) {
@@ -131,20 +117,24 @@ class OTConnection {
         } else return false
     }
 
-    fun getSerializedString(): String {
-        return parser.toJson(this)
+    fun getSerializedString(configuredContext: ConfiguredContext): String {
+        return configuredContext.configuredAppComponent.getConnectionTypeAdapter().toJson(this)
+    }
+
+    fun getSerializedString(adapter: ConnectionTypeAdapter): String {
+        return adapter.toJson(this)
     }
 
     fun isAvailableToRequestValue(invalidMessages: MutableList<CharSequence>? = null): Boolean {
         val source = source
         if (source != null) {
-            val service = source.factory.getService()
+            val service = source.factory.parentService
             if (service.state == OTExternalService.ServiceState.ACTIVATED) {
                 return true
             } else {
                 invalidMessages?.add(TextHelper.fromHtml(String.format(
-                        "<font color=\"blue\">${OTApp.instance.resourcesWrapped.getString(R.string.msg_service_is_not_activated_format)}</font>",
-                        OTApp.instance.resourcesWrapped.getString(service.nameResourceId))))
+                        "<font color=\"blue\">${source.factory.context.resources.getString(R.string.msg_service_is_not_activated_format)}</font>",
+                        source.factory.context.resources.getString(service.nameResourceId))))
                 return false
             }
         } else {
@@ -155,16 +145,16 @@ class OTConnection {
         }
     }
 
-    fun makeValidationStateObservable(): Flowable<Pair<Boolean, CharSequence?>> {
+    fun makeValidationStateObservable(context: Context): Flowable<Pair<Boolean, CharSequence?>> {
         return source?.let { source ->
             Flowable.defer {
-                val service = source.factory.getService()
+                val service = source.factory.parentService
                 service.onStateChanged.map { state ->
                     when (state) {
                         OTExternalService.ServiceState.ACTIVATED -> Pair(true, null)
                         else -> Pair<Boolean, CharSequence?>(false, TextHelper.fromHtml(String.format(
-                                "<font color=\"blue\">${OTApp.instance.resourcesWrapped.getString(R.string.msg_service_is_not_activated_format)}</font>",
-                                OTApp.instance.resourcesWrapped.getString(service.nameResourceId))))
+                                "<font color=\"blue\">${context.resources.getString(R.string.msg_service_is_not_activated_format)}</font>",
+                                context.resources.getString(service.nameResourceId))))
                     }
                 }.toFlowable(BackpressureStrategy.LATEST)
             }

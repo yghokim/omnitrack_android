@@ -22,6 +22,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
@@ -105,9 +106,9 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
                 .observeOn(AndroidSchedulers.mainThread())
 
     private fun refreshCredentialsWithFallbackSignIn() {
-        if (authManager.isUserSignedIn() && NetworkHelper.isConnectedToInternet()) {
+        if (authManager.isUserSignedIn() && NetworkHelper.isConnectedToInternet(this)) {
             //println("${LOG_TAG} OMNITRACK Google is signed in.")
-            if (NetworkHelper.isConnectedToInternet()) {
+            if (NetworkHelper.isConnectedToInternet(this)) {
                 this.creationSubscriptions.add(
                         authManager.refreshCredentialWithFallbackSignIn(this)
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -127,13 +128,13 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         }
     }
 
-    protected open fun onInject(app: OTApp) {
+    protected open fun onInject(app: OTAndroidApp) {
         app.currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        onInject(application as OTApp)
+        onInject(application as OTAndroidApp)
         processAuthorization()
         PreferenceManager.setDefaultValues(this, R.xml.global_preferences, false)
 

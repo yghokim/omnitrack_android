@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers
 
-import kr.ac.snu.hcil.omnitrack.OTApp
+import android.content.Context
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -10,17 +10,17 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.Qu
 /**
  * Created by Young-Ho on 9/9/2016.
  */
-abstract class ATimelineChartDrawer : AChartDrawer() {
+abstract class ATimelineChartDrawer(val context: Context) : AChartDrawer() {
 
-    val xScale = QuantizedTimeScale().inset(true)
+    val xScale = QuantizedTimeScale(context).inset(true)
 
-    val horizontalAxis = Axis(Axis.Pivot.BOTTOM)
+    val horizontalAxis = Axis(context, Axis.Pivot.BOTTOM)
 
     init {
-        paddingBottom = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_height).toFloat()
-        paddingLeft = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_width).toFloat()
-        paddingTop = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
-        paddingRight = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_right_margin).toFloat()
+        paddingBottom = context.resources.getDimension(R.dimen.vis_axis_height).toFloat()
+        paddingLeft = context.resources.getDimension(R.dimen.vis_axis_width).toFloat()
+        paddingTop = context.resources.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
+        paddingRight = context.resources.getDimension(R.dimen.vis_right_margin).toFloat()
 
         horizontalAxis.drawBar = true
         horizontalAxis.drawGridLines = true

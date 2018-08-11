@@ -10,6 +10,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UsageLog
 import kr.ac.snu.hcil.omnitrack.core.di.configured.UsageLogger
@@ -33,7 +34,7 @@ class OTUsageLogUploadService : JobService() {
 
     override fun onCreate() {
         super.onCreate()
-        (application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
     override fun onDestroy() {

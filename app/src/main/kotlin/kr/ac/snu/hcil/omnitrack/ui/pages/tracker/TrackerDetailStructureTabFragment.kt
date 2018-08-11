@@ -18,7 +18,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.salomonbrys.kotson.set
@@ -29,7 +28,6 @@ import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.attribute_list_element.view.*
 import kotlinx.android.synthetic.main.fragment_tracker_detail_structure.*
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
@@ -59,8 +57,8 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     companion object {
         const val REQUEST_CODE_ATTRIBUTE_DETAIL = 52423
-        val toastForAdded by lazy { Toast.makeText(OTApp.instance, R.string.msg_shortcut_added, Toast.LENGTH_SHORT) }
-        val toastForRemoved by lazy { Toast.makeText(OTApp.instance, R.string.msg_shortcut_removed, Toast.LENGTH_SHORT) }
+        //val toastForAdded by lazy { Toast.makeText(OTApp.instance, R.string.msg_shortcut_added, Toast.LENGTH_SHORT) }
+        //val toastForRemoved by lazy { Toast.makeText(OTApp.instance, R.string.msg_shortcut_removed, Toast.LENGTH_SHORT) }
     }
 
     private lateinit var rootScrollView: NestedScrollView
@@ -115,6 +113,9 @@ class TrackerDetailStructureTabFragment : OTFragment() {
     @Inject
     lateinit var attributeManager: OTAttributeManager
 
+    @Inject
+    lateinit var tutorialManager: TutorialManager
+
     override fun onInject(configuredContext: ConfiguredContext) {
         configuredContext.configuredAppComponent.inject(this)
     }
@@ -128,7 +129,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         nameProperty.showEditedOnTitle = viewModel.isNameDirty
         nameProperty.inputLengthMin = 1
         nameProperty.inputLengthMax = 30
-        nameProperty.dialogTitle = String.format(OTApp.getString(R.string.msg_format_change_name), OTApp.getString(R.string.msg_text_tracker))
+        nameProperty.dialogTitle = String.format(getString(R.string.msg_format_change_name), getString(R.string.msg_text_tracker))
 
 
         isOnShortcutProperty.setToggleMode(this.viewModel.isBookmarked, false)
@@ -241,7 +242,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         checkRequiredInformationVisibility()
 
         if (savedInstanceState == null) {
-            TutorialManager.checkAndShowTargetPrompt("TrackerDetail_add_attribute", true, act, newAttributeButton, R.string.msg_tutorial_add_attribute_primary, R.string.msg_tutorial_add_attribute_secondary, this.viewModel.color)
+            tutorialManager.checkAndShowTargetPrompt("TrackerDetail_add_attribute", true, act, newAttributeButton, R.string.msg_tutorial_add_attribute_primary, R.string.msg_tutorial_add_attribute_secondary, this.viewModel.color)
         }
     }
 
@@ -277,7 +278,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
             }*/
 
         attributeListView = rootView.findViewById(R.id.ui_attribute_list)
-        attributeListView.setViewIntervalDistance(dipRound(8))
+        attributeListView.setViewIntervalDistance(dipRound(act, 8))
         attributeListView.emptyView = rootView.findViewById(R.id.ui_empty_list_message)
 
         attributeListView.addOnLayoutChangeListener { view, a, b, c, d, e, f, g, h ->

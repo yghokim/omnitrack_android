@@ -9,7 +9,6 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.Scope
 import io.reactivex.Observable
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
@@ -22,7 +21,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 16. 8. 8
  */
-object GoogleFitService : OTExternalService("GoogleFitService", 19) {
+class GoogleFitService(context: Context) : OTExternalService(context, "GoogleFitService", 19) {
 
     override fun isSupportedInSystem(): Boolean {
         return true
@@ -59,13 +58,13 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
     }
 
     override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
-        return arrayOf(GoogleFitStepsFactory)
+        return arrayOf(GoogleFitStepsFactory(context, this))
     }
 
     override fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
         return arrayOf(
-                GoogleFitAuthDependencyResolver(),
-                ThirdPartyAppDependencyResolver.Builder(OTApp.instance)
+                GoogleFitAuthDependencyResolver(this),
+                ThirdPartyAppDependencyResolver.Builder(context)
                         .setPackageName("com.google.android.apps.fitness")
                         .isMandatory(false)
                         .setAppName(R.string.service_googlefit_app_name)
@@ -121,7 +120,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
         }
     }
 
-    private fun buildClientBuilderBase(context: Context = OTApp.instance): GoogleApiClient.Builder {
+    private fun buildClientBuilderBase(): GoogleApiClient.Builder {
         val builder = GoogleApiClient.Builder(context)
 
         for (api in usedApis) {
@@ -134,23 +133,24 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
         return builder
     }
 
-    abstract class GoogleFitMeasureFactory(typeKey: String) : OTMeasureFactory(typeKey) {
+    abstract class GoogleFitMeasureFactory(context: Context, service: GoogleFitService, typeKey: String) : OTMeasureFactory(context, service, typeKey) {
         abstract val usedAPI: Api<out Api.ApiOptions.NotRequiredOptions>
         abstract val usedScope: Scope
     }
 
-    class GoogleFitAuthDependencyResolver : OTSystemDependencyResolver() {
+    class GoogleFitAuthDependencyResolver(val parentService: GoogleFitService) : OTSystemDependencyResolver() {
         override fun checkDependencySatisfied(context: Context, selfResolve: Boolean): Single<DependencyCheckResult> {
-            return getConnectedClient().firstOrError().map {
+            return parentService.getConnectedClient().firstOrError().map {
                 client ->
-                DependencyCheckResult(DependencyState.Passed, TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_passed, nameResourceId), "")
-            }.onErrorReturn { err -> DependencyCheckResult(DependencyState.FatalFailed, TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_failed, nameResourceId), context.getString(R.string.msg_sign_in)) }
+                DependencyCheckResult(DependencyState.Passed, TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_passed, parentService.nameResourceId), "")
+            }.onErrorReturn { err -> DependencyCheckResult(DependencyState.FatalFailed, TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_failed, parentService.nameResourceId), context.getString(R.string.msg_sign_in)) }
         }
 
         override fun tryResolve(activity: Activity): Single<Boolean> {
             return Single.create<GoogleApiClient> {
                 subscriber ->
-                client = buildClientBuilderBase(activity)
+                //TODO possible memory leak point
+                parentService.client = parentService.buildClientBuilderBase()
                         .addConnectionCallbacks(object : GoogleApiClient.ConnectionCallbacks {
                             override fun onConnectionSuspended(reason: Int) {
                                 println("Google Fit activation connection is pending.. - $reason")
@@ -159,7 +159,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
                             override fun onConnected(reason: Bundle?) {
                                 println("activation success.")
                                 if (!subscriber.isDisposed) {
-                                    subscriber.onSuccess(client!!)
+                                    subscriber.onSuccess(parentService.client!!)
                                 }
                             }
                         })
@@ -174,7 +174,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
                                         .subscribe {
                                             result ->
                                             if (result.resultCode() == Activity.RESULT_OK) {
-                                                client?.connect()
+                                                parentService.client?.connect()
                                             } else {
                                                 if (!subscriber.isDisposed) {
                                                     subscriber.onError(Exception("resolution was canceled by user."))
@@ -184,7 +184,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
 
                             }
                         }.build()
-                client?.connect()
+                parentService.client?.connect()
             }.onErrorReturn { err ->
                 err.printStackTrace()
                 return@onErrorReturn null

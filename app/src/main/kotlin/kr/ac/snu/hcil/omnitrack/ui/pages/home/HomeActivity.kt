@@ -18,7 +18,7 @@ import android.view.ViewGroup
 import butterknife.bindView
 import kotlinx.android.synthetic.main.layout_home_sidebar.*
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
@@ -27,6 +27,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceListFragment
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
+import javax.inject.Inject
 
 class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), DrawerLayout.DrawerListener {
 
@@ -51,6 +52,14 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     private lateinit var viewModel: HomeScreenViewModel
 
     private val homeTabInfos: Array<HomeTabInfo>
+
+    @Inject
+    protected lateinit var tutorialManager: TutorialManager
+
+    override fun onInject(app: OTAndroidApp) {
+        super.onInject(app)
+        app.currentConfiguredContext.configuredAppComponent.inject(this)
+    }
 
     init {
         val homeTabs = HomeTabInfo.values().toMutableList()
@@ -121,9 +130,9 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
                     viewModel = ViewModelProviders.of(this).get(HomeScreenViewModel::class.java)
                     viewModel.userId = user
                     //Ask permission if needed
-                    if (BuildConfig.SHOW_TUTORIALS && TutorialManager.hasShownTutorials(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER)) {
+                    if (BuildConfig.SHOW_TUTORIALS && tutorialManager.hasShownTutorials(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER)) {
                         val tabs = tabLayout.getChildAt(0) as ViewGroup
-                        TutorialManager.checkAndShowSequence("home_main_tabs", true, this, false,
+                        tutorialManager.checkAndShowSequence("home_main_tabs", true, this, false,
                                 homeTabInfos.mapIndexed { index, info ->
                                     when (info) {
                                         HomeTabInfo.TAB_TRACKERS -> TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_trackers_primary,
@@ -144,7 +153,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
                     if(intent.getBooleanExtra(INTENT_EXTRA_INITIAL_LOGIN, false))
                     {
-                        if(NetworkHelper.isConnectedToInternet()) {
+                        if (NetworkHelper.isConnectedToInternet(this)) {
                             viewModel.startPullSync()
                             if (BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
                                 viewModel.syncResearch()
@@ -213,8 +222,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
     override fun onStop() {
         super.onStop()
-        OTApp.instance.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(this))
-
+        startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(this))
     }
 
 

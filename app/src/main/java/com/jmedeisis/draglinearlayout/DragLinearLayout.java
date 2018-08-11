@@ -26,7 +26,6 @@ import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
-import kr.ac.snu.hcil.omnitrack.OTApp;
 import kr.ac.snu.hcil.omnitrack.R;
 
 /**
@@ -127,7 +126,7 @@ public class DragLinearLayout extends LinearLayout {
         Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
-        Drawable shadow = ContextCompat.getDrawable(OTApp.Companion.getInstance(), R.drawable.shadow);
+        Drawable shadow = ContextCompat.getDrawable(view.getContext(), R.drawable.shadow);
         shadow.setBounds(0, 0, view.getWidth(), view.getHeight());
         shadow.draw(canvas);
         view.draw(canvas);

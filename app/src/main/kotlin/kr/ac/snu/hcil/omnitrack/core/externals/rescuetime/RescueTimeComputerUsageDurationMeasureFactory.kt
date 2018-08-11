@@ -1,12 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 
+import android.content.Context
 import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -16,7 +16,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-02.
  */
-object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
+class RescueTimeComputerUsageDurationMeasureFactory(context: Context, service: RescueTimeService) : OTMeasureFactory(context, service, "cud") {
 
     val configurator = object : IExampleAttributeConfigurator {
         override fun configureExampleAttribute(attr: OTAttributeDAO): Boolean {
@@ -41,10 +41,6 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
 
     override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
 
-    override fun getService(): OTExternalService {
-        return RescueTimeService
-    }
-
     override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
         return attribute.type == OTAttributeManager.TYPE_NUMBER
     }
@@ -56,15 +52,15 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
     override val isDemandingUserInput: Boolean = false
 
     override fun makeMeasure(): OTMeasure {
-        return ComputerUsageDurationMeasure()
+        return ComputerUsageDurationMeasure(this)
     }
 
     override fun makeMeasure(reader: JsonReader): OTMeasure {
-        return ComputerUsageDurationMeasure()
+        return ComputerUsageDurationMeasure(this)
     }
 
     override fun makeMeasure(serialized: String): OTMeasure {
-        return ComputerUsageDurationMeasure()
+        return ComputerUsageDurationMeasure(this)
     }
 
     override fun serializeMeasure(measure: OTMeasure): String {
@@ -83,13 +79,12 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
 
     }
 
-    class ComputerUsageDurationMeasure : OTRangeQueriedMeasure() {
+    class ComputerUsageDurationMeasure(factory: RescueTimeComputerUsageDurationMeasureFactory) : OTRangeQueriedMeasure(factory) {
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_DOUBLE
-        override val factory: OTMeasureFactory = RescueTimeComputerUsageDurationMeasureFactory
-
 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
-            return RescueTimeService.getSummaryRequest(Date(start), Date(end - 1), usageDurationCalculator).toFlowable() as Flowable<Nullable<out Any>>
+            return service<RescueTimeService>().getSummaryRequest(Date(start), Date(end - 1),
+                    (factory as RescueTimeComputerUsageDurationMeasureFactory).usageDurationCalculator).toFlowable() as Flowable<Nullable<out Any>>
         }
 
         override fun equals(other: Any?): Boolean {

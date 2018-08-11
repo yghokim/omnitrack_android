@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.configuration
 
 import android.content.Context
+import android.support.annotation.StringRes
 import kr.ac.snu.hcil.omnitrack.core.di.configured.*
 import kr.ac.snu.hcil.omnitrack.core.di.global.ApplicationComponent
 
@@ -11,7 +12,7 @@ class ConfiguredContext(val configuration: OTConfiguration, val applicationCompo
 
     val applicationContext: Context
         get() {
-            return applicationComponent.applicationContext()
+            return applicationComponent.applicationContext().get()
         }
 
     private val configuredModule: ConfiguredModule by lazy {
@@ -19,7 +20,7 @@ class ConfiguredContext(val configuration: OTConfiguration, val applicationCompo
     }
 
     private val authModule: AuthModule by lazy {
-        AuthModule(applicationComponent.application())
+        AuthModule()
     }
 
     private val firebaseModule: FirebaseModule by lazy {
@@ -117,6 +118,10 @@ class ConfiguredContext(val configuration: OTConfiguration, val applicationCompo
                 .plus(authModule)
                 .plus(firebaseModule)
                 .build()
+    }
+
+    fun getString(@StringRes id: Int): String {
+        return applicationComponent.wrappedResources().get().getString(id)
     }
 
     fun activateOnSystem() {

@@ -2,9 +2,11 @@ package kr.ac.snu.hcil.omnitrack.core.visualization
 
 import android.content.Context
 import android.text.format.DateUtils
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.utils.getYear
+import kr.ac.snu.hcil.omnitrack.utils.time.LocalTimeFormats
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.util.*
 
@@ -58,7 +60,8 @@ enum class Granularity(val nameId: Int) {
         override fun getFormattedCurrentScope(time: Long, context: Context): String {
             val ts = TimeSpan()
             convertToRange(time, ts)
-            return "${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.from)} ~ ${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.to - 1)} "
+            val formats = getFormats(context)
+            return "${formats.FORMAT_DAY_WITHOUT_YEAR.format(ts.from)} ~ ${formats.FORMAT_DAY_WITHOUT_YEAR.format(ts.to - 1)} "
         }
 
     },
@@ -82,7 +85,8 @@ enum class Granularity(val nameId: Int) {
         override fun getFormattedCurrentScope(time: Long, context: Context): String {
             val ts = TimeSpan()
             convertToRange(time, ts)
-            return "${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.from)} ~ ${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.to - 1)} "
+            val formats = getFormats(context)
+            return "${formats.FORMAT_DAY_WITHOUT_YEAR.format(ts.from)} ~ ${formats.FORMAT_DAY_WITHOUT_YEAR.format(ts.to - 1)} "
         }
 
     },
@@ -135,7 +139,9 @@ enum class Granularity(val nameId: Int) {
         }
 
         override fun getFormattedCurrentScope(time: Long, context: Context): String {
-            return TimeHelper.FORMAT_MONTH.format(Date(time))
+
+            val formats = getFormats(context)
+            return formats.FORMAT_MONTH.format(Date(time))
         }
 
     },
@@ -185,7 +191,9 @@ enum class Granularity(val nameId: Int) {
         override fun getFormattedCurrentScope(time: Long, context: Context): String {
             val ts = TimeSpan()
             convertToRange(time, ts)
-            return "${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.from)} ~ ${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.to - 1)} "
+
+            val formats = getFormats(context)
+            return "${formats.FORMAT_DAY_WITHOUT_YEAR.format(ts.from)} ~ ${formats.FORMAT_DAY_WITHOUT_YEAR.format(ts.to - 1)} "
         }
 
     },
@@ -204,7 +212,9 @@ enum class Granularity(val nameId: Int) {
         override fun getFormattedCurrentScope(time: Long, context: Context): String {
             val ts = TimeSpan()
             convertToRange(time, ts)
-            return "${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.from)} ~ ${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.to - 1)} "
+
+            val formats = getFormats(context)
+            return "${formats.FORMAT_DAY_WITHOUT_YEAR.format(ts.from)} ~ ${formats.FORMAT_DAY_WITHOUT_YEAR.format(ts.to - 1)} "
         }
 
     },
@@ -223,7 +233,9 @@ enum class Granularity(val nameId: Int) {
         override fun getFormattedCurrentScope(time: Long, context: Context): String {
             val ts = TimeSpan()
             convertToRange(time, ts)
-            return "${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.from)} ~ ${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.to - 1)} "
+
+            val formats = getFormats(context)
+            return "${formats.FORMAT_DAY_WITHOUT_YEAR.format(ts.from)} ~ ${formats.FORMAT_DAY_WITHOUT_YEAR.format(ts.to - 1)} "
         }
 
     };
@@ -232,4 +244,8 @@ enum class Granularity(val nameId: Int) {
     abstract fun getIntervalMillis(directionToNext: Boolean, pivot: Long): Long
 
     abstract fun getFormattedCurrentScope(time: Long, context: Context): String
+
+    protected fun getFormats(context: Context): LocalTimeFormats {
+        return (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.getLocalTimeFormats()
+    }
 }

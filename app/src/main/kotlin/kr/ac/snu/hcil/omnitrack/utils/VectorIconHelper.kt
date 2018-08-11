@@ -73,10 +73,10 @@ object VectorIconHelper {
                 }
 
                 val width: Int = if (sizeDp != null) {
-                    dipRound(sizeDp)
+                    dipRound(context, sizeDp)
                 } else drawable.intrinsicWidth
                 val height: Int = if (sizeDp != null) {
-                    dipRound(sizeDp)
+                    dipRound(context, sizeDp)
                 } else drawable.intrinsicHeight
 
                 val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)

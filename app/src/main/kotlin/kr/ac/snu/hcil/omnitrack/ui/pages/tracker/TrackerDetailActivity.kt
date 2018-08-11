@@ -75,7 +75,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     private val removedOutsideAlert: Dialog by lazy {
         DialogHelper.makeSimpleAlertBuilder(this,
-                String.format(OTApp.getString(R.string.msg_format_removed_outside_return_home), OTApp.getString(R.string.msg_text_tracker)), null)
+                String.format(getString(R.string.msg_format_removed_outside_return_home), getString(R.string.msg_text_tracker)), null)
         {
             finish()
         }.build()
@@ -171,7 +171,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         super.onDestroy()
         if(viewModel.isDirty)
         {
-            OTApp.instance.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(this))
+            startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(this))
         }
     }
 
@@ -185,7 +185,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     override fun onToolbarLeftButtonClicked() {
         if (!viewModel.isEditMode) {
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
-                    String.format(OTApp.getString(R.string.msg_format_confirm_save_creation), OTApp.getString(R.string.msg_text_tracker).toLowerCase()), yesLabel = R.string.msg_save, noLabel = R.string.msg_do_not_save, onYes = {
+                    String.format(getString(R.string.msg_format_confirm_save_creation), getString(R.string.msg_text_tracker).toLowerCase()), yesLabel = R.string.msg_save, noLabel = R.string.msg_do_not_save, onYes = {
                 onToolbarRightButtonClicked()
             }, onNo = {
                 setResult(Activity.RESULT_CANCELED)

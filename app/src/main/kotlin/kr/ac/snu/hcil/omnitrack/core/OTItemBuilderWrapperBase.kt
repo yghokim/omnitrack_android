@@ -6,7 +6,6 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
@@ -43,7 +42,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext:
     fun saveToItem(itemDao: OTItemDAO?, loggingSource: ItemLoggingSource?, metadata: JsonObject?): OTItemDAO {
         val itemDaoToSave = itemDao ?: OTItemDAO()
         if (itemDao == null) {
-            itemDaoToSave.deviceId = OTApp.instance.deviceId
+            itemDaoToSave.deviceId = (configuredContext.applicationComponent.application()).deviceId
             itemDaoToSave.loggingSource = loggingSource ?: ItemLoggingSource.Unspecified
             itemDaoToSave.trackerId = dao.tracker?.objectId
             itemDaoToSave.timezone = configuredContext.configuredAppComponent.getPreferredTimeZone().id
@@ -74,7 +73,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext:
                 val realm = realmProvider.get()
                 Observable.merge(attributes.mapIndexed { i, attr: OTAttributeDAO ->
                     val attrLocalId = attr.localId
-                    val connection = attr.getParsedConnection()
+                    val connection = attr.getParsedConnection(configuredContext)
                     if (connection != null && connection.isAvailableToRequestValue()) {
                         //Connection
                         connection.getRequestedValue(this).flatMap { data ->

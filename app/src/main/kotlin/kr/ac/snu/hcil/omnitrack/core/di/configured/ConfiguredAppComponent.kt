@@ -11,8 +11,10 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAudioRecordAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTImageAttributeHelper
+import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions.RealmLazyFunction
+import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
@@ -29,6 +31,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragmen
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AudioRecordInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.pages.SendReportActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
@@ -40,9 +43,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.export.PackageExportViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.export.UploadTemporaryPackageDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.*
-import kr.ac.snu.hcil.omnitrack.ui.pages.services.AttributeSelectionPage
-import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceWizardView
-import kr.ac.snu.hcil.omnitrack.ui.pages.services.TrackerSelectionPage
+import kr.ac.snu.hcil.omnitrack.ui.pages.services.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.FieldPresetSelectionBottomSheetFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailStructureTabFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailViewModel
@@ -52,6 +53,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListV
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerViewModel
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
+import kr.ac.snu.hcil.omnitrack.utils.time.LocalTimeFormats
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetService
 import java.util.*
 
@@ -71,6 +73,7 @@ import java.util.*
     TriggerSystemModule::class,
     ScriptingModule::class,
     UsageLoggingModule::class,
+    UIHelperModule::class,
     ResearchModule::class
 ])
 interface ConfiguredAppComponent {
@@ -101,7 +104,11 @@ interface ConfiguredAppComponent {
 
     fun getBackendDbManager(): BackendDbManager
 
+    fun getConnectionTypeAdapter(): OTConnection.ConnectionTypeAdapter
+
     fun getPreferredTimeZone(): TimeZone
+
+    fun getLocalTimeFormats(): LocalTimeFormats
 
     @Backend
     fun backendRealmFactory(): Factory<Realm>
@@ -113,6 +120,7 @@ interface ConfiguredAppComponent {
     fun getSyncManager(): OTSyncManager
 
     fun getAttributeManager(): OTAttributeManager
+    fun getPropertyManager(): OTPropertyManager
 
     fun inject(application: OTApp)
     fun inject(realmViewModel: RealmViewModel)
@@ -124,6 +132,8 @@ interface ConfiguredAppComponent {
     fun inject(factory: OTShortcutPanelWidgetService.PanelWidgetElementFactory)
 
     fun inject(activity: OTActivity)
+
+    fun inject(activity: HomeActivity)
 
     fun inject(activity: SignInActivity)
 
@@ -163,7 +173,6 @@ interface ConfiguredAppComponent {
     fun inject(chartModel: LoggingHeatMapModel)
     fun inject(chartModel: DailyCountChartModel)
     fun inject(chartModel: TimelineComparisonLineChartModel)
-    fun inject(chartModel: DurationTimelineModel)
     fun inject(chartModel: ChoiceCategoricalBarChartModel)
 
     fun inject(receiver: RebootReceiver)
@@ -212,4 +221,10 @@ interface ConfiguredAppComponent {
     fun inject(viewModel: UploadTemporaryPackageDialogFragment.ViewModel)
 
     fun inject(slide: InvitationCodePromptSlideFragment)
+
+    fun inject(fragment: ServiceListFragment)
+
+    fun inject(activity: ExternalServiceActivationActivity)
+
+    fun inject(scale: QuantizedTimeScale)
 }

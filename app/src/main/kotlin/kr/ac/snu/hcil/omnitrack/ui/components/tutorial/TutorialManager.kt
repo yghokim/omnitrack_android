@@ -6,19 +6,20 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTApp
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 
 /**
  * Created by younghokim on 2017. 3. 21..
  */
-object TutorialManager {
+class TutorialManager(val context: Context) {
+
+    companion object {
+        const val PREFERENCE_NAME = "pref_tutorial_flags"
+
+        const val FLAG_TRACKER_LIST_ADD_TRACKER = "tracker_list_add_tracker"
+    }
 
     val DEBUG_ALWAYS_SHOW_TUTORIAL = false
-
-    const val PREFERENCE_NAME = "pref_tutorial_flags"
-
-    const val FLAG_TRACKER_LIST_ADD_TRACKER = "tracker_list_add_tracker"
 
     data class TapTargetInfo(val primaryTextRes: Int, val secondaryTextRes: Int, val backgroundColor: Int, val target: View, val focalColorAlpha: Int = 255)
 
@@ -27,7 +28,7 @@ object TutorialManager {
     }
 
     private val preferences: SharedPreferences by lazy {
-        OTApp.instance.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
     }
 
     fun hasShownTutorials(tag: String): Boolean {

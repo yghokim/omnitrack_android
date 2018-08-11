@@ -1,19 +1,19 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales
 
+import android.content.Context
 import android.text.format.DateUtils
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.IAxisScale
 import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
-import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.util.*
 
 /**
  * Created by Young-Ho Kim on 16. 9. 8
  */
-class TimeLinearScale : IAxisScale<Long> {
+class TimeLinearScale(val context: Context) : IAxisScale<Long> {
 
     private var rangeFrom: Float = 0f
     private var rangeTo: Float = 0f
@@ -59,9 +59,9 @@ class TimeLinearScale : IAxisScale<Long> {
                         val hourOfDay = calendarCache.getHourOfDay()
 
                         return if (hourOfDay == 12) {
-                            OTApp.instance.resourcesWrapped.getString(R.string.msg_noon)
+                            context.resources.getString(R.string.msg_noon)
                         } else if (hourOfDay == 0 || hourOfDay == 23) {
-                            TimeHelper.FORMAT_DAY.format(Date(value))
+                            (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.getLocalTimeFormats().FORMAT_DAY.format(Date(value))
                         } else {
                             "haha"
                         }

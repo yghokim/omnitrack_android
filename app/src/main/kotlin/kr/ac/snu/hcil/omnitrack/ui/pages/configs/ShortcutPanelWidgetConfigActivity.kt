@@ -16,7 +16,7 @@ import android.widget.TextView
 import butterknife.bindView
 import dagger.internal.Factory
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
@@ -53,7 +53,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
         realm = realmProvider.get()
     }
 

@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers.conditions
 
+import android.content.Context
 import com.google.gson.JsonObject
 
 /**
@@ -9,7 +10,7 @@ abstract class ATriggerCondition(val type: Byte) : Cloneable {
     open val isSticky: Boolean = false
     abstract fun getSerializedString(): String
 
-    abstract fun isConfigurationValid(validationErrorMessages: MutableList<CharSequence>?): Boolean
+    abstract fun isConfigurationValid(context: Context?, validationErrorMessages: MutableList<CharSequence>?): Boolean
 
     abstract fun writeEventLogContent(table: JsonObject)
 

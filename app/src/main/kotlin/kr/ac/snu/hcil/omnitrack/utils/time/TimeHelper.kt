@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.utils.time
 
 import android.content.Context
 import android.text.format.DateUtils
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.*
 import java.text.SimpleDateFormat
@@ -14,6 +13,11 @@ import java.util.*
  **/
 object TimeHelper {
 
+    const val secondsInMilli: Long = 1000
+    const val minutesInMilli = secondsInMilli * 60
+    const val hoursInMilli = minutesInMilli * 60
+    const val daysInMilli = hoursInMilli * 24
+
     enum class Length {
         FULL, SHORT, SHORTEST
     }
@@ -22,28 +26,17 @@ object TimeHelper {
         Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
     }
 
-    const val secondsInMilli: Long = 1000
-    const val minutesInMilli = secondsInMilli * 60
-    const val hoursInMilli = minutesInMilli * 60
-    const val daysInMilli = hoursInMilli * 24
 
-    val DAY_OF_WEEK_FULL_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEEE") }
-    val DAY_OF_WEEK_SHORT_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEE") }
+    val DAY_OF_WEEK_FULL_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEEE", Locale.getDefault()) }
+    val DAY_OF_WEEK_SHORT_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEE", Locale.getDefault()) }
 
     val FORMAT_ISO_8601: SimpleDateFormat by lazy {
-        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ROOT)
     }
 
     val FORMAT_YYYY_MM_DD: SimpleDateFormat by lazy {
-        SimpleDateFormat("yyyy-MM-dd")
+        SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
     }
-
-    val FORMAT_DATETIME: SimpleDateFormat by lazy { SimpleDateFormat(OTApp.Companion.instance.resourcesWrapped.getString(R.string.dateformat_minute)) }
-    val FORMAT_DAY: SimpleDateFormat by lazy { SimpleDateFormat(OTApp.Companion.instance.resourcesWrapped.getString(R.string.msg_date_format_scope_day)) }
-    val FORMAT_MONTH: SimpleDateFormat by lazy { SimpleDateFormat(OTApp.Companion.instance.resourcesWrapped.getString(R.string.msg_date_format_scope_month)) }
-    val FORMAT_MONTH_SHORT: SimpleDateFormat by lazy { SimpleDateFormat(OTApp.Companion.instance.resourcesWrapped.getString(R.string.msg_date_format_scope_month_short)) }
-    val FORMAT_DAY_WITHOUT_YEAR: SimpleDateFormat by lazy { SimpleDateFormat(OTApp.Companion.instance.resourcesWrapped.getString(R.string.msg_date_format_scope_day_for_week)) }
-    val FORMAT_DAY_OF_WEEK_SHORT: SimpleDateFormat by lazy { SimpleDateFormat(OTApp.Companion.instance.resourcesWrapped.getString(R.string.dateformat_day_of_week_short)) }
 
     fun addDays(timestamp: Long, days: Int): Long {
         return timestamp + days * daysInMilli

@@ -6,6 +6,7 @@ import dagger.Lazy
 import dagger.internal.Factory
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
@@ -28,7 +29,7 @@ open class RealmViewModel(app: Application) : AndroidViewModel(app) {
 
     protected val subscriptions = CompositeDisposable()
 
-    fun inject(app: OTApp) {
+    fun inject(app: OTAndroidApp) {
         onInject(app.currentConfiguredContext)
     }
 
@@ -38,7 +39,7 @@ open class RealmViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     init {
-        inject(app as OTApp)
+        inject(app as OTAndroidApp)
         realm = realmProvider.get()
     }
 

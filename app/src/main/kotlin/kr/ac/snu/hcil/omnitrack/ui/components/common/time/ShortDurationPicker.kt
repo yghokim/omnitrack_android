@@ -7,7 +7,6 @@ import android.text.TextWatcher
 import android.util.AttributeSet
 import android.widget.TextView
 import kotlinx.android.synthetic.main.component_property_duration_picker.view.*
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
@@ -66,7 +65,7 @@ class ShortDurationPicker : ConstraintLayout {
     init {
         inflateContent(R.layout.component_property_duration_picker, true)
 
-        ui_unit_spinner.setItems(OTApp.getString(R.string.time_duration_hour_full), OTApp.getString(R.string.time_duration_minute_full), OTApp.getString(R.string.time_duration_second_full))
+        ui_unit_spinner.setItems(resources.getString(R.string.time_duration_hour_full), resources.getString(R.string.time_duration_minute_full), resources.getString(R.string.time_duration_second_full))
 
         ui_unit_spinner.selectedIndex = UNIT_MINUTE
 

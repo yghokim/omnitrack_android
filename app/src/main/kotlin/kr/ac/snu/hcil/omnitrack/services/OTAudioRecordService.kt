@@ -23,6 +23,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecordingModule
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
+import org.jetbrains.anko.notificationManager
 
 /**
  * Created by junhoe on 2017. 9. 11..
@@ -245,17 +246,14 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
         }
     }
 
-    private val notificationManager: NotificationManager by lazy {
-        (OTApp.instance.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
-    }
-
     private fun putNotificationControl(rv: RemoteViews?) {
         val notification = notificationBuilder.setContent(rv).build()
         notificationManager.notify(TAG, RECORD_NOTIFICATION_ID, notification)
     }
 
-    private fun dismissNotificationControl()
-        = notificationManager.cancel(TAG, RECORD_NOTIFICATION_ID)
+    private fun dismissNotificationControl() {
+        notificationManager.cancel(TAG, RECORD_NOTIFICATION_ID)
+    }
 
     private fun disposeRecorder() {
         title = ""

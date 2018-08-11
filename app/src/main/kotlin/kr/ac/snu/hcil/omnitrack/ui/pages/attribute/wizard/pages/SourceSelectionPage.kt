@@ -10,19 +10,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho Kim on 2016-08-30.
  */
 class SourceSelectionPage(override val parent: ConnectionWizardView, val attribute: OTAttributeDAO) : AWizardPage(parent) {
+
+    @Inject
+    protected lateinit var externalServiceManager: OTExternalServiceManager
 
     override val getTitleResourceId: Int = R.string.msg_connection_wizard_title_source_selection
 
@@ -35,7 +40,9 @@ class SourceSelectionPage(override val parent: ConnectionWizardView, val attribu
         private set
 
     init {
-        sources = OTExternalService.getFilteredMeasureFactories {
+        (parent.context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
+
+        sources = externalServiceManager.getFilteredMeasureFactories {
             it.isAttachableTo(attribute)
         }.map {
             MeasureFactoryInformation(it)
@@ -67,7 +74,7 @@ class SourceSelectionPage(override val parent: ConnectionWizardView, val attribu
         init {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light),
-                    dipRound(1.5f),
+                    dipRound(context, 1.5f),
                     resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin),
                     resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)))
 
@@ -79,7 +86,7 @@ class SourceSelectionPage(override val parent: ConnectionWizardView, val attribu
         abstract fun getSource(): OTMeasureFactory.OTMeasure
     }
 
-    class MeasureFactoryInformation(val factory: OTMeasureFactory) : SourceInformation(factory.getService().nameResourceId, factory.nameResourceId, factory.descResourceId) {
+    class MeasureFactoryInformation(val factory: OTMeasureFactory) : SourceInformation(factory.parentService.nameResourceId, factory.nameResourceId, factory.descResourceId) {
         override fun getSource(): OTMeasureFactory.OTMeasure {
             return factory.makeMeasure()
         }

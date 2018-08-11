@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.utils.auth
 
 import android.accounts.NetworkErrorException
 import android.app.Activity
+import android.content.Context
 import android.content.SharedPreferences
 import android.os.AsyncTask
 import io.reactivex.Observable
@@ -19,7 +20,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-01.
  */
-class OAuth2Client(val config: OAuth2Config) {
+class OAuth2Client(val context: Context, val config: OAuth2Config) {
 
     class OAuth2Config {
         var authorizationUrl: String = ""
@@ -170,7 +171,7 @@ class OAuth2Client(val config: OAuth2Config) {
     }
 
     private fun <T> requestAwait(credential: Credential, converter: OAuth2RequestConverter<T>, credentialRefreshedListener: OAuth2CredentialRefreshedListener?, vararg urls: String): T? {
-        if (NetworkHelper.isConnectedToInternet()) {
+        if (NetworkHelper.isConnectedToInternet(context)) {
             try {
 
                 val result = ArrayList<String>()
@@ -227,7 +228,7 @@ class OAuth2Client(val config: OAuth2Config) {
                     .post(requestBody)
                     .build()
 
-            if (NetworkHelper.isConnectedToInternet()) {
+            if (NetworkHelper.isConnectedToInternet(context)) {
                 try {
                     val response = OkHttpClient().newCall(request).execute()
                     if (response.code() == 200) {
@@ -267,7 +268,7 @@ class OAuth2Client(val config: OAuth2Config) {
                     .post(requestBody)
                     .build()
 
-            if (NetworkHelper.isConnectedToInternet()) {
+            if (NetworkHelper.isConnectedToInternet(context)) {
                 try {
                     val response = OkHttpClient().newCall(request).execute()
                     val json = JSONObject(response.body()!!.string())
@@ -312,7 +313,7 @@ class OAuth2Client(val config: OAuth2Config) {
                     .post(requestBody)
                     .build()
 
-            if (NetworkHelper.isConnectedToInternet()) {
+            if (NetworkHelper.isConnectedToInternet(context)) {
                 try {
                     val response = OkHttpClient().newCall(request).execute()
                     val json = JSONObject(response.body()!!.string())

@@ -10,7 +10,7 @@ import dagger.Lazy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_send_report.*
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.net.IUserReportServerAPI
@@ -40,7 +40,7 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
 
         rightActionBarTextButton?.visibility = View.VISIBLE
         rightActionBarTextButton?.setText(R.string.msg_send)

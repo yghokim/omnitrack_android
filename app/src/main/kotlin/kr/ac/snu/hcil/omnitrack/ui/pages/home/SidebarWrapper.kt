@@ -23,7 +23,7 @@ import io.reactivex.disposables.SerialDisposable
 import io.realm.Realm
 import kotlinx.android.synthetic.main.layout_home_sidebar.view.*
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
@@ -93,7 +93,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
 
     init {
 
-        (parentActivity.application as OTApp).applicationComponent.configurationController().currentConfiguredContext
+        (parentActivity.application as OTAndroidApp).applicationComponent.configurationController().currentConfiguredContext
                 .configuredAppComponent.inject(this)
 
         /*
@@ -125,7 +125,6 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
             R.id.action_unlink_with_this_device -> {
                 DialogHelper.makeNegativePhrasedYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), R.string.msg_logout, onYes = {
                     authManager.signOut()
-                    OTApp.instance.unlinkUser()
 
                     eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_SIGNED_OUT)
 

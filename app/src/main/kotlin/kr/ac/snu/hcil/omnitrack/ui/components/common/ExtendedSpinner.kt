@@ -218,7 +218,7 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
                 lp = LinearLayout.LayoutParams(lp)
             }
 
-            val margin = dipRound(6)
+            val margin = dipRound(context, 6)
             lp.topMargin = margin
             lp.marginStart = margin
             lp.bottomMargin = margin

@@ -32,6 +32,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_new_item.*
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
@@ -139,7 +140,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         }
     }
 
-    override fun onInject(app: OTApp) {
+    override fun onInject(app: OTAndroidApp) {
         app.currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
@@ -241,14 +242,14 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
         creationSubscriptions.add(
                 viewModel.hasTrackerRemovedOutside.subscribe {
-                    invalidOutsideDialogBuilder.content(R.string.msg_format_removed_outside_return_home, OTApp.getString(R.string.msg_text_tracker))
+                    invalidOutsideDialogBuilder.content(R.string.msg_format_removed_outside_return_home, getString(R.string.msg_text_tracker))
                     invalidOutsideDialogBuilder.show()
                 }
         )
 
         creationSubscriptions.add(
                 viewModel.hasItemRemovedOutside.subscribe {
-                    invalidOutsideDialogBuilder.content(R.string.msg_format_removed_outside_return_home, OTApp.getString(R.string.msg_text_item))
+                    invalidOutsideDialogBuilder.content(R.string.msg_format_removed_outside_return_home, getString(R.string.msg_text_item))
                     invalidOutsideDialogBuilder.show()
                 }
         )
@@ -630,7 +631,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                 )
 
 
-                connectionIndicatorStubProxy.onBind(attributeViewModel.attributeDAO.getParsedConnection())
+                connectionIndicatorStubProxy.onBind(attributeViewModel.attributeDAO.getParsedConnection(configuredContext))
 
                 internalSubscriptions.add(
                         attributeViewModel.stateObservable.observeOn(AndroidSchedulers.mainThread()).subscribe { state ->

@@ -43,7 +43,7 @@ class ProcessArrowIndicator : View {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     init {
-        arrowPointRadius = dipSize(2.5f)
+        arrowPointRadius = dipSize(context, 2.5f)
 
         arrowHeadLineLength = arrowPointRadius * 3.5f
 

@@ -30,6 +30,7 @@ import kr.ac.snu.hcil.omnitrack.utils.time.DesignatedTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.ExperienceSamplingTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.IntervalTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
+import org.jetbrains.anko.alarmManager
 import org.jetbrains.anko.powerManager
 import org.jetbrains.anko.runOnUiThread
 import java.util.*
@@ -47,31 +48,29 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
 
         const val INTENT_EXTRA_TRIGGER_TIME = "triggerTime"
         const val INTENT_EXTRA_ALARM_ID = "alarmId"
-
-        private fun makeIntent(context: Context, userId: String, triggerTime: Long, alarmId: Int): PendingIntent {
-            val intent = Intent(context, TimeTriggerAlarmReceiver::class.java)
-            intent.action = OTApp.BROADCAST_ACTION_TIME_TRIGGER_ALARM
-            intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId)
-            intent.putExtra(INTENT_EXTRA_ALARM_ID, alarmId)
-            intent.putExtra(INTENT_EXTRA_TRIGGER_TIME, triggerTime)
-            return PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
-        }
-
-        private fun findAppendableAlarmInstance(alarmTime: Long, realm: Realm): OTTriggerAlarmInstance? {
-            return realm.where(OTTriggerAlarmInstance::class.java).equalTo("reservedAlarmTime", TimeHelper.roundToSeconds(alarmTime)).findFirst()
-        }
     }
 
     private val scheduleIdGenerator = ConcurrentUniqueLongGenerator()
     private val alarmDbIdGenerator = ConcurrentUniqueLongGenerator()
 
-    private val alarmManager by lazy { OTApp.instance.getSystemService(Context.ALARM_SERVICE) as AlarmManager }
-
     init {
     }
 
-
     //==========================================================
+
+
+    private fun makeIntent(context: Context, userId: String, triggerTime: Long, alarmId: Int): PendingIntent {
+        val intent = Intent(context, TimeTriggerAlarmReceiver::class.java)
+        intent.action = OTApp.BROADCAST_ACTION_TIME_TRIGGER_ALARM
+        intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId)
+        intent.putExtra(INTENT_EXTRA_ALARM_ID, alarmId)
+        intent.putExtra(INTENT_EXTRA_TRIGGER_TIME, triggerTime)
+        return PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+    }
+
+    private fun findAppendableAlarmInstance(alarmTime: Long, realm: Realm): OTTriggerAlarmInstance? {
+        return realm.where(OTTriggerAlarmInstance::class.java).equalTo("reservedAlarmTime", TimeHelper.roundToSeconds(alarmTime)).findFirst()
+    }
 
     override fun activateOnSystem() {
 
@@ -282,9 +281,9 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
 
     private fun registerSystemAlarm(alarmTimeToReserve: Long, userId: String, alarmId: Int) {
         if (android.os.Build.VERSION.SDK_INT >= 23) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTimeToReserve, makeIntent(OTApp.instance, userId, alarmTimeToReserve, alarmId))
+            context.alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTimeToReserve, makeIntent(context, userId, alarmTimeToReserve, alarmId))
         } else {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeToReserve, makeIntent(OTApp.instance, userId, alarmTimeToReserve, alarmId))
+            context.alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeToReserve, makeIntent(context, userId, alarmTimeToReserve, alarmId))
         }
     }
 
@@ -308,7 +307,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                         if (parent.triggerSchedules?.isEmpty() != false) {
                             println("remove system alarm")
                             val pendingIntent = makeIntent(context, trigger.userId!!, parent.reservedAlarmTime, parent.alarmId)
-                            alarmManager.cancel(pendingIntent)
+                            context.alarmManager.cancel(pendingIntent)
                             pendingIntent.cancel()
                             parent.deleteFromRealm()
                         }

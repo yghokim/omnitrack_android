@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
+import android.content.Context
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.dependency.OAuth2LoginDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
@@ -10,25 +10,25 @@ import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 /**
  * Created by Young-Ho Kim on 16. 9. 3
  */
-abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) : OTExternalService(identifier, minimumSDK), OAuth2Client.OAuth2CredentialRefreshedListener {
+abstract class OAuth2BasedExternalService(context: Context, identifier: String, minimumSDK: Int) : OTExternalService(context, identifier, minimumSDK), OAuth2Client.OAuth2CredentialRefreshedListener {
 
     protected val authClient: OAuth2Client by lazy {
         makeNewAuth2Client()
     }
 
     var credential: OAuth2Client.Credential?
-        get() = OAuth2Client.Credential.restore(preferences, identifier)
+        get() = OAuth2Client.Credential.restore(externalServiceManager.get().preferences, identifier)
         set(value) {
             if (value != null)
-                value.store(preferences, identifier)
+                value.store(externalServiceManager.get().preferences, identifier)
             else {
-                credential?.remove(preferences, identifier)
+                credential?.remove(externalServiceManager.get().preferences, identifier)
             }
         }
 
     override fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
         return super.onRegisterDependencies() + arrayOf(
-                OAuth2LoginDependencyResolver(authClient, identifier, preferences, OTApp.getString(nameResourceId))
+                OAuth2LoginDependencyResolver(authClient, identifier, externalServiceManager.get().preferences, context.resources.getString(nameResourceId))
 
         )
     }

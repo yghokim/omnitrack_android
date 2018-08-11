@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.google.fit
 
+import android.content.Context
 import com.google.android.gms.common.api.Api
 import com.google.android.gms.common.api.Scope
 import com.google.android.gms.fitness.Fitness
@@ -15,7 +16,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.concurrent.TimeUnit
@@ -24,17 +24,13 @@ import java.util.concurrent.TimeUnit
  * Created by Young-Ho on 8/11/2016.
  */
 
-object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") {
+class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : GoogleFitService.GoogleFitMeasureFactory(context, service, "step") {
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_STEP_ATTRIBUTE
     }
 
     override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
-
-    override fun getService(): OTExternalService {
-        return GoogleFitService
-    }
 
     override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
 
@@ -56,31 +52,30 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
     override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
 
     override fun makeMeasure(): OTMeasure {
-        return Measure()
+        return Measure(this)
     }
 
     override fun makeMeasure(reader: JsonReader): OTMeasure {
-        return Measure()
+        return Measure(this)
     }
 
     override fun makeMeasure(serialized: String): OTMeasure {
-        return Measure()
+        return Measure(this)
     }
 
     override fun serializeMeasure(measure: OTMeasure): String {
         return "{}"
     }
 
-    class Measure : OTRangeQueriedMeasure() {
+    class Measure(factory: GoogleFitStepsFactory) : OTRangeQueriedMeasure(factory) {
 
         override val dataTypeName = TypeStringSerializationHelper.TYPENAME_INT
 
-        override val factory: OTMeasureFactory = GoogleFitStepsFactory
 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             println("Requested Google Fit Step Measure")
-            return if (factory.getService().state == OTExternalService.ServiceState.ACTIVATED) {
-                GoogleFitService.getConnectedClient().toFlowable(BackpressureStrategy.LATEST).map<Nullable<out Any>> { client ->
+            return if (service<GoogleFitService>().state == OTExternalService.ServiceState.ACTIVATED) {
+                service<GoogleFitService>().getConnectedClient().toFlowable(BackpressureStrategy.LATEST).map<Nullable<out Any>> { client ->
                         val request = DataReadRequest.Builder()
                                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                                 .bucketByTime(1, TimeUnit.DAYS)

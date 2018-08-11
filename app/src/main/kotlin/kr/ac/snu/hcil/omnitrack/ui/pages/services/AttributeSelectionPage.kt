@@ -14,6 +14,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
@@ -60,7 +61,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
     var attributeDAO: OTAttributeDAO? = null
 
     init {
-        val component = (parent.context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent
+        val component = (parent.context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent
         component.inject(this)
 
     }

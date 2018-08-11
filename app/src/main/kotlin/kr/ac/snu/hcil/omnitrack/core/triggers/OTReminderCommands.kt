@@ -19,6 +19,7 @@ import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.Sort
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
@@ -83,7 +84,7 @@ class OTReminderCommands(val context: Context) {
     protected lateinit var dbManager: BackendDbManager
 
     init {
-        (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
     internal fun onUserLogged(startId: Int, trackerId: String, loggedAt: Long): Completable {
@@ -244,7 +245,7 @@ class OTReminderCommands(val context: Context) {
                 if (it.isNotBlank() == true) it
                 else null
             }
-                    ?: String.format(OTApp.getString(R.string.msg_format_reminder_noti_title), tracker.name)
+                    ?: String.format(context.getString(R.string.msg_format_reminder_noti_title), tracker.name)
 
             val notiBuilder = makeReminderNotificationBuilderBase(notificationId, entry.triggerId!!, entry.trackerId!!, tracker.name, entry.id, entry.intrinsicTriggerTime, entry.autoExpireAt, entry.timeoutDuration?.toLong(), 0, message)
 
@@ -338,7 +339,7 @@ class OTReminderCommands(val context: Context) {
                             entry.notifiedAt = System.currentTimeMillis()
                             val notificationId = notificationIdSeed.incrementAndGet()
                             entry.systemIntrinsicId = notificationId
-                            val notiBuilder = makeReminderNotificationBuilderBase(notificationId, entry.triggerId!!, trackerId, tracker.name, entry.id, entry.intrinsicTriggerTime, entries.first().autoExpireAt, entry.timeoutDuration?.toLong(), entries.size, OTApp.getString(R.string.msg_reminder_omitted))
+                            val notiBuilder = makeReminderNotificationBuilderBase(notificationId, entry.triggerId!!, trackerId, tracker.name, entry.id, entry.intrinsicTriggerTime, entries.first().autoExpireAt, entry.timeoutDuration?.toLong(), entries.size, context.getString(R.string.msg_reminder_omitted))
 
                             if (entry.autoExpireAt < Long.MAX_VALUE) reserveAutoExpiry(entry)
 
@@ -455,10 +456,10 @@ class OTReminderCommands(val context: Context) {
 
         val ringtone = pref.getString(SettingsActivity.PREF_REMINDER_NOTI_RINGTONE, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.toString())
         val lightColor = pref.getInt(SettingsActivity.PREF_REMINDER_LIGHT_COLOR, ContextCompat.getColor(context, R.color.colorPrimary))
-        val contentTextBase = String.format(OTApp.getString(R.string.msg_noti_tap_for_tracking_format), trackerName)
+        val contentTextBase = String.format(context.getString(R.string.msg_noti_tap_for_tracking_format), trackerName)
 
         val contentText: String = if (expireAt < Long.MAX_VALUE) {
-            contentTextBase + " (${String.format(OTApp.getString(R.string.msg_noti_reminder_until), dateFormat.format(Date(expireAt)))})"
+            contentTextBase + " (${String.format(context.getString(R.string.msg_noti_reminder_until), dateFormat.format(Date(expireAt)))})"
         } else contentTextBase
 
         return OTTrackingNotificationFactory.makeBaseBuilder(context, System.currentTimeMillis(), OTNotificationManager.CHANNEL_ID_IMPORTANT)
@@ -477,8 +478,8 @@ class OTReminderCommands(val context: Context) {
                 .setAutoCancel(false)
                 .setOngoing(true)
                 .apply { if (durationMs != null) this.setTimeoutAfter(durationMs) }
-                .addAction(NotificationCompat.Action.Builder(0, OTApp.getString(R.string.msg_reminder_open_input), accessPendingIntent).build())
-                .addAction(NotificationCompat.Action.Builder(0, OTApp.getString(R.string.msg_reminder_skip), dismissIntent).build())
+                .addAction(NotificationCompat.Action.Builder(0, context.getString(R.string.msg_reminder_open_input), accessPendingIntent).build())
+                .addAction(NotificationCompat.Action.Builder(0, context.getString(R.string.msg_reminder_skip), dismissIntent).build())
                 .setDeleteIntent(dismissIntent)
                 .setContentIntent(accessPendingIntent)
         //.setFullScreenIntent(accessPendingIntent, true)

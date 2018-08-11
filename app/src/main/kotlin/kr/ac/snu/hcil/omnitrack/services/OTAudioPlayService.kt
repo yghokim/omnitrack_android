@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.services
 
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
@@ -26,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecordMetadata
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import kr.ac.snu.hcil.omnitrack.utils.Ticker
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
+import org.jetbrains.anko.notificationManager
 
 /**
  * Created by Young-Ho on 4/22/2017.
@@ -145,23 +145,17 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
             val notification = builder.setContent(rv)
                     .build()
 
-            notificationManager.notify(TAG, AUDIO_NOTIFICATION_ID, notification)
+            context.notificationManager.notify(TAG, AUDIO_NOTIFICATION_ID, notification)
         }
 
         private fun dismissNotificationControl(context: Context) {
-            notificationManager.cancel(TAG, AUDIO_NOTIFICATION_ID)
-        }
-
-
-        private val notificationManager: NotificationManager by lazy {
-            (OTApp.instance.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+            context.notificationManager.cancel(TAG, AUDIO_NOTIFICATION_ID)
         }
     }
 
     private val binder = AudioServiceBinder(this)
 
     private var currentFile: Uri? = null
-        private set
 
     private var pausedPosition: Int = -1
 
@@ -285,7 +279,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
             currentPlayer?.let {
                 it.setDataSource(file.path)
                 this.currentFile = file
-                val metadata = AudioRecordMetadata.readMetadata(file.path)
+                val metadata = AudioRecordMetadata.readMetadata(file.path, this)
                 if (metadata != null) {
                     description = String.format(resources.getString(R.string.msg_audio_record_player_description_recorded_at_format), metadata.recordedAt)
                 }

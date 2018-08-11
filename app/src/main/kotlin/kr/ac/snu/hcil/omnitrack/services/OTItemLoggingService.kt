@@ -7,6 +7,7 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.BuildConfig
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
@@ -74,7 +75,7 @@ class OTItemLoggingService : WakefulService(TAG) {
 
     override fun onCreate() {
         super.onCreate()
-        (application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
     override fun onDestroy() {
@@ -109,7 +110,7 @@ class OTItemLoggingService : WakefulService(TAG) {
                         val builder = OTItemBuilderDAO()
                         builder.holderType = OTItemBuilderDAO.HOLDER_TYPE_SERVICE
                         builder.tracker = unManagedTrackerDao
-                        val wrapper = OTItemBuilderWrapperBase(builder, (application as OTApp).currentConfiguredContext, realm)
+                        val wrapper = OTItemBuilderWrapperBase(builder, (application as OTAndroidApp).currentConfiguredContext, realm)
                         val trackerName = trackerDao.name
                         val notificationId = OTItemLoggingService.notificationIdSeed.incrementAndGet()
 
@@ -141,7 +142,7 @@ class OTItemLoggingService : WakefulService(TAG) {
                                             tracker.attributes.filter { !it.isHidden && !it.isInTrashcan }.forEach {
                                                 val value = item.getValueOf(it.localId)
                                                 if (value != null) {
-                                                    table.add(Pair(it.name, it.getHelper((application as OTApp).currentConfiguredContext).formatAttributeValue(it, value)))
+                                                    table.add(Pair(it.name, it.getHelper((application as OTAndroidApp).currentConfiguredContext).formatAttributeValue(it, value)))
                                                 } else {
                                                     table.add(Pair(it.name, null))
                                                 }
@@ -154,7 +155,7 @@ class OTItemLoggingService : WakefulService(TAG) {
 
                                         if (notify) {
                                             this@OTItemLoggingService.runOnUiThread {
-                                                val successfulNotiBuilder = OTTrackingNotificationFactory.makeLoggingSuccessNotificationBuilder(this@OTItemLoggingService, (application as OTApp).currentConfiguredContext, trackerId, trackerName, itemId!!, System.currentTimeMillis(), table, notificationId, NOTIFICATION_TAG)
+                                                val successfulNotiBuilder = OTTrackingNotificationFactory.makeLoggingSuccessNotificationBuilder(this@OTItemLoggingService, (application as OTAndroidApp).currentConfiguredContext, trackerId, trackerName, itemId!!, System.currentTimeMillis(), table, notificationId, NOTIFICATION_TAG)
 
                                                 this@OTItemLoggingService.notificationManager.notify(kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService.NOTIFICATION_TAG, notificationId, successfulNotiBuilder.build())
                                             }

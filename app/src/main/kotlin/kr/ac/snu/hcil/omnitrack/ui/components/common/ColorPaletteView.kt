@@ -8,8 +8,10 @@ import android.support.constraint.ConstraintLayout
 import android.support.constraint.ConstraintSet
 import android.util.AttributeSet
 import android.view.View
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
+import kr.ac.snu.hcil.omnitrack.core.di.global.ColorPalette
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho Kim on 2016-07-19
@@ -26,23 +28,28 @@ class ColorPaletteView : ConstraintLayout, View.OnClickListener {
 
     val colorChanged = Event<Int>()
 
-    var colorPalette: IntArray = OTApp.instance.colorPalette
-        set(newPalette) {
-            if (!field.contentEquals(newPalette)) {
-                field = newPalette
-                refreshUI()
-            }
-        }
 
     var buttons = ArrayList<ColorSelectionButton>()
 
-    init {
+    @field:[Inject ColorPalette]
+    protected lateinit var colorPalette: IntArray
+
+    fun initialize(context: Context) {
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
         refreshUI()
     }
 
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet? = null) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context) : super(context) {
+        initialize(context)
+    }
+
+    constructor(context: Context, attrs: AttributeSet? = null) : this(context, attrs, 0) {
+        initialize(context)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        initialize(context)
+    }
 
     var selectedColor: Int
         get() {
@@ -116,7 +123,6 @@ class ColorPaletteView : ConstraintLayout, View.OnClickListener {
         val thisState = state as SavedState
         super.onRestoreInstanceState(thisState.superState)
         selectedIndex = thisState.selectedIndex
-        colorPalette = thisState.colorPalette ?: OTApp.instance.colorPalette
     }
 
     class SavedState : BaseSavedState {

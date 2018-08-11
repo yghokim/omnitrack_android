@@ -10,7 +10,6 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import io.reactivex.Single
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
@@ -43,17 +42,20 @@ class OTTimeAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeH
         const val GRANULARITY_MINUTE = 1
         const val GRANULARITY_SECOND = 2
 
-        val formats = mapOf<Int, SimpleDateFormat>(
-                Pair(GRANULARITY_DAY, SimpleDateFormat(OTApp.getString(R.string.property_time_format_granularity_day))),
-                Pair(GRANULARITY_MINUTE, SimpleDateFormat(OTApp.getString(R.string.property_time_format_granularity_minute))),
-                Pair(GRANULARITY_SECOND, SimpleDateFormat(OTApp.getString(R.string.property_time_format_granularity_second)))
-        )
-
-        private val timezoneSizeSpan = AbsoluteSizeSpan(OTApp.instance.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
-        private val timezoneStyleSpan = StyleSpan(Typeface.BOLD)
-        private val timezoneColorSpan = ForegroundColorSpan(ContextCompat.getColor(OTApp.instance.contextCompat, R.color.textColorLight))
 
     }
+
+
+    val formats = mapOf<Int, SimpleDateFormat>(
+            Pair(GRANULARITY_DAY, SimpleDateFormat(configuredContext.applicationContext.getString(R.string.property_time_format_granularity_day))),
+            Pair(GRANULARITY_MINUTE, SimpleDateFormat(configuredContext.applicationContext.getString(R.string.property_time_format_granularity_minute))),
+            Pair(GRANULARITY_SECOND, SimpleDateFormat(configuredContext.applicationContext.getString(R.string.property_time_format_granularity_second)))
+    )
+
+    private val timezoneSizeSpan = AbsoluteSizeSpan(configuredContext.applicationContext.resources.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
+    private val timezoneStyleSpan = StyleSpan(Typeface.BOLD)
+    private val timezoneColorSpan = ForegroundColorSpan(ContextCompat.getColor(configuredContext.applicationContext, R.color.textColorLight))
+
 
     override fun getValueNumericCharacteristics(attribute: OTAttributeDAO): NumericCharacteristics = NumericCharacteristics(true, true)
 
@@ -67,7 +69,7 @@ class OTTimeAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeH
 
     override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
         get() = super.supportedFallbackPolicies.apply {
-            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(R.string.msg_intrinsic_time, isValueVolatile = true) {
+            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(configuredContext.applicationContext, R.string.msg_intrinsic_time, isValueVolatile = true) {
                 override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
                     return Single.just(Nullable(TimePoint(System.currentTimeMillis(), configuredContext.configuredAppComponent.getPreferredTimeZone().id)))
                 }
@@ -89,7 +91,7 @@ class OTTimeAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeH
 
     override fun <T> getPropertyHelper(propertyKey: String): OTPropertyHelper<T> {
         return when (propertyKey) {
-            GRANULARITY -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.Selection)
+            GRANULARITY -> propertyManager.getHelper(OTPropertyManager.EPropertyType.Selection)
             else -> throw IllegalArgumentException("Unsupported property type ${propertyKey}")
         } as OTPropertyHelper<T>
     }
@@ -103,7 +105,7 @@ class OTTimeAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeH
 
     override fun getPropertyTitle(propertyKey: String): String {
         return when (propertyKey) {
-            GRANULARITY -> OTApp.getString(R.string.property_time_granularity)
+            GRANULARITY -> configuredContext.applicationContext.getString(R.string.property_time_granularity)
             else -> ""
         }
     }
@@ -111,9 +113,9 @@ class OTTimeAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeH
     override fun makePropertyView(propertyKey: String, context: Context): APropertyView<out Any> {
         val superView = super.makePropertyView(propertyKey, context)
         if (propertyKey == GRANULARITY && superView is SelectionPropertyView) {
-            superView.setEntries(arrayOf(OTApp.instance.resourcesWrapped.getString(R.string.property_time_granularity_day),
-                    OTApp.instance.resourcesWrapped.getString(R.string.property_time_granularity_minute),
-                    OTApp.instance.resourcesWrapped.getString(R.string.property_time_granularity_second)
+            superView.setEntries(arrayOf(context.resources.getString(R.string.property_time_granularity_day),
+                    context.resources.getString(R.string.property_time_granularity_minute),
+                    context.resources.getString(R.string.property_time_granularity_second)
 
             ))
         }

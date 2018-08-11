@@ -69,7 +69,7 @@ class AudioRecorderProgressBar : View {
         volumeLinePaint.style = Paint.Style.STROKE
         volumeLinePaint.color = Color.WHITE
         volumeLinePaint.alpha = 100
-        volumeLinePaint.strokeWidth = dipSize(1)
+        volumeLinePaint.strokeWidth = dipSize(context, 1)
     }
 
     override fun onDraw(canvas: Canvas) {

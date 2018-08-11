@@ -14,14 +14,13 @@ import com.google.gson.JsonObject
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfigurationController
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
-import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import org.jetbrains.anko.notificationManager
@@ -54,7 +53,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onCreate() {
         super.onCreate()
-        (application as OTApp).applicationComponent.inject(this)
+        (application as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun onDestroy() {
@@ -77,7 +76,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
                                         val currentUserId = configuredContext.configuredAppComponent.getAuthManager().userId
                                         if (currentUserId != null) {
                                             val jobBuilder = configuredContext.scheduledJobComponent.getInformationUploadJobBuilderProvider().get()
-                                            dispatcher.mustSchedule(jobBuilder.setTag(OTInformationUploadService.INFORMATION_DEVICE).build())
+                                            dispatcher.mustSchedule(jobBuilder.build())
                                         }
                                     }
                                 } catch (ex: IOException) {

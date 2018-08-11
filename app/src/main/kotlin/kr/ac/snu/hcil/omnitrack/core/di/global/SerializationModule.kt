@@ -10,7 +10,7 @@ import javax.inject.Singleton
 /**
  * Created by younghokim on 2017. 12. 19..
  */
-@Module(subcomponents = [DaoSerializationComponent::class])
+@Module(includes = [DesignModule::class], subcomponents = [DaoSerializationComponent::class])
 class SerializationModule {
     @Provides
     @Singleton

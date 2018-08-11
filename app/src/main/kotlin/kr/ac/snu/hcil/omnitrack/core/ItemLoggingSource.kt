@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core
 
-import kr.ac.snu.hcil.omnitrack.OTApp
+import android.content.Context
 import kr.ac.snu.hcil.omnitrack.R
 
 /**
@@ -13,7 +13,8 @@ enum class ItemLoggingSource(val nameResId: Int) {
     Shortcut(R.string.msg_tracking_source_shortcut),
     Manual(R.string.msg_tracking_source_manual);
 
-    val sourceText: String by lazy {
-        OTApp.instance.resourcesWrapped.getString(nameResId)
+
+    fun sourceText(context: Context): String {
+        return context.getString(nameResId)
     }
 }

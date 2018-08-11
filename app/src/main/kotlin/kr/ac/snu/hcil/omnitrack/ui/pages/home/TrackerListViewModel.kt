@@ -8,7 +8,6 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.*
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
@@ -69,7 +68,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                 println("Viewmodel first time limit")
                 //first time emit
                 clearTrackerViewModelList()
-                val viewModels = snapshot.map { TrackerInformationViewModel(it, realm, researchRealm, dbManager.get()) }
+                val viewModels = snapshot.map { TrackerInformationViewModel(it, realm, researchRealm, dbManager.get(), configuredContext) }
                 currentTrackerViewModelList.addAll(viewModels)
 
                 trackerViewModelListSubject.onNext(
@@ -84,7 +83,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
                 //deal with additions
                 changeSet.insertions.forEach { index ->
-                    currentTrackerViewModelList.add(index, TrackerInformationViewModel(snapshot[index]!!, realm, researchRealm, dbManager.get()))
+                    currentTrackerViewModelList.add(index, TrackerInformationViewModel(snapshot[index]!!, realm, researchRealm, dbManager.get(), configuredContext))
                 }
 
                 trackerViewModelListSubject.onNext(
@@ -105,7 +104,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
     }
 
     fun generateNewTrackerName(): String {
-        return DefaultNameGenerator.generateName(OTApp.getString(R.string.msg_new_tracker_prefix), currentTrackerViewModelList.map {
+        return DefaultNameGenerator.generateName(configuredContext.applicationContext.getString(R.string.msg_new_tracker_prefix), currentTrackerViewModelList.map {
             it.trackerName.value ?: ""
         }, false)
     }
@@ -159,7 +158,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         }
     }
 
-    class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm, val researchRealm: Realm, dbManager: BackendDbManager) : IReadonlyObjectId, RealmChangeListener<OTTrackerDAO> {
+    class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm, val researchRealm: Realm, dbManager: BackendDbManager, val configuredContext: ConfiguredContext) : IReadonlyObjectId, RealmChangeListener<OTTrackerDAO> {
         override val objectId: String?
             get() = _objectId
 
@@ -217,7 +216,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                 subscriptions.add(
                         Flowable.merge(
                                 snapshot.map {
-                                    (it.getParsedConnection()?.makeValidationStateObservable()
+                                    (it.getParsedConnection(configuredContext)?.makeValidationStateObservable(configuredContext.applicationContext)
                                             ?: Flowable.just(Pair<Boolean, CharSequence?>(true, null))).map { validationResult ->
                                         Pair(it.localId, validationResult)
                                     }

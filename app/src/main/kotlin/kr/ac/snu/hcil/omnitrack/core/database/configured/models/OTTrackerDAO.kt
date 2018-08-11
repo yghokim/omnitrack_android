@@ -213,9 +213,9 @@ open class OTAttributeDAO : RealmObject() {
     var serializedCreationFlags: String = "{}"
     var serializedLockedPropertyInfo: String = "{}"
 
-    fun getParsedConnection(): OTConnection? {
+    fun getParsedConnection(configuredContext: ConfiguredContext): OTConnection? {
         return try {
-            serializedConnection?.let { OTConnection.fromJson(it) }
+            serializedConnection?.let { configuredContext.configuredAppComponent.getConnectionTypeAdapter().fromJson(it) }
         } catch (ex: JsonSyntaxException) {
             ex.printStackTrace(); null
         }

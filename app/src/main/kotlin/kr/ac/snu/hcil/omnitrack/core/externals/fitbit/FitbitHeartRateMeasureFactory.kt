@@ -1,12 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
+import android.content.Context
 import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -15,11 +15,7 @@ import org.json.JSONObject
 /**
  * Created by Young-Ho Kim on 2016-10-06.
  */
-object FitbitHeartRateMeasureFactory : OTMeasureFactory("heart") {
-
-    override fun getService(): OTExternalService {
-        return FitbitService
-    }
+class FitbitHeartRateMeasureFactory(context: Context, service: FitbitService) : OTMeasureFactory(context, service, "heart") {
 
     override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
         return attribute.type == OTAttributeManager.TYPE_NUMBER
@@ -32,15 +28,15 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory("heart") {
     override val isDemandingUserInput: Boolean = false
 
     override fun makeMeasure(): OTMeasure {
-        return FitbitHeartRateMeasure()
+        return FitbitHeartRateMeasure(this)
     }
 
     override fun makeMeasure(reader: JsonReader): OTMeasure {
-        return FitbitHeartRateMeasure()
+        return FitbitHeartRateMeasure(this)
     }
 
     override fun makeMeasure(serialized: String): OTMeasure {
-        return FitbitHeartRateMeasure()
+        return FitbitHeartRateMeasure(this)
     }
 
     override fun serializeMeasure(measure: OTMeasure): String {
@@ -55,7 +51,7 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory("heart") {
     override val nameResourceId: Int = R.string.measure_fitbit_heart_rate_name
     override val descResourceId: Int = R.string.measure_fitbit_heart_rate_desc
 
-    class FitbitHeartRateMeasure : OTRangeQueriedMeasure() {
+    class FitbitHeartRateMeasure(factory: FitbitHeartRateMeasureFactory) : OTRangeQueriedMeasure(factory) {
         companion object {
             val converter = object : FitbitApi.AIntraDayConverter<Int, Int>("activities-heart-intraday") {
                 override fun extractValueFromDatum(datum: JSONObject): Int {
@@ -71,11 +67,10 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory("heart") {
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             val urls = FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_HEART_RATE, start, end)
             println(urls)
-            return FitbitService.getRequest(converter, *urls).toFlowable() as Flowable<Nullable<out Any>>
+            return service<FitbitService>().getRequest(converter, *urls).toFlowable() as Flowable<Nullable<out Any>>
         }
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
-        override val factory: OTMeasureFactory = FitbitHeartRateMeasureFactory
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

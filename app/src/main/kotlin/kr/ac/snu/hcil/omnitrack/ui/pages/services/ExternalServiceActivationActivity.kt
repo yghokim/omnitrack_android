@@ -17,8 +17,10 @@ import at.markushi.ui.RevealColorView
 import butterknife.bindView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyControlView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyControlViewModel
@@ -27,6 +29,7 @@ import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import mehdi.sakout.fancybuttons.FancyButton
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017. 5. 25..
@@ -44,6 +47,9 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
                     }
         }
     }
+
+    @Inject
+    protected lateinit var externalServiceManager: OTExternalServiceManager
 
     private var serviceIdentifier: String = ""
 
@@ -65,6 +71,11 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
     private val dependencyAdapter = DependencyAdapter()
 
 
+    override fun onInject(app: OTAndroidApp) {
+        super.onInject(app)
+        app.currentConfiguredContext.configuredAppComponent.inject(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_service_activation_wizard)
@@ -72,7 +83,7 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
         dependencyListView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         dependencyListView.adapter = dependencyAdapter
         dependencyListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(this, R.color.separator_Light),
-                dipRound(1),
+                dipRound(this, 1),
                 resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin),
                 resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
         ))
@@ -85,7 +96,7 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
             savedInstanceState.getString(INTENT_EXTRA_SERVICE_IDENTIFIER)
         }
 
-        viewModel.attachedService = OTExternalService.findServiceByIdentifier(serviceIdentifier)
+        viewModel.attachedService = externalServiceManager.findServiceByIdentifier(serviceIdentifier)
 
         if (savedInstanceState != null) {
             when (viewModel.currentState.value) {

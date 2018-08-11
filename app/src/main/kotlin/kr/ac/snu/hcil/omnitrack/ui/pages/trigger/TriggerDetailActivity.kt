@@ -155,9 +155,9 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                     val actionNameResId = OTTriggerInformationHelper.getActionNameResId(actionType)
                     if (viewModel.viewModelMode.hasValue() && actionNameResId != null) {
                         if (viewModel.viewModelMode.value == TriggerDetailViewModel.MODE_NEW) {
-                            title = String.format(OTApp.getString(R.string.msg_format_new_something), OTApp.getString(actionNameResId))
+                            title = String.format(getString(R.string.msg_format_new_something), getString(actionNameResId))
                         } else {
-                            title = String.format(OTApp.getString(R.string.msg_format_edit_something), OTApp.getString(actionNameResId))
+                            title = String.format(getString(R.string.msg_format_edit_something), getString(actionNameResId))
                         }
                     }
                 },
@@ -211,15 +211,15 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
             val actionNameId = OTTriggerInformationHelper.getActionNameResId(viewModel.actionType.value
                     ?: 0) ?: R.string.msg_text_trigger
             val msg = if (isEditMode) {
-                String.format(OTApp.getString(R.string.msg_format_confirm_apply_change), OTApp.getString(actionNameId).toLowerCase())
+                String.format(getString(R.string.msg_format_confirm_apply_change), getString(actionNameId).toLowerCase())
             } else {
-                String.format(OTApp.getString(R.string.msg_format_confirm_save_creation), OTApp.getString(actionNameId).toLowerCase())
+                String.format(getString(R.string.msg_format_confirm_save_creation), getString(actionNameId).toLowerCase())
             }
 
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
                     msg, yesLabel = R.string.msg_save, noLabel = R.string.msg_do_not_save, onYes =
             {
-                val errorMessages = viewModel.validateConfiguration()
+                val errorMessages = viewModel.validateConfiguration(this)
                 if (errorMessages == null) {
                     viewModel.saveFrontToDao()
                     setResult(Activity.RESULT_OK, makeResultData())
@@ -241,7 +241,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
 
     override fun onToolbarRightButtonClicked() {
         ui_script_form.clearFocus()
-        val errorMessages = viewModel.validateConfiguration()
+        val errorMessages = viewModel.validateConfiguration(this)
         if (errorMessages == null) {
             viewModel.saveFrontToDao()
             setResult(Activity.RESULT_OK, makeResultData())

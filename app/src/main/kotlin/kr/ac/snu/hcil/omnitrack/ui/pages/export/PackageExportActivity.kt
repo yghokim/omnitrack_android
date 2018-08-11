@@ -204,7 +204,7 @@ class PackageExportActivity : MultiButtonActionBarActivity(R.layout.activity_pac
         }
 
         init {
-            itemView.ui_children_list.addItemDecoration(SpacingItemDecoration(dipRound(8), dipRound(10)))
+            itemView.ui_children_list.addItemDecoration(SpacingItemDecoration(dipRound(parent.context, 8), dipRound(parent.context, 10)))
             itemView.ui_children_list.layoutManager = ChipsLayoutManager.newBuilder(itemView.context)
                     .setChildGravity(Gravity.CENTER_VERTICAL)
                     .setOrientation(ChipsLayoutManager.HORIZONTAL)

@@ -8,19 +8,23 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.TextView
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
 import kr.ac.snu.hcil.omnitrack.core.calculation.SingleNumericComparison
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditionerviews.SingleNumericConditionerSettingView
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 16. 9. 5..
  */
 class EventTriggerConfigurationPanel : FrameLayout {
 
+    @Inject
+    lateinit var externalServiceManager: OTExternalServiceManager
 
     var selectedMeasureFactory: OTMeasureFactory?
         get() {
@@ -54,12 +58,14 @@ class EventTriggerConfigurationPanel : FrameLayout {
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
 
     init {
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
+
         //TODO change to merge
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         addView(inflater.inflate(R.layout.trigger_event_trigger_config_panel, this, false))
 
 
-        availableMeasures = OTExternalService.getFilteredMeasureFactories {
+        availableMeasures = externalServiceManager.getFilteredMeasureFactories {
             it.isDemandingUserInput == false
         }
 
@@ -105,7 +111,7 @@ class EventTriggerConfigurationPanel : FrameLayout {
         private val categoryView: TextView = view.findViewById(R.id.title)
 
         fun bind(factory: OTMeasureFactory) {
-            categoryView.setText(factory.getService().nameResourceId)
+            categoryView.setText(factory.parentService.nameResourceId)
             titleView.setText(factory.nameResourceId)
         }
     }

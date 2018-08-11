@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.configs
 
 import android.annotation.TargetApi
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.media.RingtoneManager
@@ -20,7 +21,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import kotlinx.android.synthetic.main.common_toolbar_with_buttons.*
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
@@ -53,6 +54,10 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private var fragment: SettingsFragment? = null
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.wrapContextWithLocale(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -185,7 +190,7 @@ class SettingsActivity : AppCompatActivity() {
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
 
-            (act.application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+            (act.application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
             languageOnCreation = LocaleHelper.getLanguageCode(activity)
         }
 
@@ -282,7 +287,7 @@ class SettingsActivity : AppCompatActivity() {
                 }
 
                 LocaleHelper.PREF_USE_DEVICE_DEFAULT, LocaleHelper.PREF_KEY_SELECTED_LANGUAGE -> {
-                    OTApp.instance.refreshConfiguration(activity)
+                    (act.application as OTAndroidApp).refreshConfiguration(activity)
                     Toast.makeText(activity, R.string.msg_language_change_applied_after_exit_this_screen, Toast.LENGTH_LONG).show()
                     setResult(Activity.RESULT_OK, Intent().apply { putExtra(FLAG_CONFIGURATION_CHANGED, true) })
                     println("activity: ${activity}")

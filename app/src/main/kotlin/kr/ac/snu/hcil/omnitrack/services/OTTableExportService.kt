@@ -17,6 +17,7 @@ import dagger.internal.Factory
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
@@ -126,7 +127,7 @@ class OTTableExportService : WakefulService(TAG) {
 
     override fun onCreate() {
         super.onCreate()
-        (application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
         realm = realmProvider.get()
     }
 
@@ -202,7 +203,7 @@ class OTTableExportService : WakefulService(TAG) {
 
             subscriptions.add(
                     Single.defer<Boolean> {
-                        val configuredContext = (application as OTApp).currentConfiguredContext
+                        val configuredContext = (application as OTAndroidApp).currentConfiguredContext
                         val tracker = dbManager.get().getUnManagedTrackerDao(trackerId, realm)
                         val attributes = tracker?.attributes?.filter { it.isHidden == false && it.isInTrashcan == false }
                                 ?: emptyList()

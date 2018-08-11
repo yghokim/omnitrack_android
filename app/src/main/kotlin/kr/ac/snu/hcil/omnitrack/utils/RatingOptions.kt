@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
+import android.content.Context
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
 
@@ -86,10 +86,18 @@ class RatingOptions {
 
     var leftMost: Int = 1
     var rightMost: Int = 5
-    var leftLabel: String = OTApp.instance.resourcesWrapped.getString(R.string.property_rating_options_leftmost_label_example)
+    var leftLabel: String = ""
     var middleLabel: String = ""
-    var rightLabel: String = OTApp.instance.resourcesWrapped.getString(R.string.property_rating_options_rightmost_label_example)
+    var rightLabel: String = ""
     var isFractional: Boolean = true
+
+
+    constructor()
+
+    constructor(context: Context) {
+        leftLabel = context.resources.getString(R.string.property_rating_options_leftmost_label_example)
+        rightLabel = context.resources.getString(R.string.property_rating_options_rightmost_label_example)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) {

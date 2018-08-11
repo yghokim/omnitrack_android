@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.database.configured.models
 
+import android.content.Context
 import android.content.Intent
 import android.support.v4.content.LocalBroadcastManager
 import com.github.salomonbrys.kotson.toJson
@@ -235,10 +236,10 @@ open class OTTriggerDAO : RealmObject() {
      *
      * @return if null, is valid. is not, the trigger is invalid due to the returned exception.
      */
-    fun isValidToTurnOn(): TriggerConfigInvalidException? {
+    fun isValidToTurnOn(context: Context): TriggerConfigInvalidException? {
         val containsTracker = liveTrackerCount > 0
 
-        val isConditionValid = condition?.isConfigurationValid(null) ?: false
+        val isConditionValid = condition?.isConfigurationValid(context, null) ?: false
 
         return if (containsTracker && isConditionValid) null else {
             val invalids = ArrayList<TriggerValidationComponent>()

@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.utils.net
 import android.content.Context
 import android.net.ConnectivityManager
 import kr.ac.snu.hcil.omnitrack.OTApp
+import org.jetbrains.anko.connectivityManager
 
 /**
  * Created by younghokim on 2016. 10. 25..
@@ -13,8 +14,8 @@ object NetworkHelper {
         val isInternetConnected: Boolean get() = wifiConnected || mobileConnected
     }
 
-    fun isConnectedToInternet(): Boolean {
-        val connectivityManager = OTApp.instance.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    fun isConnectedToInternet(context: Context): Boolean {
+        val connectivityManager = context.connectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
         if (networkInfo != null) {
             val wifi = networkInfo.type == ConnectivityManager.TYPE_WIFI
@@ -24,8 +25,8 @@ object NetworkHelper {
         } else return false
     }
 
-    fun getCurrentNetworkConnectionInfo(): NetworkConnectionInfo {
-        val connectivityManager = OTApp.instance.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    fun getCurrentNetworkConnectionInfo(context: Context): NetworkConnectionInfo {
+        val connectivityManager = context.connectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
         if (networkInfo != null) {
             val wifi = networkInfo.type == ConnectivityManager.TYPE_WIFI

@@ -1,19 +1,19 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.jawbone
 
+import android.content.Context
 import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
  * Created by younghokim on 2017. 1. 25..
  */
-object JawboneDistanceMeasureFactory : OTMeasureFactory("dist") {
+class JawboneDistanceMeasureFactory(context: Context, service: JawboneUpService) : OTMeasureFactory(context, service, "dist") {
     override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
@@ -32,37 +32,31 @@ object JawboneDistanceMeasureFactory : OTMeasureFactory("dist") {
 
 
     override fun makeMeasure(): OTMeasure {
-        return JawboneDistanceMeasure()
+        return JawboneDistanceMeasure(this)
     }
 
     override fun makeMeasure(reader: JsonReader): OTMeasure {
-        return JawboneDistanceMeasure()
+        return JawboneDistanceMeasure(this)
     }
 
     override fun makeMeasure(serialized: String): OTMeasure {
-        return JawboneDistanceMeasure()
+        return JawboneDistanceMeasure(this)
     }
 
     override fun serializeMeasure(measure: OTMeasure): String {
         return "{}"
     }
 
-    override fun getService(): OTExternalService {
-        return JawboneUpService
-    }
-
     override val descResourceId: Int = R.string.measure_jawbone_distance_desc
     override val nameResourceId: Int = R.string.measure_jawbone_distance_name
 
-    class JawboneDistanceMeasure : AJawboneMoveMeasure() {
+    class JawboneDistanceMeasure(factory: JawboneDistanceMeasureFactory) : AJawboneMoveMeasure(factory) {
 
         override fun extractValueFromItem(item: JsonObject): Float {
             return item.getAsJsonObject("details").get("distance").asFloat
         }
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_FLOAT
-
-        override val factory: OTMeasureFactory = JawboneDistanceMeasureFactory
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

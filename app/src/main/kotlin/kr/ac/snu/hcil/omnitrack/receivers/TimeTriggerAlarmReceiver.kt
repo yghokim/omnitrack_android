@@ -10,6 +10,7 @@ import android.os.PowerManager
 import android.util.SparseArray
 import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.BuildConfig
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.triggers.ITriggerAlarmController
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
@@ -93,7 +94,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
 
         override fun onCreate() {
             super.onCreate()
-            (application as OTApp).currentConfiguredContext.triggerSystemComponent.inject(this)
+            (application as OTAndroidApp).currentConfiguredContext.triggerSystemComponent.inject(this)
         }
 
         override fun onDestroy() {

@@ -17,6 +17,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
@@ -91,7 +92,7 @@ class AttributeEditDialogFragment : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //retainInstance = true
-        (activity?.application as? OTApp)?.currentConfiguredContext?.configuredAppComponent?.inject(this)
+        (activity?.application as? OTAndroidApp)?.currentConfiguredContext?.configuredAppComponent?.inject(this)
         realm = realmFactory.get()
 
         viewModel = ViewModelProviders.of(this).get(ViewModel::class.java)

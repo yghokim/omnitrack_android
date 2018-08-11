@@ -10,7 +10,6 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
 import kr.ac.snu.hcil.omnitrack.utils.dipSize
@@ -39,7 +38,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
     }
 
 
-    var leftLabel: String by Delegates.observable(OTApp.instance.resourcesWrapped.getString(R.string.property_rating_options_leftmost_label_example)) {
+    var leftLabel: String by Delegates.observable(resources.getString(R.string.property_rating_options_leftmost_label_example)) {
         prop, old, new ->
         if (old != new) {
             requestLayout()
@@ -53,7 +52,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
         }
     }
 
-    var rightLabel: String by Delegates.observable(OTApp.instance.resourcesWrapped.getString(R.string.property_rating_options_rightmost_label_example)) {
+    var rightLabel: String by Delegates.observable(resources.getString(R.string.property_rating_options_rightmost_label_example)) {
         prop, old, new ->
         if (old != new) {
             requestLayout()
@@ -280,7 +279,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
         val rightLabelLayout = makeMultilineStaticLayout(rightLabel, labelTextPaint, contentWidth / 5, Layout.Alignment.ALIGN_NORMAL)
         canvas.save()
 
-        canvas.translate((paddingLeft + contentWidth).toFloat() - dipSize(2), _labelY)
+        canvas.translate((paddingLeft + contentWidth).toFloat() - dipSize(context, 2), _labelY)
         rightLabelLayout.draw(canvas)
         canvas.restore()
 

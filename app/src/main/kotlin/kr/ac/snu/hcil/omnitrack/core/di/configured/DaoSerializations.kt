@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.Subcomponent
 import dagger.internal.Factory
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
@@ -14,7 +15,9 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.typeadapters.*
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
+import kr.ac.snu.hcil.omnitrack.core.di.global.ColorPalette
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import javax.inject.Qualifier
 
 /**
@@ -47,16 +50,16 @@ class DaoSerializationModule {
     @Configured
     @ForTracker
     fun provideTrackerAdapter(@ForAttribute attributeTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTAttributeDAO>>,
-                              @ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTTrackerDAO>
-            = TrackerTypeAdapter(false, attributeTypeAdapter, gson)
+                              @ForGeneric gson: Lazy<Gson>,
+                              @ColorPalette colorPalette: IntArray): ServerCompatibleTypeAdapter<OTTrackerDAO> = TrackerTypeAdapter(false, attributeTypeAdapter, gson, colorPalette)
 
 
     @Provides
     @Configured
     @ForServerTracker
     fun provideServerTrackerAdapter(@ForServerAttribute attributeTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTAttributeDAO>>,
-                                    @ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTTrackerDAO>
-            = TrackerTypeAdapter(true, attributeTypeAdapter, gson)
+                                    @ForGeneric gson: Lazy<Gson>,
+                                    @ColorPalette colorPalette: IntArray): ServerCompatibleTypeAdapter<OTTrackerDAO> = TrackerTypeAdapter(true, attributeTypeAdapter, gson, colorPalette)
 
 
 
@@ -70,6 +73,13 @@ class DaoSerializationModule {
     @Configured
     @ForServerItem
     fun provideServerItemAdapter(@ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTItemDAO> = ItemTypeAdapter(true, gson)
+
+    @Provides
+    @Configured
+    fun provideConnectionTypeAdapter(serviceManager: OTExternalServiceManager): OTConnection.ConnectionTypeAdapter {
+        return OTConnection.ConnectionTypeAdapter(serviceManager)
+    }
+
 }
 
 @Configured
@@ -103,6 +113,10 @@ interface DaoSerializationComponent {
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class ForItem
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class ForValueConnection
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class ForServerTrigger

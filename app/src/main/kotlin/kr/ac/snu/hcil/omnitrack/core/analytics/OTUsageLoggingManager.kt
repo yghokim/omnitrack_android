@@ -8,7 +8,6 @@ import com.google.gson.JsonObject
 import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_CHANGE_ATTRIBUTE
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_CHANGE_ITEM
@@ -35,7 +34,7 @@ import javax.inject.Provider
 /**
  * Created by younghokim on 2017. 11. 28..
  */
-class OTUsageLoggingManager(configuredContext: ConfiguredContext) : IEventLogger {
+class OTUsageLoggingManager(val configuredContext: ConfiguredContext) : IEventLogger {
 
     @field:[Inject UsageLogger]
     lateinit var realmFactory: Factory<Realm>
@@ -63,7 +62,7 @@ class OTUsageLoggingManager(configuredContext: ConfiguredContext) : IEventLogger
             val newLog = realm.createObject(UsageLog::class.java, logIdGenerator.getNewUniqueLong())
             newLog.name = name
             newLog.sub = sub
-            newLog.deviceId = OTApp.instance.deviceId
+            newLog.deviceId = configuredContext.applicationComponent.application().deviceId
             newLog.userId = authManager.userId
             newLog.timestamp = timestamp
             newLog.contentJson = content?.toString() ?: "null"

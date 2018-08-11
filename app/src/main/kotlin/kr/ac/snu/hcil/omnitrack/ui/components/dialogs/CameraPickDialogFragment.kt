@@ -14,7 +14,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.ToggleButton
-import com.wonderkiln.camerakit.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
@@ -51,11 +50,11 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
     private val listener = CameraListener()
 
     private val cameraFrontDrawable by lazy {
-        applyTint(DrawableCompat.wrap(ContextCompat.getDrawable(OTApp.instance, R.drawable.camera_front)!!), Color.WHITE)
+        applyTint(DrawableCompat.wrap(ContextCompat.getDrawable(context!!, R.drawable.camera_front)!!), Color.WHITE)
     }
 
     private val cameraRearDrawable by lazy {
-        applyTint(DrawableCompat.wrap(ContextCompat.getDrawable(OTApp.instance, R.drawable.camera_rear)!!), Color.WHITE)
+        applyTint(DrawableCompat.wrap(ContextCompat.getDrawable(context!!, R.drawable.camera_rear)!!), Color.WHITE)
     }
 
     private fun findViews(view: View) {

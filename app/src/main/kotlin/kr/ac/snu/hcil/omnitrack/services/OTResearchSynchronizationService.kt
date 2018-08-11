@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.services
 import com.firebase.jobdispatcher.JobParameters
 import com.firebase.jobdispatcher.JobService
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.research.ResearchManager
 import javax.inject.Inject
 
@@ -20,7 +20,7 @@ class OTResearchSynchronizationService : JobService() {
 
     override fun onCreate() {
         super.onCreate()
-        (application as OTApp).currentConfiguredContext.researchComponent.inject(this)
+        (application as OTAndroidApp).currentConfiguredContext.researchComponent.inject(this)
     }
 
     override fun onDestroy() {

@@ -1,15 +1,19 @@
 package kr.ac.snu.hcil.omnitrack.core
 
+import com.google.gson.Gson
 import com.google.gson.JsonObject
-import kr.ac.snu.hcil.omnitrack.OTApp
 
 /**
  * Created by younghokim on 2018. 2. 19..
  */
 abstract class AFlagsHelperBase {
     companion object {
+        private val parser: Gson by lazy {
+            Gson()
+        }
+
         fun parseFlags(json: String): JsonObject {
-            return OTApp.instance.serializationComponent.genericGson().fromJson(json, JsonObject::class.java)
+            return parser.fromJson(json, JsonObject::class.java)
         }
     }
 

@@ -101,7 +101,7 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
 
         configIconResId.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigIconResId(dao))
         configDescResId.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigDescResId(dao))
-        configSummary.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigSummaryText(dao))
+        configSummary.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigSummaryText(dao, configuredContext.applicationContext))
         scriptUsed.onNextIfDifferAndNotNull(dao.checkScript && dao.additionalScript?.isNotBlank() == true)
         triggerSwitch.onNextIfDifferAndNotNull(dao.isOn)
 
@@ -174,7 +174,7 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
                     Completable.complete()
                 } else {
                     if (dao.isManaged) {
-                        val validationError = dao.isValidToTurnOn()
+                        val validationError = dao.isValidToTurnOn(configuredContext.applicationContext)
                         if (validationError == null) {
                             val id = dao.objectId
                             realm.executeTransactionAsObservable { realm ->
@@ -193,7 +193,7 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
                     } else {
                         //offline mode
                         println("offline mode trigger switch on")
-                        val validationError = dao.isValidToTurnOn()
+                        val validationError = dao.isValidToTurnOn(configuredContext.applicationContext)
                         if (validationError == null ||
                                 (validationError.causes.size == 1 &&
                                         validationError.causes.contains(OTTriggerDAO.TriggerValidationComponent.TRACKER_ATTACHED))) {

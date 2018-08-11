@@ -23,6 +23,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
 import kotlinx.android.synthetic.main.activity_item_browser.*
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
@@ -96,7 +97,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     private val startSubscriptions = CompositeDisposable()
 
-    override fun onInject(app: OTApp) {
+    override fun onInject(app: OTAndroidApp) {
         app.currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
@@ -424,7 +425,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                 valueListView.layoutManager = LinearLayoutManager(this@ItemBrowserActivity, LinearLayoutManager.VERTICAL, false)
 
-                valueListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(this@ItemBrowserActivity, R.color.separator_Light), dipRound(1)))
+                valueListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(this@ItemBrowserActivity, R.color.separator_Light), dipRound(this@ItemBrowserActivity, 1)))
 
                 valueListAdapter = TableRowAdapter()
                 valueListView.adapter = valueListAdapter
@@ -468,7 +469,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 monthView.text = String.format(Locale.US, "%tb", cal)
                 dayView.text = cal.getDayOfMonth().toString()
 
-                var text = "${itemVM.loggingSource.sourceText}\n${OTTimeAttributeHelper.formats[OTTimeAttributeHelper.GRANULARITY_MINUTE]!!.format(Date(itemVM.timestamp))}"
+                var text = "${itemVM.loggingSource.sourceText(this@ItemBrowserActivity)}\n${(attributeManager.getAttributeHelper(OTAttributeManager.TYPE_TIME) as OTTimeAttributeHelper).formats[OTTimeAttributeHelper.GRANULARITY_MINUTE]!!.format(Date(itemVM.timestamp))}"
 
                 if (itemVM.timezone != null) {
                     text += " (${cal.timeZone.displayName})"
@@ -698,7 +699,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
-            (act.application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+            (act.application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
             viewModel = ViewModelProviders.of(activity!!).get(ItemListViewModel::class.java)
 
             dialogSubscriptions.add(
@@ -767,7 +768,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         override fun setupDialogAndContentView(dialog: Dialog, contentView: View) {
 
-            purgeMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.clear_cache, OTApp.getString(R.string.msg_purge_cache), null, isEnabled = false, onClick = {
+            purgeMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.clear_cache, getString(R.string.msg_purge_cache), null, isEnabled = false, onClick = {
                 dialogSubscriptions.add(
                         localCacheManager.purgeSynchronizedCacheFiles(viewModel.trackerId).subscribe { count ->
                             Toast.makeText(act, "Removed ${count} files", Toast.LENGTH_LONG).show()
@@ -777,7 +778,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
             })
 
-            deletionMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.trashcan, OTApp.getString(R.string.msg_remove_all_the_items_permanently), null, isEnabled = false, onClick = {
+            deletionMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.trashcan, getString(R.string.msg_remove_all_the_items_permanently), null, isEnabled = false, onClick = {
                 //TODO remove all items
             })
 
@@ -798,7 +799,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                         val intent = FileHelper.makeSaveLocationPickIntent("omnitrack_export_${it.name}_${SimpleDateFormat("yyyyMMddHHmmss").format(Date())}.$extension")
 
                         if (includeFile) {
-                            val currentNetworkConnectionInfo = NetworkHelper.getCurrentNetworkConnectionInfo()
+                            val currentNetworkConnectionInfo = NetworkHelper.getCurrentNetworkConnectionInfo(act)
                             if (currentNetworkConnectionInfo.mobileConnected && !currentNetworkConnectionInfo.wifiConnected) {
                                 DialogHelper.makeYesNoDialogBuilder(act, "OmniTrack", getString(R.string.msg_export_warning_mobile_network), R.string.msg_export, onYes = {
                                     this@SettingsDialogFragment.startActivityForResult(intent, ItemBrowserActivity.SettingsDialogFragment.REQUEST_CODE_FILE_LOCATION_PICK)

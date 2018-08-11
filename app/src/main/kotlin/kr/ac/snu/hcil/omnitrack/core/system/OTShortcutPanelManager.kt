@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.system
 
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -20,7 +19,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
@@ -33,13 +31,16 @@ import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
+import org.jetbrains.anko.notificationManager
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Created by Young-Ho Kim on 9/4/2016
  */
 @Configured
 class OTShortcutPanelManager @Inject constructor(
+        @Singleton val context: Context,
         val authManager: Lazy<OTAuthManager>,
         val dbManager: Lazy<BackendDbManager>,
         @Default val pref: SharedPreferences,
@@ -63,10 +64,6 @@ class OTShortcutPanelManager @Inject constructor(
             return pref.getBoolean("pref_show_shortcut_panel", false)
         }
 
-    private val notificationManager: NotificationManager by lazy {
-        (OTApp.instance.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
-    }
-
     private fun buildNewNotificationShortcutViews(trackers: List<OTTrackerDAO>, context: Context, bigStyle: Boolean): RemoteViews {
         val rv = RemoteViews(context.packageName, if (bigStyle) R.layout.remoteview_shortcut_notification_big else R.layout.remoteview_shortcut_notification_normal)
 
@@ -87,7 +84,7 @@ class OTShortcutPanelManager @Inject constructor(
 
         rv.removeAllViews(R.id.container)
 
-        val buttonSize = OTApp.instance.resourcesWrapped.getDimensionPixelSize(R.dimen.button_height_small)
+        val buttonSize = context.resources.getDimensionPixelSize(R.dimen.button_height_small)
         val buttonRadius = buttonSize * .5f
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
         paint.style = Paint.Style.FILL
@@ -171,10 +168,9 @@ class OTShortcutPanelManager @Inject constructor(
                     val realm = backendRealmProvider.get()
                     return@defer dbManager.get().makeBookmarkedTrackersObservable(userId, realm).filter { it.isLoaded && it.isValid }.map { it.toList() }.first(emptyList())
                             .doOnSuccess { trackers ->
-                                refreshNotificationShortcutViews(trackers, context)
+                                refreshNotificationShortcutViews(trackers)
                                 realm.close()
-                            }.doOnError { realm.close() }
-                            .toCompletable()
+                            }.doOnError { realm.close() }.ignoreElement()
                 } else {
                     println("user is NOT signed in. dispose shortcut panel.")
                 }
@@ -185,7 +181,7 @@ class OTShortcutPanelManager @Inject constructor(
         }
     }
 
-    fun refreshNotificationShortcutViews(trackers: List<OTTrackerDAO>, context: Context = OTApp.instance.contextCompat) {
+    fun refreshNotificationShortcutViews(trackers: List<OTTrackerDAO>) {
 
         if (showPanels) {
             if (trackers.isNotEmpty()) {
@@ -206,7 +202,7 @@ class OTShortcutPanelManager @Inject constructor(
                         .setOngoing(true)
                         .build()
 
-                notificationManager
+                context.notificationManager
                         .notify(NOTIFICATION_ID, noti)
             } else {
                 //dismiss notification
@@ -219,7 +215,7 @@ class OTShortcutPanelManager @Inject constructor(
 
 
     fun disposeShortcutPanel() {
-        notificationManager.cancel(NOTIFICATION_ID)
+        context.notificationManager.cancel(NOTIFICATION_ID)
     }
 
 }

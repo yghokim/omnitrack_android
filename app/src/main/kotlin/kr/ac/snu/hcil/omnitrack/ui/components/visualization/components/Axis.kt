@@ -1,12 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
 import android.support.v4.content.ContextCompat
 import android.support.v4.graphics.ColorUtils
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.IDrawer
 import kr.ac.snu.hcil.omnitrack.utils.dipSize
@@ -15,7 +15,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 9/8/2016.
  */
-class Axis(var pivot: Pivot) : IDrawer {
+class Axis(val context: Context, var pivot: Pivot) : IDrawer {
 
     enum class Pivot {
         LEFT, BOTTOM
@@ -26,17 +26,17 @@ class Axis(var pivot: Pivot) : IDrawer {
         Small {
             override fun applyStyle(axis: Axis) {
 
-                axis.labelPaint.textSize = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size)
+                axis.labelPaint.textSize = axis.context.resources.getDimension(R.dimen.vis_axis_label_numeric_size)
                 axis.labelPaint.isFakeBoldText = true
-                axis.labelSpacing = dipSize(2)
+                axis.labelSpacing = dipSize(axis.context, 2)
             }
 
         },
         Normal {
             override fun applyStyle(axis: Axis) {
-                axis.labelPaint.textSize = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_label_categorical_size)
+                axis.labelPaint.textSize = axis.context.resources.getDimension(R.dimen.vis_axis_label_categorical_size)
                 axis.labelPaint.isFakeBoldText = false
-                axis.labelSpacing = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_label_spacing)
+                axis.labelSpacing = axis.context.resources.getDimension(R.dimen.vis_axis_label_spacing)
             }
         };
 
@@ -78,20 +78,20 @@ class Axis(var pivot: Pivot) : IDrawer {
     }
 
     init {
-        linePaint.color = ContextCompat.getColor(OTApp.instance, R.color.vis_color_axis)
+        linePaint.color = ContextCompat.getColor(context, R.color.vis_color_axis)
         linePaint.style = Paint.Style.STROKE
-        linePaint.strokeWidth = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_thickness)
+        linePaint.strokeWidth = context.resources.getDimension(R.dimen.vis_axis_thickness)
 
         gridLinePaint.color = ColorUtils.setAlphaComponent(linePaint.color, 50)
         gridLinePaint.style = Paint.Style.STROKE
-        gridLinePaint.strokeWidth = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_grid_thickness)
+        gridLinePaint.strokeWidth = context.resources.getDimension(R.dimen.vis_axis_grid_thickness)
 
         labelPaint.style = Paint.Style.FILL
-        labelPaint.color = ContextCompat.getColor(OTApp.instance, R.color.textColorMid)
+        labelPaint.color = ContextCompat.getColor(context, R.color.textColorMid)
         labelPaint.textAlign = Paint.Align.CENTER
-        labelPaint.textSize = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_label_categorical_size)
+        labelPaint.textSize = context.resources.getDimension(R.dimen.vis_axis_label_categorical_size)
 
-        labelSpacing = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_label_spacing)
+        labelSpacing = context.resources.getDimension(R.dimen.vis_axis_label_spacing)
     }
 
     override fun onDraw(canvas: Canvas) {

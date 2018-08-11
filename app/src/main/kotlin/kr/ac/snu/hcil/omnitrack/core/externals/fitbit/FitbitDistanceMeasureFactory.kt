@@ -1,12 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
+import android.content.Context
 import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
@@ -18,7 +18,7 @@ import java.util.*
 /**
  * Created by younghokim on 16. 9. 3..
  */
-object FitbitDistanceMeasureFactory : OTMeasureFactory("dist") {
+class FitbitDistanceMeasureFactory(context: Context, parentService: FitbitService) : OTMeasureFactory(context, parentService, "dist") {
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_DISTANCE_ATTRIBUTE
@@ -39,15 +39,15 @@ object FitbitDistanceMeasureFactory : OTMeasureFactory("dist") {
     override val isDemandingUserInput: Boolean = false
 
     override fun makeMeasure(): OTMeasure {
-        return FitbitDistanceMeasure()
+        return FitbitDistanceMeasure(this)
     }
 
     override fun makeMeasure(reader: JsonReader): OTMeasure {
-        return FitbitDistanceMeasure()
+        return FitbitDistanceMeasure(this)
     }
 
     override fun makeMeasure(serialized: String): OTMeasure {
-        return FitbitDistanceMeasure()
+        return FitbitDistanceMeasure(this)
     }
 
 
@@ -55,19 +55,13 @@ object FitbitDistanceMeasureFactory : OTMeasureFactory("dist") {
         return "{}"
     }
 
-    override fun getService(): OTExternalService {
-        return FitbitService
-    }
-
     override val descResourceId: Int = R.string.measure_fitbit_distance_desc
     override val nameResourceId: Int = R.string.measure_fitbit_distance_name
 
 
-    class FitbitDistanceMeasure : OTRangeQueriedMeasure() {
+    class FitbitDistanceMeasure(factory: FitbitDistanceMeasureFactory) : OTRangeQueriedMeasure(factory) {
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_FLOAT
-
-        override val factory: OTMeasureFactory = FitbitDistanceMeasureFactory
 
         val dailyConverter = object : OAuth2Client.OAuth2RequestConverter<Float?> {
             override fun process(requestResultStrings: Array<String>): Float? {
@@ -96,13 +90,13 @@ object FitbitDistanceMeasureFactory : OTMeasureFactory("dist") {
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
 
             return if (TimeHelper.isSameDay(start, end - 10)) {
-                FitbitService.getRequest(
+                service<FitbitService>().getRequest(
                         dailyConverter,
                         FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SUMMARY, Date(start))).toFlowable()
                         as Flowable<Nullable<out Any>>
             } else
             //TODO: Can be optimized by querying summary data of middle days.
-                FitbitService.getRequest(intraDayConverter, *FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_DISTANCE, start, end)).toFlowable()
+                service<FitbitService>().getRequest(intraDayConverter, *FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_DISTANCE, start, end)).toFlowable()
                         as Flowable<Nullable<out Any>>
         }
 

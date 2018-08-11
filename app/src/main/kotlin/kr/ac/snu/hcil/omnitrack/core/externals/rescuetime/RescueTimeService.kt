@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 
+import android.content.Context
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
@@ -16,7 +17,21 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-02.
  */
-object RescueTimeService : OAuth2BasedExternalService("RescueTimeService", 0) {
+class RescueTimeService(context: Context) : OAuth2BasedExternalService(context, "RescueTimeService", 0) {
+
+    companion object {
+        const val AUTHORIZATION_URL = "https://www.rescuetime.com/oauth/authorize"
+        const val TOKEN_REQUEST_URL = "https://www.rescuetime.com/oauth/token"
+        const val REVOKE_URL = "https://www.rescuetime.com/oauth/revoke"
+        const val URL_ROOT = "rescuetime.com"
+        const val SUBURL_ANALYTICS_API = "api/oauth"
+        const val SUBURL_DATA = "data"
+        const val SUBURL_SUMMARY = "daily_summary_feed"
+
+        const val SUMMARY_VARIABLE_PRODUCTIVITY = "productivity_pulse"
+        const val SUMMARY_VARIABLE_TOTAL_HOURS = "total_hours"
+
+    }
 
     override fun isSupportedInSystem(): Boolean {
         return BuildConfig.RESCUETIME_CLIENT_ID != null && BuildConfig.RESCUETIME_CLIENT_SECRET != null && BuildConfig.RESCUETIME_REDIRECT_URI != null
@@ -30,19 +45,8 @@ object RescueTimeService : OAuth2BasedExternalService("RescueTimeService", 0) {
         fun calculate(list: List<JSONObject>, startDate: Date, endDate: Date): T?
     }
 
-    const val AUTHORIZATION_URL = "https://www.rescuetime.com/oauth/authorize"
-    const val TOKEN_REQUEST_URL = "https://www.rescuetime.com/oauth/token"
-    const val REVOKE_URL = "https://www.rescuetime.com/oauth/revoke"
 
     val DEFAULT_SCOPES = arrayOf("time_data", "category_data", "productivity_data").joinToString(" ")
-
-    const val URL_ROOT = "rescuetime.com"
-    const val SUBURL_ANALYTICS_API = "api/oauth"
-    const val SUBURL_DATA = "data"
-    const val SUBURL_SUMMARY = "daily_summary_feed"
-
-    const val SUMMARY_VARIABLE_PRODUCTIVITY = "productivity_pulse"
-    const val SUMMARY_VARIABLE_TOTAL_HOURS = "total_hours"
 
     override val thumbResourceId: Int = R.drawable.service_thumb_rescuetime
 
@@ -52,7 +56,10 @@ object RescueTimeService : OAuth2BasedExternalService("RescueTimeService", 0) {
 
 
     override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
-        return arrayOf(RescueTimeProductivityMeasureFactory, RescueTimeComputerUsageDurationMeasureFactory)
+        return arrayOf(
+                RescueTimeProductivityMeasureFactory(context, this),
+                RescueTimeComputerUsageDurationMeasureFactory(context, this)
+        )
     }
 
     override fun makeNewAuth2Client(): OAuth2Client {
@@ -65,7 +72,7 @@ object RescueTimeService : OAuth2BasedExternalService("RescueTimeService", 0) {
         config.scope = DEFAULT_SCOPES
         config.redirectUri = BuildConfig.RESCUETIME_REDIRECT_URI
 
-        return OAuth2Client(config)
+        return OAuth2Client(context, config)
     }
 
     fun makeSummaryRequestUrl(subUrl: String, parameters: Map<String, String> = mapOf()): String {

@@ -6,7 +6,6 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
@@ -20,7 +19,7 @@ import java.util.*
 /**
  * Created by younghokim on 2017. 11. 3..
  */
-class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTAttributeDAO>>, val gson: Lazy<Gson>) : ServerCompatibleTypeAdapter<OTTrackerDAO>(isServerMode) {
+class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTAttributeDAO>>, val gson: Lazy<Gson>, val palette: IntArray) : ServerCompatibleTypeAdapter<OTTrackerDAO>(isServerMode) {
 
     override fun read(reader: JsonReader, isServerMode: Boolean): OTTrackerDAO {
         val dao = OTTrackerDAO()
@@ -120,7 +119,7 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
                 BackendDbManager.FIELD_SYNCHRONIZED_AT -> applyTo.synchronizedAt = json.getLongCompat(key)
                 BackendDbManager.FIELD_NAME -> applyTo.name = json.getStringCompat(key) ?: ""
                 BackendDbManager.FIELD_REDIRECT_URL -> applyTo.redirectUrl = json.getStringCompat(key)
-                "color" -> applyTo.color = json.getIntCompat(key) ?: OTApp.instance.colorPalette[0]
+                "color" -> applyTo.color = json.getIntCompat(key) ?: palette[0]
                 "isBookmarked" -> applyTo.isBookmarked = json.getBooleanCompat(key) ?: false
                 "lockedProperties"->applyTo.serializedLockedPropertyInfo = json[key]?.toString() ?: "null"
                 "flags" -> {

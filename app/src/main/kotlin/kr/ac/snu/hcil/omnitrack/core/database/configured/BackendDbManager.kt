@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.database.configured
 
+import android.content.Context
 import android.content.Intent
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
@@ -26,15 +27,18 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
+import kr.ac.snu.hcil.omnitrack.utils.getLongCompat
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017. 9. 25..
  */
 @Configured
 class BackendDbManager @Inject constructor(
+        @Singleton private val context: Context,
         @Backend private val config: RealmConfiguration,
         private val eventLogger: IEventLogger,
         private val shortcutPanelManager: Lazy<OTShortcutPanelManager>,
@@ -110,7 +114,7 @@ class BackendDbManager @Inject constructor(
     fun makeShortcutPanelRefreshObservable(userId: String, realm: Realm): Flowable<RealmResults<OTTrackerDAO>> {
         return makeBookmarkedTrackersObservable(userId, realm).filter { it.isValid && it.isLoaded }
                 .doAfterNext { list ->
-                    shortcutPanelManager.get().refreshNotificationShortcutViews(list, OTApp.instance)
+                    shortcutPanelManager.get().refreshNotificationShortcutViews(list)
                 }
     }
 
@@ -354,7 +358,7 @@ class BackendDbManager @Inject constructor(
                 intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, item.trackerId)
                 intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
 
-                OTApp.instance.sendBroadcast(intent)
+                context.sendBroadcast(intent)
 
                 if (resultPair.first == SAVE_RESULT_NEW) {
                     OnItemListUpdated.onNext(item.trackerId!!)
@@ -417,7 +421,7 @@ class BackendDbManager @Inject constructor(
 
             intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
 
-            OTApp.instance.sendBroadcast(intent)
+            context.sendBroadcast(intent)
 
             OnItemListUpdated.onNext(trackerId!!)
         } else {
@@ -540,7 +544,9 @@ class BackendDbManager @Inject constructor(
                     { tracker, realm -> realm.insertOrUpdate(tracker) },
                     { tracker, realm -> removeTracker(tracker, true, realm) },
                     null,
-                    { dao, serverPojo -> dao.userUpdatedAt < serverPojo.get(FIELD_UPDATED_AT_LONG).asLong }, serializationManager.serverTrackerTypeAdapter as Lazy<JsonObjectApplier<OTTrackerDAO>>)
+                    { dao, serverPojo ->
+                        dao.userUpdatedAt < serverPojo.getLongCompat(FIELD_UPDATED_AT_LONG) ?: Long.MIN_VALUE
+                    }, serializationManager.serverTrackerTypeAdapter as Lazy<JsonObjectApplier<OTTrackerDAO>>)
             ESyncDataType.TRIGGER -> applyServerRowsToSyncImpl(OTTriggerDAO::class.java, jsonList, { trigger -> trigger.synchronizedAt },
                     { trigger, realm -> saveTrigger(trigger, realm) },
                     { trigger, realm -> removeTrigger(trigger, true, realm) },
@@ -552,10 +558,10 @@ class BackendDbManager @Inject constructor(
                             triggerSystemManager.tryCheckInToSystem(trigger)
                         }
                     },
-                    { dao, serverPojo -> dao.userUpdatedAt < serverPojo.get(FIELD_UPDATED_AT_LONG).asLong }, serializationManager.serverTriggerTypeAdapter as Lazy<JsonObjectApplier<OTTriggerDAO>>)
+                    { dao, serverPojo -> dao.userUpdatedAt < serverPojo.getLongCompat(FIELD_UPDATED_AT_LONG) ?: Long.MIN_VALUE }, serializationManager.serverTriggerTypeAdapter as Lazy<JsonObjectApplier<OTTriggerDAO>>)
             ESyncDataType.ITEM -> applyServerRowsToSyncImpl(OTItemDAO::class.java, jsonList, { item -> item.synchronizedAt },
                     { item, realm -> realm.insertOrUpdate(item) },
-                    { item, realm -> removeItemImpl(item, true, realm) }, null, { dao, serverPojo -> dao.timestamp < serverPojo.get(FIELD_TIMESTAMP_LONG).asLong }, serializationManager.serverItemTypeAdapter as Lazy<JsonObjectApplier<OTItemDAO>>)
+                    { item, realm -> removeItemImpl(item, true, realm) }, null, { dao, serverPojo -> dao.timestamp < serverPojo.getLongCompat(FIELD_TIMESTAMP_LONG) ?: Long.MIN_VALUE }, serializationManager.serverItemTypeAdapter as Lazy<JsonObjectApplier<OTItemDAO>>)
         }
     }
 
@@ -589,6 +595,7 @@ class BackendDbManager @Inject constructor(
                             //found matched row, but it is dirty. Conflict!
                             //late timestamp win policy
                             println("conflict")
+                            println("compare")
                             if (isServerWinForResolutionFunc(match, serverPojo)) {
                                 //server win
                                 println("server win")

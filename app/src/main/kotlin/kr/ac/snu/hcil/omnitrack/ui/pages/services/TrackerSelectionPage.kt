@@ -14,12 +14,13 @@ import com.afollestad.materialdialogs.MaterialDialog
 import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.ColorPalette
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import org.jetbrains.anko.padding
 import java.util.*
@@ -46,6 +47,9 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
     @field:[Inject Backend]
     lateinit var realmProvider: Factory<Realm>
 
+    @field:[Inject ColorPalette]
+    lateinit var colorPalette: IntArray
+
     @Inject
     protected lateinit var dbManager: Lazy<BackendDbManager>
 
@@ -53,7 +57,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
     protected lateinit var authManager: OTAuthManager
 
     init {
-        val component = (parent.context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent
+        val component = (parent.context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent
         component.inject(this)
 
     }
@@ -121,7 +125,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
         }
 
         override fun onClick(view: View?) {
-            val trackerDefaultName = OTApp.getString(R.string.msg_new_tracker_prefix)
+            val trackerDefaultName = parent.context.getString(R.string.msg_new_tracker_prefix)
             newTrackerNameDialog.input(null, trackerDefaultName, false) {
                 _, text ->
                 addNewTracker(text.toString())
@@ -170,7 +174,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
             trackerDao.userId = authManager.userId
             trackerDao.name = name
             trackerDao.isBookmarked = false
-            trackerDao.color = OTApp.instance.colorPalette[0]
+            trackerDao.color = colorPalette[0]
         }
     }
 

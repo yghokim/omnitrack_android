@@ -1,20 +1,21 @@
 package kr.ac.snu.hcil.omnitrack.core.database
 
+import android.content.Context
 import android.support.annotation.Keep
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.di.configured.FirebaseComponent
 
 /**
  * Created by Young-Ho on 9/24/2017.
  */
 @Keep
-class OTDeviceInfo private constructor() {
+class OTDeviceInfo private constructor(context: Context) {
     var os: String = OS
-    var deviceId: String = OTApp.instance.deviceId
+    var deviceId: String = (context.applicationContext as OTAndroidApp).deviceId
     var instanceId: String? = null
     var firstLoginAt: Long = System.currentTimeMillis()
     var appVersion: String = BuildConfig.VERSION_NAME
@@ -33,9 +34,9 @@ class OTDeviceInfo private constructor() {
 
         val OS: String get() = "Android api-${android.os.Build.VERSION.SDK_INT}"
 
-        fun makeDeviceInfo(firebaseComponent: FirebaseComponent): Single<OTDeviceInfo> {
+        fun makeDeviceInfo(context: Context, firebaseComponent: FirebaseComponent): Single<OTDeviceInfo> {
             return firebaseComponent.getFirebaseInstanceIdToken().map { token ->
-                OTDeviceInfo().apply {
+                OTDeviceInfo(context).apply {
                     instanceId = token
                 }
             }

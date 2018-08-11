@@ -9,7 +9,6 @@ import android.view.View.OnClickListener
 import com.afollestad.materialdialogs.MaterialDialog
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import kotlinx.android.synthetic.main.component_time_range_picker.view.*
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
@@ -177,11 +176,11 @@ class TimeRangePicker : ConstraintLayout, View.OnClickListener {
             ui_interval_indicator.text = TimeHelper.durationToText(to - from, true, context)
 
             if (granularity == Granularity.DATE) {
-                ui_button_preset_1.text = OTApp.getString(R.string.time_range_picker_1_day)
-                ui_button_preset_2.text = OTApp.getString(R.string.time_range_picker_1_week)
+                ui_button_preset_1.text = resources.getString(R.string.time_range_picker_1_day)
+                ui_button_preset_2.text = resources.getString(R.string.time_range_picker_1_week)
             } else if (granularity == Granularity.TIME) {
-                ui_button_preset_1.text = OTApp.getString(R.string.time_range_picker_30_mins)
-                ui_button_preset_2.text = OTApp.getString(R.string.time_range_picker_1_hour)
+                ui_button_preset_1.text = resources.getString(R.string.time_range_picker_30_mins)
+                ui_button_preset_2.text = resources.getString(R.string.time_range_picker_1_hour)
             }
         }
     }

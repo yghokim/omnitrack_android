@@ -116,7 +116,7 @@ class ExperimentListFragment : OTFragment() {
         override fun bind(experiment: ExperimentInfo) {
             super.bind(experiment)
             experimentId = experiment.id
-            itemView.description.text = String.format(itemView.resources.getString(R.string.msg_format_experiment_joined_at), TimeHelper.FORMAT_DAY.format(Date(experiment.joinedAt)))
+            itemView.description.text = String.format(itemView.resources.getString(R.string.msg_format_experiment_joined_at), TimeHelper.FORMAT_YYYY_MM_DD.format(Date(experiment.joinedAt)))
         }
 
         init {
@@ -132,7 +132,7 @@ class ExperimentListFragment : OTFragment() {
 
         override fun bind(experiment: ExperimentInfo) {
             super.bind(experiment)
-            itemView.description.text = String.format(itemView.resources.getString(R.string.msg_format_experiment_dropped_at), TimeHelper.FORMAT_DAY.format(Date(experiment.droppedAt!!)))
+            itemView.description.text = String.format(itemView.resources.getString(R.string.msg_format_experiment_dropped_at), TimeHelper.FORMAT_YYYY_MM_DD.format(Date(experiment.droppedAt!!)))
         }
     }
 

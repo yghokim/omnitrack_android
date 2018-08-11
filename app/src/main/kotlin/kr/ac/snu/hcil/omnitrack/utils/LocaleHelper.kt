@@ -58,9 +58,13 @@ object LocaleHelper {
         }
     }
 
+    fun wrapContextWithLocale(context: Context): Context {
+        return wrapContextWithLocale(context, getLanguageCode(context))
+    }
+
     fun wrapContextWithLocale(context: Context, language: String): Context {
         val country = Locale.getDefault().country
-        println("country: " + country)
+        println("country: $country, language: $language")
         val locale = Locale(language, country)
         Locale.setDefault(locale)
 

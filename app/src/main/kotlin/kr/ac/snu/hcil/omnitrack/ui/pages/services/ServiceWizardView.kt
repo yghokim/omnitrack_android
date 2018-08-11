@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.util.Log
 import dagger.internal.Factory
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
@@ -38,20 +38,20 @@ class ServiceWizardView: WizardView {
     private var attributeDAO: OTAttributeDAO? = null
 
     constructor(context: Context?, measureFactory: OTMeasureFactory) : super(context) {
-        val component = (context?.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent
+        val component = (context?.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent
         component.inject(this)
         currentMeasureFactory = measureFactory
         connection.source = measureFactory.makeMeasure()
         Log.i("Omnitrack", measureFactory.javaClass.name)
-        setAdapter(Adapter())
+        setAdapter(Adapter(context))
     }
 
     constructor(context: Context?, measureFactory: OTMeasureFactory, attrs: AttributeSet?) : super(context, attrs) {
-        val component = (context?.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent
+        val component = (context?.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent
         component.inject(this)
         currentMeasureFactory = measureFactory
         connection.source = measureFactory.makeMeasure()
-        setAdapter(Adapter())
+        setAdapter(Adapter(context))
     }
 
     override fun onLeavePage(page: AWizardPage, position: Int) {
@@ -64,14 +64,14 @@ class ServiceWizardView: WizardView {
                 (page as QueryRangeSelectionPage).applyConfiguration(connection)
                 val realm = realmProvider.get()
                 realm.executeTransactionIfNotIn {
-                    attributeDAO?.serializedConnection = connection.getSerializedString()
+                    attributeDAO?.serializedConnection = connection.getSerializedString((context.applicationContext as OTAndroidApp).currentConfiguredContext)
                 }
                 realm.close()
             }
         }
     }
 
-    inner class Adapter : AWizardViewPagerAdapter() {
+    inner class Adapter(context: Context) : AWizardViewPagerAdapter(context) {
 
         val pages = Array(3) {
             index ->

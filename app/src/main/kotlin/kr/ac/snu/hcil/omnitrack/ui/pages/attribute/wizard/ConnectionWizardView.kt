@@ -44,7 +44,7 @@ class ConnectionWizardView : WizardView {
      * used to modify existing connection
      */
     fun init(attribute: OTAttributeDAO, connection: OTConnection) {
-        setAdapter(Adapter(attribute))
+        setAdapter(Adapter(attribute, context))
         pendingConnection = connection
     }
 
@@ -82,7 +82,7 @@ class ConnectionWizardView : WizardView {
     }
 
 
-    inner class Adapter(attribute: OTAttributeDAO) : AWizardViewPagerAdapter() {
+    inner class Adapter(attribute: OTAttributeDAO, context: Context) : AWizardViewPagerAdapter(context) {
         val pages = Array<AWizardPage>(3) {
             index ->
             when (index) {

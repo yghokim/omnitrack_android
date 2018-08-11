@@ -93,12 +93,11 @@ open class PlaceHolderImageView : FrameLayout {
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     init {
         setBackgroundColor(ContextCompat.getColor(context, R.color.editTextFormBackground))
 
-        val padding = dipRound(8)
+        val padding = dipRound(context, 8)
         setPadding(padding, padding, padding, padding)
 
         imageView = ImageView(context)
@@ -116,7 +115,7 @@ open class PlaceHolderImageView : FrameLayout {
                 context.resources.getDimensionPixelSize(R.dimen.image_placeholder_loading_indicator_size),
                 context.resources.getDimensionPixelSize(R.dimen.image_placeholder_loading_indicator_size))
         lp.gravity = Gravity.CENTER
-        val indicatorMargin = dipRound(8)
+        val indicatorMargin = dipRound(context, 8)
         lp.setMargins(indicatorMargin, indicatorMargin, indicatorMargin, indicatorMargin)
         loadingIndicator.layoutParams = lp
 
@@ -130,7 +129,7 @@ open class PlaceHolderImageView : FrameLayout {
 
             button.setSupportAllCaps(false)
             button.setTextColor(ContextCompat.getColor(context, R.color.colorRed_Light))
-            button.compoundDrawablePadding = dipRound(8)
+            button.compoundDrawablePadding = dipRound(context, 8)
             button.background = ContextCompat.getDrawable(context, R.drawable.transparent_button_background)
 
             button.setCompoundDrawablesRelativeWithIntrinsicBounds(applyTint(ContextCompat.getDrawable(context, R.drawable.error_dark)!!, ContextCompat.getColor(context, R.color.colorRed)), null, null, null)

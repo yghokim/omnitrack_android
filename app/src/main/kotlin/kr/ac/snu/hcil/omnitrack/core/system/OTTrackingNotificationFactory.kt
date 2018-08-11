@@ -38,16 +38,16 @@ object OTTrackingNotificationFactory {
                 .putExtra(OTApp.INTENT_EXTRA_NOTIFICATON_TAG, tag)
 
         val discardAction = NotificationCompat.Action.Builder(0,
-                OTApp.getString(R.string.msg_notification_action_discard_item),
+                context.getString(R.string.msg_notification_action_discard_item),
                 PendingIntent.getService(context, notificationId, itemRemoveIntent, PendingIntent.FLAG_UPDATE_CURRENT)).build()
 
-        val editAction = NotificationCompat.Action.Builder(0, OTApp.getString(R.string.msg_edit), resultPendingIntent).build()
+        val editAction = NotificationCompat.Action.Builder(0, context.getString(R.string.msg_edit), resultPendingIntent).build()
 
         return makeBaseBuilder(context, loggedTime, OTNotificationManager.CHANNEL_ID_SYSTEM)
                 .setSmallIcon(R.drawable.icon_simple_plus)
                 .setContentIntent(resultPendingIntent)
                 .setAutoCancel(true)
-                .setContentTitle(String.format(OTApp.getString(R.string.msg_notification_title_format_new_item),
+                .setContentTitle(String.format(context.getString(R.string.msg_notification_title_format_new_item),
                         trackerName
                 ))
                 .addAction(editAction)
@@ -59,18 +59,18 @@ object OTTrackingNotificationFactory {
                             return if (value != null) {
                                 TextHelper.fromHtml("<b>${key}</b> : ${value}")
                             } else {
-                                TextHelper.fromHtml("<b>${key}</b> : [${OTApp.getString(R.string.msg_empty_value)}]")
+                                TextHelper.fromHtml("<b>${key}</b> : [${context.getString(R.string.msg_empty_value)}]")
                             }
                         }
 
                         table.forEach { (key, value) ->
                             inboxStyle.addLine(makeRowCharSequence(key, value))
                         }
-                        inboxStyle.setBigContentTitle(String.format(OTApp.getString(R.string.msg_notification_format_inbox_title), trackerName))
+                        inboxStyle.setBigContentTitle(String.format(context.getString(R.string.msg_notification_format_inbox_title), trackerName))
                         setStyle(inboxStyle)
                         setContentText("${makeRowCharSequence(table.first().first, table.first().second)}...")
                     } else {
-                        setContentText(OTApp.getString(R.string.msg_notification_content_new_item))
+                        setContentText(context.getString(R.string.msg_notification_content_new_item))
                     }
                 }
     }

@@ -1,11 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.datatypes
 
 
-import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
-import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
-import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -45,12 +41,6 @@ class TimeSpan : IStringSerializable {
         else if (other is TimeSpan) {
             return other.from == this.from && other.duration == this.duration && other.timeZone == this.timeZone
         } else return false
-    }
-
-
-    override fun toString(): String {
-        val format = SimpleDateFormat(OTApp.instance.resourcesWrapped.getString(R.string.msg_tracker_list_time_format))
-        return "${TimeHelper.getDateText(from, OTApp.instance)}, ${format.format(Date(from))} \n~ ${TimeHelper.getDateText(to, OTApp.instance)}, ${format.format(Date(to))} \n ${from} ~ ${to}"
     }
 
     constructor(serialized: String) {

@@ -10,7 +10,6 @@ import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
@@ -18,7 +17,10 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import dagger.Lazy
 import dagger.internal.Factory
+import io.ashdavies.rx.rxtasks.toCompletable
+import io.ashdavies.rx.rxtasks.toSingle
 import io.reactivex.Completable
+import io.reactivex.Completable.defer
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -157,23 +159,16 @@ class OTAuthManager @Inject constructor(
     }
 
     fun refreshCredentialSilently(skipValidationIfCacheHit: Boolean): Completable {
-        return Completable.defer {
+        return defer {
             if (isUserSignedIn()) {
                 if (skipValidationIfCacheHit) {
                     Log.d(LOG_TAG, "Skip sign in. use cached Firebase User.")
                     return@defer Completable.complete()
                 } else {
                     Log.d(LOG_TAG, "Reload Firebase User to check connection.")
-                    return@defer Single.create<Task<Void>> {
-                        firebaseAuth.currentUser!!.reload().addOnCompleteListener { task ->
-                            if (!it.isDisposed) {
-                                it.onSuccess(task)
-                            }
-                        }
-                    }.flatMapCompletable { task ->
-                        if (task.isSuccessful) {
-                            return@flatMapCompletable Completable.complete()
-                        } else signInSilently()
+
+                    return@defer firebaseAuth.currentUser!!.reload().toCompletable().onErrorResumeNext {
+                        signInSilently()
                     }
                 }
             } else {
@@ -217,7 +212,7 @@ class OTAuthManager @Inject constructor(
 
                             .flatMap { authResult ->
                                 println("Signed in through Google account. try to push device info to server...")
-                                OTDeviceInfo.makeDeviceInfo(configuredContext.firebaseComponent)
+                                OTDeviceInfo.makeDeviceInfo(configuredContext.applicationContext, configuredContext.firebaseComponent)
                             }
                             .flatMap { deviceInfo ->
                                 if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
@@ -297,26 +292,10 @@ class OTAuthManager @Inject constructor(
     }
 
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount): Single<AuthResult> {
-        return Single.create<AuthResult> { subscriber ->
+        return Single.defer {
             Log.d(LOG_TAG, "firebaseAuthWithGooogle:" + acct.id)
             val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
-            firebaseAuth.signInWithCredential(credential)
-                    .addOnCompleteListener { task: Task<AuthResult> ->
-                        Log.d(LOG_TAG, "signInWithCredential:onComplete:" + task.isSuccessful)
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful) {
-                            Log.w(LOG_TAG, "signInWithCredential", task.exception)
-                            if (!subscriber.isDisposed) {
-                                subscriber.onError(task.exception!!)
-                            }
-                        } else {
-                            if (!subscriber.isDisposed) {
-                                subscriber.onSuccess(task.result)
-                            }
-                        }
-                    }
+            return@defer firebaseAuth.signInWithCredential(credential).toSingle()
         }
     }
 
@@ -341,18 +320,19 @@ class OTAuthManager @Inject constructor(
             Auth.GoogleSignInApi.signOut(mGoogleApiClient)
 
             configuredContext.triggerSystemComponent.getTriggerSystemManager().get().checkOutAllFromSystem(lastUserId)
+            configuredContext.configuredAppComponent.shortcutPanelManager().disposeShortcutPanel()
 
             notifySignedOut()
         }
     }
 
     private fun notifySignedIn() {
-        OTApp.instance.sendBroadcast(Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_IN)
+        context.sendBroadcast(Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_IN)
                 .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId))
     }
 
     private fun notifySignedOut() {
-        OTApp.instance.sendBroadcast(Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_OUT)
+        context.sendBroadcast(Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_OUT)
                 .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId))
     }
 

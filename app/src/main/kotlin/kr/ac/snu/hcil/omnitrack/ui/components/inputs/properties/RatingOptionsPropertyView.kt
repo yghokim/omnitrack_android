@@ -17,7 +17,7 @@ class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APrope
 
     override var value: RatingOptions
         get() {
-            val result = RatingOptions()
+            val result = RatingOptions(context)
             result.isFractional = allowIntermediatePropertyView.value
             result.stars = selectableStarLevels[starLevelSelectionView.value]
             result.type = RatingOptions.DisplayType.values()[displayTypeSelectionView.value]

@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.app.Application
+import android.content.Context
 import dagger.Lazy
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.OrderedCollectionChangeSet
@@ -113,9 +114,9 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
         return originalTriggerDao?.let { serializationManager.get().serializeTrigger(it) }
     }
 
-    fun validateConfiguration(): List<CharSequence>? {
+    fun validateConfiguration(context: Context): List<CharSequence>? {
         val msgs = ArrayList<CharSequence>()
-        if (conditionInstance.value?.isConfigurationValid(msgs) != false) {
+        if (conditionInstance.value?.isConfigurationValid(context, msgs) != false) {
             return null
         } else return msgs
     }

@@ -9,6 +9,7 @@ import android.graphics.Paint
 import android.support.v4.graphics.ColorUtils
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
@@ -17,7 +18,6 @@ import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfigurationController
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -26,19 +26,14 @@ import javax.inject.Inject
  */
 class OTShortcutPanelWidgetService : RemoteViewsService() {
 
-    companion object {
-
-        val lastLoggedTimeFormat by lazy {
-            SimpleDateFormat(OTApp.instance.resourcesWrapped.getString(R.string.msg_tracker_list_time_format))
-        }
-    }
+    companion object;
 
     @Inject
     lateinit var configController: OTConfigurationController
 
     override fun onCreate() {
         super.onCreate()
-        (application as OTApp).applicationComponent.inject(this)
+        (application as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
@@ -136,7 +131,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
                     rv.setTextViewText(R.id.ui_text_statistics, text)
                 }*/
 
-            val buttonSize = OTApp.instance.resourcesWrapped.getDimensionPixelSize(R.dimen.app_widget_instant_logging_button_height)
+            val buttonSize = configuredContext.applicationContext.resources.getDimensionPixelSize(R.dimen.app_widget_instant_logging_button_height)
             val buttonRadius = buttonSize * .5f
             val paint = Paint(Paint.ANTI_ALIAS_FLAG)
             paint.style = Paint.Style.FILL

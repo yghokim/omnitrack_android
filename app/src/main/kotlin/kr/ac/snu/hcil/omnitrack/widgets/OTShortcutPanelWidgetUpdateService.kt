@@ -13,7 +13,7 @@ import android.support.v4.app.TaskStackBuilder
 import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfigurationController
@@ -188,7 +188,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        (application as OTApp).applicationComponent.inject(this)
+        (application as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {

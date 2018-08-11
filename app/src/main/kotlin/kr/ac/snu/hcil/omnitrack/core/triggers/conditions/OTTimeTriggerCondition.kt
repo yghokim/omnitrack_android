@@ -1,12 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers.conditions
 
+import android.content.Context
 import com.github.salomonbrys.kotson.toJson
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
@@ -148,13 +148,14 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
         }
 
 
-    override fun isConfigurationValid(validationErrorMessages: MutableList<CharSequence>?): Boolean {
+    override fun isConfigurationValid(context: Context?, validationErrorMessages: MutableList<CharSequence>?): Boolean {
         if (timeConditionType == TIME_CONDITION_INTERVAL && intervalSeconds <= 0.toShort()) {
-            validationErrorMessages?.add(OTApp.getString(R.string.msg_trigger_error_interval_not_0))
+            validationErrorMessages?.add(context?.getString(R.string.msg_trigger_error_interval_not_0)
+                    ?: "trigger_error_interval_not_0")
             return false
         } else if (timeConditionType == TIME_CONDITION_SAMPLING) {
             if (samplingCount <= 0) {
-                validationErrorMessages?.add(OTApp.getString(R.string.msg_trigger_alerts_per_day) + " must be higher than zero.")
+                validationErrorMessages?.add(context?.getString(R.string.msg_trigger_alerts_per_day) + " must be higher than zero.")
                 return false
             }
 

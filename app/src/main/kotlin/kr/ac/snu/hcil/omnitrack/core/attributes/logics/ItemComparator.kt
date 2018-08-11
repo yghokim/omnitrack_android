@@ -11,15 +11,11 @@ abstract class ItemComparator : Comparator<OTItemDAO> {
 
     var isDecreasing: Boolean = true
 
-    companion object {
-        val TIMESTAMP_SORTER = TimestampSorter()
-    }
-
     override fun toString(): String {
         return name
     }
 
-    override final fun compare(p0: OTItemDAO?, p1: OTItemDAO?): Int {
+    final override fun compare(p0: OTItemDAO?, p1: OTItemDAO?): Int {
         if (isDecreasing) {
             return -1 * increasingCompare(p0, p1)
         } else {

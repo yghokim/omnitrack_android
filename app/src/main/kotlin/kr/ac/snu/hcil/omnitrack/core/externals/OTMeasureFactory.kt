@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
+import android.content.Context
 import android.text.Html
 import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
@@ -14,7 +14,7 @@ import kr.ac.snu.hcil.omnitrack.utils.Nullable
 /**
  * Created by Young-Ho Kim on 16. 7. 28
  */
-abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionResourceProvider {
+abstract class OTMeasureFactory(val context: Context, val parentService: OTExternalService, val factoryTypeName: String) : INameDescriptionResourceProvider {
 
     companion object {
         val CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE = intArrayOf(AConditioner.TYPECODE_SINGLE_NUMERIC_COMPARISON)
@@ -88,10 +88,8 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
     }
 
     val typeCode: String by lazy {
-        "${getService().identifier}_${factoryTypeName}"
+        "${parentService.identifier}_${factoryTypeName}"
     }
-
-    abstract fun getService(): OTExternalService
 
     open val supportedConditionerTypes: IntArray = intArrayOf()
 
@@ -111,7 +109,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
     abstract fun serializeMeasure(measure: OTMeasure): String
 
     open fun getFormattedName(): CharSequence {
-        val html = "<b>${OTApp.instance.resourcesWrapped.getString(nameResourceId)}</b> | ${OTApp.instance.getString(getService().nameResourceId)}"
+        val html = "<b>${context.resources.getString(nameResourceId)}</b> | ${context.resources.getString(parentService.nameResourceId)}"
         return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
         } else {
@@ -123,24 +121,26 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
     protected abstract val exampleAttributeType: Int
     protected abstract fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator
 
-    abstract class OTMeasure {
+    abstract class OTMeasure(val factory: OTMeasureFactory) {
 
         /*** Typename in TypeStringSerializer
          *
          */
         abstract val dataTypeName: String
 
-        val factoryCode: String get() = factory.typeCode
-        abstract val factory: OTMeasureFactory
-
-        constructor() : super()
+        val factoryCode: String get() = this.factory.typeCode
 
         abstract fun getValueRequest(builder: OTItemBuilderWrapperBase, query: OTTimeRangeQuery?): Flowable<Nullable<out Any>>
+
+        protected fun <T : OTExternalService> service(): T {
+            @Suppress("UNCHECKED_CAST")
+            return factory.parentService as T
+        }
+
     }
 
-    abstract class OTRangeQueriedMeasure : OTMeasure {
+    abstract class OTRangeQueriedMeasure(factory: OTMeasureFactory) : OTMeasure(factory) {
 
-        constructor() : super()
 
         abstract fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>>
 

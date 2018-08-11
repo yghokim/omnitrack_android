@@ -9,7 +9,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.kotlin.where
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTUserDAO
@@ -45,7 +45,7 @@ class OTInformationUploadService : JobService() {
 
     override fun onCreate() {
         super.onCreate()
-        (application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
     override fun onDestroy() {
@@ -60,14 +60,14 @@ class OTInformationUploadService : JobService() {
     }
 
     override fun onStartJob(job: JobParameters): Boolean {
-        val configuredContext = (application as OTApp).currentConfiguredContext
+        val configuredContext = (application as OTAndroidApp).currentConfiguredContext
         val informationType = job.tag
         if (authManager.isUserSignedIn() && subscriptionDict[informationType]?.isDisposed != false) {
             preferences.edit().putBoolean(informationType, true).apply()
             when (informationType) {
                 INFORMATION_DEVICE -> {
                     setSubscription(informationType,
-                            OTDeviceInfo.makeDeviceInfo(configuredContext.firebaseComponent).flatMap { deviceInfo ->
+                            OTDeviceInfo.makeDeviceInfo(this@OTInformationUploadService, configuredContext.firebaseComponent).flatMap { deviceInfo ->
                                 syncServerController
                                         .putDeviceInfo(deviceInfo)
                             }.doFinally {

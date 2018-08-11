@@ -19,6 +19,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import dagger.internal.Factory
 import io.realm.Realm
 import kotlinx.android.synthetic.main.input_choice.view.*
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTChoiceAttributeHelper
@@ -78,14 +79,14 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
     }
 
     init {
-        (context.applicationContext as OTApp).applicationComponent.configurationController().currentConfiguredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.configurationController().currentConfiguredContext.configuredAppComponent.inject(this)
 
         adapter = Adapter()
 
         listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         listView.adapter = adapter
         listView.itemAnimator.changeDuration = 200
-        listView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light), dipRound(0.8f), resources.getDimensionPixelSize(R.dimen.choice_indicator_size) + resources.getDimensionPixelSize(R.dimen.choice_indicator_spacing)))
+        listView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light), dipRound(context, 0.8f), resources.getDimensionPixelSize(R.dimen.choice_indicator_size) + resources.getDimensionPixelSize(R.dimen.choice_indicator_spacing)))
 
     }
 

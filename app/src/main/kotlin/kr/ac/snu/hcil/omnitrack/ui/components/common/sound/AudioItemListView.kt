@@ -11,7 +11,7 @@ import com.github.ybq.android.spinkit.SpinKitView
 import dagger.Lazy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
@@ -81,7 +81,7 @@ class AudioItemListView : ConstraintLayout {
         durationView = findViewById(R.id.ui_duration_view)
         unitView = findViewById(R.id.ui_unit_text)
 
-        (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
     override fun onDetachedFromWindow() {
@@ -101,7 +101,7 @@ class AudioItemListView : ConstraintLayout {
                 iconView.visibility = View.VISIBLE
                 loadingIndicatorView.visibility = View.INVISIBLE
                 iconView.setImageResource(R.drawable.icon_waveform)
-                val metadata = AudioRecordMetadata.readMetadata(localFileUri.path)
+                val metadata = AudioRecordMetadata.readMetadata(localFileUri.path, context)
                 if (metadata != null) {
                     durationView.visibility = View.VISIBLE
                     durationView.text = ((metadata.durationMillis / 10) / 100f).toString()

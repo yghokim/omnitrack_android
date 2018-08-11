@@ -16,7 +16,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.Realm
 import kotlinx.android.synthetic.main.layout_attached_tracker_list_element_removable.view.*
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
@@ -56,7 +56,7 @@ class TrackerAssignPanel : RecyclerView {
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-        (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
     private val subscriptions = CompositeDisposable()
@@ -79,7 +79,7 @@ class TrackerAssignPanel : RecyclerView {
     }
 
     init {
-        addItemDecoration(SpacingItemDecoration(dipRound(8), dipRound(10)))
+        addItemDecoration(SpacingItemDecoration(dipRound(context, 8), dipRound(context, 10)))
         layoutManager = ChipsLayoutManager.newBuilder(context)
                 .setChildGravity(Gravity.CENTER_VERTICAL)
                 .setOrientation(ChipsLayoutManager.HORIZONTAL)

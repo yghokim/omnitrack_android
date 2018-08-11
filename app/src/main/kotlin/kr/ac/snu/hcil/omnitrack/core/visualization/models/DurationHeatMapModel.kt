@@ -69,7 +69,7 @@ open class DurationHeatMapModel(tracker: OTTrackerDAO, timeSpanAttribute: OTAttr
 
             val data = ArrayList<DataPoint>()
 
-            val xScale = QuantizedTimeScale()
+            val xScale = QuantizedTimeScale(configuredContext.applicationContext)
             xScale.setDomain(getTimeScope().from, getTimeScope().to)
             xScale.quantize(currentGranularity)
             cachedDates = xScale.binPointsOnDomain.toList()

@@ -118,7 +118,7 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, View.OnClickL
 
         return MaterialDialog.Builder(context)
                 .customView(view, true)
-                .customViewHorizontalPadding(dipRound(8))
+                .customViewHorizontalPadding(dipRound(context, 8))
                 .positiveColorRes(R.color.colorPointed)
                 .negativeColorRes(R.color.colorRed_Light)
                 .positiveText(R.string.msg_apply)

@@ -32,7 +32,7 @@ import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import kotlinx.android.synthetic.main.fragment_tracker_detail_triggers.*
 import kotlinx.android.synthetic.main.layout_attached_tracker_list.view.*
 import kotlinx.android.synthetic.main.trigger_list_element.view.*
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
@@ -202,7 +202,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         if (requestCode == DETAIL_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
             if (data.hasExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO)) {
                 val resultDao =
-                        (act.application as OTApp).currentConfiguredContext.daoSerializationComponent.manager().parseTrigger(data.getStringExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO))
+                        (act.application as OTAndroidApp).currentConfiguredContext.daoSerializationComponent.manager().parseTrigger(data.getStringExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO))
                 viewModel.addNewTrigger(resultDao)
             }
         }
@@ -318,7 +318,8 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
                 DialogHelper.makeNegativePhrasedYesNoDialogBuilder(act,
                         "OmniTrack",
-                        String.format(OTApp.getString(R.string.msg_format_confirm_remove_trigger), OTApp.getString(OTTriggerInformationHelper.getActionNameResId(viewModel.defaultTriggerInterfaceOptions.defaultActionType) ?: 0)),
+                        String.format(getString(R.string.msg_format_confirm_remove_trigger), getString(OTTriggerInformationHelper.getActionNameResId(viewModel.defaultTriggerInterfaceOptions.defaultActionType)
+                                ?: 0)),
                         R.string.msg_remove, R.string.msg_cancel, {
                     attachedViewModel?.objectId?.let {
                         viewModel.removeTrigger(it)
@@ -431,7 +432,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                     attachedTrackerListView = itemView.ui_attached_tracker_list_stub.inflate()
                             .apply {
                                 ui_attached_tracker_list.adapter = attachedTrackerListAdapter
-                                ui_attached_tracker_list.addItemDecoration(SpacingItemDecoration(dipRound(8), dipRound(10)))
+                                ui_attached_tracker_list.addItemDecoration(SpacingItemDecoration(dipRound(context, 8), dipRound(context, 10)))
                                 ui_attached_tracker_list.layoutManager = ChipsLayoutManager.newBuilder(context)
                                         .setChildGravity(Gravity.CENTER_VERTICAL)
                                         .setOrientation(ChipsLayoutManager.HORIZONTAL)

@@ -57,7 +57,7 @@ class CompoundDrawableTintCore {
 
             for (drawable in compoundDrawables) {
                 if (drawable?.bounds?.isEmpty == true) {
-                    drawable.setBounds(0, 0, dipRound(24), dipRound(24))
+                    drawable.setBounds(0, 0, dipRound(context, 24), dipRound(context, 24))
                 }
             }
         } catch (ex: Exception) {

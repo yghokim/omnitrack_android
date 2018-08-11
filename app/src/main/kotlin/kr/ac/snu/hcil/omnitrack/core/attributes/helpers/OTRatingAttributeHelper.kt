@@ -32,7 +32,7 @@ class OTRatingAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
         const val PROPERTY_OPTIONS = "options"
     }
 
-    inner class MiddleValueFallbackPolicyResolver : FallbackPolicyResolver(R.string.msg_intrinsic_rating, false) {
+    inner class MiddleValueFallbackPolicyResolver : FallbackPolicyResolver(configuredContext.applicationContext, R.string.msg_intrinsic_rating, false) {
         override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
             return Single.defer {
                 val ratingOptions = getRatingOptions(attribute)
@@ -62,18 +62,19 @@ class OTRatingAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
 
     override fun <T> getPropertyHelper(propertyKey: String): OTPropertyHelper<T> {
         return when (propertyKey) {
-            PROPERTY_OPTIONS -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.RatingOptions)
+            PROPERTY_OPTIONS -> propertyManager.getHelper(OTPropertyManager.EPropertyType.RatingOptions)
             else -> throw IllegalArgumentException("Unsupported property type: ${propertyKey}")
         } as OTPropertyHelper<T>
     }
 
     fun getRatingOptions(attribute: OTAttributeDAO): RatingOptions {
-        return getDeserializedPropertyValue<RatingOptions>(PROPERTY_OPTIONS, attribute) ?: RatingOptions()
+        return getDeserializedPropertyValue<RatingOptions>(PROPERTY_OPTIONS, attribute)
+                ?: RatingOptions(configuredContext.applicationContext)
     }
 
     override fun getPropertyInitialValue(propertyKey: String): Any? {
         return when (propertyKey) {
-            PROPERTY_OPTIONS -> RatingOptions()
+            PROPERTY_OPTIONS -> RatingOptions(configuredContext.applicationContext)
             else -> null
         }
     }

@@ -9,7 +9,6 @@ import android.util.AttributeSet
 import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
 import kotlinx.android.synthetic.main.component_property_modaltext.view.*
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 
 /**
@@ -61,7 +60,7 @@ class ModalTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
         }
 
 
-    var dialogTitle: String = String.format(OTApp.getString(R.string.msg_format_change_name), OTApp.getString(R.string.msg_text_tracker))
+    var dialogTitle: String = String.format(resources.getString(R.string.msg_format_change_name), resources.getString(R.string.msg_text_tracker))
         set(value) {
             field = value
             builderCache = null

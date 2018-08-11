@@ -12,8 +12,8 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
+import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
-import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
@@ -36,54 +36,56 @@ import kotlin.collections.set
  */
 @Configured
 abstract class OTAttributeHelper(protected val configuredContext: ConfiguredContext) {
-    companion object {
-        val FALLBACK_POLICY_RESOLVER_EMPTY_VALUE = object: FallbackPolicyResolver(R.string.msg_empty_value){
-            override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
-                return Single.just<Nullable<out Any>>(Nullable(null)).observeOn(AndroidSchedulers.mainThread())
-            }
+
+    protected val propertyManager: OTPropertyManager
+        get() = configuredContext.configuredAppComponent.getPropertyManager()
+
+    val FALLBACK_POLICY_RESOLVER_EMPTY_VALUE = object : FallbackPolicyResolver(configuredContext.applicationContext, R.string.msg_empty_value) {
+        override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
+            return Single.just<Nullable<out Any>>(Nullable(null)).observeOn(AndroidSchedulers.mainThread())
         }
+    }
 
-        val FALLBACK_POLICY_RESOLVER_PREVIOUS_VALUE = object: FallbackPolicyResolver(R.string.msg_attribute_fallback_policy_last, isValueVolatile = true){
-            override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
+    val FALLBACK_POLICY_RESOLVER_PREVIOUS_VALUE = object : FallbackPolicyResolver(configuredContext.applicationContext, R.string.msg_attribute_fallback_policy_last, isValueVolatile = true) {
+        override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
 
-                return Single.defer {
-                    var previousValue: Any? = null
-                    try {
-                        /*
-                        previousValue= realm.where(OTItemValueEntryDAO::class.java)
-                                .equalTo("key", attribute.localId)
-                                .equalTo("items.trackerId", attribute.trackerId)
-                                .equalTo("items.removed", false)
-                                .sort("items.timestamp", Sort.DESCENDING)
-                                .findAll().filter { it.value != null }.first()?.value?.let{
-                            TypeStringSerializationHelper.deserialize(it)
-                        }*/
+            return Single.defer {
+                var previousValue: Any? = null
+                try {
+                    /*
+                    previousValue= realm.where(OTItemValueEntryDAO::class.java)
+                            .equalTo("key", attribute.localId)
+                            .equalTo("items.trackerId", attribute.trackerId)
+                            .equalTo("items.removed", false)
+                            .sort("items.timestamp", Sort.DESCENDING)
+                            .findAll().filter { it.value != null }.first()?.value?.let{
+                        TypeStringSerializationHelper.deserialize(it)
+                    }*/
 
 
-                        val list = realm.where(OTItemDAO::class.java)
-                                .equalTo(BackendDbManager.FIELD_TRACKER_ID, attribute.trackerId)
-                                .equalTo("fieldValueEntries.key", attribute.localId)
-                                .equalTo(BackendDbManager.FIELD_REMOVED_BOOLEAN, false)
-                                .sort("timestamp", Sort.DESCENDING)
-                                .findAll()
-                        if (list.count() > 0) {
-                            for (item in list) {
-                                val value = item.getValueOf(attribute.localId)
-                                if (value != null) {
-                                    previousValue = value
-                                    break
-                                }
+                    val list = realm.where(OTItemDAO::class.java)
+                            .equalTo(BackendDbManager.FIELD_TRACKER_ID, attribute.trackerId)
+                            .equalTo("fieldValueEntries.key", attribute.localId)
+                            .equalTo(BackendDbManager.FIELD_REMOVED_BOOLEAN, false)
+                            .sort("timestamp", Sort.DESCENDING)
+                            .findAll()
+                    if (list.count() > 0) {
+                        for (item in list) {
+                            val value = item.getValueOf(attribute.localId)
+                            if (value != null) {
+                                previousValue = value
+                                break
                             }
-                        } else previousValue = null
+                        }
+                    } else previousValue = null
 
-                    } catch (ex: Exception) {
-                        ex.printStackTrace()
-                        previousValue = null
-                    }
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                    previousValue = null
+                }
 
-                    return@defer Single.just<Nullable<out Any>>(Nullable(previousValue))
-                }.subscribeOn(AndroidSchedulers.mainThread())
-            }
+                return@defer Single.just<Nullable<out Any>>(Nullable(previousValue))
+            }.subscribeOn(AndroidSchedulers.mainThread())
         }
     }
 
@@ -169,7 +171,7 @@ abstract class OTAttributeHelper(protected val configuredContext: ConfiguredCont
     //Input Values=======================================================================================================
 
     open fun isAttributeValueVolatile(attribute: OTAttributeDAO): Boolean {
-        return attribute.serializedConnection?.let { OTConnection.fromJson(it) }?.source != null
+        return attribute.serializedConnection?.let { configuredContext.configuredAppComponent.getConnectionTypeAdapter().fromJson(it) }?.source != null
                 || supportedFallbackPolicies[attribute.fallbackValuePolicy]?.isValueVolatile == true
     }
 

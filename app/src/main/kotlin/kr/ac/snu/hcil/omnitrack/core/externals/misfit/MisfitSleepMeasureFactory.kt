@@ -1,12 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
+import android.content.Context
 import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -15,14 +15,10 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-01.
  */
-object MisfitSleepMeasureFactory : OTMeasureFactory("slp") {
+class MisfitSleepMeasureFactory(context: Context, service: MisfitService) : OTMeasureFactory(context, service, "slp") {
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_FOR_TIMESPAN_ATTRIBUTE
-    }
-
-    override fun getService(): OTExternalService {
-        return MisfitService
     }
 
     override val exampleAttributeType: Int = OTAttributeManager.TYPE_TIMESPAN
@@ -38,15 +34,15 @@ object MisfitSleepMeasureFactory : OTMeasureFactory("slp") {
     override val isDemandingUserInput: Boolean = false
 
     override fun makeMeasure(): OTMeasure {
-        return MisfitSleepMeasure()
+        return MisfitSleepMeasure(this)
     }
 
     override fun makeMeasure(reader: JsonReader): OTMeasure {
-        return MisfitSleepMeasure()
+        return MisfitSleepMeasure(this)
     }
 
     override fun makeMeasure(serialized: String): OTMeasure {
-        return MisfitSleepMeasure()
+        return MisfitSleepMeasure(this)
     }
 
     override fun serializeMeasure(measure: OTMeasure): String {
@@ -56,17 +52,15 @@ object MisfitSleepMeasureFactory : OTMeasureFactory("slp") {
     override val nameResourceId: Int = R.string.measure_misfit_sleeps_name
     override val descResourceId: Int = R.string.measure_misfit_sleeps_desc
 
-    class MisfitSleepMeasure : OTRangeQueriedMeasure() {
+    class MisfitSleepMeasure(factory: MisfitSleepMeasureFactory) : OTRangeQueriedMeasure(factory) {
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
 
-        override val factory: OTMeasureFactory = MisfitSleepMeasureFactory
-
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             return Flowable.defer {
-                val token = MisfitService.getStoredAccessToken()
+                val token = service<MisfitService>().getStoredAccessToken()
                 if (token != null) {
-                    return@defer MisfitApi.getLatestSleepOnDayRequest(token, Date(start), Date(end - 20)).toFlowable() as Flowable<Nullable<out Any>>
+                    return@defer service<MisfitService>().api.getLatestSleepOnDayRequest(token, Date(start), Date(end - 20)).toFlowable() as Flowable<Nullable<out Any>>
                 } else return@defer Flowable.error<Nullable<out Any>>(Exception("no token"))
             }
         }

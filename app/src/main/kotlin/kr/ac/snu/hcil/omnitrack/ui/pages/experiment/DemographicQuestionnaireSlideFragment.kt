@@ -11,7 +11,7 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.slide_demographic.view.*
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.getStringCompat
 import org.jetbrains.anko.bundleOf
@@ -64,12 +64,12 @@ class DemographicQuestionnaireSlideFragment : ExperimentSignUpActivity.SlideFrag
         println("serializedError: ${serializedError}")
         println("serializedValues: ${serializedValues}")
         if (serializedError != null) {
-            val errorObj = (act.applicationContext as OTApp).serializationComponent.genericGson().fromJson(serializedError, JsonObject::class.java)
+            val errorObj = (act.applicationContext as OTAndroidApp).serializationComponent.genericGson().fromJson(serializedError, JsonObject::class.java)
             if (errorObj.getStringCompat("error") == "RequiredFields") {
                 Toast.makeText(act, "Fill up all the required questions.", Toast.LENGTH_LONG).show()
             }
         } else {
-            val valueObj = (act.applicationContext as OTApp).serializationComponent.genericGson().fromJson(serializedValues, JsonObject::class.java)
+            val valueObj = (act.applicationContext as OTAndroidApp).serializationComponent.genericGson().fromJson(serializedValues, JsonObject::class.java)
             viewModel.demographicAnswers = valueObj
             viewModel.goNext(slide)
         }

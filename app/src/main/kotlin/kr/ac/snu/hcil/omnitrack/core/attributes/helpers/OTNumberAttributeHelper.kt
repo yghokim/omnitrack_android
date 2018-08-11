@@ -31,7 +31,7 @@ class OTNumberAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
 
     override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
         get() = super.supportedFallbackPolicies.apply{
-            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object: FallbackPolicyResolver(R.string.msg_intrinsic_number, false){
+            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(configuredContext.applicationContext, R.string.msg_intrinsic_number, false) {
                 override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
                     return Single.just(Nullable(0))
                 }
@@ -61,9 +61,9 @@ class OTNumberAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
     override fun <T> getPropertyHelper(propertyKey: String): OTPropertyHelper<T> {
         return when (propertyKey) {
             NUMBERSTYLE ->
-                OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.NumberStyle)
+                propertyManager.getHelper(OTPropertyManager.EPropertyType.NumberStyle)
             BUTTON_UNIT ->
-                OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.Number)
+                propertyManager.getHelper(OTPropertyManager.EPropertyType.Number)
 
             else -> throw IllegalArgumentException("Unsupported property key.")
         } as OTPropertyHelper<T>
@@ -72,7 +72,7 @@ class OTNumberAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
     override fun getPropertyTitle(propertyKey: String): String {
         return when (propertyKey) {
             NUMBERSTYLE -> ""
-            BUTTON_UNIT -> configuredContext.applicationComponent.applicationContext().getString(R.string.msg_number_button_unit)
+            BUTTON_UNIT -> configuredContext.getString(R.string.msg_number_button_unit)
             else -> ""
         }
     }

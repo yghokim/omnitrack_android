@@ -1,8 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
+import android.content.Context
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
@@ -13,17 +13,17 @@ import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
  */
 object OTTriggerInformationHelper {
 
-    fun getConfigSummaryText(trigger: OTTriggerDAO): CharSequence? {
+    fun getConfigSummaryText(trigger: OTTriggerDAO, context: Context): CharSequence? {
         return when (trigger.conditionType) {
             OTTriggerDAO.CONDITION_TYPE_TIME -> {
                 val condition = trigger.condition as OTTimeTriggerCondition
                 if (condition.isRepeated) {
                     //display only days of weeks
                     if (condition.dayOfWeekFlags == 0b1111111.toByte()) {
-                        OTApp.instance.resourcesWrapped.getString(R.string.msg_everyday)
+                        context.resources.getString(R.string.msg_everyday)
                     } else {
 
-                        val names = OTApp.instance.resourcesWrapped.getStringArray(R.array.days_of_week_short)
+                        val names = context.resources.getStringArray(R.array.days_of_week_short)
 
                         val stringBuilder = StringBuilder()
 
@@ -36,7 +36,7 @@ object OTTriggerInformationHelper {
 
                         stringBuilder.trim()
                     }
-                } else OTApp.instance.resourcesWrapped.getString(R.string.msg_once)
+                } else context.resources.getString(R.string.msg_once)
             }
             else -> null
         }

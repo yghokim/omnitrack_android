@@ -7,7 +7,6 @@ import android.arch.lifecycle.ProcessLifecycleOwner
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
-import android.graphics.Color
 import android.os.Build
 import android.os.SystemClock
 import android.provider.Settings
@@ -20,7 +19,6 @@ import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.di.global.*
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
@@ -34,23 +32,15 @@ import java.util.concurrent.atomic.AtomicLong
  * Created by Young-Ho Kim on 2016-07-11.
  */
 
-class OTApp : MultiDexApplication(), LifecycleObserver {
+class OTApp : MultiDexApplication(), LifecycleObserver, OTAndroidApp {
 
     companion object {
-        lateinit var instance: OTApp
-            private set
 
         lateinit var logger: LoggingDbHelper
             private set
 
         const val PREFIX_ACTION = "${BuildConfig.APPLICATION_ID}.action"
         const val PREFIX_PREF_KEY = "${BuildConfig.APPLICATION_ID}.preference"
-
-        const val ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER = "gender"
-        const val ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION = "occupation"
-        const val ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP = "age_group"
-        const val ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY = "country"
-        const val ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES = "purpose"
 
         const val INTENT_EXTRA_OBJECT_ID_TRACKER = "trackerId"
         const val INTENT_EXTRA_OBJECT_ID_ATTRIBUTE = "attributeObjectId"
@@ -107,11 +97,6 @@ class OTApp : MultiDexApplication(), LifecycleObserver {
 
         const val PREFERENCE_KEY_FIREBASE_INSTANCE_ID = "$PREFIX_PREF_KEY.firebase_instance_id"
 
-
-        fun getString(resId: Int): String {
-            return instance.resourcesWrapped.getString(resId)
-        }
-
         init {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         }
@@ -125,7 +110,7 @@ class OTApp : MultiDexApplication(), LifecycleObserver {
         return wrappedContext ?: this
     }
 
-    val deviceId: String by lazy {
+    override val deviceId: String by lazy {
         val deviceUUID: UUID
         val cached: String = applicationComponent.defaultPreferences().getString("cached_device_id", "")
         if (cached.isNotBlank()) {
@@ -166,6 +151,14 @@ class OTApp : MultiDexApplication(), LifecycleObserver {
         ApplicationModule(this)
     }
 
+    private val designModule: DesignModule by lazy {
+        DesignModule()
+    }
+
+    private val externalServiceModule: ExternalServiceModule by lazy {
+        ExternalServiceModule()
+    }
+
     private val serializationModule: SerializationModule by lazy {
         SerializationModule()
     }
@@ -178,33 +171,31 @@ class OTApp : MultiDexApplication(), LifecycleObserver {
         JobDispatcherModule()
     }
 
-    val applicationComponent: ApplicationComponent by lazy {
+    override val applicationComponent: ApplicationComponent by lazy {
         DaggerApplicationComponent.builder()
                 .applicationModule(appModule)
+                .designModule(designModule)
+                .externalServiceModule(externalServiceModule)
                 .jobDispatcherModule(jobDispatcherModule)
                 .serializationModule(serializationModule)
                 .systemIdentifierFactoryModule(systemIdentifierFactoryModule)
                 .build()
     }
 
-    val jobDispatcherComponent: JobDispatcherComponent by lazy {
+    override val jobDispatcherComponent: JobDispatcherComponent by lazy {
         DaggerJobDispatcherComponent.builder()
                 .jobDispatcherModule(jobDispatcherModule)
                 .applicationModule(appModule)
                 .build()
     }
 
-    val serializationComponent: SerializationComponent by lazy {
+    override val serializationComponent: SerializationComponent by lazy {
         DaggerSerializationComponent.builder()
                 .serializationModule(serializationModule)
                 .build()
     }
 
-    val colorPalette: IntArray by lazy {
-        this.resources.getStringArray(R.array.colorPaletteArray).map { Color.parseColor(it) }.toIntArray()
-    }
-
-    val currentConfiguredContext: ConfiguredContext
+    override val currentConfiguredContext: ConfiguredContext
         get() {
             return this.applicationComponent.configurationController().currentConfiguredContext
         }
@@ -216,7 +207,7 @@ class OTApp : MultiDexApplication(), LifecycleObserver {
         MultiDex.install(this)
     }
 
-    fun refreshConfiguration(context: Context) {
+    override fun refreshConfiguration(context: Context) {
         val wrapped = LocaleHelper.wrapContextWithLocale(context.applicationContext ?: context, LocaleHelper.getLanguageCode(context))
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -242,10 +233,6 @@ class OTApp : MultiDexApplication(), LifecycleObserver {
             LeakCanary.install(this)
         }
 
-        instance = this
-        println("set application instance.")
-
-
         //initialize modules===============================================
 
         logger = LoggingDbHelper(this)
@@ -253,7 +240,7 @@ class OTApp : MultiDexApplication(), LifecycleObserver {
 
         //=================================================================
 
-        OTExternalService.init()
+        /*
         for (service in OTExternalService.availableServices) {
             if (service.state == OTExternalService.ServiceState.ACTIVATED) {
                 service.activateSilently().subscribe { success ->
@@ -262,7 +249,7 @@ class OTApp : MultiDexApplication(), LifecycleObserver {
                     }
                 }
             }
-        }
+        }*/
 
         //TODO start service in job controller
         //startService(this.binaryUploadServiceController.makeResumeUploadIntent())
@@ -299,15 +286,6 @@ class OTApp : MultiDexApplication(), LifecycleObserver {
         }
     }
     //====================================================
-
-    fun unlinkUser() {
-        applicationComponent.
-                configurationController().
-                currentConfiguredContext.
-                configuredAppComponent.
-                shortcutPanelManager().disposeShortcutPanel()
-        applicationComponent.defaultPreferences().edit().remove(INTENT_EXTRA_OBJECT_ID_USER).apply()
-    }
 
     override fun onTerminate() {
         super.onTerminate()

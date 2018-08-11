@@ -1,11 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.properties
 
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import java.util.*
 
 /**
  * Created by Young-Ho on 10/8/2017.
  */
-object OTPropertyManager {
+class OTPropertyManager(val configuredContext: ConfiguredContext) {
     enum class EPropertyType {
         Boolean, ChoiceEntryList, NumberStyle, RatingOptions, Selection, Number
     }
@@ -17,7 +18,7 @@ object OTPropertyManager {
         return if (helperInTable == null) {
             val newHelper = when (type) {
                 EPropertyType.Boolean -> OTBooleanPropertyHelper()
-                EPropertyType.ChoiceEntryList -> OTChoiceEntryListPropertyHelper()
+                EPropertyType.ChoiceEntryList -> OTChoiceEntryListPropertyHelper(configuredContext.applicationContext)
                 EPropertyType.NumberStyle -> OTNumberStylePropertyHelper()
                 EPropertyType.RatingOptions -> OTRatingOptionsPropertyHelper()
                 EPropertyType.Selection -> OTSelectionPropertyHelper()

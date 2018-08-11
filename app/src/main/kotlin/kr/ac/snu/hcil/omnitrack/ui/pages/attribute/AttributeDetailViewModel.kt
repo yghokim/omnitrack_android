@@ -82,7 +82,7 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
         }
 
     val isConnectionDirty: Boolean
-        get() = connectionObservable.value?.datum != attributeDAO?.getParsedConnection()
+        get() = connectionObservable.value?.datum != attributeDAO?.getParsedConnection(configuredContext)
 
     val isDefaultValuePolicyDirty: Boolean
         get() = defaultValuePolicy != attributeDAO?.fallbackValuePolicy
@@ -109,6 +109,9 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
     @Inject
     lateinit var attributeManager: OTAttributeManager
 
+    @Inject
+    lateinit var connectionTypeAdapter: OTConnection.ConnectionTypeAdapter
+
     override fun onInject(configuredContext: ConfiguredContext) {
         configuredContext.configuredAppComponent.inject(this)
     }
@@ -117,7 +120,7 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
         if (!isInitialized) {
             this.attributeDAO = attributeDao
             name = attributeDao.name
-            connection = attributeDao.serializedConnection?.let { OTConnection.fromJson(it) }
+            connection = attributeDao.serializedConnection?.let { connectionTypeAdapter.fromJson(it) }
 
             isRequired = attributeDao.isRequired
 
@@ -189,7 +192,7 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
         }
 
         if (isConnectionDirty) {
-            changes.add("connection" to connection?.getSerializedString())
+            changes.add("connection" to connection?.getSerializedString(this.configuredContext))
         }
 
         return if (changes.isNotEmpty()) jsonObject(changes) else null
@@ -209,7 +212,7 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
             }
         }
 
-        attributeDAO?.serializedConnection = connection?.getSerializedString()
+        attributeDAO?.serializedConnection = connection?.getSerializedString(this.configuredContext)
     }
 
     fun makeFrontalChangesToDao(): OTAttributeDAO? {
@@ -233,7 +236,7 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
                 }
             }
 
-            dao.serializedConnection = connectionObservable.value?.datum?.getSerializedString()
+            dao.serializedConnection = connectionObservable.value?.datum?.getSerializedString(configuredContext)
             dao
         }
     }

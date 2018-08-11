@@ -10,7 +10,6 @@ import com.patloew.rxlocation.RxLocation
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Single
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -32,11 +31,11 @@ class OTLocationAttributeHelper(configuredContext: ConfiguredContext) : OTAttrib
 
     override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
         get() = super.supportedFallbackPolicies.apply{
-            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object: FallbackPolicyResolver(R.string.msg_intrinsic_location, isValueVolatile = true)
+            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(configuredContext.applicationContext, R.string.msg_intrinsic_location, isValueVolatile = true)
             {
                 override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
                     return Single.defer {
-                        val rxLocation = RxLocation(OTApp.instance)
+                        val rxLocation = RxLocation(configuredContext.applicationContext)
                         val request = LocationRequest.create() //standard GMS LocationRequest
                                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                                 .setNumUpdates(2)

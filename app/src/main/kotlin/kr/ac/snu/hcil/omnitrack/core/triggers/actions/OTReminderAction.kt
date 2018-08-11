@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.core.triggers.actions
 
 import android.app.KeyguardManager
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.PowerManager
 import android.os.Vibrator
 import android.support.annotation.DrawableRes
@@ -14,7 +13,6 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import io.reactivex.Completable
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
@@ -109,10 +107,6 @@ class OTReminderAction : OTTriggerAction() {
 
         val popupTriggersQueue = ArrayList<WeakReference<OTTriggerDAO>>()
         var popupTriggerQueueTime: Long? = null
-
-        val localSettingsPreferences: SharedPreferences by lazy {
-            OTApp.instance.getSharedPreferences("Trigger_local_settings", Context.MODE_PRIVATE)
-        }
 
         fun notifyPopupQueue(context: Context) {
             val triggerTime = popupTriggerQueueTime

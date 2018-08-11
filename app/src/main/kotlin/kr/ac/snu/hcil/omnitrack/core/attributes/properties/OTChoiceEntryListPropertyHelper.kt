@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.properties
 
 import android.content.Context
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ChoiceEntryListPropertyView
@@ -11,18 +10,12 @@ import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
  * Created by younghokim on 16. 8. 13..
  */
 
-class OTChoiceEntryListPropertyHelper : OTPropertyHelper<UniqueStringEntryList>() {
+class OTChoiceEntryListPropertyHelper(val context: Context) : OTPropertyHelper<UniqueStringEntryList>() {
 
-
-    companion object {
-
-        val PREVIEW_ENTRIES: Array<UniqueStringEntryList.Entry>
-
-        init {
-            PREVIEW_ENTRIES = OTApp.instance.resourcesWrapped.getStringArray(R.array.choice_preview_entries).mapIndexed { i, s ->
-                UniqueStringEntryList.Entry(i, s)
-            }.toTypedArray()
-        }
+    val previewChoiceEntries: Array<UniqueStringEntryList.Entry> by lazy {
+        context.resources.getStringArray(R.array.choice_preview_entries).mapIndexed { i, s ->
+            UniqueStringEntryList.Entry(i, s)
+        }.toTypedArray()
     }
 
     override fun parseValue(serialized: String): UniqueStringEntryList {
@@ -34,7 +27,7 @@ class OTChoiceEntryListPropertyHelper : OTPropertyHelper<UniqueStringEntryList>(
             try {
                 return UniqueStringEntryList(serialized)
             } catch (e2: Exception) {
-                return UniqueStringEntryList(PREVIEW_ENTRIES)
+                return UniqueStringEntryList(previewChoiceEntries)
             }
         }
     }

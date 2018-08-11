@@ -5,7 +5,6 @@ import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import kotlinx.android.synthetic.main.component_hour_range_picker.view.*
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.INumericUpDown
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
@@ -20,11 +19,11 @@ class HourRangePicker : ConstraintLayout {
             String.format("%02d", value) + ":00"
         }
 
-        fun getTimeText(hourOfDay: Int, wrapNextDay: Boolean = false): String {
+        fun getTimeText(context: Context, hourOfDay: Int, wrapNextDay: Boolean = false): String {
             return when (hourOfDay) {
-                0 -> OTApp.getString(R.string.msg_midnight_0)
-                12 -> OTApp.getString(R.string.msg_noon)
-                24 -> OTApp.getString(R.string.msg_midnight_24)
+                0 -> context.resources.getString(R.string.msg_midnight_0)
+                12 -> context.resources.getString(R.string.msg_noon)
+                24 -> context.resources.getString(R.string.msg_midnight_24)
                 else -> {
                     val amPm = if (hourOfDay / 12 == 0) "AM" else "PM"
                     val hour = hourOfDay % 12
@@ -32,7 +31,7 @@ class HourRangePicker : ConstraintLayout {
                 }
             }.let {
                 if (wrapNextDay) {
-                    String.format(OTApp.getString(R.string.msg_format_next_day), it)
+                    String.format(context.resources.getString(R.string.msg_format_next_day), it)
                 } else it
             }
         }
@@ -80,7 +79,7 @@ class HourRangePicker : ConstraintLayout {
                 val durationLength = if (toNextDay) {
                     24 - ui_picker_from.value + ui_picker_to.value
                 } else ui_picker_to.value - ui_picker_from.value
-                "${getTimeText(ui_picker_from.value)} - ${getTimeText(ui_picker_to.value, toNextDay)} (${resources.getQuantityString(R.plurals.time_duration_hour_short, durationLength, durationLength)})"
+                "${getTimeText(context, ui_picker_from.value)} - ${getTimeText(context, ui_picker_to.value, toNextDay)} (${resources.getQuantityString(R.plurals.time_duration_hour_short, durationLength, durationLength)})"
             }
         }
 

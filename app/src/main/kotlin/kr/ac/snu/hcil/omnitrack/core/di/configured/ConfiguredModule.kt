@@ -1,12 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core.di.configured
 
+import android.content.Context
 import dagger.Module
 import dagger.Provides
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfiguration
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
+import kr.ac.snu.hcil.omnitrack.utils.time.LocalTimeFormats
 import java.util.*
-import javax.inject.Qualifier
 
 /**
  * Created by Young-Ho on 12/9/2017.
@@ -29,7 +30,9 @@ class ConfiguredModule(val configuration: OTConfiguration, val parent: Configure
     fun providesPreferredTimeZone(): TimeZone {
         return TimeZone.getDefault()
     }
-}
 
-@Qualifier
-@Retention(AnnotationRetention.RUNTIME) annotation class ConfigurationDirectory
+    @Provides
+    fun providesLocalTimeFormats(context: Context): LocalTimeFormats {
+        return LocalTimeFormats(context)
+    }
+}

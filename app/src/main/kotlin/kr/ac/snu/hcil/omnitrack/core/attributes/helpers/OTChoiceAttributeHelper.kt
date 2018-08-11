@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import io.reactivex.Single
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ChoiceSorter
@@ -62,9 +61,9 @@ class OTChoiceAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
 
     override fun <T> getPropertyHelper(propertyKey: String): OTPropertyHelper<T> {
         return when (propertyKey) {
-            PROPERTY_MULTISELECTION -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.Boolean)
-            PROPERTY_ALLOW_APPENDING_FROM_VIEW -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.Boolean)
-            PROPERTY_ENTRIES -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.ChoiceEntryList)
+            PROPERTY_MULTISELECTION -> propertyManager.getHelper(OTPropertyManager.EPropertyType.Boolean)
+            PROPERTY_ALLOW_APPENDING_FROM_VIEW -> propertyManager.getHelper(OTPropertyManager.EPropertyType.Boolean)
+            PROPERTY_ENTRIES -> propertyManager.getHelper(OTPropertyManager.EPropertyType.ChoiceEntryList)
             else -> throw IllegalArgumentException("Unsupported property key ${propertyKey}")
         } as OTPropertyHelper<T>
     }
@@ -73,7 +72,7 @@ class OTChoiceAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
         return when (propertyKey) {
             PROPERTY_MULTISELECTION -> false
             PROPERTY_ALLOW_APPENDING_FROM_VIEW -> false
-            PROPERTY_ENTRIES -> UniqueStringEntryList(OTChoiceEntryListPropertyHelper.PREVIEW_ENTRIES)
+            PROPERTY_ENTRIES -> UniqueStringEntryList((propertyManager.getHelper(OTPropertyManager.EPropertyType.ChoiceEntryList) as OTChoiceEntryListPropertyHelper).previewChoiceEntries)
             else -> null
         }
     }
@@ -81,9 +80,9 @@ class OTChoiceAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
 
     override fun getPropertyTitle(propertyKey: String): String {
         return when (propertyKey) {
-            PROPERTY_MULTISELECTION -> OTApp.getString(R.string.property_choice_allow_multiple_selections)
-            PROPERTY_ALLOW_APPENDING_FROM_VIEW -> OTApp.getString(R.string.msg_allow_appending_from_view)
-            PROPERTY_ENTRIES -> OTApp.getString(R.string.property_choice_entries)
+            PROPERTY_MULTISELECTION -> configuredContext.applicationContext.getString(R.string.property_choice_allow_multiple_selections)
+            PROPERTY_ALLOW_APPENDING_FROM_VIEW -> configuredContext.applicationContext.getString(R.string.msg_allow_appending_from_view)
+            PROPERTY_ENTRIES -> configuredContext.applicationContext.getString(R.string.property_choice_entries)
             else -> ""
         }
     }
@@ -115,7 +114,7 @@ class OTChoiceAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
         val inputView = super.getInputView(context, previewMode, attribute, recycledView)
         if (inputView is ChoiceInputView) {
             if (inputView.entries.isEmpty()) {
-                inputView.entries = OTChoiceEntryListPropertyHelper.PREVIEW_ENTRIES
+                inputView.entries = (propertyManager.getHelper(OTPropertyManager.EPropertyType.ChoiceEntryList) as OTChoiceEntryListPropertyHelper).previewChoiceEntries
             }
         }
 

@@ -84,7 +84,7 @@ class DayOfWeekSelector : LinearLayout, View.OnClickListener {
             val lp = LayoutParams(0, resources.getDimensionPixelSize(R.dimen.button_height_normal))
             lp.weight = 1f
             lp.gravity = Gravity.CENTER_VERTICAL
-            button.inset = dipSize(3)
+            button.inset = dipSize(context, 3)
             button.tag = index
             button.text = oneLetterDayNames[index].toUpperCase()
             button.setPadding(0, 0, 0, 0)

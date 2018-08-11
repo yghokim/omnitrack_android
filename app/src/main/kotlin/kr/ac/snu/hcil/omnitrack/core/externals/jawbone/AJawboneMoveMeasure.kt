@@ -18,13 +18,13 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2017-01-25.
  */
-abstract class AJawboneMoveMeasure : OTMeasureFactory.OTRangeQueriedMeasure() {
+abstract class AJawboneMoveMeasure(factory: OTMeasureFactory) : OTMeasureFactory.OTRangeQueriedMeasure(factory) {
 
     override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
         if (TimeHelper.isSameDay(start, end - 10)) {
             return Flowable.create<Nullable<out Any>>({
                 subscriber ->
-                ApiManager.getRestApiInterface().getMoveEventsList(UpPlatformSdkConstants.API_VERSION_STRING, HashMap<String, Long>().apply { this["date"] = JawboneUpService.makeFormattedDateInteger(start).toLong() }, object : Callback<Any> {
+                ApiManager.getRestApiInterface().getMoveEventsList(UpPlatformSdkConstants.API_VERSION_STRING, HashMap<String, Long>().apply { this["date"] = service<JawboneUpService>().makeFormattedDateInteger(start).toLong() }, object : Callback<Any> {
                     override fun onFailure(call: Call<Any>?, t: Throwable) {
                         if (!subscriber.isCancelled) {
                             subscriber.onError(t)
@@ -46,7 +46,7 @@ abstract class AJawboneMoveMeasure : OTMeasureFactory.OTRangeQueriedMeasure() {
                 Observable.zip(TimeHelper.sliceToDate(start, end).map {
                     Observable.create<Float> {
                         subscriber ->
-                        ApiManager.getRestApiInterface().getMoveEventsList(UpPlatformSdkConstants.API_VERSION_STRING, JawboneUpService.makeIntraDayRequestQueryParams(it.first, it.second, null), object : Callback<Any> {
+                        ApiManager.getRestApiInterface().getMoveEventsList(UpPlatformSdkConstants.API_VERSION_STRING, service<JawboneUpService>().makeIntraDayRequestQueryParams(it.first, it.second, null), object : Callback<Any> {
                             override fun onFailure(call: Call<Any>?, t: Throwable) {
                                 if (!subscriber.isDisposed) {
                                     subscriber.onError(t)

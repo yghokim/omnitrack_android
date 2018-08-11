@@ -10,6 +10,7 @@ import io.realm.RealmResults
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
+import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimestampSorter
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
@@ -58,9 +59,9 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
     val sorterSetObservable = BehaviorSubject.create<List<ItemComparator>>()
     private val currentSorterSet = ArrayList<ItemComparator>()
 
-    val currentSorterObservable = BehaviorSubject.createDefault<ItemComparator>(ItemComparator.TIMESTAMP_SORTER)
+    val currentSorterObservable = BehaviorSubject.createDefault<ItemComparator>(TimestampSorter(getApplication()))
     var currentSorter: ItemComparator
-        get() = currentSorterObservable.value ?: ItemComparator.TIMESTAMP_SORTER
+        get() = currentSorterObservable.value ?: TimestampSorter(getApplication())
         set(value) {
             currentSorterObservable.onNext(value)
         }
@@ -103,7 +104,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
         trackerName = trackerDao.name
 
         currentSorterSet.clear()
-        currentSorterSet.add(ItemComparator.TIMESTAMP_SORTER)
+        currentSorterSet.add(TimestampSorter(getApplication()))
         attributes.forEach {
             currentSorterSet += it.getHelper(configuredContext).getSupportedSorters(it)
         }

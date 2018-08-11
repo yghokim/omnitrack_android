@@ -7,7 +7,7 @@ import android.os.PowerManager
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import dagger.Lazy
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
@@ -35,7 +35,7 @@ class RebootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         println("OMNITRACK: reboot receiver called - ${intent.action}")
 
-        (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
 
         val result = goAsync()
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager

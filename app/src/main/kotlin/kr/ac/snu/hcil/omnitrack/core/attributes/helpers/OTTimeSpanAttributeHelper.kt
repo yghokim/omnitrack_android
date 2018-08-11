@@ -4,7 +4,6 @@ import android.content.Context
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
@@ -43,6 +42,11 @@ class OTTimeSpanAttributeHelper(configuredContext: ConfiguredContext) : OTAttrib
         const val GRANULARITY_MINUTE = 1
     }
 
+    val formats = mapOf<Int, SimpleDateFormat>(
+            Pair(OTTimeAttributeHelper.GRANULARITY_DAY, SimpleDateFormat(configuredContext.applicationContext.getString(R.string.property_time_format_granularity_day))),
+            Pair(OTTimeAttributeHelper.GRANULARITY_MINUTE, SimpleDateFormat(configuredContext.applicationContext.getString(R.string.property_time_format_granularity_minute)))
+    )
+
     override fun getValueNumericCharacteristics(attribute: OTAttributeDAO): NumericCharacteristics = NumericCharacteristics(true, false)
 
     override fun getTypeNameResourceId(attribute: OTAttributeDAO): Int {
@@ -68,7 +72,7 @@ class OTTimeSpanAttributeHelper(configuredContext: ConfiguredContext) : OTAttrib
     override fun <T> getPropertyHelper(propertyKey: String): OTPropertyHelper<T> {
         return when (propertyKey) {
         //PROPERTY_TYPE->OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.Selection).parseValue(serializedValue)
-            PROPERTY_GRANULARITY -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.Selection)
+            PROPERTY_GRANULARITY -> propertyManager.getHelper(OTPropertyManager.EPropertyType.Selection)
             else -> throw IllegalArgumentException("Unsupported property type ${propertyKey}")
         } as OTPropertyHelper<T>
     }
@@ -76,8 +80,8 @@ class OTTimeSpanAttributeHelper(configuredContext: ConfiguredContext) : OTAttrib
     override fun makePropertyView(propertyKey: String, context: Context): APropertyView<out Any> {
         val superView = super.makePropertyView(propertyKey, context)
         if (propertyKey == PROPERTY_GRANULARITY && superView is SelectionPropertyView) {
-            superView.setEntries(arrayOf(OTApp.instance.resourcesWrapped.getString(R.string.property_time_granularity_day),
-                    OTApp.instance.resourcesWrapped.getString(R.string.property_time_granularity_minute)
+            superView.setEntries(arrayOf(context.resources.getString(R.string.property_time_granularity_day),
+                    context.resources.getString(R.string.property_time_granularity_minute)
             ))
         }
 
@@ -90,7 +94,7 @@ class OTTimeSpanAttributeHelper(configuredContext: ConfiguredContext) : OTAttrib
 
     override fun getPropertyTitle(propertyKey: String): String {
         return when (propertyKey) {
-            PROPERTY_GRANULARITY -> OTApp.getString(R.string.property_time_granularity)
+            PROPERTY_GRANULARITY -> configuredContext.applicationContext.getString(R.string.property_time_granularity)
             else -> ""
         }
     }
@@ -119,13 +123,13 @@ class OTTimeSpanAttributeHelper(configuredContext: ConfiguredContext) : OTAttrib
 
     override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
         get() = super.supportedFallbackPolicies.apply {
-            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(R.string.msg_intrinsic_time, isValueVolatile = true) {
+            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(configuredContext.applicationContext, R.string.msg_intrinsic_time, isValueVolatile = true) {
                 override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
                     return Single.just(Nullable(TimeSpan().apply { this.timeZone = configuredContext.configuredAppComponent.getPreferredTimeZone() }))
                 }
             }
 
-            this[FALLBACK_POLICY_ID_TIMESPAN_CONNECT_PREVIOUS] = object : FallbackPolicyResolver(R.string.msg_attribute_fallback_policy_timespan_connect_previous, isValueVolatile = true) {
+            this[FALLBACK_POLICY_ID_TIMESPAN_CONNECT_PREVIOUS] = object : FallbackPolicyResolver(configuredContext.applicationContext, R.string.msg_attribute_fallback_policy_timespan_connect_previous, isValueVolatile = true) {
                 override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
                     return Single.defer {
                         val previousNotNullEntry = try {
@@ -160,9 +164,9 @@ class OTTimeSpanAttributeHelper(configuredContext: ConfiguredContext) : OTAttrib
         return (value as? TimeSpan)?.let {
             val granularity = getGranularity(attribute)
             val format = when (granularity) {
-                GRANULARITY_DAY -> OTTimeAttributeHelper.formats[GRANULARITY_DAY]!!
-                GRANULARITY_MINUTE -> OTTimeAttributeHelper.formats[GRANULARITY_MINUTE]!!
-                else -> OTTimeAttributeHelper.formats[GRANULARITY_MINUTE]!!
+                GRANULARITY_DAY -> formats[GRANULARITY_DAY]!!
+                GRANULARITY_MINUTE -> formats[GRANULARITY_MINUTE]!!
+                else -> formats[GRANULARITY_MINUTE]!!
             }
 
             val from = format.format(Date(it.from))

@@ -16,7 +16,9 @@ import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
 import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.MeasureFactoryAdapter
@@ -24,11 +26,15 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import org.jetbrains.anko.support.v4.act
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho on 7/29/2016.
  */
 class ServiceListFragment : OTFragment() {
+
+    @Inject
+    protected lateinit var externalServiceManager: OTExternalServiceManager
 
     private lateinit var listView: RecyclerView
 
@@ -44,6 +50,10 @@ class ServiceListFragment : OTFragment() {
         DialogHelper.makeSimpleAlertBuilder(act, act.getString(R.string.msg_external_service_activation_requires_internet))
     }
 
+    override fun onInject(configuredContext: ConfiguredContext) {
+        super.onInject(configuredContext)
+        configuredContext.configuredAppComponent.inject(this)
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_home_services, container, false)
@@ -98,11 +108,11 @@ class ServiceListFragment : OTFragment() {
         }
 
         override fun getItemCount(): Int {
-            return OTExternalService.availableServices.size
+            return externalServiceManager.availableServices.size
         }
 
         private fun getService(position: Int): OTExternalService {
-            return OTExternalService.availableServices[position]
+            return externalServiceManager.availableServices[position]
         }
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -138,7 +148,7 @@ class ServiceListFragment : OTFragment() {
                 measureFactoryListView = view.findViewById(R.id.ui_supported_measure_list)
                 measureFactoryListView.adapter = measureFactoryAdapter
                 measureFactoryListView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-                measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(act, R.color.separator_Light), dipRound(0.6f)))
+                measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(act, R.color.separator_Light), dipRound(act, 0.6f)))
 
                 activationButton = view.findViewById(R.id.ui_button_activate)
                 activationButton.background.setColorFilter(activateColor, PorterDuff.Mode.MULTIPLY)
@@ -155,7 +165,7 @@ class ServiceListFragment : OTFragment() {
 
                         }
                         OTExternalService.ServiceState.DEACTIVATED -> {
-                            if (service.isInternetRequiredForActivation && !NetworkHelper.isConnectedToInternet()) {
+                            if (service.isInternetRequiredForActivation && !NetworkHelper.isConnectedToInternet(view.context)) {
                                 internetRequiredAlertBuilder.show()
                             } else {
                                 /*

@@ -15,7 +15,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 import kotlinx.android.synthetic.main.dialog_temporary_package_upload.view.*
-import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
@@ -104,7 +104,7 @@ class UploadTemporaryPackageDialogFragment : DialogFragment(), View.OnClickListe
         protected lateinit var serverApi: ISynchronizationServerSideAPI
 
         init {
-            (application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
+            (application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
         }
 
         override fun onCleared() {

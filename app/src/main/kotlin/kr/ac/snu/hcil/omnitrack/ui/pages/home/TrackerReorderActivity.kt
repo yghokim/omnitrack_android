@@ -14,7 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.activity_multibutton_single_recyclerview.*
 import kotlinx.android.synthetic.main.sortable_list_element.view.*
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
@@ -66,7 +65,7 @@ class TrackerReorderActivity: MultiButtonActionBarActivity(R.layout.activity_mul
     override fun onToolbarLeftButtonClicked() {
         if (viewModel.isDirty) {
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
-                    OTApp.getString(R.string.msg_confirm_order), yesLabel = R.string.msg_apply, noLabel = R.string.msg_discard_apply, onYes = {
+                    resources.getString(R.string.msg_confirm_order), yesLabel = R.string.msg_apply, noLabel = R.string.msg_discard_apply, onYes = {
                 onToolbarRightButtonClicked()
             }, onNo = {
                 setResult(Activity.RESULT_CANCELED)
