@@ -192,6 +192,7 @@ dependencies {
     implementation "com.android.support:support-v4:$rootProject.ext.android_support_version"
     implementation "com.android.support:support-vector-drawable:$rootProject.ext.android_support_version"
     implementation "com.android.support:animated-vector-drawable:$rootProject.ext.android_support_version"
+    implementation "com.android.support:exifinterface:$rootProject.ext.android_support_version"
     implementation "com.google.android.gms:play-services-maps:$rootProject.ext.google_play_version"
     implementation "com.google.android.gms:play-services-places:$rootProject.ext.google_play_version"
     implementation "com.google.android.gms:play-services-fitness:$rootProject.ext.google_play_version"
@@ -253,7 +254,7 @@ dependencies {
     kapt "com.github.bumptech.glide:compiler:$rootProject.ext.glide_version"
     implementation "com.github.bumptech.glide:annotations:$rootProject.ext.glide_version"
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
-    implementation 'com.wonderkiln:camerakit:0.13.1'
+    implementation 'com.otaliastudios:cameraview:1.5.1'
     implementation 'com.github.mukeshsolanki:country-picker-android:1.2.0'
     implementation 'com.patloew.rxlocation:rxlocation:1.0.5'
     implementation 'uk.co.samuelwall:material-tap-target-prompt:2.9.0'

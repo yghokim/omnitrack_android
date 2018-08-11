@@ -13,7 +13,12 @@ import android.support.v7.widget.AppCompatImageButton
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import android.widget.ToggleButton
+import com.otaliastudios.cameraview.CameraException
+import com.otaliastudios.cameraview.CameraListener
+import com.otaliastudios.cameraview.CameraView
+import com.otaliastudios.cameraview.Facing
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
@@ -47,7 +52,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
 
     private lateinit var loadingIndicator: LoadingIndicatorBar
 
-    private val listener = CameraListener()
+    private val listener = CameraPickListener()
 
     private val cameraFrontDrawable by lazy {
         applyTint(DrawableCompat.wrap(ContextCompat.getDrawable(context!!, R.drawable.camera_front)!!), Color.WHITE)
@@ -59,7 +64,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
 
     private fun findViews(view: View) {
         cameraView = view.findViewById(R.id.ui_camera_view)
-        cameraView.addCameraKitListener(listener)
+        cameraView.addCameraListener(listener)
 
         shutterButton = view.findViewById(R.id.ui_camera_shutter)
         shutterButton.setOnClickListener(this)
@@ -70,10 +75,10 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
             if (checked) {
                 //true: SelfieMode on
                 compoundButton.setCompoundDrawablesRelativeWithIntrinsicBounds(cameraRearDrawable, null, null, null)
-                cameraView.facing = CameraKit.Constants.FACING_FRONT
+                cameraView.facing = Facing.FRONT
             } else {
                 compoundButton.setCompoundDrawablesRelativeWithIntrinsicBounds(cameraFrontDrawable, null, null, null)
-                cameraView.facing = CameraKit.Constants.FACING_BACK
+                cameraView.facing = Facing.BACK
             }
         }
 
@@ -102,7 +107,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
                 shutterButton.isEnabled = false
                 shutterButton.alpha = 0.5f
                 loadingIndicator.show()
-                cameraView.captureImage()
+                cameraView.capturePicture()
             } catch(e: Exception) {
                 e.printStackTrace()
             }
@@ -121,6 +126,11 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
         super.onPause()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraView.destroy()
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val inflater = activity!!.layoutInflater
@@ -133,37 +143,20 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
                 .create()
     }
 
-    inner class CameraListener : com.wonderkiln.camerakit.CameraKitEventListener {
-        override fun onVideo(p0: CameraKitVideo?) {
+    inner class CameraPickListener : CameraListener() {
 
-        }
-
-        override fun onEvent(p0: CameraKitEvent?) {
-
-        }
-
-        override fun onImage(image: CameraKitImage?) {
-            if (image != null) {
-                /*
-                val activity = activity
-                if (activity is OTActivity) {
-                    arguments?.getInt(ARG_REQUEST_CODE)?.let {
-                        val data = Intent()
-                        data.putExtra(EXTRA_IMAGE_DATA, jpeg)
-                        activity.performOnActivityResult(it, RESULT_OK, data)
-                    }
-                }*/
-
+        override fun onPictureTaken(jpeg: ByteArray?) {
+            if (jpeg != null) {
                 arguments?.getString(EXTRA_REQUEST_KEY)?.let {
                     LocalBroadcastManager.getInstance(context!!)
-                            .sendBroadcast(Intent(EXTRA_ACTION_PHOTO_TAKEN).putExtra(EXTRA_IMAGE_DATA, image.jpeg).putExtra(EXTRA_REQUEST_KEY, it))
+                            .sendBroadcast(Intent(EXTRA_ACTION_PHOTO_TAKEN).putExtra(EXTRA_IMAGE_DATA, jpeg).putExtra(EXTRA_REQUEST_KEY, it))
                 }
                 dismiss()
             }
         }
 
-        override fun onError(p0: CameraKitError?) {
-
+        override fun onCameraError(exception: CameraException) {
+            Toast.makeText(context, exception.message, Toast.LENGTH_LONG).show()
         }
     }
 }

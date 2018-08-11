@@ -1,11 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core
 
+import android.util.Log
 import com.google.gson.JsonObject
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
@@ -84,10 +86,15 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext:
                                 println("Received valueConnection result - ${data.datum}")
                                 return@flatMap Flowable.just(data)
                             }
-                        }.onErrorResumeNext { err: Throwable -> err.printStackTrace(); attr.getFallbackValue(configuredContext, realm).toFlowable() }.map { nullable: Nullable<out Any> -> Pair(attrLocalId, AnyValueWithTimestamp(nullable)) }.subscribeOn(Schedulers.io()).doOnSubscribe {
-
-                            onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.GettingExternalValue)
-                        }.toObservable()
+                        }.onErrorResumeNext { err: Throwable ->
+                            err.printStackTrace()
+                            OTApp.logger.writeSystemLog(Log.getStackTraceString(err), "OTItemBuilderWrapperBase")
+                            attr.getFallbackValue(configuredContext, realm).toFlowable()
+                        }.map { nullable: Nullable<out Any> -> Pair(attrLocalId, AnyValueWithTimestamp(nullable)) }
+                                .subscribeOn(Schedulers.io())
+                                .doOnSubscribe {
+                                    onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.GettingExternalValue)
+                                }.toObservable()
                     } else {
 
                         println("No connection. use fallback value: ${attrLocalId}")
@@ -110,9 +117,9 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext:
 
                             onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.Idle)
                         }.doOnError { err -> err.printStackTrace(); realm.close() }.doOnComplete {
-                    realm.close()
-                    println("RX finished autocompleting builder=======================")
-                }
+                            realm.close()
+                            println("RX finished autocompleting builder=======================")
+                        }
             }
         }
     }

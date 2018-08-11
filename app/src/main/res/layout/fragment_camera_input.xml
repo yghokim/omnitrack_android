@@ -25,18 +25,17 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.wonderkiln.camerakit.CameraView
+        <com.otaliastudios.cameraview.CameraView
             android:id="@+id/ui_camera_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:adjustViewBounds="true"
 
-            app:ckCropOutput="true"
-            app:ckFacing="back"
-            app:ckFlash="off"
-            app:ckFocus="continuous"
-            app:ckJpegQuality="100"
-            app:ckMethod="still"
+            app:cameraCropOutput="true"
+            app:cameraFacing="back"
+            app:cameraFlash="off"
+            app:cameraJpegQuality="100"
+            app:cameraSessionType="picture"
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
