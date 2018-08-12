@@ -144,7 +144,7 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
         )
 
         creationSubscriptions.add(
-                viewModel.currentState.subscribeOn(AndroidSchedulers.mainThread()).subscribe {
+                viewModel.currentState.observeOn(AndroidSchedulers.mainThread()).subscribe {
                     state ->
                     println("Service Activation ViewModel state changed to ${state}")
                     when (state) {

@@ -8,7 +8,6 @@ import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.fitness.request.DataReadRequest
 import com.google.gson.stream.JsonReader
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -77,7 +76,7 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
             println("Requested Google Fit Step Measure")
             OTApp.logger.writeSystemLog("Start Google Fit step measure", "GoogleFitStepsFactory")
             return if (service<GoogleFitService>().state == OTExternalService.ServiceState.ACTIVATED) {
-                service<GoogleFitService>().getConnectedClient().toFlowable(BackpressureStrategy.LATEST).flatMap<Nullable<out Any>> { client ->
+                service<GoogleFitService>().getConnectedClient().toFlowable().flatMap<Nullable<out Any>> { client ->
                     Flowable.defer {
                         val request = DataReadRequest.Builder()
                                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
