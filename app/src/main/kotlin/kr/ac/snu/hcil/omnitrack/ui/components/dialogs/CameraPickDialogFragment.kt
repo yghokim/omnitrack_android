@@ -15,10 +15,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.ToggleButton
-import com.otaliastudios.cameraview.CameraException
-import com.otaliastudios.cameraview.CameraListener
-import com.otaliastudios.cameraview.CameraView
-import com.otaliastudios.cameraview.Facing
+import com.otaliastudios.cameraview.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
@@ -35,11 +32,18 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
         const val EXTRA_IMAGE_DATA = "image"
         const val EXTRA_ACTION_PHOTO_TAKEN = "${OTApp.PREFIX_ACTION}.CAMERA_PHOTO_TAKEN"
 
-        fun getInstance(requestKey: String): CameraPickDialogFragment {
+        const val EXTRA_IMAGE_MAX_AREA = "max_area"
+
+        fun getInstance(requestKey: String, maxImageArea: Int?): CameraPickDialogFragment {
             val fragment = CameraPickDialogFragment()
             val args = Bundle()
             args.putString(EXTRA_REQUEST_KEY, requestKey)
+
+            if(maxImageArea!=null)
+                args.putInt(EXTRA_IMAGE_MAX_AREA, maxImageArea)
+
             fragment.arguments = args
+
             return fragment
         }
     }
@@ -65,6 +69,10 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
     private fun findViews(view: View) {
         cameraView = view.findViewById(R.id.ui_camera_view)
         cameraView.addCameraListener(listener)
+
+        if(arguments?.containsKey(EXTRA_IMAGE_MAX_AREA)?:false){
+            cameraView.setPictureSize(SizeSelectors.maxArea(arguments!!.getInt(EXTRA_IMAGE_MAX_AREA)))
+        }
 
         shutterButton = view.findViewById(R.id.ui_camera_shutter)
         shutterButton.setOnClickListener(this)

@@ -153,8 +153,8 @@ class ImagePicker : ConstraintLayout, View.OnClickListener {
         activity.startActivityForResult(chooserIntent, requestCode)
     }
 
-    fun showCameraPickDialog(activity: AppCompatActivity, requestKey: String) {
-        val dialog = CameraPickDialogFragment.getInstance(requestKey)
+    fun showCameraPickDialog(activity: AppCompatActivity, requestKey: String, maxArea: Int?) {
+        val dialog = CameraPickDialogFragment.getInstance(requestKey, maxArea)
         dialog.show(activity.supportFragmentManager, "CAMERA")
     }
 

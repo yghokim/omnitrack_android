@@ -1,1 +1,1 @@
-include ':app', ':material_dialog_core', ':UpPlatformSdk', ':material_about', ':fancybuttons', ':TedBottomPicker:tedbottompicker', ':AppUpdater:appupdater'
+include ':app', ':material_dialog_core', ':UpPlatformSdk', ':material_about', ':fancybuttons', ':TedBottomPicker', ':AppUpdater:appupdater'

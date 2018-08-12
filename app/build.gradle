@@ -221,7 +221,7 @@ dependencies {
     implementation project(':UpPlatformSdk')
     implementation project(':material_about')
     implementation project(':fancybuttons')
-    implementation project(':TedBottomPicker:tedbottompicker')
+    implementation project(':TedBottomPicker')
     implementation project(':AppUpdater:appupdater')
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3

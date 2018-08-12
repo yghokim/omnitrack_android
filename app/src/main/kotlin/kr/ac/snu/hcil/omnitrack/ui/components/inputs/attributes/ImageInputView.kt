@@ -134,7 +134,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     override fun onRequestCameraImage(view: ImagePicker) {
         val activity = this.getActivity()
         if (activity != null) {
-            picker.showCameraPickDialog(activity, boundAttributeObjectId ?: "")
+            picker.showCameraPickDialog(activity, boundAttributeObjectId ?: "", IMAGE_MAX_PIXELS)
         }
     }
 
