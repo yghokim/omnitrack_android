@@ -28,6 +28,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
+import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
@@ -183,6 +184,10 @@ class SettingsActivity : AppCompatActivity() {
             if (result?.first == OTExternalSettingsPrompter.KEY_IGNORE_BATTERY_OPTIMIZATION) {
                 if (Build.VERSION.SDK_INT >= 23) {
                     this.ignoreBatteryOptimizationPreference.isChecked = settingsPrompter.isBatteryOptimizationWhiteListed()
+                }
+
+                if (settingsPrompter.isBatteryOptimizationWhiteListed()) {
+                    act.startService(Intent(act, OTDeviceStatusService::class.java))
                 }
             }
         }

@@ -11,6 +11,7 @@ import android.os.IBinder
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
+import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 
 
 class OTDeviceStatusService : Service() {
@@ -68,7 +69,12 @@ class OTDeviceStatusService : Service() {
 
         OTApp.logger.writeSystemLog("BatteryStatusService destroyed", PowerReceiver.TAG)
 
-        this.startService(Intent(this, OTDeviceStatusService::class.java))
+        if (OTExternalSettingsPrompter.isBatteryOptimizationWhiteListed(this)) {
+            this.startService(Intent(this, OTDeviceStatusService::class.java))
+        } else {
+            OTApp.logger.writeSystemLog("reserve starting batteryStatusService for next foreground enter.", PowerReceiver.TAG)
+            (application as OTApp).isDeviceStateServiceStartReserved = true
+        }
     }
 
     class PowerReceiver : BroadcastReceiver() {

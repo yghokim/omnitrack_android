@@ -27,12 +27,17 @@ class OTExternalSettingsPrompter(private val context: Context) {
         const val TAG = "OTExternalSettingsPrompter"
 
         const val NOTIFICATION_ID_IGNORE_BATTERY_OPTIMIZATION = 0
+
+
+        fun isBatteryOptimizationWhiteListed(context: Context): Boolean {
+            return if (Build.VERSION.SDK_INT >= 23)
+                context.powerManager.isIgnoringBatteryOptimizations(context.packageName)
+            else true
+        }
     }
 
     fun isBatteryOptimizationWhiteListed(): Boolean {
-        return if (Build.VERSION.SDK_INT >= 23)
-            context.powerManager.isIgnoringBatteryOptimizations(context.packageName)
-        else true
+        return Companion.isBatteryOptimizationWhiteListed(context)
     }
 
     fun askUserBatterOptimizationWhitelist() {

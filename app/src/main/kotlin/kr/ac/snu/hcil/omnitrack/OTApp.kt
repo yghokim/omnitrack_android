@@ -19,6 +19,7 @@ import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.di.global.*
+import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
@@ -110,6 +111,8 @@ class OTApp : MultiDexApplication(), LifecycleObserver, OTAndroidApp {
         return wrappedContext ?: this
     }
 
+    var isDeviceStateServiceStartReserved = false
+
     override val deviceId: String by lazy {
         val deviceUUID: UUID
         val cached: String = applicationComponent.defaultPreferences().getString("cached_device_id", "")
@@ -144,6 +147,8 @@ class OTApp : MultiDexApplication(), LifecycleObserver, OTAndroidApp {
     private var wrappedContext: Context? = null
 
     private val foregroundTime = AtomicLong(0)
+
+    val isAppForeground: Boolean get() = foregroundTime.get() == Long.MIN_VALUE
 
     //Dependency Injection
 
@@ -256,10 +261,14 @@ class OTApp : MultiDexApplication(), LifecycleObserver, OTAndroidApp {
 
         applicationComponent.configurationController().currentConfiguredContext.activateOnSystem()
 
+        if (OTExternalSettingsPrompter.isBatteryOptimizationWhiteListed(this) || ProcessLifecycleOwner.get().lifecycle.currentState >= Lifecycle.State.STARTED) {
+            startService(Intent(this, OTDeviceStatusService::class.java))
+        } else {
+            isDeviceStateServiceStartReserved = true
+        }
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
-        startService(Intent(this, OTDeviceStatusService::class.java))
 
         println("creation took ${SystemClock.elapsedRealtime() - startedAt}")
     }
@@ -270,6 +279,11 @@ class OTApp : MultiDexApplication(), LifecycleObserver, OTAndroidApp {
     fun onAppDidEnterForeground() {
         println("App Screen State: FOREGROUND")
         foregroundTime.set(System.currentTimeMillis())
+
+        if (isDeviceStateServiceStartReserved) {
+            startService(Intent(this, OTDeviceStatusService::class.java))
+            isDeviceStateServiceStartReserved = false
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
