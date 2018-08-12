@@ -24,7 +24,7 @@ object OTAppVersionCheckManager {
                     }
                 }
                 .appendQueryParameter("host", URLEncoder.encode(BuildConfig.OMNITRACK_SYNCHRONIZATION_SERVER_URL, "UTF-8"))
-                .build().path
+                .build().toString()
     }
 
     fun makeAppUpdater(context: Context): AppUpdater {
