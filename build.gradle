@@ -27,8 +27,8 @@ def buildConfigs = new groovy.json.JsonSlurper().parseText(buildConfigJsonFile.t
 
 
 ext {
-    targetSdkVersion = 27
-    compileSdkVersion = 27
+    targetSdkVersion = 28
+    compileSdkVersion = 28
     buildToolsVersion = '28.0.2'
     minSdkVersion = 19
 }

@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 27
+        targetSdkVersion rootProject.ext.targetSdkVersion
     }
 
     buildTypes {
@@ -18,6 +18,11 @@ android {
 
     lintOptions {
         disable 'MissingTranslation'
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
     }
 }
 
