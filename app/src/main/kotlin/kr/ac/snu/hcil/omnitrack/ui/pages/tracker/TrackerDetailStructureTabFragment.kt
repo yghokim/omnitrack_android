@@ -157,7 +157,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 }
         )
 
-        if (BuildConfig.DISABLE_EXTERNAL_ENTITIES) {
+        if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
             assignedExperimentProperty.visibility = View.GONE
         } else {
             val experimentListObservable: Observable<Pair<Boolean, List<ExperimentInfo>>> = Observable.combineLatest(this.viewModel.isInjectedObservable, this.viewModel.experimentListObservable, BiFunction { t1: Boolean, t2: List<ExperimentInfo> -> Pair(t1, t2) })

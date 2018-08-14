@@ -408,7 +408,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 trackerDao.isBookmarked = isBookmarkedObservable.value ?: false
                 trackerDao.color = colorObservable.value ?: 0
 
-                if (BuildConfig.DISABLE_EXTERNAL_ENTITIES) {
+                if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
                     trackerDao.experimentIdInFlags = BuildConfig.DEFAULT_EXPERIMENT_ID
                     trackerDao.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(BuildConfig.DEFAULT_EXPERIMENT_ID).build()
                 } else if (isInjectedObservable.value != true) {
