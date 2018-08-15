@@ -1,5 +1,6 @@
 package com.github.javiersantos.appupdater;
 
+import android.net.Uri;
 import android.util.Log;
 
 import com.github.javiersantos.appupdater.objects.Update;
@@ -15,6 +16,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 
 class JSONParser {
@@ -51,7 +53,7 @@ class JSONParser {
                 }
                 update.setReleaseNotes(builder.toString());
             }
-            URL url = new URL(json.getString(KEY_URL).trim());
+            URL url = new URL(Uri.parse(URLDecoder.decode(json.getString(KEY_URL).trim(), "UTF8")).toString());
             update.setUrlToDownload(url);
             return update;
         } catch (IOException e) {

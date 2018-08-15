@@ -3,6 +3,9 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 //apply plugin: 'io.fabric'
+apply plugin: 'com.google.android.gms.oss-licenses-plugin'
+apply plugin: 'com.google.android.gms.strict-version-matcher-plugin'
+
 
 import java.util.regex.Pattern
 
@@ -193,16 +196,19 @@ dependencies {
     implementation "com.android.support:support-vector-drawable:$rootProject.ext.android_support_version"
     implementation "com.android.support:animated-vector-drawable:$rootProject.ext.android_support_version"
     implementation "com.android.support:exifinterface:$rootProject.ext.android_support_version"
-    implementation "com.google.android.gms:play-services-maps:$rootProject.ext.google_play_version"
-    implementation "com.google.android.gms:play-services-places:$rootProject.ext.google_play_version"
-    implementation "com.google.android.gms:play-services-fitness:$rootProject.ext.google_play_version"
-    implementation "com.google.android.gms:play-services-gcm:$rootProject.ext.google_play_version"
-    implementation "com.google.android.gms:play-services-plus:$rootProject.ext.google_play_version"
-    implementation "com.google.android.gms:play-services-auth:$rootProject.ext.google_play_version"
+
+    implementation 'com.google.android.gms:play-services-maps:15.0.1'
+    implementation 'com.google.android.gms:play-services-places:15.0.1'
+    implementation 'com.google.android.gms:play-services-fitness:15.0.1'
+    implementation 'com.google.android.gms:play-services-gcm:15.0.1'
+    implementation 'com.google.android.gms:play-services-plus:15.0.1'
+    implementation 'com.google.android.gms:play-services-auth:16.0.0'
+
     implementation 'com.google.firebase:firebase-core:16.0.1'
-    implementation 'com.google.firebase:firebase-auth:16.0.2'
-    implementation 'com.google.firebase:firebase-messaging:17.1.0'
+    implementation 'com.google.firebase:firebase-auth:16.0.3'
+    implementation 'com.google.firebase:firebase-messaging:17.3.0'
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
+
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     def work_version = "1.0.0-alpha06"
     implementation "android.arch.work:work-runtime-ktx:$work_version"
@@ -271,6 +277,8 @@ dependencies {
     implementation 'org.nield:kotlin-statistics:1.0.0'
     implementation 'com.shawnlin:number-picker:2.4.4'
     implementation 'com.opencsv:opencsv:4.2'
+    implementation 'com.google.android.gms:play-services-oss-licenses:16.0.0'
+
 }
 
 repositories {

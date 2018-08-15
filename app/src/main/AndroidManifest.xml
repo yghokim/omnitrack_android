@@ -320,6 +320,14 @@
             android:name=".ui.pages.experiment.ExperimentSignUpActivity"
             android:windowSoftInputMode="adjustPan" />
 
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
+            android:theme="@style/AppTheme" />
+
     </application>
 
 </manifest>

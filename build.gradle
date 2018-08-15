@@ -35,7 +35,6 @@ ext {
 
 buildscript {
     ext.kotlin_version = '1.2.60'
-    ext.google_play_version = '15.0.1'
     ext.android_support_version = '27.1.1'
     ext.dagger_version = '2.16'
     ext.gson_version = '2.8.2'
@@ -54,6 +53,8 @@ buildscript {
         classpath 'com.google.gms:google-services:3.1.2'
         classpath "io.realm:realm-gradle-plugin:5.4.0"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.google.android.gms:oss-licenses-plugin:0.9.3'
+        classpath 'com.google.android.gms:strict-version-matcher-plugin:1.0.3'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
