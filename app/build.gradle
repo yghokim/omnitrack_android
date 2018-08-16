@@ -194,7 +194,6 @@ dependencies {
     implementation "com.android.support:exifinterface:$rootProject.ext.android_support_version"
 
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
-    implementation 'com.google.android.gms:play-services-places:15.0.1'
     implementation 'com.google.android.gms:play-services-fitness:15.0.1'
     implementation 'com.google.android.gms:play-services-gcm:15.0.1'
     implementation 'com.google.android.gms:play-services-plus:15.0.1'

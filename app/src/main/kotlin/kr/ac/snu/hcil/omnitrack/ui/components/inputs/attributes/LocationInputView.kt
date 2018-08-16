@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -10,7 +9,6 @@ import android.view.ViewStub
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.places.ui.PlacePicker
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -247,14 +245,6 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
             //getActivity()?.startActivityForResult()
 
         }*/
-    }
-
-    override fun setValueFromActivityResult(data: Intent, requestType: Int): Boolean {
-        if (requestType == REQUEST_TYPE_GOOGLE_PLACE_PICKER) {
-            val place = PlacePicker.getPlace(this.context, data)
-            value = place.latLng
-            return true
-        } else return false
     }
 
     private fun fitToValueLocation(animate: Boolean) {
