@@ -13,18 +13,24 @@ import android.widget.Toast
 import com.google.android.gms.common.GoogleApiAvailability
 import com.tbruyelle.rxpermissions2.RxPermissions
 import dagger.Lazy
+import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_sign_in.*
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.di.configured.ServerResponsive
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.net.NetworkNotConnectedException
+import java.util.concurrent.CancellationException
 import javax.inject.Inject
+import javax.inject.Provider
 
 class SignInActivity : AppCompatActivity() {
 
@@ -33,6 +39,9 @@ class SignInActivity : AppCompatActivity() {
 
     @Inject
     protected lateinit var eventLogger: Lazy<IEventLogger>
+
+    @field:[Inject ServerResponsive]
+    protected lateinit var checkServerConnection: Provider<Completable>
 
     private val creationSubscription = CompositeDisposable()
 
@@ -61,8 +70,7 @@ class SignInActivity : AppCompatActivity() {
                             yesLabel = R.string.msg_allow_permission, noLabel = R.string.msg_cancel, onYes = {
                         val permissions = RxPermissions(this)
                         permissions.request(Manifest.permission.GET_ACCOUNTS)
-                                .subscribe {
-                                    granted ->
+                                .subscribe { granted ->
                                     if (granted) {
                                         this.findViewById<View>(kr.ac.snu.hcil.omnitrack.R.id.g_login_button).callOnClick()
                                     } else {
@@ -78,7 +86,8 @@ class SignInActivity : AppCompatActivity() {
                     return@OnClickListener
                 } else {
                     creationSubscription.add(
-                            authManager.startSignInProcess(this)
+
+                            checkServerConnection.get().andThen(authManager.startSignInProcess(this))
                                     .doOnSuccess {
                                         if (it) {
                                             this@SignInActivity.runOnUiThread {
@@ -99,15 +108,32 @@ class SignInActivity : AppCompatActivity() {
                                             toIdleMode()
                                         }
                                     }, { e ->
-                                        val errorDialogBuilder = AlertDialog.Builder(this@SignInActivity)
-                                        errorDialogBuilder.setTitle("Sign-In Error")
-                                        errorDialogBuilder.setMessage(
-                                                String.format("Sign-in Process failed.\n%s", e.message))
-                                        errorDialogBuilder.setNeutralButton("Ok", null)
-                                        errorDialogBuilder.show()
+                                        e.printStackTrace()
+                                        if (e is NetworkNotConnectedException) {
+                                            val noticeDialogBuilder = AlertDialog.Builder(this@SignInActivity)
+                                            noticeDialogBuilder
+                                                    .setTitle(BuildConfig.APP_NAME)
+                                                    .setMessage("The app server does not respond. Try again later.")
+                                                    .setNeutralButton("Ok", null)
+                                                    .show()
+                                        } else if (e is CancellationException) {
 
+                                            Log.d(LOG_TAG, String.format("User sign-in with Google canceled."))
+                                            this@SignInActivity.runOnUiThread {
+                                                Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_canceled)), Toast.LENGTH_LONG).show()
+                                            }
+
+                                        } else {
+                                            val errorDialogBuilder = AlertDialog.Builder(this@SignInActivity)
+                                            errorDialogBuilder.setTitle("Sign-In Error")
+                                            errorDialogBuilder.setMessage(
+                                                    String.format("Sign-in Process failed.\n%s", e.message))
+                                            errorDialogBuilder.setNeutralButton("Ok", null)
+                                            errorDialogBuilder.show()
+                                        }
                                         toIdleMode()
-                                    })
+                                    }
+                                    )
                     )
                 }
             })

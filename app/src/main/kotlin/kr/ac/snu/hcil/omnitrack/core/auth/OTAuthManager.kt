@@ -40,6 +40,7 @@ import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignUpActivity
 import org.jetbrains.anko.runOnUiThread
 import rx_activity_result2.RxActivityResult
+import java.util.concurrent.CancellationException
 import javax.inject.Inject
 
 /**
@@ -200,9 +201,10 @@ class OTAuthManager @Inject constructor(
     }
 
     fun startSignInProcess(activity: AppCompatActivity): Single<Boolean> {
-        println("OMNITRACK start sign in activity")
-        val signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient)
-        return RxActivityResult.on(activity).startIntent(signInIntent).singleOrError().doOnError { clearUserInfo() }.doOnSuccess { if (it.resultCode() == 0) clearUserInfo() }.flatMap { activityResult ->
+        return Single.defer {
+            println("OMNITRACK start sign in activity")
+            val signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient)
+            return@defer RxActivityResult.on(activity).startIntent(signInIntent).singleOrError().doOnError { clearUserInfo() }.doOnSuccess { if (it.resultCode() == 0) clearUserInfo() }.flatMap { activityResult ->
 
                 val result = Auth.GoogleSignInApi.getSignInResultFromIntent(activityResult.data())
                 if (result.isSuccess) {
@@ -229,7 +231,7 @@ class OTAuthManager @Inject constructor(
                                                                         .firstOrError()
                                                                         .map { result ->
                                                                             if (result.resultCode() != Activity.RESULT_OK) {
-                                                                                throw Exception("Canceled the sign up process.")
+                                                                                throw CancellationException()
                                                                             } else {
                                                                                 Pair<String, JsonObject?>(
                                                                                         BuildConfig.DEFAULT_INVITATION_CODE
@@ -262,10 +264,13 @@ class OTAuthManager @Inject constructor(
                                 firebaseAuth.signOut()
                                 Auth.GoogleSignInApi.signOut(mGoogleApiClient)
                             }
+                } else if (result.status.isCanceled || result.status.statusCode == 12501) {
+                    throw CancellationException(result.status.statusMessage)
                 } else {
                     println("Google sign in failed")
                     return@flatMap Single.error<Boolean>(Exception("Google login process was failed."))
                 }
+            }
         }
     }
 

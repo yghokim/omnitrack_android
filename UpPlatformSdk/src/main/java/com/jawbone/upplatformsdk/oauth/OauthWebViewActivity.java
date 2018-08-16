@@ -4,6 +4,7 @@
  */
 package com.jawbone.upplatformsdk.oauth;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -44,6 +45,7 @@ public class OauthWebViewActivity extends Activity {
         activity.startActivityForResult(intent, request_code);
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +56,7 @@ public class OauthWebViewActivity extends Activity {
         Intent intent = this.getIntent();
         Uri uri = intent.getParcelableExtra(UpPlatformSdkConstants.AUTH_URI);
 
-        WebView webview = (WebView) findViewById(R.id.webview);
+        WebView webview = findViewById(R.id.webview);
         webview.getSettings().setJavaScriptEnabled(true);
 
         webview.setWebViewClient(new WebViewClient() {

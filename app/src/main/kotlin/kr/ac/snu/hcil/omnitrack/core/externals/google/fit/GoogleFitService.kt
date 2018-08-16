@@ -7,6 +7,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.Api
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.Scope
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -73,9 +74,12 @@ class GoogleFitService(context: Context) : OTExternalService(context, "GoogleFit
         )
     }
 
-    override fun onDeactivate() {
-        client?.disconnect()
-        client = null
+    override fun onDeactivate(): Completable {
+        return Completable.defer {
+            client?.disconnect()
+            client = null
+            return@defer Completable.complete()
+        }
     }
 
     /*

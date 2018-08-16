@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
@@ -29,6 +30,7 @@ import java.nio.charset.Charset
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
+@SuppressLint("HardwareIds")
 /**
  * Created by Young-Ho Kim on 2016-07-11.
  */

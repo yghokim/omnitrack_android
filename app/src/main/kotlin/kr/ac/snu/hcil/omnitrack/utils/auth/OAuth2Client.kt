@@ -1,17 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.utils.auth
 
-import android.accounts.NetworkErrorException
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.AsyncTask
-import io.reactivex.Observable
+import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
+import kr.ac.snu.hcil.omnitrack.utils.net.NetworkNotConnectedException
 import okhttp3.*
 import org.json.JSONObject
 import rx_activity_result2.RxActivityResult
@@ -71,7 +70,7 @@ class OAuth2Client(val context: Context, val config: OAuth2Config) {
         }
     }
 
-    fun authorize(activity: Activity, serviceName: String? = null): Observable<Credential> {
+    fun authorize(activity: Activity, serviceName: String? = null): Single<Credential> {
         val uri = HttpUrl.parse(config.authorizationUrl)!!.newBuilder()
                 .addQueryParameter(AuthConstants.PARAM_CLIENT_ID, config.clientId)
                 .addQueryParameter(AuthConstants.PARAM_RESPONSE_TYPE, AuthConstants.VALUE_RESPONSE_TYPE_CODE)
@@ -82,8 +81,7 @@ class OAuth2Client(val context: Context, val config: OAuth2Config) {
         return RxActivityResult.on(activity)
                 .startIntent(WebServiceLoginActivity.makeIntent(uri.toString(), serviceName
                         ?: "Service", null, activity))
-                .flatMap {
-                    result ->
+                .firstOrError().flatMap { result ->
                     println("RxActivityResult : activity result")
                     val data = result.data()
                     val resultCode = result.resultCode()
@@ -91,30 +89,13 @@ class OAuth2Client(val context: Context, val config: OAuth2Config) {
                         val code = data.getStringExtra(AuthConstants.PARAM_CODE)
                         return@flatMap exchangeToken(code)
                     } else {
-                        return@flatMap Observable.error<Credential>(Exception("Authentication process was canceled by user."))
+                        return@flatMap Single.error<Credential>(Exception("Authentication process was canceled by user."))
                     }
                 }
 
 
         //activity.startActivityForResult(WebServiceLoginActivity.makeIntent(uri.toString(), serviceName ?: "Service", activity), activityRequestCode)
     }
-
-    fun signOut(credential: Credential, resultHandler: (Boolean) -> Unit) {
-        RevokeTask(resultHandler).execute(credential)
-    }
-
-    /*
-    fun handleLoginActivityResult(data: Intent) {
-        val code = data.getStringExtra(AuthConstants.PARAM_CODE)
-        TokenExchangeTask {
-            credential ->
-            if (credential != null) {
-                resultHandler?.onSuccess(credential)
-            } else {
-                resultHandler?.onFailed("Token exchanged failed.")
-            }
-        }.execute(code)
-    }*/
 
     private fun refreshToken(credential: Credential): Credential? {
         val uri = HttpUrl.parse(config.tokenRequestUrl)!!
@@ -140,7 +121,7 @@ class OAuth2Client(val context: Context, val config: OAuth2Config) {
                         json.getString(AuthConstants.PARAM_REFRESH_TOKEN),
                         json.getInt(AuthConstants.PARAM_EXPIRES_IN))
             } else return null
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
             return null
         }
@@ -164,46 +145,72 @@ class OAuth2Client(val context: Context, val config: OAuth2Config) {
     }
 
     fun <T> getRequest(credential: Credential, converter: OAuth2RequestConverter<T>, credentialRefreshedListener: OAuth2CredentialRefreshedListener?, vararg requestUrls: String): Single<Nullable<T>> {
-        return Single.defer {
+        return ReactiveNetwork.checkInternetConnectivity().flatMapCompletable { connected ->
+            if (connected) Completable.complete() else Completable.error(NetworkNotConnectedException())
+        }.andThen(Single.defer {
             val result = requestAwait(credential, converter, credentialRefreshedListener, *requestUrls)
             return@defer Single.just(Nullable(result))
-        }.subscribeOn(Schedulers.io())
+        }.subscribeOn(Schedulers.io()))
+    }
+
+
+    fun signOut(credential: Credential): Completable {
+        return ReactiveNetwork.checkInternetConnectivity().flatMapCompletable { connected ->
+            if (connected) {
+                Completable.defer {
+                    val requestBody = FormBody.Builder()
+                            .add("token", credential.accessToken)
+                            .build()
+
+                    val request = makeRequestBuilderWithAuthHeader(HttpUrl.parse(config.revokeUrl)!!)
+                            .post(requestBody)
+                            .build()
+                    try {
+                        val response = OkHttpClient().newCall(request).execute()
+                        if (response.code() == 200) {
+                            return@defer Completable.complete()
+                        } else {
+                            println("result code is not 200. sign out failed.")
+                            println(response.message())
+                            return@defer Completable.error(IllegalStateException(response.message()))
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        return@defer Completable.error(e)
+                    }
+                }.subscribeOn(Schedulers.io())
+            } else {
+                Completable.error(NetworkNotConnectedException())
+            }
+        }
     }
 
     private fun <T> requestAwait(credential: Credential, converter: OAuth2RequestConverter<T>, credentialRefreshedListener: OAuth2CredentialRefreshedListener?, vararg urls: String): T? {
-        if (NetworkHelper.isConnectedToInternet(context)) {
-            try {
+        val result = ArrayList<String>()
+        for (url in urls) {
+            println("fetching ${url}")
+            var response = requestAwait(credential, url)
 
-                val result = ArrayList<String>()
-                for (url in urls) {
-                    println("fetching ${url}")
-                    var response = requestAwait(credential, url)
+            println("fetching finished")
+            if (response.code() == 401) {
 
-                    println("fetching finished")
-                    if (response.code() == 401) {
+                //token expired
+                println("token expired. try refreshing..")
 
-                        //token expired
-                        println("token expired. try refreshing..")
+                val newCredential = refreshToken(credential)
 
-                        val newCredential = refreshToken(credential)
-
-                        if (newCredential != null) {
-                            println("token was refreshed successfully. Made new credential.")
-                            credentialRefreshedListener?.onCredentialRefreshed(newCredential)
-                            response = requestAwait(newCredential, url)
-                        } else {
-                            println("new credential is null. token refresh failed.")
-                            continue
-                        }
-                    }
-                    result.add(response.body()!!.string())
+                if (newCredential != null) {
+                    println("token was refreshed successfully. Made new credential.")
+                    credentialRefreshedListener?.onCredentialRefreshed(newCredential)
+                    response = requestAwait(newCredential, url)
+                } else {
+                    println("new credential is null. token refresh failed.")
+                    continue
                 }
-                return converter.process(result.toTypedArray())
-            } catch(e: Exception) {
-                e.printStackTrace()
-                return null
             }
-        } else return null
+            result.add(response.body()!!.string())
+        }
+        return converter.process(result.toTypedArray())
     }
 
     private fun requestAwait(credential: Credential, requestUrl: String): Response {
@@ -213,47 +220,12 @@ class OAuth2Client(val context: Context, val config: OAuth2Config) {
         return OkHttpClient().newCall(request).execute()
     }
 
-    inner class RevokeTask(val handler: (Boolean) -> Unit) : AsyncTask<Credential, Void?, Boolean>() {
-        override fun onPostExecute(result: Boolean) {
-            super.onPostExecute(result)
-            handler.invoke(result)
-        }
-
-        override fun doInBackground(vararg credentials: Credential): Boolean {
-            val requestBody = FormBody.Builder()
-                    .add("token", credentials[0].accessToken)
-                    .build()
-
-            val request = makeRequestBuilderWithAuthHeader(HttpUrl.parse(config.revokeUrl)!!)
-                    .post(requestBody)
-                    .build()
-
-            if (NetworkHelper.isConnectedToInternet(context)) {
-                try {
-                    val response = OkHttpClient().newCall(request).execute()
-                    if (response.code() == 200) {
-                        return true
-                    } else {
-                        println("result code is not 200. sign out failed.")
-                        println(response.message())
-                        return false
-                    }
-                } catch(e: Exception) {
-                    e.printStackTrace()
-                    return false
-                }
-            } else {
-                println("internet is not connected. Sign out was failed.")
-                return false
-            }
-
-        }
-
-
-    }
-
-    private fun exchangeToken(requestCode: String): Observable<Credential> {
-        return Observable.defer {
+    private fun exchangeToken(requestCode: String): Single<Credential> {
+        return ReactiveNetwork.checkInternetConnectivity().flatMapCompletable { connected ->
+            if (connected) {
+                Completable.complete()
+            } else Completable.error(NetworkNotConnectedException())
+        }.andThen(Single.defer {
             val uri = HttpUrl.parse(config.tokenRequestUrl)!!
 
             val requestBody = FormBody.Builder()
@@ -268,73 +240,25 @@ class OAuth2Client(val context: Context, val config: OAuth2Config) {
                     .post(requestBody)
                     .build()
 
-            if (NetworkHelper.isConnectedToInternet(context)) {
-                try {
-                    val response = OkHttpClient().newCall(request).execute()
-                    val json = JSONObject(response.body()!!.string())
-                    println(json)
-                    if (json.has(AuthConstants.PARAM_ACCESS_TOKEN)) {
-                        println("successfully exchanged code to credential.")
-                        val accessToken = json.getString(AuthConstants.PARAM_ACCESS_TOKEN)
-                        val refreshToken = if (json.has(AuthConstants.PARAM_REFRESH_TOKEN)) {
-                            json.getString(AuthConstants.PARAM_REFRESH_TOKEN)
-                        } else ""
-                        val expiresIn = if (json.has(AuthConstants.PARAM_EXPIRES_IN)) {
-                            json.getInt(AuthConstants.PARAM_EXPIRES_IN)
-                        } else Int.MAX_VALUE
-                        return@defer Observable.just(Credential(accessToken, refreshToken, expiresIn))
-                    } else Observable.error<Credential>(IllegalArgumentException("Access token was not received."))
-                } catch(e: Exception) {
-                    Observable.error<Credential>(e)
-                }
-            } else Observable.error<Credential>(NetworkErrorException("No internet connection"))
-        }.subscribeOn(Schedulers.io())
+            try {
+                val response = OkHttpClient().newCall(request).execute()
+                val json = JSONObject(response.body()!!.string())
+                println(json)
+                if (json.has(AuthConstants.PARAM_ACCESS_TOKEN)) {
+                    println("successfully exchanged code to credential.")
+                    val accessToken = json.getString(AuthConstants.PARAM_ACCESS_TOKEN)
+                    val refreshToken = if (json.has(AuthConstants.PARAM_REFRESH_TOKEN)) {
+                        json.getString(AuthConstants.PARAM_REFRESH_TOKEN)
+                    } else ""
+                    val expiresIn = if (json.has(AuthConstants.PARAM_EXPIRES_IN)) {
+                        json.getInt(AuthConstants.PARAM_EXPIRES_IN)
+                    } else Int.MAX_VALUE
+                    return@defer Single.just(Credential(accessToken, refreshToken, expiresIn))
+                } else Single.error<Credential>(IllegalArgumentException("Access token was not received."))
+            } catch (e: Exception) {
+                Single.error<Credential>(e)
+            }
+        }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-    }
-
-    inner class TokenExchangeTask(val handler: (Credential?) -> Unit) : AsyncTask<String, Void?, Credential?>() {
-        override fun onPostExecute(result: Credential?) {
-            super.onPostExecute(result)
-            handler.invoke(result)
-        }
-
-        override fun doInBackground(vararg p0: String): Credential? {
-            val uri = HttpUrl.parse(config.tokenRequestUrl)!!
-
-            val requestBody = FormBody.Builder()
-                    .add(AuthConstants.PARAM_CODE, p0[0])
-                    .add(AuthConstants.PARAM_CLIENT_ID, config.clientId)
-                    .add(AuthConstants.PARAM_GRANT_TYPE, "authorization_code")
-                    .add(AuthConstants.PARAM_REDIRECT_URI, config.redirectUri)
-                    // .add(AuthConstants.PARAM_EXPIRES_IN, "2592000" ) //use long period when you sure that there is no error in the token process.
-                    .build()
-
-            val request = makeRequestBuilderWithAuthHeader(uri)
-                    .post(requestBody)
-                    .build()
-
-            if (NetworkHelper.isConnectedToInternet(context)) {
-                try {
-                    val response = OkHttpClient().newCall(request).execute()
-                    val json = JSONObject(response.body()!!.string())
-                    println(json)
-                    if (json.has(AuthConstants.PARAM_ACCESS_TOKEN)) {
-                        println("successfully exchanged code to credential.")
-                        val accessToken = json.getString(AuthConstants.PARAM_ACCESS_TOKEN)
-                        val refreshToken = if (json.has(AuthConstants.PARAM_REFRESH_TOKEN)) {
-                            json.getString(AuthConstants.PARAM_REFRESH_TOKEN)
-                        } else ""
-                        val expiresIn = if (json.has(AuthConstants.PARAM_EXPIRES_IN)) {
-                            json.getInt(AuthConstants.PARAM_EXPIRES_IN)
-                        } else Int.MAX_VALUE
-                        return Credential(accessToken, refreshToken, expiresIn)
-                    } else return null
-                } catch(e: Exception) {
-                    return null
-                }
-            } else return null
-
-        }
-
     }
 }

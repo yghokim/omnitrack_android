@@ -13,7 +13,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
+import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
+import io.reactivex.Completable
 import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
@@ -24,7 +27,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemD
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.MeasureFactoryAdapter
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
-import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import org.jetbrains.anko.support.v4.act
 import javax.inject.Inject
 
@@ -158,31 +160,43 @@ class ServiceListFragment : OTFragment() {
                     println("service state: ${service.state}")
                     when (service.state) {
                         OTExternalService.ServiceState.ACTIVATED -> {
-                            service.deactivate()
-                            eventLogger.get().logServiceActivationChangeEvent(service.identifier, false)
+                            creationSubscriptions.add(
+                                    service.deactivate().subscribe({
+                                        eventLogger.get().logServiceActivationChangeEvent(service.identifier, false)
+                                    }, { err ->
+                                        err.printStackTrace()
+                                        Toast.makeText(act, "Deactivation was failed due to an error. Please Try again later.", Toast.LENGTH_LONG).show()
+                                    })
+                            )
                         }
                         OTExternalService.ServiceState.ACTIVATING -> {
 
                         }
                         OTExternalService.ServiceState.DEACTIVATED -> {
-                            if (service.isInternetRequiredForActivation && !NetworkHelper.isConnectedToInternet(view.context)) {
-                                internetRequiredAlertBuilder.show()
-                            } else {
-                                /*
-                                if (!service.permissionGranted) {
-                                    pendedActivations.setValueAt(adapterPosition, this@ViewHolder)
-                                    service.grantPermissions(this@ServiceListFragment, adapterPosition)
-                                } else {
-                                */
-                                creationSubscriptions.add(
-                                        service.startActivationActivityAsync(act).subscribe({
-                                            success ->
-                                            if (success)
-                                                eventLogger.get().logServiceActivationChangeEvent(service.identifier, true)
-                                        }, { })
-                                )
-                                //}
-                            }
+                            creationSubscriptions.add(
+                                    Completable.defer {
+                                        if (!service.isInternetRequiredForActivation) {
+                                            Completable.complete()
+                                        } else {
+                                            ReactiveNetwork.checkInternetConnectivity()
+                                                    .flatMapCompletable { connected ->
+                                                        if (connected) {
+                                                            Completable.complete()
+                                                        } else {
+                                                            Completable.error(IllegalStateException("No network connection"))
+                                                        }
+                                                    }
+                                        }
+                                    }.andThen(service.startActivationActivityAsync(act)).subscribe({ success ->
+                                        if (success) {
+                                            eventLogger.get().logServiceActivationChangeEvent(service.identifier, true)
+                                        }
+                                    }, { ex ->
+                                        if (ex is IllegalStateException && ex.message?.contains("network", true) == true) {
+                                            internetRequiredAlertBuilder.show()
+                                        }
+                                    })
+                            )
                         }
                     }
                 }

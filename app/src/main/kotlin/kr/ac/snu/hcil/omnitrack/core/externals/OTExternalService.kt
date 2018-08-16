@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.support.v4.app.Fragment
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
@@ -191,13 +192,16 @@ abstract class OTExternalService(val context: Context, val identifier: String, v
     }
 
 
-    fun deactivate() {
-        externalServiceManager.get().setIsActivatedFlag(this, false)
-        state = ServiceState.DEACTIVATED
-        onDeactivate()
+    fun deactivate(): Completable {
+        return Completable.defer {
+            externalServiceManager.get().setIsActivatedFlag(this, false)
+            state = ServiceState.DEACTIVATED
+            onDeactivate()
+        }
+
     }
 
-    abstract fun onDeactivate()
+    abstract fun onDeactivate(): Completable
 
     abstract val thumbResourceId: Int
 

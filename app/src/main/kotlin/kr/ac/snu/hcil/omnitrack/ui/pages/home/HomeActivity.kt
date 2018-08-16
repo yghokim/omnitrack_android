@@ -15,6 +15,7 @@ import android.support.v4.widget.DrawerLayout
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import butterknife.bindView
 import kotlinx.android.synthetic.main.layout_home_sidebar.*
 import kr.ac.snu.hcil.omnitrack.BuildConfig
@@ -25,7 +26,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceListFragment
-import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
+import kr.ac.snu.hcil.omnitrack.utils.net.NetworkNotConnectedException
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 import javax.inject.Inject
 
@@ -153,12 +154,18 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
                     if(intent.getBooleanExtra(INTENT_EXTRA_INITIAL_LOGIN, false))
                     {
-                        if (NetworkHelper.isConnectedToInternet(this)) {
-                            viewModel.startPullSync()
-                            if (BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
-                                viewModel.syncResearch()
-                            }
-                        }
+                        creationSubscriptions.add(
+                                serverConnectionChecker.get().subscribe({
+                                    viewModel.startPullSync()
+                                    if (BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
+                                        viewModel.syncResearch()
+                                    }
+                                }, { ex ->
+                                    if (ex is NetworkNotConnectedException) {
+                                        Toast.makeText(this, "Server does not response.", Toast.LENGTH_SHORT).show()
+                                    }
+                                })
+                        )
                     }
                 }
         )

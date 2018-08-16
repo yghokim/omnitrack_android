@@ -17,7 +17,9 @@ import com.github.javiersantos.appupdater.enums.Display
 import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
 import dagger.Lazy
+import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -28,18 +30,19 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.di.configured.ServerResponsive
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
 import kr.ac.snu.hcil.omnitrack.core.system.OTAppVersionCheckManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
-import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import org.jetbrains.anko.defaultSharedPreferences
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
+import javax.inject.Provider
 
 /**
  * Created by younghokim on 2016. 11. 15..
@@ -58,6 +61,9 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     @Inject
     protected lateinit var eventLogger: Lazy<IEventLogger>
+
+    @field:[Inject ServerResponsive]
+    protected lateinit var serverConnectionChecker: Provider<Completable>
 
     protected open val isSessionLoggingEnabled = true
 
@@ -104,29 +110,6 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         get() = signedInUserSubject
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-
-    private fun refreshCredentialsWithFallbackSignIn() {
-        if (authManager.isUserSignedIn() && NetworkHelper.isConnectedToInternet(this)) {
-            //println("${LOG_TAG} OMNITRACK Google is signed in.")
-            if (NetworkHelper.isConnectedToInternet(this)) {
-                this.creationSubscriptions.add(
-                        authManager.refreshCredentialWithFallbackSignIn(this)
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe({ ok ->
-                                    if (ok) {
-                                        performSignInProcessCompletelyFinished()
-                                    } else {
-                                        goSignIn()
-                                    }
-                                }, { e ->
-                                    goSignIn()
-                                })
-                )
-            }
-        } else {
-            goSignInUnlessUserCached()
-        }
-    }
 
     protected open fun onInject(app: OTAndroidApp) {
         app.currentConfiguredContext.configuredAppComponent.inject(this)
@@ -187,10 +170,32 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     protected open fun processAuthorization() {
         if (checkRefreshingCredential) {
-            val thread = Thread(Runnable {
-                refreshCredentialsWithFallbackSignIn()
-            })
-            thread.start()
+            creationSubscriptions.add(
+                    serverConnectionChecker.get().andThen(
+                            Single.defer {
+                                if (authManager.isUserSignedIn()) {
+                                    authManager.refreshCredentialWithFallbackSignIn(this)
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .doOnSuccess { ok ->
+                                                if (ok) {
+                                                    performSignInProcessCompletelyFinished()
+                                                } else goSignIn()
+                                            }.doOnError { e ->
+                                                goSignIn()
+                                            }.map { true }
+                                } else {
+                                    Single.just(false)
+                                }
+                            }
+                    ).subscribe({ handled ->
+                        if (!handled) {
+                            goSignInUnlessUserCached()
+                        }
+                    }, { ex ->
+                        ex.printStackTrace()
+                        goSignInUnlessUserCached()
+                    })
+            )
         } else {
             goSignInUnlessUserCached()
         }

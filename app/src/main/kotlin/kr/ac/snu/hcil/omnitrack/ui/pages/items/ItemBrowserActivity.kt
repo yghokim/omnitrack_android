@@ -800,7 +800,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                         if (includeFile) {
                             val currentNetworkConnectionInfo = NetworkHelper.getCurrentNetworkConnectionInfo(act)
-                            if (currentNetworkConnectionInfo.mobileConnected && !currentNetworkConnectionInfo.wifiConnected) {
+                            if (currentNetworkConnectionInfo.internetConnected && !currentNetworkConnectionInfo.isUnMetered) {
                                 DialogHelper.makeYesNoDialogBuilder(act, "OmniTrack", getString(R.string.msg_export_warning_mobile_network), R.string.msg_export, onYes = {
                                     this@SettingsDialogFragment.startActivityForResult(intent, ItemBrowserActivity.SettingsDialogFragment.REQUEST_CODE_FILE_LOCATION_PICK)
                                 })

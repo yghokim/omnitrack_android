@@ -296,6 +296,7 @@ fun TimePicker.getHourOfDayCompat(): Int {
     if (android.os.Build.VERSION.SDK_INT >= 23) {
         return this.hour
     } else {
+        @Suppress("DEPRECATION")
         return this.currentHour
     }
 }
@@ -304,6 +305,7 @@ fun TimePicker.getMinuteCompat(): Int {
     if (android.os.Build.VERSION.SDK_INT >= 23) {
         return this.minute
     } else {
+        @Suppress("DEPRECATION")
         return this.currentMinute
     }
 }
@@ -312,6 +314,7 @@ fun TimePicker.setHourOfDayCompat(hourOfDay: Int) {
     if (android.os.Build.VERSION.SDK_INT >= 23) {
         this.hour = hourOfDay
     } else {
+        @Suppress("DEPRECATION")
         this.currentHour = hourOfDay
     }
 }
@@ -320,6 +323,7 @@ fun TimePicker.setMinuteCompat(minute: Int) {
     if (android.os.Build.VERSION.SDK_INT >= 23) {
         this.minute = minute
     } else {
+        @Suppress("DEPRECATION")
         this.currentMinute = minute
     }
 }
@@ -332,7 +336,10 @@ fun applyTint(drawable: Drawable, color: Int): Drawable {
 
 val PowerManager.isInteractiveCompat: Boolean get() {
 
-    if (Build.VERSION.SDK_INT <= 19) return this.isScreenOn else {
+    if (Build.VERSION.SDK_INT <= 19) {
+        @Suppress("DEPRECATION")
+        return this.isScreenOn
+    } else {
         return this.isInteractive
     }
 }

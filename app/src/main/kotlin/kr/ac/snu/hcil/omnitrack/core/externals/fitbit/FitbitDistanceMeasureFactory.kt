@@ -73,7 +73,6 @@ class FitbitDistanceMeasureFactory(context: Context, parentService: FitbitServic
 
                 } else return null
             }
-
         }
 
         val intraDayConverter = object : FitbitApi.AIntraDayConverter<Float, Float>("activities-distance-intraday") {

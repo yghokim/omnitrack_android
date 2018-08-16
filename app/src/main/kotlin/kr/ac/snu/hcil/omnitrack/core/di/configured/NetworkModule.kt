@@ -1,12 +1,18 @@
 package kr.ac.snu.hcil.omnitrack.core.di.configured
 
 import android.content.Context
+import android.net.Uri
 import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.firebase.jobdispatcher.Job
+import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
+import com.github.pwittchen.reactivenetwork.library.rx2.internet.observing.InternetObservingSettings
+import com.github.pwittchen.reactivenetwork.library.rx2.internet.observing.strategy.SocketInternetObservingStrategy
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.internal.Factory
+import io.reactivex.Completable
+import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.annotations.RealmModule
@@ -20,6 +26,7 @@ import kr.ac.snu.hcil.omnitrack.core.di.global.DeviceId
 import kr.ac.snu.hcil.omnitrack.core.di.global.Sha1FingerPrint
 import kr.ac.snu.hcil.omnitrack.core.net.*
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
+import kr.ac.snu.hcil.omnitrack.utils.net.NetworkNotConnectedException
 import okhttp3.Cache
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
@@ -180,6 +187,36 @@ class NetworkModule {
             }
         }
     }
+
+    @Provides
+    @Configured
+    @ServerResponsive
+    fun provideServerConnection(configuration: OTConfiguration): Completable {
+        val serverUri = Uri.parse(configuration.synchronizationServerUrl)
+
+        return ReactiveNetwork.checkInternetConnectivity(
+                InternetObservingSettings
+                        .host(serverUri.host)
+                        .port(serverUri.port)
+                        .strategy(SocketInternetObservingStrategy())
+                        .timeout(2000)
+                        .build())
+                .subscribeOn(Schedulers.io())
+                .flatMapCompletable { connected ->
+                    if (connected) {
+                        Completable.complete()
+                    } else Completable.error(NetworkNotConnectedException())
+                }
+        /*
+        return Completable.defer{
+            val reachable = InetAddress.getByName(serverUri.host).isReachable(2000)
+            if(reachable){
+                Completable.complete()
+            } else Completable.error(NetworkNotConnectedException())
+        }.subscribeOn(Schedulers.io())*/
+    }
+
+
 }
 
 enum class MediaTypeValue {
@@ -197,6 +234,12 @@ enum class MediaTypeValue {
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class OkHttpMediaType(val type: MediaTypeValue)
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class ServerResponsive
+
+
 
 @RealmModule(classes = arrayOf(UploadTaskInfo::class, LocalMediaCacheEntry::class))
 class UploadTaskQueueRealmModule

@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
 import android.app.Activity
 import android.content.Context
+import io.reactivex.Completable
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
@@ -38,8 +39,11 @@ class MisfitService(context: Context) : OTExternalService(context, "MisfitServic
         } else return null
     }
 
-    override fun onDeactivate() {
-        externalServiceManager.get().preferences.edit().remove(PREFERENCE_ACCESS_TOKEN).apply()
+    override fun onDeactivate(): Completable {
+        return Completable.defer {
+            externalServiceManager.get().preferences.edit().remove(PREFERENCE_ACCESS_TOKEN).apply()
+            return@defer Completable.complete()
+        }
     }
 
     override val thumbResourceId: Int = R.drawable.service_thumb_misfit

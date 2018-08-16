@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 import android.accounts.NetworkErrorException
 import android.app.Activity
 import android.content.Context
+import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -13,7 +14,6 @@ import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
-import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import okhttp3.FormBody
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
@@ -123,17 +123,21 @@ class MisfitApi(val context: Context) {
                     .get()
                     .build()
 
-            if (NetworkHelper.isConnectedToInternet(context)) {
-                try {
-                    val response = OkHttpClient().newCall(request).execute()
-                    val responseBody = response.body()!!.string()
-                    println(responseBody)
-                    return@defer Single.just(JSONObject(responseBody))
-                } catch (e: Exception) {
-                    OTApp.logger.writeSystemLog("Misfit API Exception: ${e.message}", "MisfitAPI")
-                    return@defer Single.error<JSONObject>(e)
+            return@defer ReactiveNetwork.checkInternetConnectivity().flatMap { connected ->
+                if (connected) {
+                    try {
+                        val response = OkHttpClient().newCall(request).execute()
+                        val responseBody = response.body()!!.string()
+                        println(responseBody)
+                        return@flatMap Single.just(JSONObject(responseBody))
+                    } catch (e: Exception) {
+                        OTApp.logger.writeSystemLog("Misfit API Exception: ${e.message}", "MisfitAPI")
+                        return@flatMap Single.error<JSONObject>(e)
+                    }
+                } else {
+                    return@flatMap Single.error<JSONObject>(NetworkErrorException("Network is not on."))
                 }
-            } else return@defer Single.error<JSONObject>(NetworkErrorException("Network is not on."))
+            }
         }
     }
 

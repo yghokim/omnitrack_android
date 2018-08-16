@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.content.Context
+import io.reactivex.Completable
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.dependency.OAuth2LoginDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
@@ -35,19 +36,19 @@ abstract class OAuth2BasedExternalService(context: Context, identifier: String, 
 
     abstract fun makeNewAuth2Client(): OAuth2Client
 
-    override fun onDeactivate() {
-        val cd = credential
-        if (cd != null) {
-            authClient.signOut(cd) {
-                result ->
-                if (result) {
-                    println("${identifier} OAuth2 signed out.")
-                } else {
+    override fun onDeactivate(): Completable {
+        return Completable.defer {
+            val cd = credential
+            if (cd != null) {
+                return@defer authClient.signOut(cd).doOnError {
                     println("${identifier} OAuth2 sign out failed.")
+                }.doOnComplete {
+                    println("${identifier} OAuth2 signed out.")
+                    credential = null
                 }
-            }
-            credential = null
+            } else return@defer Completable.complete()
         }
+
     }
 
     override fun onCredentialRefreshed(newCredential: OAuth2Client.Credential) {

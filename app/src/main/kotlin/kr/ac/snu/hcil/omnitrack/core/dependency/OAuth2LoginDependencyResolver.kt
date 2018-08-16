@@ -25,12 +25,11 @@ class OAuth2LoginDependencyResolver(val authClient: OAuth2Client, val identifier
 
     override fun tryResolve(activity: Activity): Single<Boolean> {
         return authClient.authorize(activity, serviceName)
-                .doOnNext { credential ->
+                .doOnSuccess { credential ->
                     credential.store(containerPreferences, identifier)
                 }
                 .map { credential ->
                     true
                 }.onErrorReturn { false }
-                .firstOrError()
     }
 }

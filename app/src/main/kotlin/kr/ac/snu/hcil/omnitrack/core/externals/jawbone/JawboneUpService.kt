@@ -10,6 +10,7 @@ import com.jawbone.upplatformsdk.oauth.OauthWebViewActivity
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants.UP_PLATFORM_ACCESS_TOKEN
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants.UP_PLATFORM_REFRESH_TOKEN
+import io.reactivex.Completable
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
@@ -85,24 +86,28 @@ class JawboneUpService(context: Context) : OTExternalService(context, "JawboneUp
 
     internal var accessToken: String? = null
 
-    override fun onDeactivate() {
-        ApiManager.getRequestInterceptor().clearAccessToken()
-        ApiManager.getRestApiInterface().revokeUser(UpPlatformSdkConstants.API_VERSION_STRING, object : Callback<Any> {
-            override fun onFailure(call: Call<Any>?, t: Throwable?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+    override fun onDeactivate(): Completable {
+        return Completable.create {
+            ApiManager.getRequestInterceptor().clearAccessToken()
+            ApiManager.getRestApiInterface().revokeUser(UpPlatformSdkConstants.API_VERSION_STRING, object : Callback<Any> {
+                override fun onFailure(call: Call<Any>?, t: Throwable) {
+                    it.onError(t)
+                }
 
-            override fun onResponse(call: Call<Any>?, response: Response<Any>?) {
-                println("successfully disconnected from UP server.")
-            }
+                override fun onResponse(call: Call<Any>?, response: Response<Any>?) {
+                    println("successfully disconnected from UP server.")
+                    accessToken = null
+                    externalServiceManager.get().preferences.edit()
+                            .remove(UP_PLATFORM_ACCESS_TOKEN)
+                            .remove(UP_PLATFORM_REFRESH_TOKEN)
+                            .apply()
+                    it.onComplete()
+                }
 
-        })
-        accessToken = null
-        externalServiceManager.get().preferences.edit()
-                .remove(UP_PLATFORM_ACCESS_TOKEN)
-                .remove(UP_PLATFORM_REFRESH_TOKEN)
-                .apply()
+            })
+        }
     }
+
 
     class JawboneAuthDependencyResolver(val parentService: JawboneUpService) : OTSystemDependencyResolver() {
         override fun checkDependencySatisfied(context: Context, selfResolve: Boolean): Single<DependencyCheckResult> {
