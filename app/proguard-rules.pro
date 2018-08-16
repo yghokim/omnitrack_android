@@ -35,6 +35,9 @@
 # A resource is loaded with a relative path so the package of this class must be preserved.
 -keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
 
+# Log4j
+-dontwarn org.apache.log4j.**
+-dontnote org.apache.log4j.**
 
 -dontwarn org.apache.commons.math3.**
 -dontwarn java.beans.**

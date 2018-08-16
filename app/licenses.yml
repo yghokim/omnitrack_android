@@ -1,0 +1,443 @@
+- artifact: com.android.support:+:+
+  name: Android Support Libraries
+  copyrightHolder: The Android Open Source Project
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+
+- artifact: com.android.support.constraint:+:+
+  name: Android ConstraintLayout Solver
+  copyrightHolder: Google, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://tools.android.com
+
+- artifact: com.google.android.gms:+:+
+  name: play-services-flags
+  copyrightHolder: Google, Inc.
+  license: Android Software Development Kit License
+  licenseUrl: https://developer.android.com/studio/terms.html
+  skip: true
+
+- artifact: com.google.firebase:+:+
+  name: Google Firebase
+  copyrightHolder: Google, Inc.
+  license: Android Software Development Kit License
+  licenseUrl: https://developer.android.com/studio/terms.html
+  skip: true
+
+- artifact: com.firebase:firebase-jobdispatcher:+
+  name: Firebase JobDispatcher
+  copyrightHolder: Google, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+
+- artifact: android.arch.core:+:+
+  name: Android Architecture Components - Core
+  copyrightHolder: Google, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://developer.android.com/topic/libraries/architecture/index.html
+
+- artifact: android.arch.lifecycle:+:+
+  name: Android Architecture Components - Lifecycle
+  copyrightHolder: Google, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://developer.android.com/topic/libraries/architecture/index.html
+
+- artifact: android.arch.persistence:+:+
+  name: Android Architecture Components - Persistence
+  copyrightHolder: Google, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://developer.android.com/topic/libraries/architecture/index.html
+
+- artifact: android.arch.persistence.room:+:+
+  name: Android Architecture Components - Persistence - Room
+  copyrightHolder: Google, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://developer.android.com/topic/libraries/architecture/index.html
+
+- artifact: android.arch.work:+:+
+  name: Android Architecture Components - Work
+  copyrightHolder: Google, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://developer.android.com/topic/libraries/architecture/index.html
+
+- artifact: com.squareup.retrofit2:+:+
+  name: Retrofit
+  copyrightHolder: Square, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+
+- artifact: com.squareup.okhttp3:+:+
+  name: OkHttp3
+  copyrightHolder: Square, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+
+- artifact: io.realm:+:+
+  name: Realm Java
+  copyrightHolder: Realm
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+
+- artifact: io.reactivex.rxjava2:+:+
+  name: RxJava
+  copyrightHolder: RxJava Contributors
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/ReactiveX/RxJava
+
+
+- artifact: org.jetbrains.kotlin:+:+
+  name: org.jetbrains.kotlin
+  copyrightHolder: Jetbrains
+  license: The Apache License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://kotlinlang.org/
+
+- artifact: org.jetbrains.anko:+:+
+  name: anko
+  copyrightHolder: Jetbrains
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/license/LICENSE-2.0.txt
+  url: https://github.com/JetBrains/anko
+
+- artifact: org.jetbrains.kotlinx:+:+
+  name: kotlinx
+  copyrightHolder: Jetbrains
+  license: MIT
+  licenseUrl: http://opensource.org/licenses/MIT
+
+- artifact: com.squareup.okio:+:+
+  name: Okio
+  copyrightHolder: Square, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+
+- artifact: com.squareup.leakcanary:leakcanary-android-no-op:+
+  name: No op LeakCanary for Android
+  copyrightHolder: Square, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://github.com/square/leakcanary/
+
+- artifact: com.github.bumptech.glide:+:+
+  name: Glide
+  copyrightHolder: Google, Inc.
+  license: Simplified BSD License
+  licenseUrl: http://www.opensource.org/licenses/bsd-license
+  url: https://github.com/bumptech/glide
+
+- artifact: org.apache.commons:+:+
+  name: Apache Commons
+  copyrightHolder: Apache
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+
+- artifact: commons-logging:commons-logging:+
+  name: Apache Commons Logging
+  copyrightHolder: Apache
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://commons.apache.org/proper/commons-logging/
+
+- artifact: commons-beanutils:commons-beanutils:+
+  name: Apache Commons BeanUtils
+  copyrightHolder: Apache
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://commons.apache.org/proper/commons-beanutils/
+
+
+- artifact: commons-collections:commons-collections:+
+  name: Apache Commons Collections
+  copyrightHolder: Apache
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://commons.apache.org/collections/
+
+- artifact: log4j:log4j:+
+  name: Log4j
+  copyrightHolder: Apache
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://logging.apache.org/log4j/docs/
+
+- artifact: net.sourceforge.jexcelapi:jxl:+
+  name: jxl
+  copyrightHolder: JExcelApi
+  license: GNU Lesser General Public License
+  licenseUrl: http://www.opensource.org/licenses/lgpl-license.php
+  url: http://www.jexcelapi.org
+
+
+- artifact: com.github.mukeshsolanki:country-picker-android:+
+  name: country-picker-android
+  copyrightHolder: Mukesh Solanki
+  year: 2018
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+
+
+  ################################################
+
+- artifact: com.google.code.gson:gson:+
+  name: Gson
+  copyrightHolder: Google, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/license/LICENSE-2.0.txt
+
+- artifact: com.beloo.widget:ChipsLayoutManager:+
+  name: ChipsLayoutManager
+  copyrightHolder: Beloy Oleg, Ukraine.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/BelooS/ChipsLayoutManager
+
+
+- artifact: javax.inject:javax.inject:+
+  name: javax.inject
+  copyrightHolder: Javax
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://code.google.com/p/atinject/
+
+- artifact: us.feras.mdv:markdownview:+
+  name: markdownview
+  copyrightHolder: Feras Alnatsheh
+  year: 2011
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+
+- artifact: com.otaliastudios:cameraview:+
+  name: CameraView
+  copyrightHolder: WonderKiln, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/natario1/CameraView
+
+- artifact: com.patloew.rxlocation:rxlocation:+
+  name: rxlocation
+  copyrightHolder: Patrick Löwenstein
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+
+- artifact: com.jakewharton.threetenabp:threetenabp:+
+  name: ThreeTenAbp
+  copyrightHolder: Jake Wharton
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/JakeWharton/ThreeTenABP/
+
+- artifact: com.google.dagger:+:+
+  name: Dagger
+  copyrightHolder: Google, Inc.
+  license: Apache 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/google/dagger
+
+- artifact: org.reactivestreams:reactive-streams:+
+  name: reactive-streams
+  copyrightHolder: Reactive Streams
+  license: CC0
+  licenseUrl: http://creativecommons.org/publicdomain/zero/1.0/
+  url: http://www.reactive-streams.org/
+
+- artifact: com.github.VictorAlbertos:RxActivityResult:+
+  name: RxActivityResult
+  copyrightHolder: Victor Albertos
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/VictorAlbertos/RxActivityResult
+
+- artifact: me.zhanghai.android.materialprogressbar:library:+
+  name: MaterialProgressBar Library
+  copyrightHolder: Hai Zhang
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/DreaminginCodeZH/MaterialProgressBar
+
+- artifact: com.opencsv:opencsv:+
+  name: opencsv
+  copyrightHolder: OpenCSV
+  license: Apache 2
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://opencsv.sf.net
+
+- artifact: uk.co.samuelwall:material-tap-target-prompt:+
+  name: material-tap-target-prompt
+  copyrightHolder: Samuel Wall
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/sjwall/MaterialTapTargetPrompt
+
+- artifact: com.github.Epsiloni:android-target-tooltip:+
+  name: android-target-tooltip
+  copyrightHolder: Epsiloni
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+
+- artifact: org.apmem.tools:layouts:+
+  name: FlowLayouts
+  copyrightHolder: Artem Votincev (apmem.org)
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/ApmeM/android-flowlayout
+
+- artifact: org.jetbrains:annotations:+
+  name: IntelliJ IDEA Annotations
+  copyrightHolder: Jetbrains
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://www.jetbrains.org
+
+- artifact: uk.co.chrisjenx:calligraphy:+
+  name: Calligraphy
+  copyrightHolder: Christopher Jenkins
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/chrisjenx/Calligraphy
+
+- artifact: org.threeten:threetenbp:+
+  name: ThreeTen backport
+  copyrightHolder: Jake Wharton
+  license: BSD 3-clause
+  licenseUrl: https://raw.githubusercontent.com/ThreeTen/threetenbp/master/LICENSE.txt
+  url: https://www.threeten.org/threetenbp
+
+- artifact: com.google.android:flexbox:+
+  name: flexbox-layout
+  copyrightHolder: Google, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/google/flexbox-layout
+
+
+- artifact: com.wdullaer:materialdatetimepicker:+
+  name: MaterialDateTimePicker
+  copyrightHolder: Wouter Dullaert
+  license: Apache v2 License
+  licenseUrl: https://github.com/wdullaer/MaterialDateTimePicker/blob/master/LICENSE
+  url: https://github.com/wdullaer/MaterialDateTimePicker
+
+- artifact: com.tbruyelle.rxpermissions2:rxpermissions:+
+  name: RxPermissions
+  copyrightHolder: Thomas Bruyelle
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/tbruyelle/RxPermissions
+
+- artifact: org.atteo:evo-inflector:+
+  name: Evo Inflector
+  copyrightHolder: Atteo
+  license: Apache License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://atteo.org/static/evo-inflector
+
+- artifact: com.google.code.findbugs:jsr305:+
+  name: FindBugs-jsr305
+  copyrightHolder: FindBugs
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://findbugs.sourceforge.net/
+
+- artifact: com.airbnb.android:lottie:+
+  name: Lottie
+  copyrightHolder: AirBnB
+  license: Apache License 2.0
+  licenseUrl: https://github.com/airbnb/lottie-android/blob/master/LICENSE
+  url: https://github.com/airbnb/lottie-android
+
+- artifact: com.github.salomonbrys.kotson:kotson:+
+  name: Kotson
+  copyrightHolder: Salomon BRYS
+  license: MIT
+  licenseUrl: http://opensource.org/licenses/MIT
+  url: https://github.com/SalomonBrys/Kotson
+
+- artifact: com.github.markushi:android-ui:+
+  name: Android UI Library
+  copyrightHolder: Markushi
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/markushi/android-ui
+
+- artifact: com.jaredrummler:material-spinner:+
+  name: Material Spinner
+  copyrightHolder: Jared Rummler
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/jaredrummler/Material-Spinner
+
+- artifact: com.github.ybq:Android-SpinKit:+
+  name: ybq/Android-SpinKit
+  copyrightHolder: ybq
+  license: MIT
+  licenseUrl: http://opensource.org/licenses/MIT
+  url: http://ybq.github.io/Android-SpinKit
+
+- artifact: com.shawnlin:number-picker:+
+  name: number-picker
+  copyrightHolder: ShawnLin013
+  year: 2018
+  license: MIT
+  licenseUrl: http://opensource.org/licenses/MIT
+
+- artifact: javax.annotation:jsr250-api:+
+  name: JSR-250 Common Annotations for the JavaTM Platform
+  copyrightHolder: Javax
+  license: COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+  licenseUrl: https://glassfish.dev.java.net/public/CDDLv1.0.html
+  url: http://jcp.org/aboutJava/communityprocess/final/jsr250/index.html
+
+- artifact: com.github.pwittchen:reactivenetwork-rx2:+
+  name: reactivenetwork
+  copyrightHolder: Piotr Wittchen
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/pwittchen/ReactiveNetwork
+
+- artifact: org.markdownj:markdownj-core:+
+  name: MarkdownJ
+  copyrightHolder: Alex Coles
+  license: BSD 3-Clause "New" or "Revised" License
+  licenseUrl: https://github.com/myabc/markdownj/blob/master/LICENSE
+
+- artifact: org.nield:kotlin-statistics:+
+  name: kotlin-statistics
+  copyrightHolder: Thomas Nield
+  license: The Apache License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/thomasnield/kotlin-statistics
+
+- artifact: com.getkeepsafe.relinker:relinker:+
+  name: ReLinker
+  copyrightHolder: Keepsafe Software Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/KeepSafe/ReLinker
+
+- artifact: jp.wasabeef:recyclerview-animators:+
+  name: recyclerview-animators
+  copyrightHolder: Wasabeef
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/wasabeef/recyclerview-animators
+
+- artifact: com.larswerkman:lobsterpicker:+
+  name: Lobsterpicker
+  copyrightHolder: Marie Schweiz & Lars Werkman
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/LarsWerkman/Lobsterpicker
+
+- artifact: de.hdodenhof:circleimageview:+
+  name: CircleImageView
+  copyrightHolder: Henning Dodenhof
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/hdodenhof/CircleImageView

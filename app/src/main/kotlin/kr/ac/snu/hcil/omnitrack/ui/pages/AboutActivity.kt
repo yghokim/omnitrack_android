@@ -8,10 +8,11 @@ import com.danielstone.materialaboutlibrary.items.MaterialAboutImageItem
 import com.danielstone.materialaboutlibrary.items.MaterialAboutTitleItem
 import com.danielstone.materialaboutlibrary.model.MaterialAboutCard
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.VersionCheckDialogFragment
+import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.WebviewScreenDialogFragment
+import kr.ac.snu.hcil.omnitrack.utils.ANDROID_ASSET_PATH
 
 /**
  * Created by younghokim on 2017. 1. 25..
@@ -57,11 +58,9 @@ class AboutActivity : MaterialAboutActivity() {
                                         .text(R.string.msg_open_source_license)
                                         .setOnClickListener {
 
-                                            startActivity(Intent(this, OssLicensesMenuActivity::class.java))
-                                            /*
-                                            val licenseScreenFragment = MarkdownScreenDialogFragment.makeInstance(resources.getString(R.string.msg_open_source_license), "${ANDROID_ASSET_PATH}/licenses/osl.md", "${ANDROID_ASSET_PATH}/licenses/style.css")
+                                            val licenseScreenFragment = WebviewScreenDialogFragment.makeInstance(resources.getString(R.string.msg_open_source_license), "${ANDROID_ASSET_PATH}/licenses.html"/*, "${ANDROID_ASSET_PATH}/licenses/style.css"*/)
 
-                                            licenseScreenFragment.show(fragmentManager, "Open Source License Fragment")*/
+                                            licenseScreenFragment.show(supportFragmentManager, "Open Source License Fragment")
                                         }
                                         .build()
                         )

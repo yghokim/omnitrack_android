@@ -8,7 +8,6 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StyleRes;
 import android.support.annotation.UiThread;
-import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.text.method.LinkMovementMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -17,10 +16,8 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -35,8 +32,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import me.zhanghai.android.materialprogressbar.HorizontalProgressDrawable;
+import me.zhanghai.android.materialprogressbar.IndeterminateCircularProgressDrawable;
 import me.zhanghai.android.materialprogressbar.IndeterminateHorizontalProgressDrawable;
-import me.zhanghai.android.materialprogressbar.IndeterminateProgressDrawable;
 
 /**
  * Used by MaterialDialog while initializing the dialog. Offloads some of the code to make the main class
@@ -119,17 +116,17 @@ class DialogInit {
             builder.itemColor = DialogUtils.resolveColor(builder.context, R.attr.md_item_color, builder.contentColor);
 
         // Retrieve references to views
-        dialog.title = (TextView) dialog.view.findViewById(R.id.md_title);
-        dialog.icon = (ImageView) dialog.view.findViewById(R.id.md_icon);
+        dialog.title = dialog.view.findViewById(R.id.md_title);
+        dialog.icon = dialog.view.findViewById(R.id.md_icon);
         dialog.titleFrame = dialog.view.findViewById(R.id.md_titleFrame);
-        dialog.content = (TextView) dialog.view.findViewById(R.id.md_content);
-        dialog.recyclerView = (RecyclerView) dialog.view.findViewById(R.id.md_contentRecyclerView);
-        dialog.checkBoxPrompt = (CheckBox) dialog.view.findViewById(R.id.md_promptCheckbox);
+        dialog.content = dialog.view.findViewById(R.id.md_content);
+        dialog.recyclerView = dialog.view.findViewById(R.id.md_contentRecyclerView);
+        dialog.checkBoxPrompt = dialog.view.findViewById(R.id.md_promptCheckbox);
 
         // Button views initially used by checkIfStackingNeeded()
-        dialog.positiveButton = (MDButton) dialog.view.findViewById(R.id.md_buttonDefaultPositive);
-        dialog.neutralButton = (MDButton) dialog.view.findViewById(R.id.md_buttonDefaultNeutral);
-        dialog.negativeButton = (MDButton) dialog.view.findViewById(R.id.md_buttonDefaultNegative);
+        dialog.positiveButton = dialog.view.findViewById(R.id.md_buttonDefaultPositive);
+        dialog.neutralButton = dialog.view.findViewById(R.id.md_buttonDefaultNeutral);
+        dialog.negativeButton = dialog.view.findViewById(R.id.md_buttonDefaultNegative);
 
         // Don't allow the submit button to not be shown for input dialogs
         if (builder.inputCallback != null && builder.positiveText == null)
@@ -305,7 +302,7 @@ class DialogInit {
         // Setup custom views
         if (builder.customView != null) {
             ((MDRootLayout) dialog.view.findViewById(R.id.md_root)).noTitleNoPadding();
-            FrameLayout frame = (FrameLayout) dialog.view.findViewById(R.id.md_customViewFrame);
+            FrameLayout frame = dialog.view.findViewById(R.id.md_customViewFrame);
             dialog.customViewFrame = frame;
             View innerView = builder.customView;
             if (innerView.getParent() != null)
@@ -377,7 +374,7 @@ class DialogInit {
     private static void setupProgressDialog(final MaterialDialog dialog) {
         final MaterialDialog.Builder builder = dialog.mBuilder;
         if (builder.indeterminateProgress || builder.progress > -2) {
-            dialog.mProgress = (ProgressBar) dialog.view.findViewById(android.R.id.progress);
+            dialog.mProgress = dialog.view.findViewById(android.R.id.progress);
             if (dialog.mProgress == null) return;
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -388,7 +385,7 @@ class DialogInit {
                         dialog.mProgress.setProgressDrawable(d);
                         dialog.mProgress.setIndeterminateDrawable(d);
                     } else {
-                        IndeterminateProgressDrawable d = new IndeterminateProgressDrawable(builder.getContext());
+                        IndeterminateCircularProgressDrawable d = new IndeterminateCircularProgressDrawable(builder.getContext());
                         d.setTint(builder.widgetColor);
                         dialog.mProgress.setProgressDrawable(d);
                         dialog.mProgress.setIndeterminateDrawable(d);
@@ -407,13 +404,13 @@ class DialogInit {
                 dialog.mProgress.setIndeterminate(builder.indeterminateIsHorizontalProgress);
                 dialog.mProgress.setProgress(0);
                 dialog.mProgress.setMax(builder.progressMax);
-                dialog.mProgressLabel = (TextView) dialog.view.findViewById(R.id.md_label);
+                dialog.mProgressLabel = dialog.view.findViewById(R.id.md_label);
                 if (dialog.mProgressLabel != null) {
                     dialog.mProgressLabel.setTextColor(builder.contentColor);
                     dialog.setTypeface(dialog.mProgressLabel, builder.mediumFont);
                     dialog.mProgressLabel.setText(builder.progressPercentFormat.format(0));
                 }
-                dialog.mProgressMinMax = (TextView) dialog.view.findViewById(R.id.md_minMax);
+                dialog.mProgressMinMax = dialog.view.findViewById(R.id.md_minMax);
                 if (dialog.mProgressMinMax != null) {
                     dialog.mProgressMinMax.setTextColor(builder.contentColor);
                     dialog.setTypeface(dialog.mProgressMinMax, builder.regularFont);
@@ -441,7 +438,7 @@ class DialogInit {
 
     private static void setupInputDialog(final MaterialDialog dialog) {
         final MaterialDialog.Builder builder = dialog.mBuilder;
-        dialog.input = (EditText) dialog.view.findViewById(android.R.id.input);
+        dialog.input = dialog.view.findViewById(android.R.id.input);
         if (dialog.input == null) return;
         dialog.setTypeface(dialog.input, builder.regularFont);
         if (builder.inputPrefill != null)
@@ -500,7 +497,7 @@ class DialogInit {
             });
         }
 
-        dialog.inputMinMax = (TextView) dialog.view.findViewById(R.id.md_minMax);
+        dialog.inputMinMax = dialog.view.findViewById(R.id.md_minMax);
         if (builder.inputMinLength > 0 || builder.inputMaxLength > -1) {
             dialog.invalidateInputMinMaxIndicator(dialog.input.getText().toString().length(),
                     !builder.inputAllowEmpty);

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/ui_header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height_tall"
+        android:layout_alignParentTop="true">
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/popupTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|left"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:text="Title" />
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:id="@+id/ui_button_cancel"
+            android:layout_width="@dimen/button_height_normal"
+            android:layout_height="@dimen/button_height_tall"
+            android:layout_gravity="right"
+            android:background="@drawable/transparent_button_background"
+            android:tint="@color/colorRed"
+            app:srcCompat="@drawable/ex" />
+
+
+    </FrameLayout>
+
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/ui_header" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_below="@+id/ui_header"
+        android:clickable="false"
+        android:scaleType="fitXY"
+        app:srcCompat="@drawable/expanded_view_inner_shadow_top" />
+</RelativeLayout>

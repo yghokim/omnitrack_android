@@ -36,7 +36,7 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
     implementation "com.android.support:recyclerview-v7:$SUPPORT_LIBRARY_VERSION"
     implementation "com.android.support:support-annotations:$SUPPORT_LIBRARY_VERSION"
-    implementation "me.zhanghai.android.materialprogressbar:library:1.3.0"
+    implementation "me.zhanghai.android.materialprogressbar:library:1.4.2"
 }
 
 repositories {
