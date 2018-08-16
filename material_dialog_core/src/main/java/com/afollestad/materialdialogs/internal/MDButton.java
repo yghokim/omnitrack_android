@@ -1,13 +1,11 @@
 package com.afollestad.materialdialogs.internal;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.v7.text.AllCapsTransformationMethod;
+import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.widget.TextView;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.R;
@@ -16,7 +14,7 @@ import com.afollestad.materialdialogs.util.DialogUtils;
 /**
  * @author Kevin Barry (teslacoil) 4/02/2015
  */
-public class MDButton extends TextView {
+public class MDButton extends AppCompatTextView {
 
     private boolean mStacked = false;
     private GravityEnum mStackedGravity;
@@ -33,12 +31,6 @@ public class MDButton extends TextView {
     public MDButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs, defStyleAttr, 0);
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public MDButton(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        init(context, attrs, defStyleAttr, defStyleRes);
     }
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -87,13 +79,6 @@ public class MDButton extends TextView {
     }
 
     public void setAllCapsCompat(boolean allCaps) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            setAllCaps(allCaps);
-        } else {
-            if (allCaps)
-                setTransformationMethod(new AllCapsTransformationMethod(getContext()));
-            else
-                setTransformationMethod(null);
-        }
+        setAllCaps(allCaps);
     }
 }

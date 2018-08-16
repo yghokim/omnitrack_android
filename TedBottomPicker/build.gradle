@@ -30,19 +30,12 @@ android {
 
 }
 
-
-
-configurations {
-    javadocDeps
-}
-
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
     implementation "com.android.support:appcompat-v7:$rootProject.ext.android_support_version"
     implementation "com.android.support:design:$rootProject.ext.android_support_version"
     implementation "com.android.support:support-annotations:$rootProject.ext.android_support_version"
-    javadocDeps "com.android.support:support-annotations:$rootProject.ext.android_support_version"
     implementation "com.github.bumptech.glide:glide:$rootProject.ext.glide_version"
 }
 

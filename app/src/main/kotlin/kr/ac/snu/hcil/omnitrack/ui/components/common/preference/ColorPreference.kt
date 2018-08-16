@@ -30,10 +30,9 @@ class ColorPreference : DialogPreference {
     private var colorPicker: LobsterPicker? = null
     private var colorSlider: LobsterShadeSlider? = null
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?) : super(context)
+    constructor(context: Context?) : super(context, null)
 
     init {
         widgetLayoutResource = R.layout.layout_custom_preference_color

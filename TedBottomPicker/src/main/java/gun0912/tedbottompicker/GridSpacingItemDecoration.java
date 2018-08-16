@@ -6,10 +6,7 @@ import android.view.View;
 
 /**
  * Created by TedPark on 2016. 8. 30..
- */
-
-/**
- *https://gist.github.com/liangzhitao/e57df3c3232ee446d464
+ * https://gist.github.com/liangzhitao/e57df3c3232ee446d464
  */
 public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
 
@@ -18,7 +15,7 @@ public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
     private boolean includeEdge;
 
 
-    public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
+    GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
         this.spanCount = spanCount;
         this.spacing = spacing;
         this.includeEdge = includeEdge;

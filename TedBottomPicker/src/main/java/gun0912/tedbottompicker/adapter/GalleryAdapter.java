@@ -12,7 +12,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -33,11 +32,11 @@ import gun0912.tedbottompicker.view.TedSquareImageView;
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder> {
 
 
-    ArrayList<PickerTile> pickerTiles;
-    Context context;
-    TedBottomPicker.Builder builder;
-    OnItemClickListener onItemClickListener;
-    ArrayList<Uri> selectedUriList;
+    private ArrayList<PickerTile> pickerTiles;
+    private Context context;
+    private TedBottomPicker.Builder builder;
+    private OnItemClickListener onItemClickListener;
+    private ArrayList<Uri> selectedUriList;
 
 
     public GalleryAdapter(Context context, TedBottomPicker.Builder builder) {
@@ -186,17 +185,12 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
                 foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.gallery_photo_selected);
             }
 
-            ((FrameLayout) holder.root).setForeground(isSelected ? foregroundDrawable : null);
+            holder.root.setForeground(isSelected ? foregroundDrawable : null);
         }
 
 
         if (onItemClickListener != null) {
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    onItemClickListener.onItemClick(holder.itemView, position);
-                }
-            });
+            holder.itemView.setOnClickListener(view -> onItemClickListener.onItemClick(holder.itemView, position));
         }
     }
 
@@ -215,7 +209,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
     }
 
     public interface OnItemClickListener {
-        public void onItemClick(View view, int position);
+        void onItemClick(View view, int position);
     }
 
 
@@ -224,8 +218,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
         public static final int IMAGE = 1;
         public static final int CAMERA = 2;
         public static final int GALLERY = 3;
-        protected final Uri imageUri;
-        protected final
+        final Uri imageUri;
+        final
         @TileType
         int tileType;
 
@@ -233,7 +227,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
             this(null, tileType);
         }
 
-        protected PickerTile(@Nullable Uri imageUri, @TileType int tileType) {
+        PickerTile(@Nullable Uri imageUri, @TileType int tileType) {
             this.imageUri = imageUri;
             this.tileType = tileType;
         }
@@ -265,26 +259,26 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
             }
         }
 
-        public boolean isImageTile() {
+        boolean isImageTile() {
             return tileType == IMAGE;
         }
 
-        public boolean isCameraTile() {
+        boolean isCameraTile() {
             return tileType == CAMERA;
         }
 
-        public boolean isGalleryTile() {
+        boolean isGalleryTile() {
             return tileType == GALLERY;
         }
 
         @IntDef({IMAGE, CAMERA, GALLERY})
         @Retention(RetentionPolicy.SOURCE)
-        public @interface TileType {
+        @interface TileType {
         }
 
         @IntDef({CAMERA, GALLERY})
         @Retention(RetentionPolicy.SOURCE)
-        public @interface SpecialTileType {
+        @interface SpecialTileType {
         }
     }
 
@@ -295,10 +289,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
 
         TedSquareImageView iv_thumbnail;
 
-        public GalleryViewHolder(View view) {
+        GalleryViewHolder(View view) {
             super(view);
-            root = (TedSquareFrameLayout) view.findViewById(R.id.root);
-            iv_thumbnail = (TedSquareImageView) view.findViewById(R.id.iv_thumbnail);
+            root = view.findViewById(R.id.root);
+            iv_thumbnail = view.findViewById(R.id.iv_thumbnail);
 
         }
 
