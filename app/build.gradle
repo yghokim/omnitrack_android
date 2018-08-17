@@ -4,6 +4,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 //apply plugin: 'io.fabric'
 apply plugin: 'com.cookpad.android.licensetools'
+apply plugin: 'com.getkeepsafe.dexcount'
 
 import java.util.regex.Pattern
 
@@ -36,11 +37,10 @@ android {
         if (buildConfigJson.overridePackageName != null && buildConfigJson.overridePackageName.length() > 0) {
             applicationId buildConfigJson.overridePackageName
         } else applicationId "kr.ac.snu.hcil.omnitrack"
+
         minSdkVersion 19
+
         targetSdkVersion rootProject.ext.targetSdkVersion
-        //multidex support
-        multiDexEnabled true
-        multiDexKeepProguard file('multidex-main-include-rules.pro')
         vectorDrawables.useSupportLibrary = true
 
         def googleMapsKey = keystoreProperties.getProperty("GOOGLE_MAPS_API_KEY").toString()
@@ -62,6 +62,22 @@ android {
         buildConfigField 'boolean', 'SHOW_TUTORIALS', "${buildConfigJson.showTutorials == null ? true : buildConfigJson.showTutorials}"
     }
 
+    flavorDimensions "minApi"
+
+    productFlavors{
+        minApi19{
+            dimension "minApi"
+            minSdkVersion 19
+        }
+
+        minApi21{
+            dimension "minApi"
+            minSdkVersion 21
+        }
+    }
+
+    defaultPublishConfig "minApi21Debug" // this is to avoid 64K method limit on Debug build.
+
     compileOptions {
         sourceCompatibility 1.8
         targetCompatibility 1.8
@@ -69,14 +85,10 @@ android {
 
     applicationVariants.all { variant ->
         println("variant name: ${variant.name}")
-        if (variant.name.toLowerCase().contains("assembleRelease")) {
+        if (variant.name.toLowerCase().contains("minapi") && variant.name.toLowerCase().contains("release")) {
             variant.generateBuildConfig.dependsOn("refreshVersionsByIncreasingVersionCode")
         } else
             variant.generateBuildConfig.dependsOn("refreshVersionsNotRelease")
-    }
-
-    dexOptions {
-        javaMaxHeapSize "4g"
     }
 
     dataBinding.enabled = false
@@ -185,6 +197,7 @@ configurations.all {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
+
     implementation "com.android.support:appcompat-v7:$rootProject.ext.android_support_version"
     implementation "com.android.support:recyclerview-v7:$rootProject.ext.android_support_version"
     implementation "com.android.support:design:$rootProject.ext.android_support_version"
@@ -226,7 +239,6 @@ dependencies {
     implementation project(':AppUpdater:appupdater')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'com.google.android:flexbox:1.0.0'
     implementation "com.google.code.gson:gson:$rootProject.ext.gson_version"
