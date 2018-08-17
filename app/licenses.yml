@@ -254,13 +254,6 @@
   licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
   url: https://github.com/VictorAlbertos/RxActivityResult
 
-- artifact: me.zhanghai.android.materialprogressbar:library:+
-  name: MaterialProgressBar Library
-  copyrightHolder: Hai Zhang
-  license: The Apache Software License, Version 2.0
-  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
-  url: https://github.com/DreaminginCodeZH/MaterialProgressBar
-
 - artifact: com.opencsv:opencsv:+
   name: opencsv
   copyrightHolder: OpenCSV

@@ -27,13 +27,12 @@ import com.afollestad.materialdialogs.internal.MDButton;
 import com.afollestad.materialdialogs.internal.MDRootLayout;
 import com.afollestad.materialdialogs.internal.MDTintHelper;
 import com.afollestad.materialdialogs.util.DialogUtils;
+import com.github.ybq.android.spinkit.style.FadingCircle;
+import com.github.ybq.android.spinkit.style.ThreeBounce;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import me.zhanghai.android.materialprogressbar.HorizontalProgressDrawable;
-import me.zhanghai.android.materialprogressbar.IndeterminateCircularProgressDrawable;
-import me.zhanghai.android.materialprogressbar.IndeterminateHorizontalProgressDrawable;
 
 /**
  * Used by MaterialDialog while initializing the dialog. Offloads some of the code to make the main class
@@ -377,27 +376,24 @@ class DialogInit {
             dialog.mProgress = dialog.view.findViewById(android.R.id.progress);
             if (dialog.mProgress == null) return;
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-                if (builder.indeterminateProgress) {
-                    if (builder.indeterminateIsHorizontalProgress) {
-                        IndeterminateHorizontalProgressDrawable d = new IndeterminateHorizontalProgressDrawable(builder.getContext());
-                        d.setTint(builder.widgetColor);
-                        dialog.mProgress.setProgressDrawable(d);
-                        dialog.mProgress.setIndeterminateDrawable(d);
-                    } else {
-                        IndeterminateCircularProgressDrawable d = new IndeterminateCircularProgressDrawable(builder.getContext());
-                        d.setTint(builder.widgetColor);
-                        dialog.mProgress.setProgressDrawable(d);
-                        dialog.mProgress.setIndeterminateDrawable(d);
-                    }
+            if (builder.indeterminateProgress) {
+                if (builder.indeterminateIsHorizontalProgress) {
+                    ThreeBounce d = new ThreeBounce();
+                    d.setColor(builder.widgetColor);
+                    dialog.mProgress.setProgressDrawable(d);
+                    dialog.mProgress.setIndeterminateDrawable(d);
                 } else {
-                    HorizontalProgressDrawable d = new HorizontalProgressDrawable(builder.getContext());
-                    d.setTint(builder.widgetColor);
+                    FadingCircle d = new FadingCircle();
+                    d.setColor(builder.widgetColor);
                     dialog.mProgress.setProgressDrawable(d);
                     dialog.mProgress.setIndeterminateDrawable(d);
                 }
             } else {
-                MDTintHelper.setTint(dialog.mProgress, builder.widgetColor);
+
+                FadingCircle d = new FadingCircle();
+                d.setColor(builder.widgetColor);
+                dialog.mProgress.setProgressDrawable(d);
+                dialog.mProgress.setIndeterminateDrawable(d);
             }
 
             if (!builder.indeterminateProgress || builder.indeterminateIsHorizontalProgress) {
