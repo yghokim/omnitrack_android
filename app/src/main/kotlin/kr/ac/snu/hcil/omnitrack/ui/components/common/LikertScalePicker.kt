@@ -19,6 +19,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 2016-09-23.
  */
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 class LikertScalePicker : View, GestureDetector.OnGestureListener {
 
     var leftMost: Int by Delegates.observable(1) {

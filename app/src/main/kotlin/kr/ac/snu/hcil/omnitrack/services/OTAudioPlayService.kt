@@ -21,6 +21,7 @@ import android.util.Log
 import android.widget.RemoteViews
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecordMetadata
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import kr.ac.snu.hcil.omnitrack.utils.Ticker
@@ -134,7 +135,8 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
         private var lastNotificationBuilder: NotificationCompat.Builder? = null
 
         private fun putNotificationControl(context: Context, rv: RemoteViews) {
-            val builder = lastNotificationBuilder ?: NotificationCompat.Builder(context)
+            val builder = lastNotificationBuilder
+                    ?: NotificationCompat.Builder(context, OTNotificationManager.CHANNEL_ID_WIDGETS)
                     .setSmallIcon(R.drawable.icon_simple)
                     .setAutoCancel(false)
                     .setOngoing(true)
@@ -258,10 +260,11 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
         currentPlayer?.setOnCompletionListener(this)
         currentPlayer?.reset()
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            currentPlayer?.setAudioStreamType(AudioManager.STREAM_MUSIC)
-        } else {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             currentPlayer?.setAudioAttributes(AudioAttributes.Builder().setLegacyStreamType(AudioManager.STREAM_MUSIC).build())
+        } else {
+            @Suppress("DEPRECATION")
+            currentPlayer?.setAudioStreamType(AudioManager.STREAM_MUSIC)
         }
     }
 

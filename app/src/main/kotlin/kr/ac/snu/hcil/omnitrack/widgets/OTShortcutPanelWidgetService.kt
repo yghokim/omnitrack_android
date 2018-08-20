@@ -96,8 +96,8 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
 
         override fun getViewAt(position: Int): RemoteViews? {
             val tracker = trackers[position]
-            var lastLoggingTime: Long? = null
-            var todayCount: Long? = null
+            //var lastLoggingTime: Long? = null
+            //var todayCount: Long? = null
 
             /*
             val totalItemCount = DatabaseManager.getTotalItemCount(tracker).first().toBlocking().first().first

@@ -57,6 +57,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_browser), ExtendedSpinner.OnItemSelectedListener, View.OnClickListener, AttributeEditDialogFragment.Listener {
 
     companion object {
@@ -866,7 +867,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             override fun getMenuItemAt(index: Int): MenuItem {
                 return when (index) {
                     0 -> purgeMenuItem
-                //1 -> deletionMenuItem
+                    //1 -> deletionMenuItem
                     1 -> exportMenuItem
                     else -> purgeMenuItem
                 }

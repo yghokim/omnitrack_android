@@ -77,10 +77,12 @@ object FileHelper {
         return when (uri.scheme) {
             ContentResolver.SCHEME_CONTENT -> {
                 val returnCursor = context.contentResolver.query(uri, null, null, null, null)
-                returnCursor.use {
-                    val sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE)
-                    returnCursor.moveToFirst()
-                    return returnCursor.getLong(sizeIndex)
+                returnCursor.use { cursor ->
+                    if (cursor != null) {
+                        val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+                        cursor.moveToFirst()
+                        return cursor.getLong(sizeIndex)
+                    } else return 0
                 }
             }
             ContentResolver.SCHEME_FILE -> {
@@ -90,11 +92,11 @@ object FileHelper {
                         var size = 0L
 
                         if (dir.isDirectory) {
-                            for (file in dir.listFiles()) {
-                                if (file.isFile) {
-                                    size += file.length()
+                            for (f in dir.listFiles()) {
+                                if (f.isFile) {
+                                    size += f.length()
                                 } else {
-                                    size += getSizeRecur(file)
+                                    size += getSizeRecur(f)
                                 }
                             }
                         } else if (dir.isFile) {
@@ -115,7 +117,7 @@ object FileHelper {
     }
 
     fun getMimeTypeOf(uri: Uri, context: Context): String? {
-        if (uri.scheme.equals(ContentResolver.SCHEME_CONTENT)) {
+        if (uri.scheme?.equals(ContentResolver.SCHEME_CONTENT) == true) {
             return context.contentResolver.getType(uri)
         } else {
             val mimeTypeFromName = MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(uri.toString()))

@@ -216,7 +216,7 @@ dependencies {
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
 
     implementation 'android.arch.lifecycle:extensions:1.1.1'
-    def work_version = "1.0.0-alpha06"
+    def work_version = "1.0.0-alpha07"
     implementation "android.arch.work:work-runtime-ktx:$work_version"
 
     // use -ktx for Kotlin
@@ -241,7 +241,7 @@ dependencies {
     implementation 'com.google.android:flexbox:1.0.0'
     implementation "com.google.code.gson:gson:$rootProject.ext.gson_version"
     implementation "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxjava_version"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rxandroid_version"
     implementation 'com.github.pwittchen:reactivenetwork-rx2:2.1.0'
     implementation 'jp.wasabeef:recyclerview-animators:2.3.0'
     implementation 'com.github.markushi:android-ui:1.2'

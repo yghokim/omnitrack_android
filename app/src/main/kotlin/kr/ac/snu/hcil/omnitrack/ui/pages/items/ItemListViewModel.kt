@@ -25,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import javax.inject.Inject
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
  * Created by Young-Ho on 10/12/2017.
  */
@@ -52,7 +53,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
         }
 
     lateinit var attributes: List<OTAttributeDAO>
-    private set
+        private set
     //localKey / Type
     val onSchemaChanged = PublishSubject.create<List<OTAttributeDAO>>()
 
@@ -163,9 +164,9 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
     }
 
     fun setSorter(itemComparator: ItemComparator) {
-            currentSorter = itemComparator
-            itemsSortedList.sortWith(itemComparerMethod)
-            sortedItemsObservable.onNext(itemsSortedList)
+        currentSorter = itemComparator
+        itemsSortedList.sortWith(itemComparerMethod)
+        sortedItemsObservable.onNext(itemsSortedList)
     }
 
     inner class ItemViewModel(val itemDao: OTItemDAO) : IReadonlyObjectId {

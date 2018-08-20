@@ -67,7 +67,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
         }
 
         fun getMode(widgetId: Int, pref: SharedPreferences): String {
-            return pref.getString(makePrefKey(EXTRA_MODE, widgetId), MODE_ALL)
+            return pref.getString(makePrefKey(EXTRA_MODE, widgetId), MODE_ALL)!!
         }
 
         fun setMode(widgetId: Int, mode: String, editor: SharedPreferences.Editor) {
@@ -75,7 +75,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
         }
 
         fun getTitle(widgetId: Int, pref: SharedPreferences): String {
-            return pref.getString(makePrefKey(EXTRA_TITLE, widgetId), "OmniTrack")
+            return pref.getString(makePrefKey(EXTRA_TITLE, widgetId), "OmniTrack")!!
         }
 
         fun setTitle(widgetId: Int, title: String, editor: SharedPreferences.Editor) {

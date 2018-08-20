@@ -2,9 +2,9 @@ package kr.ac.snu.hcil.omnitrack.core.di.global
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.os.Build
 import android.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
@@ -76,10 +76,15 @@ class ApplicationModule(private val mApp: OTApp) {
         try {
             val pm = mApp.packageManager
             val packageName = mApp.packageName
-            val flags = PackageManager.GET_SIGNATURES
-            val packageInfo: PackageInfo = pm.getPackageInfo(packageName, flags)
 
-            val signatures = packageInfo.signatures
+
+            val signatures = if (Build.VERSION.SDK_INT < 28) {
+                @Suppress("DEPRECATION")
+                pm.getPackageInfo(packageName, PackageManager.GET_SIGNATURES).signatures
+            } else {
+                pm.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES).signingInfo.apkContentsSigners
+            }
+
             val cert = signatures[0].toByteArray()
             val input = ByteArrayInputStream(cert)
             var cf: CertificateFactory? = null

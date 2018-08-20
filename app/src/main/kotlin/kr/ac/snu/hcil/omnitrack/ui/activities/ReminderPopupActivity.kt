@@ -79,6 +79,7 @@ class ReminderPopupActivity : OTActivity(false, false), View.OnClickListener {
         onInitialize(intent)
     }
 
+    @Suppress("DEPRECATION")
     private fun onInitialize(intent: Intent) {
         window.setFlags(
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or

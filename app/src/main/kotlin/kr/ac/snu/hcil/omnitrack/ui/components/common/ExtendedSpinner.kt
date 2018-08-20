@@ -23,6 +23,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 2017-01-17.
  */
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 class ExtendedSpinner : LinearLayout, View.OnClickListener {
 
     interface OnItemSelectedListener {
@@ -487,9 +488,9 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
             inputMethodMode = ListPopupWindow.INPUT_METHOD_NOT_NEEDED
             super.show()
             val listView = listView
-            listView.choiceMode = ListView.CHOICE_MODE_SINGLE
-            listView.textDirection = textDirection
-            listView.textAlignment = textAlignment
+            listView?.choiceMode = ListView.CHOICE_MODE_SINGLE
+            listView?.textDirection = textDirection
+            listView?.textAlignment = textAlignment
             setSelection(this@ExtendedSpinner.selectedItemPosition)
 
             if (wasShowing) {

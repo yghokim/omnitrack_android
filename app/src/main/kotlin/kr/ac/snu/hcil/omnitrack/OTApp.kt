@@ -10,11 +10,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.os.Build
+import android.os.Looper
 import android.os.SystemClock
 import android.provider.Settings
 import android.support.v7.app.AppCompatDelegate
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.squareup.leakcanary.LeakCanary
+import io.reactivex.android.plugins.RxAndroidPlugins
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
@@ -116,15 +119,16 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
 
     override val deviceId: String by lazy {
         val deviceUUID: UUID
-        val cached: String = applicationComponent.defaultPreferences().getString("cached_device_id", "")
-        if (cached.isNotBlank()) {
-            return@lazy cached
+        val cached: String? = applicationComponent.defaultPreferences().getString("cached_device_id", null)
+        if (!cached.isNullOrBlank()) {
+            return@lazy cached!!
         } else {
             val androidUUID = Settings.Secure.getString(this.contentResolver, Settings.Secure.ANDROID_ID)
             if (!androidUUID.isNullOrBlank()) {
                 deviceUUID = UUID.nameUUIDFromBytes(androidUUID.toByteArray(Charset.forName("utf8")))
             } else {
                 try {
+                    @Suppress("DEPRECATION")
                     val phoneUUID = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         this.telephonyManager.imei
                     } else this.telephonyManager.deviceId
@@ -225,6 +229,11 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
     override fun onCreate() {
         super.onCreate()
         val startedAt = SystemClock.elapsedRealtime()
+
+        //Use a new async API to improve performance in RxAndroid 2.1.0
+        RxAndroidPlugins.initMainThreadScheduler {
+            AndroidSchedulers.from(Looper.getMainLooper(), true)
+        }
 
         //Fabric.with(this, Crashlytics())
         AndroidThreeTen.init(this)

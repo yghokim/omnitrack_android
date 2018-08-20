@@ -83,8 +83,8 @@ object TypeStringSerializationHelper {
             TYPENAME_LATITUDE_LONGITUDE -> (value as LatLng).serialize()
             TYPENAME_ROUTE -> (value as Route).getSerializedString()
             TYPENAME_FRACTION -> {
-                val value = value as Fraction
-                "${value.upper}/${value.under}"
+                val f = value as Fraction
+                "${f.upper}/${f.under}"
             }
             TYPENAME_SERVERFILE -> {
                 (value as OTServerFile).getSerializedString()

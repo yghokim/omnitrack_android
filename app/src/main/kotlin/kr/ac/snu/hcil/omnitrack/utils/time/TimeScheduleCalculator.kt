@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.utils.WritablePair
  */
 abstract class TimeScheduleCalculator {
 
-    private var availableDaysOfWeek = BooleanArray(7, { i -> true })
+    private var availableDaysOfWeek = BooleanArray(7) { true }
     var endAt: Long = Long.MAX_VALUE
 
     protected fun isAvailableDayOfWeek(dayOfWeek: Int): Boolean {

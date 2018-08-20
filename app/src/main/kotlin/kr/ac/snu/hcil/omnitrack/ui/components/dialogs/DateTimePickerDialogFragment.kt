@@ -82,7 +82,7 @@ class DateTimePickerDialogFragment : DialogFragment() {
 
     private var currentTab: String
         get() {
-            return tabHost.currentTabTag
+            return tabHost.currentTabTag!!
         }
         set(value) {
             tabHost.setCurrentTabByTag(value)

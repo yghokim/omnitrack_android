@@ -1,3 +1,4 @@
+
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.app.Activity.RESULT_OK
@@ -53,6 +54,7 @@ import javax.inject.Inject
 /**
  * Created by Young-Ho Kim on 16. 7. 29
  */
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 class TrackerDetailStructureTabFragment : OTFragment() {
 
     companion object {
@@ -318,6 +320,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
             attributeListAdapter.onMoveItem(firstPosition, secondPosition)
         }
 
+        @Suppress("UNCHECKED_CAST")
         attributeListView.adapter = attributeListAdapter as AdapterLinearLayout.ViewHolderAdapter<AdapterLinearLayout.AViewHolder>
 
     }

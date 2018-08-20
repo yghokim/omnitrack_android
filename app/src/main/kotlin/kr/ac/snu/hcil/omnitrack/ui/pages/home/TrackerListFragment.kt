@@ -67,6 +67,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
  * Created by Young-Ho Kim on 2016-07-18.
  */

@@ -58,6 +58,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 import kotlin.properties.Delegates
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
  * Created by Young-Ho Kim on 16. 7. 24
  */
