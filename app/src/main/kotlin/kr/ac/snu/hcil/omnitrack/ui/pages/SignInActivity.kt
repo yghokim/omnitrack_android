@@ -56,7 +56,7 @@ class SignInActivity : AppCompatActivity() {
         }
 
         val task = GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this)
-        task.addOnCompleteListener {
+        task.addOnCompleteListener { apiCheckTask ->
             ui_login_group_switcher.visibility = View.VISIBLE
             g_login_button.setOnClickListener(View.OnClickListener { view ->
                 toBusyMode()
@@ -117,7 +117,6 @@ class SignInActivity : AppCompatActivity() {
                                                     .setNeutralButton("Ok", null)
                                                     .show()
                                         } else if (e is CancellationException) {
-
                                             Log.d(LOG_TAG, String.format("User sign-in with Google canceled."))
                                             this@SignInActivity.runOnUiThread {
                                                 Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_canceled)), Toast.LENGTH_LONG).show()
@@ -130,6 +129,7 @@ class SignInActivity : AppCompatActivity() {
                                                     String.format("Sign-in Process failed.\n%s", e.message))
                                             errorDialogBuilder.setNeutralButton("Ok", null)
                                             errorDialogBuilder.show()
+                                            eventLogger.get().logExceptionEvent("SignInFailure", e, Thread.currentThread())
                                         }
                                         toIdleMode()
                                     }

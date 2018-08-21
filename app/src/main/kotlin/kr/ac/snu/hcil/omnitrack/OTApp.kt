@@ -240,6 +240,18 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         RxActivityResult.register(this)
         Realm.init(this)
 
+        val systemDefaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            try {
+                applicationComponent.configurationController()
+                        .currentConfiguredContext.configuredAppComponent.getEventLogger()
+                        .logExceptionEvent("Uncaught", throwable, thread)
+                println("logged the uncaught exception.")
+            } finally {
+                systemDefaultUncaughtExceptionHandler.uncaughtException(thread, throwable)
+            }
+        }
+
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
             // You should not init your instance in this process.

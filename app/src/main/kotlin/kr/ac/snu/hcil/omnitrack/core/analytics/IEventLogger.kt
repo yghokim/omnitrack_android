@@ -26,6 +26,8 @@ interface IEventLogger {
 
         const val NAME_DEVICE_STATUS_CHANGE = "device_status_change"
 
+        const val NAME_EXCEPTION = "exception"
+
         const val SUB_DEVICE_PLUGGED = "plugged"
         const val SUB_DEVICE_UNPLUGGED = "unplugged"
         const val SUB_DEVICE_BATTERY_LOW = "battery_row"
@@ -79,4 +81,6 @@ interface IEventLogger {
     fun logServiceActivationChangeEvent(serviceCode: String, isActivated: Boolean, inject: ((JsonObject) -> Unit)? = null)
 
     fun logDeviceStatusChangeEvent(sub: String, batteryPercentage: Float, inject: ((JsonObject) -> Unit)? = null)
+
+    fun logExceptionEvent(sub: String, throwable: Throwable, thread: Thread?, inject: ((JsonObject) -> Unit)? = null)
 }

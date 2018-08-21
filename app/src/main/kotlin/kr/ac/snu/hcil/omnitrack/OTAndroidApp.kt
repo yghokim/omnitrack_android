@@ -12,5 +12,6 @@ interface OTAndroidApp {
     val jobDispatcherComponent: JobDispatcherComponent
     val serializationComponent: SerializationComponent
     val currentConfiguredContext: ConfiguredContext
+    fun getPackageName(): String
     fun refreshConfiguration(context: Context)
 }

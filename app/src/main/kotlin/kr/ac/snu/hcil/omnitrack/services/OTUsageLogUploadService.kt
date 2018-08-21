@@ -54,7 +54,7 @@ class OTUsageLogUploadService : JobService() {
         return Single.defer {
             val realm = realmFactory.get()
             realm.use { realm ->
-                return@defer Single.just(realm.where(UsageLog::class.java).equalTo("isSynchronized", false).sort("timestamp").findAll()
+                return@defer Single.just(realm.where(UsageLog::class.java).sort("timestamp").findAll()
                         .map { log ->
                             UsageLog.typeAdapter.toJson(log)
                         })
@@ -78,10 +78,6 @@ class OTUsageLogUploadService : JobService() {
                             realm.executeTransaction {
                                 realm.where(UsageLog::class.java).`in`("id", storedIds.toTypedArray())
                                         .findAll().deleteAllFromRealm()
-                                /*.findAll()
-                                .forEach { l ->
-                                    l.isSynchronized = true
-                                }*/
                             }
                         }
                     }.observeOn(AndroidSchedulers.mainThread()).subscribe({ list ->

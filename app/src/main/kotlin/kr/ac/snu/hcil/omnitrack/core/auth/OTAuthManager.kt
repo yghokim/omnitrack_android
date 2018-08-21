@@ -29,6 +29,7 @@ import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTUserDAO
@@ -51,6 +52,7 @@ class OTAuthManager @Inject constructor(
         private val context: Context,
         private val configuredContext: ConfiguredContext,
         private val firebaseAuth: FirebaseAuth,
+        private val eventLogger: Lazy<IEventLogger>,
         @ForGeneric private val gson: Gson,
         @Backend private val realmFactory: Factory<Realm>,
         @ForGeneralAuth private val googleSignInOptions: Lazy<GoogleSignInOptions>,
@@ -268,7 +270,15 @@ class OTAuthManager @Inject constructor(
                     throw CancellationException(result.status.statusMessage)
                 } else {
                     println("Google sign in failed")
-                    return@flatMap Single.error<Boolean>(Exception("Google login process was failed."))
+                    eventLogger.get().logExceptionEvent("GoogleSignInError",
+                            Exception(result.status.statusMessage),
+                            Thread.currentThread()) { json ->
+                        json.addProperty("statusCode", result.status.statusCode)
+                        json.addProperty("isInterrupted", result.status.isInterrupted)
+                        json.addProperty("isCanceled", result.status.isCanceled)
+                        json.addProperty("hasResolution", result.status.hasResolution())
+                    }
+                    return@flatMap Single.error<Boolean>(Exception("Google login process was failed. status code: ${result.status.statusCode}, message: ${result.status.statusMessage}"))
                 }
             }
         }

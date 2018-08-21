@@ -117,6 +117,7 @@ class ConfiguredContext(val configuration: OTConfiguration, val applicationCompo
                 .plus(networkModule)
                 .plus(authModule)
                 .plus(firebaseModule)
+                .plus(loggingModule)
                 .build()
     }
 

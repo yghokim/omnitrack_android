@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.research.ResearchViewModel
  * Created by younghokim on 2018. 1. 3..
  */
 @Configured
-@Subcomponent(modules = [ResearchModule::class, AuthModule::class, BackendDatabaseModule::class, FirebaseModule::class])
+@Subcomponent(modules = [ResearchModule::class, AuthModule::class, BackendDatabaseModule::class, FirebaseModule::class, UsageLoggingModule::class])
 interface ResearchComponent {
 
     @Subcomponent.Builder
@@ -21,6 +21,7 @@ interface ResearchComponent {
         fun plus(module: NetworkModule): Builder
         fun plus(module: BackendDatabaseModule): Builder
         fun plus(module: FirebaseModule): Builder
+        fun plus(module: UsageLoggingModule): Builder
         fun build(): ResearchComponent
     }
 

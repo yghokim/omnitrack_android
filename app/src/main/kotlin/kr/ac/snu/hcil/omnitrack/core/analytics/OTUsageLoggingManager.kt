@@ -8,6 +8,7 @@ import com.google.gson.JsonObject
 import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_CHANGE_ATTRIBUTE
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_CHANGE_ITEM
@@ -15,6 +16,7 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_CHANG
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_CHANGE_TRACKER
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_CHANGE_TRIGGER
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_DEVICE_STATUS_CHANGE
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_EXCEPTION
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_SESSION
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_TRACKER_DATA_EXPORT
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_TRACKER_REORDER
@@ -22,12 +24,12 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.SUB_ADD
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.SUB_EDIT
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.SUB_REMOVE
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.TRIGGER_FIRED
-import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UsageLog
 import kr.ac.snu.hcil.omnitrack.core.di.configured.UsageLogger
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
+import org.jetbrains.anko.getStackTraceString
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -38,9 +40,6 @@ class OTUsageLoggingManager(val configuredContext: ConfiguredContext) : IEventLo
 
     @field:[Inject UsageLogger]
     lateinit var realmFactory: Factory<Realm>
-
-    @Inject
-    lateinit var authManager: OTAuthManager
 
     @Inject
     lateinit var jobDispatcher: Lazy<FirebaseJobDispatcher>
@@ -63,7 +62,7 @@ class OTUsageLoggingManager(val configuredContext: ConfiguredContext) : IEventLo
             newLog.name = name
             newLog.sub = sub
             newLog.deviceId = configuredContext.applicationComponent.application().deviceId
-            newLog.userId = authManager.userId
+            newLog.userId = configuredContext.configuredAppComponent.getAuthManager().userId
             newLog.timestamp = timestamp
             newLog.contentJson = content?.toString() ?: "null"
         }
@@ -207,6 +206,18 @@ class OTUsageLoggingManager(val configuredContext: ConfiguredContext) : IEventLo
         inject?.invoke(content)
 
         logEvent(NAME_DEVICE_STATUS_CHANGE, sub, content)
+    }
+
+    override fun logExceptionEvent(sub: String, throwable: Throwable, thread: Thread?, inject: ((JsonObject) -> Unit)?) {
+        val content: JsonObject = jsonObject(
+                "version_code" to BuildConfig.VERSION_CODE,
+                "packageName" to configuredContext.applicationComponent.application().getPackageName(),
+                "message" to throwable.message,
+                "thread" to thread?.name,
+                "stacktrace" to throwable.getStackTraceString()
+        )
+        inject?.invoke(content)
+        logEvent(NAME_EXCEPTION, sub, content)
     }
 
 }
