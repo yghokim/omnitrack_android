@@ -1,4 +1,4 @@
-# omnitrack_android
+# omnitrack-android
 OmniTrack Android implementation
 <https://omnitrack.github.io>
 
