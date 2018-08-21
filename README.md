@@ -4,7 +4,7 @@ OmniTrack Android implementation
 
 **This project is a part of _OmniTrack Research Kit_** (https://github.com/OmniTrack/omnitrack_research_kit)
 
-This project depends on the external config files injected by another system, and thus not intended for a standalone build.
+This project depends on the external config files injected by another system, and thus **won't build on its own.**
 
 For more information, Refer to the documentation of the OmniTrack Research Kit. (https://github.com/OmniTrack/omnitrack_research_kit/wiki)
 
