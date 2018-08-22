@@ -145,15 +145,14 @@ class DateTimePickerDialogFragment : DialogFragment() {
         timePickerView.setHourOfDayCompat(calendar.getHourOfDay())
         timePickerView.setMinuteCompat(calendar.getMinute())
 
-        timePickerView.setOnTimeChangedListener { picker, hourOfDay, minute ->
-
+        timePickerView.setOnTimeChangedListener { _, hourOfDay, minute ->
             setTimeLabel(tabHost, hourOfDay, minute)
         }
 
         return AlertDialog.Builder(activity)
                 .setTitle(resources.getString(R.string.msg_pick_date_and_time))
                 .setView(view)
-                .setPositiveButton(R.string.msg_ok) { a, b ->
+                .setPositiveButton(R.string.msg_ok) { _, _ ->
                     val cal = GregorianCalendar(TimeZone.getDefault())
                     cal.set(Calendar.MILLISECOND, 0)
                     cal.set(year, zeroBasedMonth, day, timePickerView.getHourOfDayCompat(), timePickerView.getMinuteCompat())

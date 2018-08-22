@@ -95,16 +95,15 @@
         android:id="@+id/ui_logos"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
         android:layout_marginStart="16dp"
-
+        android:adjustViewBounds="true"
+        android:contentDescription="The OmniTrack Research Kit logo"
+        android:src="@drawable/powered_by_omnitrack_research_kit_logo"
         app:layout_constraintBottom_toTopOf="@+id/ui_copyright"
         app:layout_constraintLeft_toLeftOf="@+id/guideline_team_logo_left"
-        app:layout_constraintRight_toRightOf="@+id/guideline_team_logo_right"
-        app:srcCompat="@drawable/ic_icon_snu_hcil_logos" />
+        app:layout_constraintRight_toRightOf="@+id/guideline_team_logo_right" />
 
     <TextView
         android:id="@+id/ui_copyright"
@@ -112,10 +111,9 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="13dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
         android:fontFamily="sans-serif-condensed"
         android:gravity="center"
-        android:text="Copyright © 2016-2018 the OmniTrack team. All Rights Reserved."
+        android:text="Copyright © 2016-2018 The OmniTrack Team. All Rights Reserved."
         android:textColor="@color/textColorMidLight"
 
         android:textSize="10sp"
@@ -129,7 +127,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.15" />
+        app:layout_constraintGuide_percent="0.2" />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline_logo_right"
@@ -137,7 +135,7 @@
         android:layout_height="wrap_content"
 
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.85" />
+        app:layout_constraintGuide_percent="0.8" />
 
 
     <android.support.constraint.Guideline

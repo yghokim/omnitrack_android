@@ -32,7 +32,7 @@ abstract class ACharSequenceAttributeInputView(layoutId: Int, context: Context, 
 
     init {
         valueView.setOnEditorActionListener(EditorActionListener())
-        valueView.setOnFocusChangeListener { view, hasFocus ->
+        valueView.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
                 value = valueView.text.toString().trimEnd()
             }

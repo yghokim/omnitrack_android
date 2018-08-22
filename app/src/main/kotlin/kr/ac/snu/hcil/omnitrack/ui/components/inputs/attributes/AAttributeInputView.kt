@@ -67,8 +67,7 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
 
     abstract val typeId: Int
 
-    var boundAttributeObjectId: String? by Delegates.observable(null as String?) {
-        prop, old, new ->
+    var boundAttributeObjectId: String? by Delegates.observable(null as String?) { _, old, new ->
         if (old != new) {
             if (new != null) {
                 onAttributeBound(new)
@@ -84,14 +83,14 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
     open fun forceApplyValueAsync(): Single<Nullable<out Any>> {
         return Single.defer {
             clearFocus()
+            @Suppress("UNCHECKED_CAST")
             return@defer Single.just(Nullable(value) as Nullable<Any>)
         }
     }
 
     var position: Int = -1
 
-    var previewMode: Boolean by Delegates.observable(false) {
-        prop, old, new ->
+    var previewMode: Boolean by Delegates.observable(false) { _, old, new ->
         if (old != new)
             onSetPreviewMode(new)
     }

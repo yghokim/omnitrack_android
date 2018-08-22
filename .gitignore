@@ -6,9 +6,11 @@
 .DS_Store
 /build
 /captures
+/reports
 app/app.iml
 app/app-release.apk
 app/release
+app/minApi19/release
 google-services.json
 gradle.properties
 keystore.debug.properties

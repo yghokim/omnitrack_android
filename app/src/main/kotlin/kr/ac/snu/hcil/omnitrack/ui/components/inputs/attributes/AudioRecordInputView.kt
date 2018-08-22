@@ -71,7 +71,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
                                 context.runOnUiThread {
                                     inLoadingMode = true
                                 }
-                            }.subscribe({ (refreshed, localUri) ->
+                            }.subscribe({ (_, localUri) ->
                                 valueView.audioFileUriChanged.suspend = true
                                 valueView.audioFileUri = localUri
                                 valueView.audioFileUriChanged.suspend = false
@@ -101,8 +101,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     init {
         (context.applicationContext as OTAndroidApp).applicationComponent.configurationController().currentConfiguredContext.configuredAppComponent.inject(this)
 
-        valueView.audioFileUriChanged += {
-            sender, uri ->
+        valueView.audioFileUriChanged += { _, uri ->
             println("picker uri changed to $uri")
             if (uri == Uri.EMPTY) {
                 value = null
@@ -123,7 +122,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
         } else if (!uri.equals(value?.let { localCacheManager.get().getCachedUriImmediately(it.serverPath) } ?: Uri.EMPTY)) {
             val newServerPath = localCacheManager.get().generateRandomServerPath(uri)
             val newServerFile = OTServerFile.fromLocalFile(newServerPath, uri, context)
-            return localCacheManager.get().insertOrUpdateNewLocalMedia(uri, newServerFile).map { serverUri ->
+            return localCacheManager.get().insertOrUpdateNewLocalMedia(uri, newServerFile).map { _ ->
                 Nullable(newServerFile)
             }.onErrorReturn { err -> err.printStackTrace(); Nullable<OTServerFile>() }
         } else return Single.just(Nullable(value))
@@ -134,6 +133,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     }
 
     override fun forceApplyValueAsync(): Single<Nullable<out Any>> {
+        @Suppress("UNCHECKED_CAST")
         return valueView.stopRecordingAndApplyUri().flatMap { (uri) -> convertNewUriToServerFile(uri ?: Uri.EMPTY) } as Single<Nullable<out Any>>
     }
 

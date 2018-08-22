@@ -8,11 +8,13 @@ import android.view.ViewGroup
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
+import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
 
 /**
  * Created by Young-Ho Kim on 2016-09-23.
  */
 class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APropertyView<RatingOptions>(R.layout.component_property_rating_options, context, attrs) {
+
     private val selectableStarLevels = arrayOf(5, 7, 10)
 
     override var value: RatingOptions
@@ -59,27 +61,37 @@ class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APrope
     private val middleLabelPropertyView: ShortTextPropertyView
     private val rightLabelPropertyView: ShortTextPropertyView
 
+    private val intListener = object : IEventListener<Int> {
+        override fun onEvent(sender: Any, args: Int) {
+            onValueChanged(value)
+        }
+    }
+
+    private val stringListener = object : IEventListener<String> {
+        override fun onEvent(sender: Any, args: String) {
+            onValueChanged(value)
+        }
+    }
+
+    private val booleanListener = object : IEventListener<Boolean> {
+        override fun onEvent(sender: Any, args: Boolean) {
+            onValueChanged(value)
+        }
+
+    }
+
     private val allowIntermediatePropertyView: BooleanPropertyView = findViewById(R.id.ui_allow_intermediate)
 
     init {
         layoutTransition = LayoutTransition()
 
         displayTypeSelectionView.setEntries(RatingOptions.DisplayType.values().map { resources.getString(it.nameResourceId) }.toTypedArray())
-        displayTypeSelectionView.valueChanged += {
-            sender, v ->
-            onValueChanged(value)
-        }
+        displayTypeSelectionView.valueChanged += intListener
 
         starLevelSelectionView.setEntries(selectableStarLevels.map { it.toString() }.toTypedArray())
-        starLevelSelectionView.valueChanged += {
-            sender, v ->
-            onValueChanged(value)
-        }
+        starLevelSelectionView.valueChanged += intListener
 
-        allowIntermediatePropertyView.valueChanged += {
-            sender, v ->
-            onValueChanged(value)
-        }
+        allowIntermediatePropertyView.valueChanged += booleanListener
 
         leftmostValuePicker = likertOptionsGroup.findViewById(R.id.ui_leftmost_value)
         rightmostValuePicker = likertOptionsGroup.findViewById(R.id.ui_rightmost_value)
@@ -87,30 +99,15 @@ class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APrope
         middleLabelPropertyView = likertOptionsGroup.findViewById(R.id.ui_middle_label)
         rightLabelPropertyView = likertOptionsGroup.findViewById(R.id.ui_right_label)
 
-        leftmostValuePicker.valueChanged += {
-            sender, v ->
-            onValueChanged(value)
-        }
+        leftmostValuePicker.valueChanged += intListener
 
-        rightmostValuePicker.valueChanged += {
-            sender, v ->
-            onValueChanged(value)
-        }
+        rightmostValuePicker.valueChanged += intListener
 
-        leftLabelPropertyView.valueChanged += {
-            sender, v ->
-            onValueChanged(value)
-        }
+        leftLabelPropertyView.valueChanged += stringListener
 
-        middleLabelPropertyView.valueChanged += {
-            sender, v ->
-            onValueChanged(value)
-        }
+        middleLabelPropertyView.valueChanged += stringListener
 
-        rightLabelPropertyView.valueChanged += {
-            sender, v ->
-            onValueChanged(value)
-        }
+        rightLabelPropertyView.valueChanged += stringListener
 
 
         displayTypeSelectionView.valueChanged += {

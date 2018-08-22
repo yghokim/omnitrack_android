@@ -2,9 +2,9 @@ package kr.ac.snu.hcil.omnitrack.ui.pages
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import com.danielstone.materialaboutlibrary.MaterialAboutActivity
 import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem
-import com.danielstone.materialaboutlibrary.items.MaterialAboutImageItem
 import com.danielstone.materialaboutlibrary.items.MaterialAboutTitleItem
 import com.danielstone.materialaboutlibrary.model.MaterialAboutCard
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList
@@ -71,10 +71,11 @@ class AboutActivity : MaterialAboutActivity() {
                 MaterialAboutCard.Builder()
                         .title(R.string.msg_about_about_us)
                         .addItem(
-                                MaterialAboutImageItem.Builder()
-                                        .icon(R.drawable.ic_icon_snu_hcil_logos)
-                                        .text(R.string.msg_about_text)
-                                        .textColorOverrideRes(R.color.textColorMid)
+                                MaterialAboutActionItem.Builder()
+                                        .icon(R.drawable.icon_plask)
+                                        .iconTintRes(R.color.buttonIconColorDark)
+                                        .subText(R.string.msg_about_text)
+                                        .textColorOverrideRes(R.color.textColorMidDark)
                                         .build()
                         )
                         .addItem(
@@ -89,7 +90,22 @@ class AboutActivity : MaterialAboutActivity() {
                                         }
                                         .build()
                         )
+                        .addItem(
+                                MaterialAboutActionItem.Builder()
+                                        .icon(R.drawable.icon_world)
+                                        .iconTintRes(R.color.buttonIconColorDark)
+                                        .text("Visit Website")
+                                        .subText("https://omnitrack.github.io")
+                                        .setOnClickListener {
+                                            val webpage = Uri.parse("https://omnitrack.github.io")
+                                            val intent = Intent(Intent.ACTION_VIEW, webpage)
+                                            if (intent.resolveActivity(packageManager) != null) {
+                                                startActivity(intent)
+                                            }
 
+                                        }
+                                        .build()
+                        )
                         .build()
         )
 

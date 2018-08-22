@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager
 import android.widget.CalendarView
 import android.widget.DatePicker
 import kr.ac.snu.hcil.omnitrack.R
+import org.jetbrains.anko.support.v4.act
 import java.util.*
 
 /**
@@ -55,7 +56,7 @@ class CalendarPickerDialogFragment : DialogFragment() {
 
 
         val dialogBuilder = AlertDialog.Builder(activity)
-                .setPositiveButton(R.string.msg_ok) { a, b ->
+                .setPositiveButton(R.string.msg_ok) { _, _ ->
                     val calendar = GregorianCalendar(TimeZone.getDefault())
                     calendar.set(year, month, day)
                     listener?.invoke(calendar.timeInMillis, year, month, day)
@@ -65,6 +66,7 @@ class CalendarPickerDialogFragment : DialogFragment() {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
             val datePicker = DatePicker(context)
 
+            @Suppress("DEPRECATION")
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
                 datePicker.calendarViewShown = false
                 datePicker.spinnersShown = true
@@ -79,7 +81,7 @@ class CalendarPickerDialogFragment : DialogFragment() {
 
             })
             dialogBuilder
-                    .setPositiveButton(R.string.msg_ok) { a, b ->
+                    .setPositiveButton(R.string.msg_ok) { _, _ ->
                         year = datePicker.year
                         month = datePicker.month
                         day = datePicker.dayOfMonth
@@ -92,7 +94,7 @@ class CalendarPickerDialogFragment : DialogFragment() {
             val cal = GregorianCalendar(TimeZone.getDefault())
             cal.set(year, month, day)
 
-            val calendarView = CalendarView(context)
+            val calendarView = CalendarView(act)
             calendarView.setDate(cal.timeInMillis, false, true)
 
             calendarView.setOnDateChangeListener(object : CalendarView.OnDateChangeListener {

@@ -210,7 +210,8 @@ class OTUsageLoggingManager(val configuredContext: ConfiguredContext) : IEventLo
 
     override fun logExceptionEvent(sub: String, throwable: Throwable, thread: Thread?, inject: ((JsonObject) -> Unit)?) {
         val content: JsonObject = jsonObject(
-                "version_code" to BuildConfig.VERSION_CODE,
+                "versionCode" to BuildConfig.VERSION_CODE,
+                "experiment" to BuildConfig.DEFAULT_EXPERIMENT_ID,
                 "packageName" to configuredContext.applicationComponent.application().getPackageName(),
                 "message" to throwable.message,
                 "thread" to thread?.name,
