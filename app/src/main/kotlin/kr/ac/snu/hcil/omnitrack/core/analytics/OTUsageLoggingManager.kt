@@ -209,13 +209,21 @@ class OTUsageLoggingManager(val configuredContext: ConfiguredContext) : IEventLo
     }
 
     override fun logExceptionEvent(sub: String, throwable: Throwable, thread: Thread?, inject: ((JsonObject) -> Unit)?) {
+        val stackTraceStringBuilder = StringBuilder(throwable.getStackTraceString())
+        var cause: Throwable = throwable
+        while (cause.cause != null) {
+            cause = cause.cause!!
+            stackTraceStringBuilder.append("\ncausedBy:\n")
+            stackTraceStringBuilder.append(cause.getStackTraceString())
+        }
+
         val content: JsonObject = jsonObject(
                 "versionCode" to BuildConfig.VERSION_CODE,
                 "experiment" to BuildConfig.DEFAULT_EXPERIMENT_ID,
                 "packageName" to configuredContext.applicationComponent.application().getPackageName(),
                 "message" to throwable.message,
                 "thread" to thread?.name,
-                "stacktrace" to throwable.getStackTraceString()
+                "stacktrace" to stackTraceStringBuilder.toString()
         )
         inject?.invoke(content)
         logEvent(NAME_EXCEPTION, sub, content)

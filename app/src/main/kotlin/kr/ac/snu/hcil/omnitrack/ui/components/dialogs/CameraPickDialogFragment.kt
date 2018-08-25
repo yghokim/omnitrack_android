@@ -70,7 +70,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
         cameraView = view.findViewById(R.id.ui_camera_view)
         cameraView.addCameraListener(listener)
 
-        if(arguments?.containsKey(EXTRA_IMAGE_MAX_AREA)?:false){
+        if (arguments?.containsKey(EXTRA_IMAGE_MAX_AREA) == true) {
             cameraView.setPictureSize(SizeSelectors.maxArea(arguments!!.getInt(EXTRA_IMAGE_MAX_AREA)))
         }
 
@@ -126,7 +126,14 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
-        cameraView.start()
+        try {
+            cameraView.start()
+        } catch (ex: Exception) {
+            if (ex is RuntimeException) {
+                Toast.makeText(this.context, "You can't use the camera for now.", Toast.LENGTH_LONG).show()
+                this.dismissAllowingStateLoss()
+            }
+        }
     }
 
     override fun onPause() {
