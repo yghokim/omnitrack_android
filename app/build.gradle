@@ -51,7 +51,7 @@ android {
             manifestPlaceholders.appName = buildConfigJson.overrideAppName
             buildConfigField 'String', 'APP_NAME', "\"$buildConfigJson.overrideAppName\""
         } else {
-            manifestPlaceholders.appName = "\"OmniTrack\""
+            manifestPlaceholders.appName = "OmniTrack"
             buildConfigField 'String', 'APP_NAME', "\"OmniTrack\""
         }
 
