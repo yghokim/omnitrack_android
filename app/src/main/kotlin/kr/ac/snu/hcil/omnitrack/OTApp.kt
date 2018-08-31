@@ -59,8 +59,6 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
 
         const val INTENT_EXTRA_METADATA = "metadata"
 
-        val INTENT_EXTRA_CONFIGURATION_ID = "${BuildConfig.APPLICATION_ID}.extra.configurationId"
-
         const val INTENT_EXTRA_TRIGGER_TIME = "triggerTime"
 
         const val INTENT_EXTRA_NOTIFICATION_ID = "notificationId"

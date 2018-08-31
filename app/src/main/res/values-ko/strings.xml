@@ -458,6 +458,7 @@
     <string name="msg_synchronized">동기화됨</string>
     <string name="msg_not_synchronized">동기화 대기중</string>
     <string name="msg_sampling_range">샘플링 범위</string>
+    <string name="msg_unsupported_connection">Unsupported connection in this version</string>
 
 
     <string-array name="purpose_entries">

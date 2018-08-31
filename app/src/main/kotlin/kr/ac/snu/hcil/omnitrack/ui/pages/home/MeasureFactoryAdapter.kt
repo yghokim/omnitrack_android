@@ -61,23 +61,6 @@ class MeasureFactoryAdapter(private val context: Context) : RecyclerView.Adapter
         override fun onClick(view: View) {
             if (view === connectButton) {
 
-                /* TODO measurefactory tracker picker
-                OTApplication.instance.currentUserObservable.subscribe {
-                    user ->
-                    val dialog = TrackerPickerDialogBuilder(user.trackers.unObservedList, this).createDialog(itemView.getActivity()!!, R.string.msg_pick_track_to_attach_field_with_measure, null, {
-                        tracker ->
-                        if (tracker != null) {
-                            DialogHelper.makeYesNoDialogBuilder(itemView.context, "OmniTrack", "Add a field to this tracker?", R.string.msg_add, onYes = {
-                                val exampleAttribute = this.measureFactory.makeNewExampleAttribute(tracker)
-                                tracker.attributes.add(exampleAttribute)
-                                //open tracker window
-                                val intent = TrackerDetailActivity.makeIntent(tracker.objectId, exampleAttribute, itemView.context)
-                                itemView.context.startActivity(intent)
-                            }).show()
-                        }
-                    })
-                    dialog.show()
-                }*/
                 val wizardView = ServiceWizardView(this@MeasureFactoryAdapter.context, measureFactory)
 
                 val wizardDialog = AlertDialog.Builder(this@MeasureFactoryAdapter.context)

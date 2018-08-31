@@ -8,7 +8,7 @@ import com.google.gson.JsonObject
  */
 abstract class AFlagsHelperBase {
     companion object {
-        private val parser: Gson by lazy {
+        val parser: Gson by lazy {
             Gson()
         }
 

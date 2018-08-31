@@ -451,11 +451,6 @@ class BackendDbManager @Inject constructor(
         }
     }
 
-    fun setUsedAppWidget(widgetName: String, used: Boolean) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-
     //Item Sync APIs==========================================
 
     override fun getLatestSynchronizedServerTimeOf(type: ESyncDataType): Long = when (type) {

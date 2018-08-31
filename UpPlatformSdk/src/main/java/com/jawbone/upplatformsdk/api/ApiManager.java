@@ -45,17 +45,4 @@ public class ApiManager {
         }
         return restApiHeaders;
     }
-
-    /*
-    //TODO make this more robust
-    private static class CustomErrorHandler implements ErrorHandler {
-        @Override
-        public Throwable handleError(RetrofitError cause) {
-            Response r = cause.getResponse();
-            if (r != null && r.getStatus() == 401) {
-                return cause.getCause();
-            }
-            return cause;
-        }
-    }*/
 }

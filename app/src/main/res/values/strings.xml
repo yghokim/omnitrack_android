@@ -632,5 +632,6 @@
     <string name="msg_synchronized">Synchronized</string>
     <string name="msg_not_synchronized">To be synchronized</string>
     <string name="msg_sampling_range">Sampling Range</string>
+    <string name="msg_unsupported_connection">Unsupported connection in this version</string>
 
 </resources>

@@ -139,7 +139,7 @@ class OTConnection {
             }
         } else {
             invalidMessages?.add(TextHelper.fromHtml(
-                    "<font color=\"blue\">Connection is not supported on current version.</font>"
+                    "<font color=\"blue\">This field is connected to the service that is not supported in this version of the app.</font>"
             ))
             return false
         }

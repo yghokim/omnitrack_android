@@ -60,7 +60,7 @@ class AttributeConnectionView : LinearLayout, View.OnClickListener {
 
         val source = connection?.source
         if (source == null) {
-            sourceView.text = "No source"
+            sourceView.setText(R.string.msg_unsupported_connection)
         } else {
             sourceView.text = source.factory.getFormattedName()
         }

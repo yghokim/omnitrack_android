@@ -41,43 +41,48 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListe
         println("Bind connection")
         if (connection != null) {
             val connectionSource = connection.source
-            if (connectionSource != null) {
-                if (connectionIndicator == null) {
-                    println("inflate new connection stub")
-                    connectionIndicator = connectionIndicatorStub.inflate()
-                    connectionIndicatorView = connectionIndicator?.findViewById(R.id.ui_indicator_view)
-                    connectionIndicatorLinkIconView = connectionIndicator?.findViewById(R.id.ui_connection_link_icon)
-                    connectionIndicatorSourceNameView = connectionIndicator?.findViewById(R.id.ui_connection_source_name)
-                    connectionIndicatorErrorMark = connectionIndicator?.findViewById(R.id.ui_invalid_icon)
-                    connectionIndicatorErrorMark?.setOnClickListener(this)
-                } else {
-                    println("set visible to current connection indicator")
-                    setVisibility(View.VISIBLE)
-                }
-
-                connectionIndicatorSourceNameView?.text = connectionSource.factory.getFormattedName()
-                if (connectionInvalidMessages == null) {
-                    connectionInvalidMessages = ArrayList<CharSequence>()
-                }
-                connectionInvalidMessages?.clear()
-                if (connection.isAvailableToRequestValue(connectionInvalidMessages)) {
-                    connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorPointed, null))
-                    connectionIndicatorErrorMark?.visibility = View.GONE
-                    connectionIndicatorLinkIconView?.setImageResource(R.drawable.link)
-                } else {
-                    connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorRed_Light, null))
-                    connectionIndicatorErrorMark?.visibility = View.VISIBLE
-                    connectionIndicatorLinkIconView?.setImageResource(R.drawable.unlink_dark)
-                }
+            if (connectionIndicator == null) {
+                println("inflate new connection stub")
+                connectionIndicator = connectionIndicatorStub.inflate()
+                connectionIndicatorView = connectionIndicator?.findViewById(R.id.ui_indicator_view)
+                connectionIndicatorLinkIconView = connectionIndicator?.findViewById(R.id.ui_connection_link_icon)
+                connectionIndicatorSourceNameView = connectionIndicator?.findViewById(R.id.ui_connection_source_name)
+                connectionIndicatorErrorMark = connectionIndicator?.findViewById(R.id.ui_invalid_icon)
+                connectionIndicatorErrorMark?.setOnClickListener(this)
             } else {
-                //TODO handle the case where there is a connection, but with null source
-                setVisibility(View.GONE)
+                println("set visible to current connection indicator")
+                setVisibility(View.VISIBLE)
+            }
+
+            if (connectionInvalidMessages == null) {
+                connectionInvalidMessages = ArrayList<CharSequence>()
+            }
+            connectionInvalidMessages?.clear()
+            if (connection.isAvailableToRequestValue(connectionInvalidMessages)) {
+                connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorPointed, null))
+                connectionIndicatorErrorMark?.visibility = View.GONE
+                connectionIndicatorLinkIconView?.setImageResource(R.drawable.link)
+            } else {
+                turnOnInvalidMode()
+            }
+
+            if (connectionSource != null) {
+                connectionIndicatorSourceNameView?.text = connectionSource.factory.getFormattedName()
+            } else {
+                // Unsupported source
+                connectionIndicatorSourceNameView?.setText(R.string.msg_unsupported_connection)
             }
         } else {
             println("hide the connection indicator view")
             setVisibility(View.GONE)
         }
 
+    }
+
+    private fun turnOnInvalidMode() {
+        connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorRed_Light, null))
+        connectionIndicatorErrorMark?.visibility = View.VISIBLE
+        connectionIndicatorLinkIconView?.setImageResource(R.drawable.unlink_dark)
     }
 
 

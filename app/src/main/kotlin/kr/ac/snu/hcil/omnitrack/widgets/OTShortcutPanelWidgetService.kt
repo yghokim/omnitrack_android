@@ -26,8 +26,6 @@ import javax.inject.Inject
  */
 class OTShortcutPanelWidgetService : RemoteViewsService() {
 
-    companion object;
-
     @Inject
     lateinit var configController: OTConfigurationController
 
