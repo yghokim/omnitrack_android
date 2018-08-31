@@ -573,12 +573,12 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                                 typeIconView.alpha = 0.2f
                                 columnNameButton.alpha = 0.2f
                                 previewContainer.visibility = View.GONE
-                                connectionIndicatorStubProxy.setVisibility(View.GONE)
+                                connectionIndicatorStubProxy.setContainerVisibility(View.GONE)
                             } else {
                                 typeIconView.alpha = 1.0f
                                 columnNameButton.alpha = 1.0f
                                 previewContainer.visibility = View.VISIBLE
-                                connectionIndicatorStubProxy.setVisibility(View.VISIBLE)
+                                connectionIndicatorStubProxy.setContainerVisibility(View.VISIBLE)
                             }
                         }
                 )
