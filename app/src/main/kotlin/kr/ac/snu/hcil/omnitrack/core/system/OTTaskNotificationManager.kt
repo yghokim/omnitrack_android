@@ -38,6 +38,7 @@ object OTTaskNotificationManager {
                     }
                 }
                 .setDeleteIntent(dismissedIntent)
+                .setOnlyAlertOnce(true)
                 .setProgress(100, progress, progress == PROGRESS_INDETERMINATE)
     }
 

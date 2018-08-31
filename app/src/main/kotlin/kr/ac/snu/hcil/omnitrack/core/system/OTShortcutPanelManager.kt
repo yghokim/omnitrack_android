@@ -195,6 +195,7 @@ class OTShortcutPanelManager @Inject constructor(
                         .setContentTitle(BuildConfig.APP_NAME)
                         .setCustomBigContentView(bigView)
                         .setCustomContentView(normalView)
+                        .setDefaults(0)
                         .setOnlyAlertOnce(true)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                         .setPriority(NotificationCompat.PRIORITY_HIGH)

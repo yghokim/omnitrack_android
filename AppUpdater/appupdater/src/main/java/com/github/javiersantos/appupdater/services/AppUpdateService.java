@@ -148,6 +148,7 @@ public class AppUpdateService extends Service {
                 .setContentTitle(getApplicationContext().getResources().getString(R.string.appupdater_download_notification_title))
                 .setContentText(getApplicationContext().getResources().getString(R.string.appupdater_download_notification_content))
                 .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
+                .setOnlyAlertOnce(true)
                 .setProgress(100, 0, true);
     }
 
@@ -167,6 +168,7 @@ public class AppUpdateService extends Service {
         return new NotificationCompat.Builder(this, INSTALL_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(iconResId)
                 .setAutoCancel(true)
+                .setOnlyAlertOnce(true)
                 .setContentTitle(context.getResources().getString(R.string.appupdater_install_notification_title))
                 .setContentText(context.getResources().getString(R.string.appupdater_install_notification_content))
                 .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))

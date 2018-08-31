@@ -79,6 +79,7 @@ object OTTrackingNotificationFactory {
         return NotificationCompat.Builder(context, channelId)
                 .setWhen(time)
                 .setShowWhen(true)
+                .setOnlyAlertOnce(true)
                 .setSmallIcon(R.drawable.icon_simple)
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
     }
