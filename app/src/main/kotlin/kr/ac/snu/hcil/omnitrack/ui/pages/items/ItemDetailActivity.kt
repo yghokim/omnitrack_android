@@ -32,6 +32,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_new_item.*
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -173,7 +174,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
         builderRestoredSnackbar = Snackbar.make(ui_root, resources.getText(R.string.msg_builder_restored), Snackbar.LENGTH_INDEFINITE)
         builderRestoredSnackbar.setAction(resources.getText(R.string.msg_clear_form)) { view ->
-
             creationSubscriptions.add(
                     (viewModel.trackerDao?.makePermissionAssertObservable(this, configuredContext) ?: Observable.just(true))
                             .subscribe({ approved ->
@@ -328,20 +328,28 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
             }
 
             if (needToStoreBuilder) {
+                /*
                 println("store Builder.")
                 creationSubscriptions.add(
                         viewModel.cacheEditingInfo().subscribe { saved ->
                             finish()
                         }
-                )
+                )*/
+                DialogHelper.makeYesNoDialogBuilder(this, BuildConfig.APP_NAME, resources.getString(R.string.msg_confirm_item_detail_close), R.string.msg_close, R.string.msg_cancel, {
+                    viewModel.clearHistory()
+                    finish()
+                }, {
+
+                }, false).show()
             } else {
                 println("remove builder")
                 viewModel.clearHistory()
                 finish()
             }
+        } else {
+            viewModel.clearHistory()
+            finish()
         }
-
-        finish()
     }
 
     override fun onBackPressed() {

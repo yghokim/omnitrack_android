@@ -458,8 +458,9 @@
     <string name="msg_synchronized">동기화됨</string>
     <string name="msg_not_synchronized">동기화 대기중</string>
     <string name="msg_sampling_range">샘플링 범위</string>
-    <string name="msg_unsupported_connection">Unsupported connection in this version</string>
+    <string name="msg_unsupported_connection">이 버젼의 앱에서 지원하지 않는 연결</string>
 
+    <string name="msg_confirm_item_detail_close">창을 닫으시겠습니까? 입력한 값은 사라집니다.</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>

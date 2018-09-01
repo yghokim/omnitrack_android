@@ -58,6 +58,8 @@
     <string name="msg_trigger_empty">No triggers yet.\nAdd a trigger to log tracker items automatically.</string>
     <string name="msg_reminder_empty">No reminders yet.\nAdd a reminder to notice you not to forget tracking.</string>
 
+    <string name="msg_confirm_item_detail_close">Discard the input and close the input screen?</string>
+
     <string name="msg_reminder_omitted">The omitted reminder</string>
 
     <string name="msg_reminder_open_input">Respond Now</string>
