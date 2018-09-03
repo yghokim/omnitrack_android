@@ -16,8 +16,6 @@ def firebaseProjectId = googleServices.project_info.project_id
 
 def buildConfigJson = project.buildConfigJson
 
-
-
 android {
 
     if (buildConfigJson.signing != null) {
@@ -110,6 +108,23 @@ android {
             manifestPlaceholders.appNameSuffix = " Debug"
         }
     }
+
+    //preliminary check for google-services.json validaty.
+    def matchClient
+
+    buildTypes.each{
+        buildType->
+        def finalApplicationId = buildType.applicationIdSuffix == null ? defaultConfig.applicationId : defaultConfig.applicationId + buildType.applicationIdSuffix
+        matchClient = googleServices.client.find {
+            println("Find matching service client with package name - ${finalApplicationId}")
+            return it.client_info.android_client_info.package_name == finalApplicationId
+        }
+    }
+
+    if(matchClient==null){
+        throw new IllegalStateException("google-services.json file does not contain a matching client information.")
+    }
+
     buildTypes.each {
         buildType ->
             def finalApplicationId = buildType.applicationIdSuffix == null ? defaultConfig.applicationId : defaultConfig.applicationId + buildType.applicationIdSuffix
@@ -131,19 +146,23 @@ android {
                 }
             }
 
-
             def googleServiceClient = googleServices.client.find {
-                it.client_info.android_client_info.package_name == finalApplicationId
+                println("Find matching service client with package name - ${finalApplicationId}")
+                return it.client_info.android_client_info.package_name == finalApplicationId
             }
-            def googleAuthClientId = googleServiceClient.oauth_client[0].client_id
-            def firebaseApiKey = googleServiceClient.api_key[0].current_key
-            def mobileSdkAppId = googleServiceClient.client_info.mobilesdk_app_id
 
-            buildType.buildConfigField 'String', 'FIREBASE_API_KEY', "\"$firebaseApiKey\""
+            if(googleServiceClient!=null) {
+                def googleAuthClientId = googleServiceClient.oauth_client.find{c-> c.client_type == 3 }.client_id
+                def firebaseApiKey = googleServiceClient.api_key[0].current_key
+                def mobileSdkAppId = googleServiceClient.client_info.mobilesdk_app_id
+
+                buildType.buildConfigField 'String', 'FIREBASE_API_KEY', "\"$firebaseApiKey\""
+                buildType.buildConfigField 'String', 'FIREBASE_AUTH_CLIENT_ID', "\"$googleAuthClientId\""
+                buildType.buildConfigField 'String', 'FIREBASE_CLIENT_ID', "\"$mobileSdkAppId\""
+            }
+
             buildType.buildConfigField 'String', 'FIREBASE_CLOUD_MESSAGING_SENDER_ID', "\"$gcmSenderId\""
             buildType.buildConfigField 'String', 'FIREBASE_PROJECT_ID', "\"$firebaseProjectId\""
-            buildType.buildConfigField 'String', 'FIREBASE_AUTH_CLIENT_ID', "\"$googleAuthClientId\""
-            buildType.buildConfigField 'String', 'FIREBASE_CLIENT_ID', "\"$mobileSdkAppId\""
 
             if (buildConfigJson.disableExternalEntities == true && buildConfigJson.defaultExperimentId != null && buildConfigJson.defaultExperimentId.length() > 0) {
                 buildType.buildConfigField 'boolean', 'DISABLE_EXTERNAL_ENTITIES', "true"
