@@ -23,7 +23,9 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
 
     abstract var value: T
 
-    constructor(layoutId: Int, context: Context) : this(layoutId, context, null)
+    constructor(layoutId: Int, context: Context) : this(layoutId, context, null) {
+        locked = !isEnabled
+    }
 
     init {
         if (layoutId != 0) {
@@ -35,6 +37,21 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
                 throw Exception("Inflation failed")
             }
         }
+    }
+
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+        this.locked = !enabled
+    }
+
+    override fun onViewLocked() {
+        super.onViewLocked()
+        this.alpha = 0.5f
+    }
+
+    override fun onViewUnlocked() {
+        super.onViewUnlocked()
+        this.alpha = 1.0f
     }
 
     fun addNewValidator(failedMessage: CharSequence?, func: (T) -> Boolean) {

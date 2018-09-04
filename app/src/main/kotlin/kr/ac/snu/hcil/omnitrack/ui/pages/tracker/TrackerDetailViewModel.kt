@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.app.Application
 import android.support.annotation.DrawableRes
+import com.google.gson.JsonObject
 import dagger.Lazy
 import dagger.internal.Factory
 import io.reactivex.Completable
@@ -13,7 +14,6 @@ import io.realm.RealmChangeListener
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
-import kr.ac.snu.hcil.omnitrack.core.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
@@ -99,7 +99,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     val attributeViewModelListObservable = BehaviorSubject.create<List<AttributeInformationViewModel>>()
 
-    val areAttributesRemovable = BehaviorSubject.createDefault<Boolean>(true)
+    val lockedPropertiesObservable = BehaviorSubject.create<Nullable<JsonObject>>()
 
     val isInjectedObservable = BehaviorSubject.create<Boolean>()
 
@@ -206,8 +206,11 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                                 nameObservable.onNextIfDifferAndNotNull(snapshot.name)
                                 isBookmarkedObservable.onNextIfDifferAndNotNull(snapshot.isBookmarked)
                                 colorObservable.onNextIfDifferAndNotNull(snapshot.color)
-                                areAttributesRemovable.onNextIfDifferAndNotNull(!(LockedPropertiesHelper.isLocked(LockedPropertiesHelper.TRACKER_REMOVE_ATTRIBUTES, snapshot.getParsedLockedPropertyInfo())
-                                        ?: false))
+
+                                //Locked properties ========
+                                lockedPropertiesObservable.onNextIfDifferAndNotNull(Nullable(snapshot.getParsedLockedPropertyInfo()))
+
+                                //==========================
 
                                 isInjectedObservable.onNextIfDifferAndNotNull(CreationFlagsHelper.isInjected(snapshot.getParsedCreationFlags()))
                                 experimentIdObservable.onNextIfDifferAndNotNull(Nullable(CreationFlagsHelper.getExperimentId(snapshot.getParsedCreationFlags())))

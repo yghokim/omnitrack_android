@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.android.gms.common.api.Api
 import com.google.android.gms.common.api.Scope
 import com.google.android.gms.fitness.Fitness
+import com.google.android.gms.fitness.data.DataSource
 import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.fitness.request.DataReadRequest
@@ -78,8 +79,17 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
             return if (service<GoogleFitService>().state == OTExternalService.ServiceState.ACTIVATED) {
                 service<GoogleFitService>().getConnectedClient().toFlowable().flatMap<Nullable<out Any>> { client ->
                     Flowable.defer {
+
+                        //make a DataSource to designate to use the same step count as Google Fit app.
+                        val source = DataSource.Builder()
+                                .setAppPackageName("com.google.android.gms")
+                                .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
+                                .setType(DataSource.TYPE_DERIVED)
+                                .setStreamName("estimated_steps")
+                                .build()
+
                         val request = DataReadRequest.Builder()
-                                .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                                .aggregate(source, DataType.AGGREGATE_STEP_COUNT_DELTA)
                                 .bucketByTime(1, TimeUnit.DAYS)
                                 .setTimeRange(start, end, TimeUnit.MILLISECONDS)
                                 .build()

@@ -638,6 +638,28 @@ class TrackerListFragment : OTFragment() {
                 )
 
                 subscriptions.add(
+                        viewModel.isItemListAllowed.subscribe { allowed ->
+                            listButton.isEnabled = allowed
+                            listButton.alpha = if (allowed) {
+                                1.0f
+                            } else {
+                                0.7f
+                            }
+                        }
+                )
+
+                subscriptions.add(
+                        viewModel.isVisualizationAllowed.subscribe { allowed ->
+                            chartViewButton.isEnabled = allowed
+                            chartViewButton.alpha = if (allowed) {
+                                1.0f
+                            } else {
+                                0.7f
+                            }
+                        }
+                )
+
+                subscriptions.add(
                         viewModel.activeNotificationCount.subscribe { count ->
                             if (count > 0) {
                                 alarmIcon.visibility = View.VISIBLE

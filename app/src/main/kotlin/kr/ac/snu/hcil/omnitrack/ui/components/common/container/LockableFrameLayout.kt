@@ -10,9 +10,9 @@ import kotlin.properties.Delegates
  * Created by younghokim on 16. 7. 22..
  */
 open class LockableFrameLayout : FrameLayout {
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     var locked: Boolean by Delegates.observable(false) {
         prop, old, new ->

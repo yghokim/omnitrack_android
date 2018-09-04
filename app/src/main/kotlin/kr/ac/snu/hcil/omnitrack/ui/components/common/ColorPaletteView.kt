@@ -105,9 +105,11 @@ class ColorPaletteView : ConstraintLayout, View.OnClickListener {
     }
 
     override fun onClick(v: View) {
-        val index = buttons.indexOf(v as? ColorSelectionButton)
-        if (index != -1) {
-            selectedIndex = index
+        if (isEnabled) {
+            val index = buttons.indexOf(v as? ColorSelectionButton)
+            if (index != -1) {
+                selectedIndex = index
+            }
         }
     }
 

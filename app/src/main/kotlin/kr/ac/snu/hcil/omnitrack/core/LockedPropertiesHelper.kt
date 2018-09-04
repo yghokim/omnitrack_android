@@ -11,6 +11,7 @@ object LockedPropertiesHelper : AFlagsHelperBase() {
     const val COMMON_DELETE = "delete"
     const val COMMON_EDIT = "edit"
     const val TRACKER_BOOKMARK = "bookmark"
+    const val TRACKER_ADD_ATTRIBUTES = "addAttributes"
     const val TRACKER_REMOVE_ATTRIBUTES = "removeAttributes"
     const val TRACKER_EDIT_ATTRIBUTES = "editAttributes"
     const val TRACKER_CHANGE_NAME = "changeName"
@@ -22,9 +23,14 @@ object LockedPropertiesHelper : AFlagsHelperBase() {
 
     const val ATTRIBUTE_VISIBILITY = "visibility"
 
-    fun isLocked(key: String, properties: JsonObject): Boolean? {
-        return properties.getBooleanCompat(key)
+    fun isLocked(key: String, properties: JsonObject?): Boolean? {
+        return properties?.getBooleanCompat(key)
     }
+
+    fun isLockedNotNull(key: String, properties: JsonObject?): Boolean {
+        return properties?.getBooleanCompat(key) ?: false
+    }
+
 
     class Builder : BuilderBase() {
         fun setLocked(key: String, isLocked: Boolean?): Builder {

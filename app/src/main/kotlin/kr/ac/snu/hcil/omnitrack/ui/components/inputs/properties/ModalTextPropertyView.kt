@@ -79,8 +79,10 @@ class ModalTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
     }
 
     override fun onClick(view: View) {
-        if (view === ui_text) {
-            dialogBuilder.show()
+        if (isEnabled) {
+            if (view === ui_text) {
+                dialogBuilder.show()
+            }
         }
     }
 

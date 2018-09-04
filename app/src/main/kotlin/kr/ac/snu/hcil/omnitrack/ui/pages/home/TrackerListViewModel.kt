@@ -187,6 +187,8 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
         val trackerRemovable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(true)
         val trackerEditable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(true)
+        val isVisualizationAllowed: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(true)
+        val isItemListAllowed: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(true)
 
 
         val isBookmarked: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
@@ -272,6 +274,8 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
             trackerEditable.onNextIfDifferAndNotNull(!snapshot.isEditingLocked())
             trackerRemovable.onNextIfDifferAndNotNull(!snapshot.isDeletionLocked())
+            isItemListAllowed.onNextIfDifferAndNotNull(!snapshot.isItemListLocked())
+            isVisualizationAllowed.onNextIfDifferAndNotNull(!snapshot.isVisualizationLocked())
 
             CreationFlagsHelper.getExperimentId(trackerDao.getParsedCreationFlags())?.let { experimentId ->
                 println("Observe the name of the experiment : ${experimentId}")

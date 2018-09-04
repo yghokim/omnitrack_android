@@ -156,13 +156,19 @@ open class OTTrackerDAO : RealmObject() {
     }
 
     fun isEditingLocked(): Boolean {
-        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.COMMON_EDIT, getParsedLockedPropertyInfo())
-                ?: false
+        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.COMMON_EDIT, getParsedLockedPropertyInfo())
     }
 
     fun isDeletionLocked(): Boolean {
-        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.COMMON_DELETE, getParsedLockedPropertyInfo())
-                ?: false
+        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.COMMON_DELETE, getParsedLockedPropertyInfo())
+    }
+
+    fun isVisualizationLocked(): Boolean {
+        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_ENTER_VISUALIZATION, getParsedLockedPropertyInfo())
+    }
+
+    fun isItemListLocked(): Boolean {
+        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_ENTER_ITEM_LIST, getParsedLockedPropertyInfo())
     }
 
     fun isInstantLoggingAvailable(): Boolean {

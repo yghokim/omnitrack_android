@@ -41,6 +41,8 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
         const val COMMAND_SYNC = "sync_down"
         const val COMMAND_SIGNOUT = "sign_out"
         const val COMMAND_DUMP_DB = "dump_db"
+
+        const val COMMAND_NEW_UPDATE_RELEASED = "update_released"
     }
 
     @Inject
