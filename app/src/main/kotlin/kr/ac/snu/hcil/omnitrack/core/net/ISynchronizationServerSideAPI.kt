@@ -1,7 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core.net
 
 import android.support.annotation.Keep
+import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
+import com.google.gson.stream.JsonWriter
+import dagger.Lazy
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
@@ -16,8 +22,44 @@ interface ISynchronizationServerSideAPI {
     data class ServerUserInfo(val _id: String, val name: String?, val email: String, val picture: String?, val nameUpdatedAt: Long?,
                               val dataStore: JsonObject?)
 
-    @Keep
-    data class ExperimentConsentInfo(val receiveConsentInApp: Boolean, val consent: String?, val demographicFormSchema: JsonObject?)
+    class ExperimentConsentInfo(var receiveConsentInApp: Boolean = false, var consent: String? = null, var demographicFormSchema: String? = null) {
+        class ConsentInfoTypeAdapter(val gson: Lazy<Gson>) : TypeAdapter<ExperimentConsentInfo>() {
+            override fun write(out: JsonWriter, value: ExperimentConsentInfo) {
+                out.name("receiveConsentInApp").value(value.receiveConsentInApp)
+                out.name("consent").value(value.consent)
+                out.name("demographicFormSchema").jsonValue(value.demographicFormSchema)
+            }
+
+            override fun read(reader: JsonReader): ExperimentConsentInfo {
+                val result = ExperimentConsentInfo()
+                reader.beginObject()
+
+                while (reader.hasNext()) {
+                    val name = reader.nextName()
+                    if (reader.peek() == JsonToken.NULL) {
+                        reader.skipValue()
+                    } else {
+                        when (name) {
+                            "consent" -> {
+                                result.consent = reader.nextString()
+                            }
+                            "receiveConsentInApp" -> {
+                                result.receiveConsentInApp = reader.nextBoolean()
+                            }
+                            "demographicFormSchema" -> {
+                                result.demographicFormSchema = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
+                            }
+                            else -> reader.skipValue()
+                        }
+                    }
+                }
+
+                reader.endObject()
+                return result
+            }
+
+        }
+    }
 
     @Keep
     data class AuthenticationResult(val inserted: Boolean, val deviceLocalKey: String, val userInfo: ServerUserInfo?)

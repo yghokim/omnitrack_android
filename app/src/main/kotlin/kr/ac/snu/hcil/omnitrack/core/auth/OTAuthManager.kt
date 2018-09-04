@@ -226,10 +226,10 @@ class OTAuthManager @Inject constructor(
                                                 if (!isInExperiment) {
                                                     synchronizationServerController.get().getExperimentConsentInfo(BuildConfig.DEFAULT_EXPERIMENT_ID)
                                                             .flatMap {
-                                                                if (BuildConfig.DEFAULT_INVITATION_CODE != null && it.consent == null && it.demographicFormSchema == null) {
+                                                                if (BuildConfig.DEFAULT_INVITATION_CODE != null && (!it.receiveConsentInApp || (it.consent == null && it.demographicFormSchema == null))) {
                                                                     Single.just(Pair<String, JsonObject?>(BuildConfig.DEFAULT_INVITATION_CODE, null))
                                                                 } else RxActivityResult.on(activity)
-                                                                        .startIntent(ExperimentSignUpActivity.makeIntent(activity, BuildConfig.DEFAULT_INVITATION_CODE == null, it.consent, it.demographicFormSchema))
+                                                                        .startIntent(ExperimentSignUpActivity.makeIntent(activity, BuildConfig.DEFAULT_INVITATION_CODE == null, if (it.receiveConsentInApp) it.consent else null, if (it.receiveConsentInApp) it.demographicFormSchema else null))
                                                                         .firstOrError()
                                                                         .map { result ->
                                                                             if (result.resultCode() != Activity.RESULT_OK) {

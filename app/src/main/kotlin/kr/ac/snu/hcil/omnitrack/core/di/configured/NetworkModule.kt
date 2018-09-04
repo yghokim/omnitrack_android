@@ -7,6 +7,8 @@ import com.firebase.jobdispatcher.Job
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
 import com.github.pwittchen.reactivenetwork.library.rx2.internet.observing.InternetObservingSettings
 import com.github.pwittchen.reactivenetwork.library.rx2.internet.observing.strategy.SocketInternetObservingStrategy
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -23,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.Loc
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UploadTaskInfo
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.di.global.DeviceId
+import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.di.global.Sha1FingerPrint
 import kr.ac.snu.hcil.omnitrack.core.net.*
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
@@ -44,9 +47,6 @@ import javax.inject.Qualifier
 class NetworkModule {
     private val rxJava2CallAdapterFactory: RxJava2CallAdapterFactory by lazy {
         RxJava2CallAdapterFactory.create()
-    }
-    private val gsonConverterFactory: GsonConverterFactory by lazy {
-        GsonConverterFactory.create()
     }
 
     private val scalarsConverterFactory: ScalarsConverterFactory by lazy {
@@ -105,13 +105,21 @@ class NetworkModule {
     @Provides
     @Configured
     @SynchronizationServer
-    fun provideSynchronizationRetrofit(config: OTConfiguration, @Authorized client: OkHttpClient): Retrofit {
+    fun provideSynchronizationRetrofit(config: OTConfiguration, @Authorized client: OkHttpClient, @ForGeneric gson: Lazy<Gson>): Retrofit {
         return Retrofit.Builder()
                 .client(client)
                 .baseUrl(config.synchronizationServerUrl)
                 .addCallAdapterFactory(rxJava2CallAdapterFactory)
                 .addConverterFactory(scalarsConverterFactory)
-                .addConverterFactory(gsonConverterFactory)
+                .addConverterFactory(GsonConverterFactory.create(
+                        GsonBuilder()
+                                .registerTypeAdapter(
+                                        ISynchronizationServerSideAPI
+                                                .ExperimentConsentInfo::class.java,
+                                        ISynchronizationServerSideAPI
+                                                .ExperimentConsentInfo.ConsentInfoTypeAdapter(gson))
+                                .create()
+                ))
                 .build()
     }
 
@@ -123,7 +131,7 @@ class NetworkModule {
                 .client(client)
                 .baseUrl(config.mediaStorageServerUrl)
                 .addCallAdapterFactory(rxJava2CallAdapterFactory)
-                .addConverterFactory(gsonConverterFactory)
+                .addConverterFactory(GsonConverterFactory.create())
                 .build()
     }
 

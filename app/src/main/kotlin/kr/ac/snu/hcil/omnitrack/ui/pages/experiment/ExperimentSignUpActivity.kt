@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AppCompatActivity
-import com.google.gson.JsonObject
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_experiment_signup.*
 import kr.ac.snu.hcil.omnitrack.R
@@ -29,7 +28,7 @@ class ExperimentSignUpActivity : AppCompatActivity() {
         const val DEMOGRAPHIC_SCHEMA = "demographic_schema"
         const val DEMOGRAPHIC_DATA = "demographic_data"
 
-        fun makeIntent(context: Context, askInvitationCode: Boolean, consentForm: String?, demographicSchema: JsonObject?): Intent {
+        fun makeIntent(context: Context, askInvitationCode: Boolean, consentForm: String?, demographicSchema: String?): Intent {
             return Intent(context, ExperimentSignUpActivity::class.java).apply {
                 putExtra(ASK_INVITATION_CODE, askInvitationCode)
                 if (consentForm != null) {
