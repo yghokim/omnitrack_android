@@ -294,9 +294,6 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         }
 
         override fun onChange(snapshot: OTTrackerDAO) {
-            println("tracker information viewmodel onChange")
-            println(snapshot.name)
-            println(snapshot.color)
             if (snapshot.isValid && snapshot.isLoaded) {
                 updateValues(snapshot)
             }

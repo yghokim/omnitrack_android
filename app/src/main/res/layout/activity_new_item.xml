@@ -38,9 +38,45 @@
             android:visibility="visible" />
     </android.support.design.widget.AppBarLayout>
 
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/ui_attribute_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height_normal"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_margin="24dp"
+        android:layout_marginBottom="8dp"
+        app:cardBackgroundColor="@color/colorAccent.Light"
+        app:cardElevation="12dp"
+        app:cardPreventCornerOverlap="true"
+        app:layout_dodgeInsetEdges="bottom">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/pointed_gradient" />
+
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.TintFancyButton
+            android:id="@+id/ui_button_next"
+            style="@style/TransparentButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/msg_save_current_input"
+            android:textAllCaps="true"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:fb_borderColor="#2fffffff"
+            app:fb_borderWidth="2dp"
+            app:fb_defaultColor="@color/transparent"
+            app:fb_focusColor="@color/colorAccent.Light"
+            app:fb_textColor="#FFF" />
+    </android.support.v7.widget.CardView>
+
 </android.support.design.widget.CoordinatorLayout>

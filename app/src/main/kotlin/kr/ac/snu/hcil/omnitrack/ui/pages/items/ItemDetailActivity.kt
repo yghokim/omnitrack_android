@@ -54,6 +54,7 @@ import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import org.jetbrains.anko.notificationManager
+import rx_activity_result2.RxActivityResult
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider
@@ -63,7 +64,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 16. 7. 24
  */
-class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_item) {
+class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_item), View.OnClickListener {
 
     class RequiredFieldsNotCompleteException(val inCompleteFieldLocalIds: Array<String>) : Exception("Required fields are not completed.")
     class SurveyNotCompleteException : Exception("You did not complete the survey.")
@@ -121,6 +122,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
     private var activityResultAppliedAttributePosition = -1
 
     private lateinit var builderRestoredSnackbar: Snackbar
+    private lateinit var redirectedPageCanceledSnackbar: Snackbar
 
     private val loadingIndicatorBar: LoadingIndicatorBar by bindView(R.id.ui_loading_indicator)
 
@@ -149,6 +151,11 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setActionBarButtonMode(MultiButtonActionBarActivity.Mode.SaveCancel)
+        rightActionBarTextButton?.visibility = View.GONE
+        rightActionBarButton?.visibility = View.GONE
+        rightActionBarSubButton?.visibility = View.GONE
+
+        ui_button_next.setOnClickListener(this)
 
         val action = intent.action
         viewModel = when (action) {
@@ -193,6 +200,13 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
             builderRestoredSnackbar.dismiss()
         }
+
+        redirectedPageCanceledSnackbar = Snackbar.make(ui_root, resources.getText(R.string.msg_redirected_page_canceled), Snackbar.LENGTH_INDEFINITE)
+        redirectedPageCanceledSnackbar.setAction(resources.getText(R.string.msg_reopen_redirected_page)) { view ->
+            redirectedPageCanceledSnackbar.dismiss()
+            tryOpenRedirectPage()
+        }
+
 
         creationSubscriptions.add(
                 viewModel.isBusyObservable.subscribe { isBusy ->
@@ -255,6 +269,19 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                 }
         )
 
+        (viewModel as? NewItemCreationViewModel)?.let { newItemCreationViewModel ->
+            creationSubscriptions.add(
+                    newItemCreationViewModel.redirectedPageVisitStatusObservable.subscribe {
+                        ui_button_next.text = resources.getString(
+                                when (it) {
+                                    NewItemCreationViewModel.RedirectedPageStatus.NotVisited -> R.string.msg_visit_survey_website
+                                    else -> R.string.msg_save_current_input
+                                }
+                        )
+                    }
+            )
+        }
+
         val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
 
         val metadata = if (intent.getStringExtra(OTApp.INTENT_EXTRA_METADATA) != null) {
@@ -276,6 +303,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         }
 
         viewModel.init(trackerId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM), metadata)
+
     }
 
     override fun onPause() {
@@ -291,16 +319,10 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
     override fun onDestroy() {
         super.onDestroy()
         println("onDestroy ItemDetailActivity")
+        for (inputView in attributeListAdapter.inputViews) {
+            inputView.onDestroy()
+        }
 
-        /*
-        ItemBuilder Caching Policy:
-        1. if user edited the result: save
-        2. if user did not edited the result:
-            - if field values are volatile: cache result
-            - if field values are not volatile:
-                - creationMode was new: discard builder (it will yield the same result on later visit)
-                - creationMode was restored: store builder (it is naturally dirty after autoComplete.)
-         */
     }
 
     override fun onLowMemory() {
@@ -315,9 +337,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         itemSaved = false
 
         if (mode == ItemEditionViewModelBase.ItemMode.New) {
-            val needToStoreBuilder = if (viewModel.isValid
-                    && viewModel.trackerDao?.redirectUrl == null) {
-
+            val needToStoreBuilder = if (viewModel.isValid) {
                 if (viewModel.isViewModelsDirty()) {
                     true
                 } else if (currentAttributeViewModelList.filter { it.attributeDAO.getHelper(configuredContext).isAttributeValueVolatile(it.attributeDAO) }.isNotEmpty()) {
@@ -356,22 +376,38 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         onToolbarLeftButtonClicked()
     }
 
+    override fun onClick(v: View?) {
+        if (v === ui_button_next) {
+            onToolbarRightButtonClicked()
+        }
+    }
+
     override fun onToolbarRightButtonClicked() {
         //push item to db
         //syncViewStateToBuilderAsync {viewModel.applyEditingToDatabase()
 
-        creationSubscriptions.add(
-                Single.zip(
-                        attributeListAdapter.inputViews.map { it.forceApplyValueAsync() }
-                ) { zipped -> zipped }.flatMapMaybe {
-                    val incompleteFieldLocalIds = currentAttributeViewModelList.filter {
-                        it.isRequired && it.value?.value == null
-                    }.map { it.attributeLocalId }
 
-                    if (incompleteFieldLocalIds.isNotEmpty()) {
-                        throw RequiredFieldsNotCompleteException(incompleteFieldLocalIds.toTypedArray())
-                    } else {
-                        /*
+        val viewModel = this.viewModel
+        val saveImmediately = if (viewModel is NewItemCreationViewModel) {
+            val status = viewModel.redirectedPageVisitStatusObservable.value
+            status != NewItemCreationViewModel.RedirectedPageStatus.NotVisited
+        } else {
+            true
+        }
+
+        if (saveImmediately) {
+            creationSubscriptions.add(
+                    Single.zip(
+                            attributeListAdapter.inputViews.map { it.forceApplyValueAsync() }
+                    ) { zipped -> zipped }.flatMapMaybe {
+                        val incompleteFieldLocalIds = currentAttributeViewModelList.filter { attributeViewModel ->
+                            attributeViewModel.isRequired && attributeViewModel.value?.value == null
+                        }.map { it.attributeLocalId }
+
+                        if (incompleteFieldLocalIds.isNotEmpty()) {
+                            throw RequiredFieldsNotCompleteException(incompleteFieldLocalIds.toTypedArray())
+                        } else {
+                            /*
                         if(viewModel.mode == ItemEditionViewModelBase.ItemMode.New
                                 && viewModel.trackerDao?.redirectUrl != null){
                                 val url = Uri.parse(viewModel.trackerDao!!.redirectUrl!!).buildUpon()
@@ -401,79 +437,104 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                                             }else Maybe.error<String>(SurveyNotCompleteException()))
                                         }
                         }else viewModel.applyEditingToDatabase()*/
-                        viewModel.applyEditingToDatabase()
-                    }
-                }.subscribe({ result ->
-                    viewModel.clearHistory()
-                    if (viewModel.mode == ItemEditionViewModelBase.ItemMode.New) {
-                        startService(OTReminderService.makeUserLoggedIntent(this, viewModel.trackerDao?.objectId!!, System.currentTimeMillis()))
-                    }
+                            viewModel.applyEditingToDatabase()
+                        }
+                    }.subscribe({ result ->
+                        viewModel.clearHistory()
+                        if (viewModel.mode == ItemEditionViewModelBase.ItemMode.New) {
+                            startService(OTReminderService.makeUserLoggedIntent(this, viewModel.trackerDao?.objectId!!, System.currentTimeMillis()))
+                        }
 
-                    when (viewModel.mode) {
-                        ItemEditionViewModelBase.ItemMode.New -> {
-                            itemSaved = true
-                            eventLogger.get().logItemAddedEvent(result, ItemLoggingSource.Manual) { content ->
-                                if (this.intent.hasExtra(INTENT_EXTRA_REMINDER_TIME)) {
-                                    content.add("pivotReminderTime", this.intent.getLongExtra(INTENT_EXTRA_REMINDER_TIME, 0).toJson())
+                        when (viewModel.mode) {
+                            ItemEditionViewModelBase.ItemMode.New -> {
+                                itemSaved = true
+                                eventLogger.get().logItemAddedEvent(result, ItemLoggingSource.Manual) { content ->
+                                    if (this.intent.hasExtra(INTENT_EXTRA_REMINDER_TIME)) {
+                                        content.add("pivotReminderTime", this.intent.getLongExtra(INTENT_EXTRA_REMINDER_TIME, 0).toJson())
+                                    }
                                 }
-                            }
 
-                            if (viewModel.trackerDao?.redirectUrl != null) {
-                                val url = Uri.parse(viewModel.trackerDao!!.redirectUrl!!).buildUpon()
-                                        .appendQueryParameter("userId", authManager.userId)
-                                        .appendQueryParameter("itemId", (viewModel as? NewItemCreationViewModel)?.generateNewItemId())
-                                        .run {
-                                            viewModel.metadataForItem?.let {
-                                                it.forEach { key, value ->
-                                                    try {
-                                                        this.appendQueryParameter(key, value.asString)
-                                                    } catch (ex: Exception) {
-                                                        this.appendQueryParameter(key, value.toString())
-                                                    }
-                                                }
-                                            }
-                                            this
-                                        }
-                                        .build().toString()
-                                println("redirect to ${url}")
-                                startActivity(WebServiceLoginActivity.makeIntent(url, "Qualtrics", "Complete A Survey", this))
-                            } else {
+                                setResult(RESULT_OK, Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, result))
+                                finish()
+                            }
+                            ItemEditionViewModelBase.ItemMode.Edit -> {
+                                eventLogger.get().logItemEditEvent(result) { content ->
+                                    content[IEventLogger.CONTENT_IS_INDIVIDUAL] = false
+                                }
                                 setResult(RESULT_OK, Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, result))
                                 finish()
                             }
                         }
-                        ItemEditionViewModelBase.ItemMode.Edit -> {
-                            eventLogger.get().logItemEditEvent(result) { content ->
-                                content[IEventLogger.CONTENT_IS_INDIVIDUAL] = false
-                            }
-                            setResult(RESULT_OK, Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, result))
-                            finish()
-                        }
-                    }
-                }, { ex ->
-                    if (ex is RequiredFieldsNotCompleteException) {
-                        val incompleteFields = currentAttributeViewModelList.mapIndexed { index, attributeInputViewModel -> Pair(index, attributeInputViewModel) }.filter { ex.inCompleteFieldLocalIds.contains(it.second.attributeLocalId) }
+                    }, { ex ->
+                        if (ex is RequiredFieldsNotCompleteException) {
+                            val incompleteFields = currentAttributeViewModelList.mapIndexed { index, attributeInputViewModel -> Pair(index, attributeInputViewModel) }.filter { ex.inCompleteFieldLocalIds.contains(it.second.attributeLocalId) }
 
-                        val minPosition = incompleteFields.minBy { it.first }?.first
-                        if (minPosition != null) {
-                            val topFitScroller = object : LinearSmoothScroller(this@ItemDetailActivity) {
-                                override fun getVerticalSnapPreference(): Int {
-                                    return LinearSmoothScroller.SNAP_TO_START
+                            val minPosition = incompleteFields.minBy { it.first }?.first
+                            if (minPosition != null) {
+                                val topFitScroller = object : LinearSmoothScroller(this@ItemDetailActivity) {
+                                    override fun getVerticalSnapPreference(): Int {
+                                        return LinearSmoothScroller.SNAP_TO_START
+                                    }
+                                }
+
+                                topFitScroller.targetPosition = minPosition
+                                attributeListView.layoutManager.startSmoothScroll(topFitScroller)
+                            }
+
+                            Toast.makeText(this@ItemDetailActivity, "${ex.inCompleteFieldLocalIds.size} required fields are not completed.", Toast.LENGTH_LONG).show()
+                        } else if (ex is SurveyNotCompleteException) {
+                            Toast.makeText(this@ItemDetailActivity, "The survey was not completed.", Toast.LENGTH_LONG).show()
+                        }
+                    }, {
+                        println("storing item was failed. Null item id returned")
+                    })
+            )
+        } else {
+            //redirection mode
+            tryOpenRedirectPage()
+        }
+    }
+
+    private fun tryOpenRedirectPage() {
+        val viewModel = this.viewModel
+        //redirection mode
+        if (viewModel is NewItemCreationViewModel && viewModel.trackerDao?.redirectUrl != null) {
+            val url = Uri.parse(viewModel.trackerDao?.redirectUrl).buildUpon()
+                    .appendQueryParameter("userId", authManager.userId)
+                    .appendQueryParameter("itemId", (viewModel as? NewItemCreationViewModel)?.generateNewItemId())
+                    .run {
+                        viewModel.metadataForItem?.let {
+                            it.forEach { key, value ->
+                                try {
+                                    this.appendQueryParameter(key, value.asString)
+                                } catch (ex: Exception) {
+                                    this.appendQueryParameter(key, value.toString())
                                 }
                             }
-
-                            topFitScroller.targetPosition = minPosition
-                            attributeListView.layoutManager.startSmoothScroll(topFitScroller)
                         }
-
-                        Toast.makeText(this@ItemDetailActivity, "${ex.inCompleteFieldLocalIds.size} required fields are not completed.", Toast.LENGTH_LONG).show()
-                    } else if (ex is SurveyNotCompleteException) {
-                        Toast.makeText(this@ItemDetailActivity, "The survey was not completed.", Toast.LENGTH_LONG).show()
+                        this
                     }
-                }, {
-                    println("storing item was failed. Null item id returned")
-                })
-        )
+                    .build().toString()
+            println("redirect to ${url}")
+            creationSubscriptions.add(
+                    RxActivityResult.on(this).startIntent(WebServiceLoginActivity.makeIntent(url, "Qualtrics", "Complete A Survey", this))
+                            .subscribe { result ->
+                                val redirectionStatus = when (result.resultCode()) {
+                                    Activity.RESULT_OK -> {
+                                        NewItemCreationViewModel.RedirectedPageStatus.Completed
+                                    }
+                                    else -> NewItemCreationViewModel.RedirectedPageStatus.Canceled
+                                }
+                                viewModel.setResultOfRedirectedPage(redirectionStatus)
+                                if (result.resultCode() == Activity.RESULT_OK) {
+                                    Toast.makeText(this@ItemDetailActivity, "Completed Qualtrics suvery.", Toast.LENGTH_LONG).show()
+                                    redirectedPageCanceledSnackbar.dismiss()
+                                } else {
+                                    redirectedPageCanceledSnackbar.show()
+                                }
+                            }
+            )
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

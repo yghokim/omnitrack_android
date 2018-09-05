@@ -13,7 +13,9 @@ import android.webkit.WebViewClient
 import android.widget.TextView
 import butterknife.bindView
 import com.github.ybq.android.spinkit.SpinKitView
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
 import okhttp3.HttpUrl
 
@@ -96,8 +98,18 @@ open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(view: View) {
         if (view === cancelButton) {
+            tryCancel()
+        }
+    }
+
+    override fun onBackPressed() {
+        tryCancel()
+    }
+
+    protected open fun tryCancel() {
+        DialogHelper.makeYesNoDialogBuilder(this, BuildConfig.APP_NAME, resources.getString(R.string.msg_confirm_cancel_and_close_process), R.string.msg_close, R.string.msg_cancel, {
             setResult(RESULT_CANCELED)
             finish()
-        }
+        }, null).show()
     }
 }

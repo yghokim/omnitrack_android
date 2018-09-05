@@ -60,6 +60,15 @@
 
     <string name="msg_confirm_item_detail_close">Discard the input and close the input screen?</string>
 
+    <string name="msg_save_current_input">Save Item</string>
+    <string name="msg_visit_survey_website">Open Qualtrics Page</string>
+
+    <string name="msg_redirected_page_canceled">You canceled the Qualtrics survey.</string>
+    <string name="msg_reopen_redirected_page">Open Again</string>
+
+
+    <string name="msg_confirm_cancel_and_close_process">Close the page without completion?</string>
+
     <string name="msg_reminder_omitted">The omitted reminder</string>
 
     <string name="msg_reminder_open_input">Respond Now</string>

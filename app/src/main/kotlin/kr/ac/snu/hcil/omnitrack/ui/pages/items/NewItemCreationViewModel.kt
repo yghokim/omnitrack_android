@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.items
 import android.app.Application
 import io.reactivex.Maybe
 import io.reactivex.Single
+import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
@@ -11,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTItemBuilderFieldValueEntry
 import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
+import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
 
@@ -19,8 +21,17 @@ import java.util.*
  */
 class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app) {
 
+    enum class RedirectedPageStatus {
+        RedirectionNotSet, NotVisited, Completed, Canceled
+    }
+
+    val loadPendingItemBuilder: Boolean = false
+
     private lateinit var itemBuilderDao: OTItemBuilderDAO
     private lateinit var builderWrapper: OTItemBuilderWrapperBase
+
+    val redirectedPageVisitStatusObservable = BehaviorSubject.createDefault<RedirectedPageStatus>(RedirectedPageStatus.RedirectionNotSet)
+
 
     private var reservedNewItemId: String? = null
     fun generateNewItemId(): String {
@@ -33,7 +44,14 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
     }
 
     override fun onInit(trackerDao: OTTrackerDAO, itemId: String?): Pair<ItemMode, BuilderCreationMode?>? {
-        val builderDaoResult = dbManager.get().getItemBuilderQuery(trackerDao.objectId!!, OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst()
+
+        if (!trackerDao.redirectUrl.isNullOrBlank()) {
+            redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(RedirectedPageStatus.NotVisited)
+        } else {
+            redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(RedirectedPageStatus.RedirectionNotSet)
+        }
+
+        val builderDaoResult = if (loadPendingItemBuilder) dbManager.get().getItemBuilderQuery(trackerDao.objectId!!, OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst() else null
 
         if (builderDaoResult != null) {
             //there is a pending itemBuilder.
@@ -151,9 +169,9 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
 
     override fun clearHistory() {
         subscriptions.add(
-                isBusyObservable.filter { !it }.subscribe {
-                    realm.executeTransaction {
-                        val daos = realm.where(OTItemBuilderDAO::class.java).equalTo("id", itemBuilderDao.id).findAll()
+                isBusyObservable.filter { !it }.subscribe { isBusy ->
+                    realm.executeTransaction { transactionRealm ->
+                        val daos = transactionRealm.where(OTItemBuilderDAO::class.java).equalTo("id", itemBuilderDao.id).findAll()
                         daos.forEach {
                             it.data.deleteAllFromRealm()
                         }
@@ -163,6 +181,11 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
                     isValid = false
                 }
         )
+    }
+
+
+    fun setResultOfRedirectedPage(result: RedirectedPageStatus) {
+        this.redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(result)
     }
 
 }

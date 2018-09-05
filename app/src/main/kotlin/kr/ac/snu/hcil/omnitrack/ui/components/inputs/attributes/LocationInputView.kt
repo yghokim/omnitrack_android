@@ -384,6 +384,10 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         googleMap?.clear()
         addressConversionTaskSubscription.set(null)
         myLocationTaskSubscription.set(null)
-        mapView.onDestroy()
+        try {
+            mapView.onDestroy()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
     }
 }
