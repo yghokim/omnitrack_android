@@ -531,8 +531,13 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 viewHolderSubscriptions.add(
                         Observable.combineLatest<Nullable<JsonObject>, Boolean, Boolean>(viewModel.lockedPropertiesObservable, attributeViewModel.isEditable,
                                 BiFunction { lockedProperties: Nullable<JsonObject>, localEditable: Boolean ->
-                                    !(LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_EDIT_ATTRIBUTES, lockedProperties.datum) && localEditable)
+                                    val trackerEditLocked = LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_EDIT_ATTRIBUTES, lockedProperties.datum)
+                                    val attributeEditLocked = !localEditable
+                                    !trackerEditLocked && !attributeEditLocked
                                 }).subscribe { isEditable: Boolean ->
+
+                            previewContainer.isEnabled = isEditable
+                            columnNameButton.isEnabled = isEditable
                             editButton.isEnabled = isEditable
                             editButton.alpha = if (isEditable) 1.0f else 0.2f
                         }

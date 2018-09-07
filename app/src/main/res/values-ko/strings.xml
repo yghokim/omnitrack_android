@@ -461,6 +461,7 @@
     <string name="msg_unsupported_connection">이 버젼의 앱에서 지원하지 않는 연결</string>
 
     <string name="msg_confirm_item_detail_close">창을 닫으시겠습니까? 입력한 값은 사라집니다.</string>
+    <string name="msg_menu_details">상세보기</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>

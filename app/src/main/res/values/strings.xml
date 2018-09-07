@@ -105,8 +105,8 @@
     <string name="msg_tab_invitations">Invitations</string>
 
     <string name="msg_edit">Edit</string>
-    <string name="msg_data_list">Item List</string>
-    <string name="msg_remove">Remove</string>
+    <string name="msg_data_list">Items</string>
+    <string name="msg_remove">Delete</string>
 
     <string name="msg_format_edit_something">Edit %1$s</string>
     <string name="msg_format_new_something">New %1$s</string>
@@ -644,5 +644,6 @@
     <string name="msg_not_synchronized">To be synchronized</string>
     <string name="msg_sampling_range">Sampling Range</string>
     <string name="msg_unsupported_connection">Unsupported connection in this version</string>
+    <string name="msg_menu_details">Details</string>
 
 </resources>

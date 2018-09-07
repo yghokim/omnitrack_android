@@ -210,7 +210,7 @@
             android:id="@+id/ui_button_edit"
             style="@style/expandedPanelButton"
             app:fb_iconResource="@drawable/pen"
-            app:fb_text="@string/msg_edit" />
+            app:fb_text="@string/msg_menu_details" />
 
         <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalCenterAlignedIconTextButton
             android:id="@+id/ui_button_list"

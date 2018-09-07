@@ -6,8 +6,8 @@
     <string name="title_activity_chart_view">%1$s 시각화</string>
     <string name="title_activity_item_browser">%1$s 기록</string>
     <string name="title_activity_tracker_new">새 트래커</string>
-    <string name="title_activity_tracker_edit">트래커 수정하기</string>
-    <string name="title_activity_trigger_edit">트리거 수정하기</string>
+    <string name="title_activity_tracker_edit">트래커 상세정보</string>
+    <string name="title_activity_trigger_edit">트리거 상세정보</string>
     <string name="title_activity_trigger_new">새 트리거</string>
 
     <string name="title_activity_reminder_edit">리마인더 수정하기</string>
