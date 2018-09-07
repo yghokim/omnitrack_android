@@ -163,7 +163,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         creationSubscriptions.add(
                 this.viewModel.lockedPropertiesObservable.subscribe { (lockedProperties) ->
                     val isBookmarkChangeable = !LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_BOOKMARK, lockedProperties)
-                    val canAddAttributes = !LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_ADD_ATTRIBUTES, lockedProperties)
+                    val canAddAttributes = !LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_ADD_NEW_ATTRIBUTE, lockedProperties)
                     val isNameChangeable = !LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_CHANGE_NAME, lockedProperties)
                     val isAttributeOrderChangeable = !LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_CHANGE_ATTRIBUTE_ORDER, lockedProperties)
 

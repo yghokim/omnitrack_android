@@ -171,6 +171,16 @@ open class OTTrackerDAO : RealmObject() {
         return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_ENTER_ITEM_LIST, getParsedLockedPropertyInfo())
     }
 
+
+    fun isAddNewAttributeLocked(): Boolean {
+        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_ADD_NEW_ATTRIBUTE, getParsedLockedPropertyInfo())
+    }
+
+    fun isAddNewReminderLocked(): Boolean {
+        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_ADD_NEW_REMINDER, getParsedLockedPropertyInfo())
+    }
+
+
     fun isInstantLoggingAvailable(): Boolean {
         for (attribute in getLiveAttributesSync()) {
             if (attribute.isRequired) {

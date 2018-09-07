@@ -31,7 +31,13 @@ class ManagedReminderListViewModel(app: Application) : AManagedTriggerListViewMo
     fun init(trackerId: String) {
         if (this.trackerId != trackerId) {
             trackerDao = realm.where(OTTrackerDAO::class.java).equalTo("objectId", trackerId).findFirst()
-            currentDefaultTriggerInterfaceOptions = TriggerInterfaceOptions(false, arrayOf(trackerId), arrayOf(OTTriggerDAO.CONDITION_TYPE_TIME), OTTriggerDAO.ACTION_TYPE_REMIND)
+            currentDefaultTriggerInterfaceOptions = TriggerInterfaceOptions(
+                    false,
+                    arrayOf(trackerId),
+                    arrayOf(OTTriggerDAO.CONDITION_TYPE_TIME),
+                    OTTriggerDAO.ACTION_TYPE_REMIND,
+                    !(trackerDao?.isAddNewReminderLocked() ?: false)
+            )
             init()
         }
     }
