@@ -24,7 +24,7 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
                 originalUnmanagedItemDao = realm.copyFromRealm(itemDao)
                 this.metadataForItem = originalUnmanagedItemDao.serializedMetadata?.let {
                     this.getApplication<OTApp>().applicationComponent.genericGson().fromJson(it, JsonObject::class.java)
-                }
+                } ?: JsonObject()
                 subscriptions.add(
                         itemDao.asFlowable<OTItemDAO>().subscribe { dao ->
                             if (!dao.isValid) {

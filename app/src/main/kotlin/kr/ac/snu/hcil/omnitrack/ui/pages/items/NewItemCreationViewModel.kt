@@ -153,6 +153,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         if (isValid) {
             return isBusyObservable.filter { !it }.firstOrError().flatMapMaybe {
                 refreshDaoValues()
+                println(metadataForItem)
                 val item = builderWrapper.saveToItem(null, ItemLoggingSource.Manual, metadataForItem)
                 item.objectId = reservedNewItemId
 

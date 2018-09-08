@@ -20,9 +20,7 @@ import android.widget.Toast
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.airbnb.lottie.LottieAnimationView
-import com.github.salomonbrys.kotson.forEach
-import com.github.salomonbrys.kotson.set
-import com.github.salomonbrys.kotson.toJson
+import com.github.salomonbrys.kotson.*
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import dagger.internal.Factory
@@ -284,9 +282,11 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
         val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
 
-        val metadata = if (intent.getStringExtra(OTApp.INTENT_EXTRA_METADATA) != null) {
-            val m = intent.getStringExtra(OTApp.INTENT_EXTRA_METADATA)?.let { genericGson.get().fromJson(it, JsonObject::class.java) }
-            m?.addProperty("accessedDirectlyFromReminder", true)
+        val payloadMetadataJson = intent.getStringExtra(OTApp.INTENT_EXTRA_METADATA)
+        val metadata = if (payloadMetadataJson != null) {
+            val m = genericGson.get().fromJson(payloadMetadataJson, JsonObject::class.java)
+            m.addProperty("accessedDirectlyFromReminder", true)
+            m.addProperty("pairedToReminder", true)
             m
         } else {
             //if the tracker was manually opened, get metadata from current reminder.
@@ -297,9 +297,11 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                     .findAll()
             if (entries.size > 0) {
                 val m = entries.last()?.serializedMetadata?.let { genericGson.get().fromJson(it, JsonObject::class.java) }
-                m?.addProperty("accessedDirectlyFromReminder", false)
+                        ?: JsonObject()
+                m.addProperty("accessedDirectlyFromReminder", false)
+                m.addProperty("pairedToReminder", true)
                 m
-            } else null
+            } else jsonObject("pairedToReminder" to false)
         }
 
         viewModel.init(trackerId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM), metadata)
@@ -318,7 +320,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
     override fun onDestroy() {
         super.onDestroy()
-        println("onDestroy ItemDetailActivity")
         for (inputView in attributeListAdapter.inputViews) {
             inputView.onDestroy()
         }
@@ -503,31 +504,43 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                     .appendQueryParameter("userId", authManager.userId)
                     .appendQueryParameter("itemId", (viewModel as? NewItemCreationViewModel)?.generateNewItemId())
                     .run {
-                        viewModel.metadataForItem?.let {
-                            it.forEach { key, value ->
-                                try {
-                                    this.appendQueryParameter(key, value.asString)
-                                } catch (ex: Exception) {
-                                    this.appendQueryParameter(key, value.toString())
-                                }
+                        viewModel.metadataForItem.forEach { key, value ->
+                            try {
+                                this.appendQueryParameter(key, value.asString)
+                            } catch (ex: Exception) {
+                                this.appendQueryParameter(key, value.toString())
                             }
                         }
                         this
                     }
                     .build().toString()
-            println("redirect to ${url}")
             creationSubscriptions.add(
                     RxActivityResult.on(this).startIntent(WebServiceLoginActivity.makeIntent(url, "Qualtrics", "Complete A Survey", this))
                             .subscribe { result ->
-                                val redirectionStatus = when (result.resultCode()) {
+                                val resultCode = result.resultCode()
+                                val redirectionStatus = when (resultCode) {
                                     Activity.RESULT_OK -> {
                                         NewItemCreationViewModel.RedirectedPageStatus.Completed
                                     }
                                     else -> NewItemCreationViewModel.RedirectedPageStatus.Canceled
                                 }
+
+                                if (resultCode == Activity.RESULT_OK) {
+                                    viewModel.metadataForItem.removeAll(
+                                            viewModel.metadataForItem.keys().filter { it.startsWith("returned::") }
+                                    )
+
+                                    if (result.data().hasExtra(WebServiceLoginActivity.EXTRA_RETURNED_PARAMETERS)) {
+                                        val returnedParameters = result.data().getBundleExtra(WebServiceLoginActivity.EXTRA_RETURNED_PARAMETERS)
+                                        for (key in returnedParameters.keySet()) {
+                                            viewModel.metadataForItem.set(key, returnedParameters.getString(key))
+                                        }
+                                    }
+                                }
+
                                 viewModel.setResultOfRedirectedPage(redirectionStatus)
                                 if (result.resultCode() == Activity.RESULT_OK) {
-                                    Toast.makeText(this@ItemDetailActivity, "Completed Qualtrics suvery.", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(this@ItemDetailActivity, "Completed Qualtrics survey.", Toast.LENGTH_LONG).show()
                                     redirectedPageCanceledSnackbar.dismiss()
                                 } else {
                                     redirectedPageCanceledSnackbar.show()
@@ -538,7 +551,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        println("activityResult")
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && data != null) {
             val attributePosition = AAttributeInputView.getPositionFromRequestCode(requestCode)
@@ -637,7 +649,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
             }
 
             private fun setTimestampIndicatorText(timestamp: Long?) {
-                println("timestamp: ${timestamp}")
                 if (timestamp == null || timestamp == 0L) {
                     timestampIndicator.text = ""
                 } else {
@@ -681,7 +692,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                 )
 
                 internalSubscriptions.add(
-                        inputView.valueChanged.observable.subscribe { (sender, args) ->
+                        inputView.valueChanged.observable.subscribe { (_, args) ->
                             val now = System.currentTimeMillis()
                             attributeViewModel.value = AnyValueWithTimestamp(args, now)
                             builderRestoredSnackbar.dismiss()
@@ -728,7 +739,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
                 internalSubscriptions.add(
                         attributeViewModel.valueObservable.observeOn(AndroidSchedulers.mainThread()).subscribe { valueNullable ->
-                            println("viewModel value changed - ${valueNullable.datum}, ${attributeViewModel.attributeLocalId}")
                             if (inputView.value != valueNullable.datum?.value) {
                                 inputView.valueChanged.suspend = true
                                 inputView.setAnyValue(valueNullable.datum?.value)

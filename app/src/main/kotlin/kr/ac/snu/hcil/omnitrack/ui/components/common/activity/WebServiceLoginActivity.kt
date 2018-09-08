@@ -26,6 +26,7 @@ open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
         const val EXTRA_RESQUEST_URL = "requestUrl"
         const val EXTRA_SERVICE_NAME = "serviceName"
         const val EXTRA_TITLE_OVERRIDE = "overrideTitle"
+        const val EXTRA_RETURNED_PARAMETERS = "returnedParameters"
 
         fun makeIntent(url: String, serviceName: String, overrideTitle: String?, context: Context, activityClass: Class<out WebServiceLoginActivity> = WebServiceLoginActivity::class.java): Intent {
             val intent = Intent(context, activityClass)
@@ -79,7 +80,6 @@ open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     open fun onPageFinished(url: String) {
-        println("webView finished - $url")
         finishIfPossible(url)
     }
 
@@ -90,6 +90,18 @@ open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
             if (!code.isNullOrBlank()) {
                 val result = Intent()
                 result.putExtra(AuthConstants.PARAM_CODE, code)
+
+                val paramNames = parsedUrl.queryParameterNames()
+                if (paramNames.size >= 2) {
+                    val returnedParameters = Bundle()
+                    paramNames.forEach { param ->
+                        if (param != AuthConstants.PARAM_CODE) {
+                            returnedParameters.putString("returned::" + param, parsedUrl.queryParameter(param))
+                        }
+                    }
+                    result.putExtra(EXTRA_RETURNED_PARAMETERS, returnedParameters)
+                }
+
                 setResult(Activity.RESULT_OK, result)
                 finish()
             }

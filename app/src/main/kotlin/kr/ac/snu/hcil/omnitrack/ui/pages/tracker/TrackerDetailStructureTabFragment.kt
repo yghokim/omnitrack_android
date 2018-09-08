@@ -207,7 +207,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
             )
 
             creationSubscriptions.add(
-                    assignedExperimentProperty.valueChanged.observable.subscribe { (sender, args) ->
+                    assignedExperimentProperty.valueChanged.observable.subscribe { (_, args) ->
                         println("Assigned Experiment Id was changed : ${args}")
                         if (args is ExperimentInfo) {
                             viewModel.assignedExperimentId = args.id

@@ -37,7 +37,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
     @Inject
     protected lateinit var syncManager: OTSyncManager
 
-    var metadataForItem: JsonObject? = null
+    lateinit var metadataForItem: JsonObject
         protected set
 
     var trackerDao: OTTrackerDAO? = null
@@ -82,15 +82,14 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
         configuredContext.configuredAppComponent.inject(this)
     }
 
-    fun init(trackerId: String, itemId: String?, metadata: JsonObject?) {
+    fun init(trackerId: String, itemId: String?, metadata: JsonObject) {
         isValid = true
         if (trackerDao?.objectId != trackerId) {
             this.metadataForItem = metadata
-            metadata?.let {
-                if (!it.has("screenAccessedAt")) {
-                    it.addProperty("screenAccessedAt", System.currentTimeMillis())
-                }
+            if (!this.metadataForItem.has("screenAccessedAt")) {
+                this.metadataForItem.addProperty("screenAccessedAt", System.currentTimeMillis())
             }
+
             trackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirst()
             if (trackerDao != null) {
                 trackerNameObservable.onNext(trackerDao?.name ?: "")

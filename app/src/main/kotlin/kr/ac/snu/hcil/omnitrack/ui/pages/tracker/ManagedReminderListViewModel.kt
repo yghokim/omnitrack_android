@@ -50,7 +50,7 @@ class ManagedReminderListViewModel(app: Application) : AManagedTriggerListViewMo
         super.beforeAddNewTrigger(daoToAdd)
 
         if (daoToAdd.trackers.find { it.objectId == trackerDao?.objectId } == null) {
-            daoToAdd.trackers.add(realm.copyFromRealm(trackerDao))
+            daoToAdd.trackers.add(realm.copyFromRealm(trackerDao!!))
         }
     }
 
