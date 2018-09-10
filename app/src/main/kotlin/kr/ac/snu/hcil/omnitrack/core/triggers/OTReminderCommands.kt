@@ -360,6 +360,32 @@ class OTReminderCommands(val context: Context) {
         }
     }
 
+    internal fun dismissAllReminders(realm: Realm, vararg triggers: OTTriggerDAO) {
+        val entries = realm.where(OTTriggerReminderEntry::class.java)
+                .`in`("triggerId", triggers.map { it.objectId }.toTypedArray())
+                .equalTo("dismissed", false)
+                .findAll()
+
+        entries.groupBy { it.level }.forEach { level, entriesInLevel ->
+            when (level) {
+                OTReminderAction.NotificationLevel.Noti -> {
+                    context.runOnUiThread {
+                        entriesInLevel.forEach {
+                            context.notificationManager.cancel(TAG, it.systemIntrinsicId)
+                        }
+                    }
+                }
+                else -> {
+                    //TODO handle other reminder types
+                }
+            }
+        }
+
+        realm.executeTransactionIfNotIn {
+            entries.deleteAllFromRealm()
+        }
+    }
+
     private fun insertNewReminderEntry(trigger: OTTriggerDAO, trackerId: String, action: OTReminderAction, triggerTime: Long, metadata: JsonObject, realm: Realm): OTTriggerReminderEntry {
         val entry = realm.createObject(OTTriggerReminderEntry::class.java, entryIdGenerator.getNewUniqueLong(System.currentTimeMillis()))
         entry.level = action.notificationLevelForSystem

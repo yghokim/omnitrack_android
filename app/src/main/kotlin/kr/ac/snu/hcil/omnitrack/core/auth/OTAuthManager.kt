@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.support.annotation.StringRes
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.google.android.gms.auth.api.Auth
@@ -342,13 +343,17 @@ class OTAuthManager @Inject constructor(
     }
 
     private fun notifySignedIn() {
-        context.sendBroadcast(Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_IN)
-                .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId))
+        val intent = Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_IN)
+                .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId)
+        context.sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 
     private fun notifySignedOut() {
-        context.sendBroadcast(Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_OUT)
-                .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId))
+        val intent = Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_OUT)
+                .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId)
+        context.sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 
     fun clearUserInfo() {

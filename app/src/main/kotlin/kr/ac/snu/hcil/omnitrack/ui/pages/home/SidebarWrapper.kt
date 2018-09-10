@@ -124,11 +124,8 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
         when (item.itemId) {
             R.id.action_unlink_with_this_device -> {
                 DialogHelper.makeNegativePhrasedYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), R.string.msg_logout, onYes = {
-                    authManager.signOut()
-
                     eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_SIGNED_OUT)
-
-                    parentActivity.goSignIn()
+                    authManager.signOut()
                 }).show()
                 return true
             }

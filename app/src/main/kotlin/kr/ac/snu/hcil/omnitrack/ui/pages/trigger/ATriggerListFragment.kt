@@ -32,8 +32,10 @@ import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import kotlinx.android.synthetic.main.fragment_tracker_detail_triggers.*
 import kotlinx.android.synthetic.main.layout_attached_tracker_list.view.*
 import kotlinx.android.synthetic.main.trigger_list_element.view.*
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
@@ -151,6 +153,15 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
     protected open fun makeNewDefaultTrigger(conditionType: Byte): OTTriggerDAO {
         val newDao = OTTriggerDAO()
+
+        if (BuildConfig.DEFAULT_EXPERIMENT_ID != null) {
+            newDao.experimentIdInFlags = BuildConfig.DEFAULT_EXPERIMENT_ID
+            newDao.serializedCreationFlags = CreationFlagsHelper.Builder(newDao.serializedCreationFlags)
+                    .setInjected(false)
+                    .setExperiment(BuildConfig.DEFAULT_EXPERIMENT_ID)
+                    .build()
+        }
+
         newDao.conditionType = conditionType
         onProcessNewDefaultTrigger(newDao)
         newDao.initialize()

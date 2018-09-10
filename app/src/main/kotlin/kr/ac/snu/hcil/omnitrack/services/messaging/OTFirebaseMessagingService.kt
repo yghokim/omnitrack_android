@@ -14,6 +14,7 @@ import com.google.gson.JsonObject
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
@@ -43,6 +44,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
         const val COMMAND_DUMP_DB = "dump_db"
 
         const val COMMAND_NEW_UPDATE_RELEASED = "update_released"
+        const val COMMAND_EXPERIMENT_DROPPED = "experiment_dropped"
     }
 
     @Inject
@@ -115,6 +117,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
                                     COMMAND_SYNC -> handleSyncCommand(data, configuredContext)
                                     COMMAND_SIGNOUT -> handleSignOutCommand(data, configuredContext)
                                     COMMAND_DUMP_DB -> handleDumpCommand(data, configuredContext)
+                                    COMMAND_EXPERIMENT_DROPPED -> handleExperimentDropout(data, configuredContext)
                                     COMMAND_TEXT_MESSAGE -> handleMessageCommand(data, configuredContext)
                                 }
                             } catch (ex: Exception) {
@@ -153,6 +156,18 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
 
     private fun handleSignOutCommand(data: Map<String, String>, configuredContext: ConfiguredContext) {
         configuredContext.configuredAppComponent.getAuthManager().signOut()
+    }
+
+    private fun handleExperimentDropout(data: Map<String, String>, configuredContext: ConfiguredContext) {
+        println("experiment dropout message received")
+        if (data.containsKey("experimentId")) {
+            val experimentId = data["experimentId"]!!
+            if (BuildConfig.DEFAULT_EXPERIMENT_ID == experimentId) {
+                configuredContext.configuredAppComponent.getAuthManager().signOut()
+            }
+        } else {
+            println("experiment dropout message does not contain the experiment ID.")
+        }
     }
 
     private fun handleMessageCommand(data: Map<String, String>, configuredContext: ConfiguredContext) {

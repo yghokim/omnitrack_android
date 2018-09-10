@@ -1,12 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.ui.activities
 
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.graphics.PointF
 import android.graphics.Rect
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MotionEvent
@@ -48,8 +47,10 @@ import javax.inject.Provider
  * Created by younghokim on 2016. 11. 15..
  */
 abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val checkUpdateAvailable: Boolean = true) : AppCompatActivity() {
-
-    private val LOG_TAG = "OmniTrackActivity"
+    companion object {
+        const val LOG_TAG = "OmniTrackActivity"
+        val SIGN_OUT_BROADCAST_INTENT_FILTER = IntentFilter(OTApp.BROADCAST_ACTION_USER_SIGNED_OUT)
+    }
 
     @Inject
     protected lateinit var authManager: OTAuthManager
@@ -79,6 +80,18 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     private val signedInUserSubject = BehaviorSubject.create<String>()
 
     private var backgroundSignInCheckThread: Thread? = null
+
+    private val signOutBroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == OTApp.BROADCAST_ACTION_USER_SIGNED_OUT) {
+                val userId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER)
+                if (authManager.userId == userId) {
+                    goSignIn()
+                }
+            }
+        }
+
+    }
 
     protected val appUpdater: AppUpdater by lazy {
         OTAppVersionCheckManager.makeAppUpdater(this).apply { postProcessAppUpdater(this) }
@@ -145,6 +158,9 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     override fun onStart() {
         super.onStart()
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(signOutBroadcastReceiver, SIGN_OUT_BROADCAST_INTENT_FILTER)
+
         if (checkUpdateAvailable && defaultSharedPreferences.getBoolean(AppUpdater.PREF_CHECK_UPDATES, false)) {
             try {
                 appUpdater.start()
@@ -157,10 +173,13 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         if (isSessionLoggingEnabled) {
             sessionStartedAt.set(System.currentTimeMillis())
         }
+
     }
 
     override fun onStop() {
         super.onStop()
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(signOutBroadcastReceiver)
 
         if (isSessionLoggingEnabled) {
             logSession()

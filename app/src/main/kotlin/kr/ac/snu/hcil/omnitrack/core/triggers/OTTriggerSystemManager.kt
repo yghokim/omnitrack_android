@@ -23,6 +23,10 @@ class OTTriggerSystemManager(
         OTExternalSettingsPrompter(context)
     }
 
+    private val reminderCommands: OTReminderCommands by lazy {
+        OTReminderCommands(context)
+    }
+
     fun onSystemRebooted() {
         triggerAlarmManager.get().activateOnSystem()
     }
@@ -41,6 +45,15 @@ class OTTriggerSystemManager(
         when (managedTrigger.conditionType) {
             OTTriggerDAO.CONDITION_TYPE_TIME -> {
                 triggerAlarmManager.get().cancelTrigger(managedTrigger)
+            }
+        }
+
+        //turn off reminder
+        when (managedTrigger.actionType) {
+            OTTriggerDAO.ACTION_TYPE_REMIND -> {
+                val realm = realmProvider.get()
+                reminderCommands.dismissAllReminders(realm, managedTrigger)
+                realm.close()
             }
         }
     }
