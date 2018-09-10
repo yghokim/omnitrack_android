@@ -211,6 +211,11 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
         if (trackerId != null) {
             viewModel.init(trackerId)
+
+            if (viewModel.trackerDao.isIndependentInputLocked()) {
+                rightActionBarButton?.isEnabled = false
+                rightActionBarButton?.alpha = 0.2f
+            }
         }
 
     }

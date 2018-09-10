@@ -180,6 +180,10 @@ open class OTTrackerDAO : RealmObject() {
         return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_ADD_NEW_REMINDER, getParsedLockedPropertyInfo())
     }
 
+    fun isIndependentInputLocked(): Boolean {
+        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_INDEPENDENT_INPUT, getParsedLockedPropertyInfo())
+    }
+
 
     fun isInstantLoggingAvailable(): Boolean {
         for (attribute in getLiveAttributesSync()) {

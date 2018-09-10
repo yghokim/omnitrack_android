@@ -87,9 +87,19 @@ class OTReminderCommands(val context: Context) {
         (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
+    fun isReminderPromptingToTracker(trackerId: String): Boolean {
+        val realm = getNewRealm()
+        val count = realm.where(OTTriggerReminderEntry::class.java)
+                .equalTo("dismissed", false)
+                .equalTo("trackerId", trackerId)
+                .count()
+        realm.close()
+        return count > 0
+    }
+
     internal fun onUserLogged(startId: Int, trackerId: String, loggedAt: Long): Completable {
         return Completable.defer {
-            val realm = realmProvider.get()
+            val realm = getNewRealm()
 
             val entries = realm.where(OTTriggerReminderEntry::class.java)
                     .equalTo("dismissed", false)
@@ -369,9 +379,10 @@ class OTReminderCommands(val context: Context) {
         entries.groupBy { it.level }.forEach { level, entriesInLevel ->
             when (level) {
                 OTReminderAction.NotificationLevel.Noti -> {
+                    val notificationIds = entriesInLevel.map { it.systemIntrinsicId }
                     context.runOnUiThread {
-                        entriesInLevel.forEach {
-                            context.notificationManager.cancel(TAG, it.systemIntrinsicId)
+                        notificationIds.forEach {
+                            context.notificationManager.cancel(TAG, it)
                         }
                     }
                 }

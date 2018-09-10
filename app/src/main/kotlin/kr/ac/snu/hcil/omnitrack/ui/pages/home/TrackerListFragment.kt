@@ -30,6 +30,7 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -46,6 +47,7 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.TooltipHelper
@@ -122,6 +124,10 @@ class TrackerListFragment : OTFragment() {
     }
 
     private var permissionPromptingDialog: MaterialDialog? = null
+
+    private val reminderCommands: OTReminderCommands by lazy {
+        OTReminderCommands(this.act)
+    }
 
     private val collapsedHeight = 0
     private var expandedHeight: Int = 0
@@ -316,18 +322,22 @@ class TrackerListFragment : OTFragment() {
     }
 
     private fun handleTrackerClick(tracker: OTTrackerDAO) {
-        if (tracker.makeAttributesQuery(false, false).count() == 0L) {
-            emptyTrackerDialog
-                    .onPositive { materialDialog, dialogAction ->
-                        activity?.startService(OTItemLoggingService.makeLoggingIntent(act, ItemLoggingSource.Manual, true, tracker.objectId!!))
-                        //OTBackgroundLoggingService.log(context, tracker, OTItem.ItemLoggingSource.Manual, notify = false).subscribe()
-                    }
-                    .onNeutral { materialDialog, dialogAction ->
-                        startActivity(TrackerDetailActivity.makeIntent(tracker.objectId, act))
-                    }
-                    .show()
+        if (tracker.isIndependentInputLocked() && !reminderCommands.isReminderPromptingToTracker(tracker.objectId!!)) {
+            Toast.makeText(act, "You cannot add new entry unless you are prompted by reminders.", Toast.LENGTH_LONG).show()
         } else {
-            startActivity(ItemDetailActivity.makeNewItemPageIntent(tracker.objectId!!, act))
+            if (tracker.makeAttributesQuery(false, false).count() == 0L) {
+                emptyTrackerDialog
+                        .onPositive { materialDialog, dialogAction ->
+                            activity?.startService(OTItemLoggingService.makeLoggingIntent(act, ItemLoggingSource.Manual, true, tracker.objectId!!))
+                            //OTBackgroundLoggingService.log(context, tracker, OTItem.ItemLoggingSource.Manual, notify = false).subscribe()
+                        }
+                        .onNeutral { materialDialog, dialogAction ->
+                            startActivity(TrackerDetailActivity.makeIntent(tracker.objectId, act))
+                        }
+                        .show()
+            } else {
+                startActivity(ItemDetailActivity.makeNewItemPageIntent(tracker.objectId!!, act))
+            }
         }
     }
 

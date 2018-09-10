@@ -17,6 +17,7 @@ object LockedPropertiesHelper : AFlagsHelperBase() {
     const val TRACKER_CHANGE_NAME = "changeName"
     const val TRACKER_CHANGE_ATTRIBUTE_ORDER = "changeAttributeOrder"
     const val TRACKER_ADD_NEW_REMINDER = "addNewReminder"
+    const val TRACKER_INDEPENDENT_INPUT = "independentInput"
 
     const val TRACKER_ENTER_ITEM_LIST = "enterItemList"
     const val TRACKER_ENTER_VISUALIZATION = "enterVisualization"

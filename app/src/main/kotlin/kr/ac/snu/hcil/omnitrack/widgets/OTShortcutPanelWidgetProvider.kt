@@ -6,10 +6,14 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfigurationController
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
 import javax.inject.Inject
@@ -63,16 +67,28 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
 
             context.startService(updateIntent)
         } else if (intent.action == ACTION_TRACKER_CLICK_EVENT) {
+
+            val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
+            val realm = configController.currentConfiguredContext.configuredAppComponent.backendRealmFactory().get()
+            val trackerDao = realm.where(OTTrackerDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, trackerId).findFirst()
+            if (trackerDao?.isIndependentInputLocked() == true) {
+                val reminderCommands = OTReminderCommands(context)
+                if (reminderCommands.isReminderPromptingToTracker(trackerId) == false) {
+                    Toast.makeText(context, "You cannot add new entry unless you are prompted by reminders.", Toast.LENGTH_LONG).show()
+                    realm.close()
+                    return
+                }
+            }
+            realm.close()
+
             when (intent.getStringExtra(EXTRA_CLICK_COMMAND)) {
                 CLICK_COMMAND_ROW -> {
-                    val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
                     if (trackerId != null) {
                         context.startActivity(ItemDetailActivity.makeNewItemPageIntent(trackerId, context).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
                     }
                 }
 
                 CLICK_COMMAND_INSTANT_LOGGING -> {
-                    val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
                     if (trackerId != null) {
                         context.startService(OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, trackerId))
                     }
