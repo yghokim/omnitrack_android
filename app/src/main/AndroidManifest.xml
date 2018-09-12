@@ -42,7 +42,9 @@
         android:label="${appName}${appNameSuffix}"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
-        tools:replace="android:allowBackup, android:label">
+        tools:replace="android:allowBackup, android:label"
+        android:usesCleartextTraffic="true"
+        >
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
