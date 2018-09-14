@@ -128,7 +128,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         itemListView.adapter = itemListViewAdapter
 
         itemListView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 if (removalSnackbar.isShown) {
                     removalSnackbar.dismiss()

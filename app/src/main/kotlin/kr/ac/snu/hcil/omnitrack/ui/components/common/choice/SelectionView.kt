@@ -37,8 +37,8 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
         prop, old, new ->
         if (old != new) {
             println("selected Index changed - $new")
-            adapter.notifyItemChanged(old)
-            adapter.notifyItemChanged(new)
+            adapter?.notifyItemChanged(old)
+            adapter?.notifyItemChanged(new)
             onSelectedIndexChanged.invoke(this, new)
         }
     }
@@ -51,7 +51,7 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
     fun setValues(newValues: Array<String>) {
         values.clear()
         values.addAll(newValues)
-        adapter.notifyDataSetChanged()
+        adapter?.notifyDataSetChanged()
     }
 
     fun setValues(@ArrayRes newValuesRes: Int) {

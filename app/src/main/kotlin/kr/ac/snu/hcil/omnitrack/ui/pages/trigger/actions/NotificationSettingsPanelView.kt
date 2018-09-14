@@ -107,7 +107,7 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, View.OnClickL
         val list: RecyclerView = view.findViewById(R.id.ui_recyclerview_with_fallback)
         val syncToServerCheckBox: CheckBox = view.findViewById(R.id.ui_checkbox)
         list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        list.itemAnimator.changeDuration = 0L
+        list.itemAnimator?.changeDuration = 0L
 
         val adapter = LevelAdapter(selectedNotificationLevel.ordinal)
         syncToServerCheckBox.isChecked = overrideAllDevices

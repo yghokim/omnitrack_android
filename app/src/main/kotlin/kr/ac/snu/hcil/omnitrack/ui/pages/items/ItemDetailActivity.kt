@@ -479,7 +479,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                                 }
 
                                 topFitScroller.targetPosition = minPosition
-                                attributeListView.layoutManager.startSmoothScroll(topFitScroller)
+                                attributeListView.layoutManager?.startSmoothScroll(topFitScroller)
                             }
 
                             Toast.makeText(this@ItemDetailActivity, "${ex.inCompleteFieldLocalIds.size} required fields are not completed.", Toast.LENGTH_LONG).show()
@@ -617,12 +617,18 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
                         //validation
                         if (validationIndicator.progress != 1f || validationIndicator.progress != 0f) {
-                            validationIndicator.playAnimation(0.5f, 1f)
+                            validationIndicator.setMinProgress(0.5f)
+                            validationIndicator.setMaxProgress(1.0f)
+                            validationIndicator.progress = 0.5f
+                            validationIndicator.playAnimation()
                         }
                     } else {
                         //invalidated
                         if (validationIndicator.progress != 0.5f) {
-                            validationIndicator.playAnimation(0.0f, 0.5f)
+                            validationIndicator.setMinProgress(0.0f)
+                            validationIndicator.setMaxProgress(0.5f)
+                            validationIndicator.progress = 0f
+                            validationIndicator.playAnimation()
                         }
                     }
                 }

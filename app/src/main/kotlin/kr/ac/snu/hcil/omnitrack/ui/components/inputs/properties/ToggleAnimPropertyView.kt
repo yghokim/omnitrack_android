@@ -60,10 +60,15 @@ class ToggleAnimPropertyView(context: Context, attrs: AttributeSet?) : AProperty
                 ui_lottie_view.progress = if (isOn) 0.5f else 0f
             } else {
                 if (isOn) {
-                    ui_lottie_view.playAnimation(0.0f, 0.5f)
+                    ui_lottie_view.setMinProgress(0.0f)
+                    ui_lottie_view.setMaxProgress(0.5f)
+                    ui_lottie_view.progress = 0f
+                    ui_lottie_view.playAnimation()
                 } else {
-                    ui_lottie_view.reverseAnimation()
-                    ui_lottie_view.playAnimation(0.5f, 0.0f)
+                    ui_lottie_view.setMinProgress(0.5f)
+                    ui_lottie_view.setMaxProgress(0.0f)
+                    ui_lottie_view.progress = 0.5f
+                    ui_lottie_view.playAnimation()
                 }
             }
         }

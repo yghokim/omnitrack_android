@@ -11,7 +11,7 @@ import android.view.View
 abstract class AListBottomSpaceItemDecoration(var height: Int, var reversed: Boolean = false) : RecyclerView.ItemDecoration() {
 
 
-    override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State?) {
+    override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
 
         if (parent.childCount > 0) {
             val left = parent.paddingLeft.toFloat()
@@ -34,12 +34,12 @@ abstract class AListBottomSpaceItemDecoration(var height: Int, var reversed: Boo
 
     protected abstract fun onDrawBottomSpace(c: Canvas, left: Float, right: Float, top: Float, bottom: Float)
 
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State?) {
+    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         super.getItemOffsets(outRect, view, parent, state)
         if (parent.getChildAdapterPosition(view) == if (reversed) {
             0
         } else {
-            parent.adapter.itemCount - 1
+            parent.adapter!!.itemCount - 1
         })
             outRect.bottom = height
     }

@@ -68,8 +68,8 @@ class SourceSelectionPage(override val parent: ConnectionWizardView, val attribu
 
     inner class PageView : RecyclerView {
 
-        constructor(context: Context?) : super(context)
-        constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+        constructor(context: Context) : super(context)
+        constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
         init {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)

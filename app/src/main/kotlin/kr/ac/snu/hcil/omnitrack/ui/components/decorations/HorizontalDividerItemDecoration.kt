@@ -19,7 +19,7 @@ class HorizontalDividerItemDecoration(val color: Int, val height: Int, val leftP
         paint.strokeWidth = height.toFloat()
     }
 
-    override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State?) {
+    override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
 
         if (paint.color != 0) {
             val left = parent.paddingLeft + leftPadding
@@ -42,7 +42,7 @@ class HorizontalDividerItemDecoration(val color: Int, val height: Int, val leftP
 
     }
 
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State?) {
+    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         super.getItemOffsets(outRect, view, parent, state)
         if (parent.getChildAdapterPosition(view) != 0)
             outRect.top = height

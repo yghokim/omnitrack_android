@@ -23,7 +23,7 @@ class HorizontalImageDividerItemDecoration(@DrawableRes resId: Int = R.drawable.
         dividerHeight = (divider.intrinsicHeight * heightMultiplier).toInt()
     }
 
-    override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State?) {
+    override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
 
         val left = parent.paddingLeft
         val right = parent.width - parent.paddingRight
@@ -44,7 +44,7 @@ class HorizontalImageDividerItemDecoration(@DrawableRes resId: Int = R.drawable.
 
     }
 
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State?) {
+    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         super.getItemOffsets(outRect, view, parent, state)
         if (parent.getChildAdapterPosition(view) != 0)
             outRect.top = dividerHeight

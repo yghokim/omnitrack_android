@@ -81,17 +81,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     private var backgroundSignInCheckThread: Thread? = null
 
-    private val signOutBroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == OTApp.BROADCAST_ACTION_USER_SIGNED_OUT) {
-                val userId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER)
-                if (authManager.userId == userId) {
-                    goSignIn()
-                }
-            }
-        }
-
-    }
+    private val signOutBroadcastReceiver = SignOutBroadcastReceiver()
 
     protected val appUpdater: AppUpdater by lazy {
         OTAppVersionCheckManager.makeAppUpdater(this).apply { postProcessAppUpdater(this) }
@@ -353,5 +343,16 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         }
 
         return super.dispatchTouchEvent(event)
+    }
+
+    inner class SignOutBroadcastReceiver: BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == OTApp.BROADCAST_ACTION_USER_SIGNED_OUT) {
+                val userId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER)
+                if (authManager.userId == userId) {
+                    goSignIn()
+                }
+            }
+        }
     }
 }

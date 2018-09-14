@@ -31,11 +31,10 @@ class FallbackRecyclerView : RecyclerView {
 
         private fun refresh() {
             if (adapter != null) {
-                if (adapter.itemCount == 0) {
+                if (adapter!!.itemCount == 0) {
                     emptyView?.visibility = View.VISIBLE
                     this@FallbackRecyclerView.visibility = View.GONE
                 } else {
-
                     emptyView?.visibility = View.GONE
                     this@FallbackRecyclerView.visibility = View.VISIBLE
                 }
@@ -43,9 +42,9 @@ class FallbackRecyclerView : RecyclerView {
         }
     }
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle)
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle)
 
     override fun setAdapter(adapter: Adapter<*>?) {
         this.adapter?.unregisterAdapterDataObserver(observer)

@@ -51,8 +51,8 @@ class TrackerAssignPanel : RecyclerView {
 
     private val elementAdapter = AssignElementAdapter()
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attributeSet: AttributeSet?) : super(context, attributeSet)
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attributeSet: AttributeSet?) : super(context, attributeSet)
 
     override fun onFinishInflate() {
         super.onFinishInflate()

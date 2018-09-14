@@ -84,8 +84,8 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
 
     inner class TrackerListView : RecyclerView {
 
-        constructor(context: Context?) : super(context)
-        constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+        constructor(context: Context) : super(context)
+        constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
         init {
             padding = context.resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)

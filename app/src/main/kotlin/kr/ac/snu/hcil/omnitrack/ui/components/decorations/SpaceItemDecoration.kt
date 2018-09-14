@@ -9,7 +9,7 @@ import android.view.View
  * Created by Young-Ho Kim on 2016-07-13.
  */
 class SpaceItemDecoration(private val direction: Int, private val space: Int) : RecyclerView.ItemDecoration() {
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State?) {
+    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         super.getItemOffsets(outRect, view, parent, state)
         if (parent.getChildAdapterPosition(view) != 0)
             if (direction == LinearLayoutManager.VERTICAL)
