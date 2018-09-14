@@ -66,6 +66,11 @@
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
 
+        <!--Fix a crash problem of Google Map on Android P-->
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
         <!--This version metadata is used by external parsers to get the version information of the apk file.-->
 
         <!--
