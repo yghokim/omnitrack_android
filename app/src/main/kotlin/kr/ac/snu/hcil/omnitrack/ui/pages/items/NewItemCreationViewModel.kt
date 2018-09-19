@@ -43,7 +43,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         configuredContext.configuredAppComponent.inject(this)
     }
 
-    override fun onInit(trackerDao: OTTrackerDAO, itemId: String?): Pair<ItemMode, BuilderCreationMode?>? {
+    override fun onInit(trackerDao: OTTrackerDAO, itemId: String?): Pair<ItemMode, BuilderCreationMode?> {
 
         if (!trackerDao.redirectUrl.isNullOrBlank()) {
             redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(RedirectedPageStatus.NotVisited)

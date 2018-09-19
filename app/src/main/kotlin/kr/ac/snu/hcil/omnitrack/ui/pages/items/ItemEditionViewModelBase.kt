@@ -47,7 +47,6 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
     val hasItemRemovedOutside = BehaviorSubject.create<String>()
 
     val trackerNameObservable = BehaviorSubject.create<String>()
-    val modeObservable = BehaviorSubject.createDefault<ItemMode>(ItemMode.New)
     val builderCreationModeObservable = BehaviorSubject.create<BuilderCreationMode>()
     val attributeViewModelListObservable = BehaviorSubject.create<List<AttributeInputViewModel>>()
 
@@ -65,24 +64,14 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
                 isBusyObservable.onNext(value)
             }
         }
-    var lastInitializedState = BehaviorSubject.create<Pair<ItemMode, BuilderCreationMode?>>()
-    protected val currentAttributeViewModelList = ArrayList<AttributeInputViewModel>()
 
-    var mode: ItemMode
-        get() {
-            return modeObservable.value ?: ItemMode.New
-        }
-        protected set(value) {
-            if (modeObservable.value != value) {
-                modeObservable.onNext(value)
-            }
-        }
+    protected val currentAttributeViewModelList = ArrayList<AttributeInputViewModel>()
 
     override fun onInject(configuredContext: ConfiguredContext) {
         configuredContext.configuredAppComponent.inject(this)
     }
 
-    fun init(trackerId: String, itemId: String?, metadata: JsonObject) {
+    fun init(trackerId: String, itemId: String?, metadata: JsonObject): Pair<ItemMode, BuilderCreationMode?>? {
         isValid = true
         if (trackerDao?.objectId != trackerId) {
             this.metadataForItem = metadata
@@ -97,21 +86,6 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
                 val unManagedTrackerDao = realm.copyFromRealm(trackerDao)!!
 
-
-                currentAttributeViewModelList.forEach { it.unregister() }
-                currentAttributeViewModelList.clear()
-
-                currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan }.map { AttributeInputViewModel(it) })
-                attributeViewModelListObservable.onNext(currentAttributeViewModelList)
-
-                val initResult = onInit(trackerDao!!, itemId)
-
-                if (initResult != null) {
-                    mode = initResult.first
-
-                    lastInitializedState.onNext(initResult)
-                }
-
                 subscriptions.add(
                         trackerDao!!.asFlowable<OTTrackerDAO>().filter { it.isLoaded }.subscribe { dao ->
                             if (!dao.isValid) {
@@ -119,11 +93,20 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
                             }
                         }
                 )
-            }
-        }
+
+
+                currentAttributeViewModelList.forEach { it.unregister() }
+                currentAttributeViewModelList.clear()
+
+                currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan }.map { AttributeInputViewModel(it) })
+                attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+
+                return onInit(trackerDao!!, itemId)
+            } else throw IllegalArgumentException("No such tracker.")
+        } else return null
     }
 
-    abstract fun onInit(trackerDao: OTTrackerDAO, itemId: String?): Pair<ItemMode, BuilderCreationMode?>?
+    abstract fun onInit(trackerDao: OTTrackerDAO, itemId: String?): Pair<ItemMode, BuilderCreationMode?>
 
     open fun reset() {
         val trackerId = trackerDao?.objectId
@@ -230,8 +213,8 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
     }
 
     abstract fun cacheEditingInfo(): Single<Boolean>
+    abstract fun clearHistory()
 
     abstract fun applyEditingToDatabase(): Maybe<String>
 
-    abstract fun clearHistory()
 }

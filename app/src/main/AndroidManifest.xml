@@ -258,7 +258,9 @@
             android:name=".ui.pages.items.ItemDetailActivity"
             android:label="@string/title_activity_new_item" />
         <activity android:name=".ui.pages.items.ItemBrowserActivity" />
-        <activity android:name=".ui.components.common.activity.WebServiceLoginActivity" />
+        <activity
+            android:name=".ui.components.common.activity.WebServiceLoginActivity"
+            android:configChanges="orientation|screenSize" />
         <activity android:name=".ui.pages.visualization.ChartViewActivity" />
         <activity
             android:name=".ui.pages.trigger.TriggerDetailActivity"

@@ -76,6 +76,9 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         const val INTENT_ACTION_NEW = "new_item"
         const val INTENT_ACTION_EDIT = "edit_item"
 
+        const val KEY_MODE = "viewModelMode"
+        const val KEY_ITEM_SAVED = "itemSaved"
+
         fun makeNewItemPageIntent(trackerId: String, context: Context): Intent {
             val intent = Intent(context, ItemDetailActivity::class.java)
             intent.action = INTENT_ACTION_NEW
@@ -115,10 +118,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
     private val attributeListView: RecyclerView by bindView(R.id.ui_attribute_list)
     private val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-    private var mode: ItemEditionViewModelBase.ItemMode = ItemEditionViewModelBase.ItemMode.New
-
-    private var activityResultAppliedAttributePosition = -1
-
     private lateinit var builderRestoredSnackbar: Snackbar
     private lateinit var redirectedPageCanceledSnackbar: Snackbar
 
@@ -126,7 +125,10 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
     private val currentAttributeViewModelList = ArrayList<ItemEditionViewModelBase.AttributeInputViewModel>()
 
+    //State=============================================================================================================
+    private var mode: ItemEditionViewModelBase.ItemMode = ItemEditionViewModelBase.ItemMode.New
     private var itemSaved: Boolean = false
+    //==================================================================================================================
 
     private val invalidOutsideDialogBuilder: MaterialDialog.Builder by lazy {
         DialogHelper.makeSimpleAlertBuilder(this, "", null) {
@@ -144,6 +146,14 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
     override fun onInject(app: OTAndroidApp) {
         app.currentConfiguredContext.configuredAppComponent.inject(this)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+
+        outState.putInt(KEY_MODE, mode.ordinal)
+        outState.putBoolean(KEY_ITEM_SAVED, itemSaved)
+
+        super.onSaveInstanceState(outState)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -206,6 +216,49 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         }
 
 
+        val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
+
+        val payloadMetadataJson = intent.getStringExtra(OTApp.INTENT_EXTRA_METADATA)
+        val metadata = if (payloadMetadataJson != null) {
+            val m = genericGson.get().fromJson(payloadMetadataJson, JsonObject::class.java)
+            m.addProperty("accessedDirectlyFromReminder", true)
+            m.addProperty("pairedToReminder", true)
+            m
+        } else {
+            //if the tracker was manually opened, get metadata from current reminder.
+            val realm = backendRealmFactory.get()
+            val entries = realm.where(OTTriggerReminderEntry::class.java)
+                    .equalTo("dismissed", false)
+                    .equalTo("trackerId", trackerId)
+                    .findAll()
+            if (entries.size > 0) {
+                val m = entries.last()?.serializedMetadata?.let { genericGson.get().fromJson(it, JsonObject::class.java) }
+                        ?: JsonObject()
+                m.addProperty("accessedDirectlyFromReminder", false)
+                m.addProperty("pairedToReminder", true)
+                m
+            } else jsonObject("pairedToReminder" to false)
+        }
+        val initResult = viewModel.init(trackerId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM), metadata)
+        if (initResult != null) {
+            this.mode = initResult.first
+
+            if (initResult.second != null) {
+                if (initResult.second == ItemEditionViewModelBase.BuilderCreationMode.Restored) {
+                    builderRestoredSnackbar.show()
+                } else if (initResult.second == ItemEditionViewModelBase.BuilderCreationMode.NewBuilder) {
+                    viewModel.startAutoComplete()
+                }
+            } else {
+                viewModel.startAutoComplete()
+            }
+        }
+
+        if (savedInstanceState != null) {
+            this.mode = ItemEditionViewModelBase.ItemMode.values()[savedInstanceState.getInt(KEY_MODE)]
+            this.itemSaved = savedInstanceState.getBoolean(KEY_ITEM_SAVED)
+        }
+
         creationSubscriptions.add(
                 viewModel.isBusyObservable.subscribe { isBusy ->
                     if (isBusy)
@@ -215,25 +268,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         )
 
         creationSubscriptions.add(
-                viewModel.lastInitializedState.observeOn(AndroidSchedulers.mainThread()).subscribe { (itemMode, builderCreationMode) ->
-
-                    println("ItemEditingViewModel initialized: itemMode - ${itemMode}, builderMode - ${builderCreationMode}")
-                    this.mode = itemMode
-
-                    if (builderCreationMode != null) {
-                        if (builderCreationMode == ItemEditionViewModelBase.BuilderCreationMode.Restored) {
-                            builderRestoredSnackbar.show()
-                        } else if (builderCreationMode == ItemEditionViewModelBase.BuilderCreationMode.NewBuilder) {
-                            viewModel.startAutoComplete()
-                        }
-                    } else {
-                        viewModel.startAutoComplete()
-                    }
-                }
-        )
-
-        creationSubscriptions.add(
-                viewModel.modeObservable.flatMap { mode -> viewModel.trackerNameObservable.map { name -> Pair(mode, name) } }.subscribe { (mode, name) ->
+                viewModel.trackerNameObservable.subscribe { name ->
                     when (mode) {
                         ItemEditionViewModelBase.ItemMode.Edit -> {
                             title = String.format(getString(R.string.title_activity_edit_item), name)
@@ -279,33 +314,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                     }
             )
         }
-
-        val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
-
-        val payloadMetadataJson = intent.getStringExtra(OTApp.INTENT_EXTRA_METADATA)
-        val metadata = if (payloadMetadataJson != null) {
-            val m = genericGson.get().fromJson(payloadMetadataJson, JsonObject::class.java)
-            m.addProperty("accessedDirectlyFromReminder", true)
-            m.addProperty("pairedToReminder", true)
-            m
-        } else {
-            //if the tracker was manually opened, get metadata from current reminder.
-            val realm = backendRealmFactory.get()
-            val entries = realm.where(OTTriggerReminderEntry::class.java)
-                    .equalTo("dismissed", false)
-                    .equalTo("trackerId", trackerId)
-                    .findAll()
-            if (entries.size > 0) {
-                val m = entries.last()?.serializedMetadata?.let { genericGson.get().fromJson(it, JsonObject::class.java) }
-                        ?: JsonObject()
-                m.addProperty("accessedDirectlyFromReminder", false)
-                m.addProperty("pairedToReminder", true)
-                m
-            } else jsonObject("pairedToReminder" to false)
-        }
-
-        viewModel.init(trackerId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM), metadata)
-
     }
 
     override fun onPause() {
@@ -314,8 +322,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         for (inputView in attributeListAdapter.inputViews) {
             inputView.clearFocus()
         }
-
-        this.activityResultAppliedAttributePosition = -1
     }
 
     override fun onDestroy() {
@@ -442,11 +448,11 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                         }
                     }.subscribe({ result ->
                         viewModel.clearHistory()
-                        if (viewModel.mode == ItemEditionViewModelBase.ItemMode.New) {
+                        if (mode == ItemEditionViewModelBase.ItemMode.New) {
                             startService(OTReminderService.makeUserLoggedIntent(this, viewModel.trackerDao?.objectId!!, System.currentTimeMillis()))
                         }
 
-                        when (viewModel.mode) {
+                        when (mode) {
                             ItemEditionViewModelBase.ItemMode.New -> {
                                 itemSaved = true
                                 eventLogger.get().logItemAddedEvent(result, ItemLoggingSource.Manual) { content ->
@@ -556,7 +562,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
             val attributePosition = AAttributeInputView.getPositionFromRequestCode(requestCode)
             val inputView = attributeListAdapter.inputViews.find { it.position == attributePosition }
             inputView?.setValueFromActivityResult(data, AAttributeInputView.getRequestTypeFromRequestCode(requestCode))
-            activityResultAppliedAttributePosition = attributePosition
         }
     }
 
