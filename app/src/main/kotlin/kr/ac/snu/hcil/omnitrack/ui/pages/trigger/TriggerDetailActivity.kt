@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_trigger_detail.*
 import kotlinx.android.synthetic.main.layout_tracker_assign_panel.view.*
@@ -168,7 +170,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                         val configView = viewProvider.getTriggerConfigurationPanel(conditionConfigurationView as? View, this, configuredContext)
                         this.conditionConfigurationView = configView
                         ui_condition_control_panel_container.removeAllViewsInLayout()
-                        ui_condition_control_panel_container.addView(configView as View)
+                        ui_condition_control_panel_container.addView(configView as View, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
                         creationSubscriptions.add(
                                 viewModel.conditionInstance.subscribe { condition ->
                                     configView.applyCondition(condition)

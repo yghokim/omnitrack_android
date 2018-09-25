@@ -233,7 +233,7 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-core:16.0.3'
     implementation 'com.google.firebase:firebase-auth:16.0.3'
-    implementation 'com.google.firebase:firebase-messaging:17.3.1'
+    implementation 'com.google.firebase:firebase-messaging:17.3.2'
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
 
     implementation 'android.arch.lifecycle:extensions:1.1.1'
@@ -356,8 +356,11 @@ ext.refreshVersion = {
         android.defaultConfig.versionCode = versionCode
         android.applicationVariants.all {
             variant ->
-                variant.mergedFlavor.versionCode = versionCode
-                variant.mergedFlavor.versionName = versionName
+                variant.outputs.each{
+                    output ->
+                        output.versionCodeOverride = versionCode
+                        output.versionNameOverride = versionName
+                }
 
                 variant.mergedFlavor.manifestPlaceholders.versionName = versionName
                 variant.mergedFlavor.manifestPlaceholders.versionCode = versionCode
