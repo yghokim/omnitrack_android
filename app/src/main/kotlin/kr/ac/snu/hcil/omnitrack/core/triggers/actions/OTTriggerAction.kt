@@ -14,7 +14,7 @@ abstract class OTTriggerAction {
     abstract fun performAction(trigger: OTTriggerDAO, triggerTime: Long, metadata: JsonObject, configuredContext: ConfiguredContext): Completable
 
     open fun writeEventLogContent(trigger: OTTriggerDAO, table: JsonObject) {
-        table.add("trackers", jsonArray(*trigger.liveTrackersQuery.findAll().map { it.objectId!! }.toTypedArray()))
+        table.add("trackers", jsonArray(*trigger.liveTrackerIds))
     }
 
     abstract fun getSerializedString(): String

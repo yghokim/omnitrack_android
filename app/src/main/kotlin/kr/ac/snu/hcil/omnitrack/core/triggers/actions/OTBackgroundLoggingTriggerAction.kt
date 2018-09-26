@@ -59,7 +59,7 @@ class OTBackgroundLoggingTriggerAction : OTTriggerAction() {
                                 .makeLoggingIntent(configuredContext.applicationContext,
                                         ItemLoggingSource.Trigger,
                                         notify,
-                                        *(trigger.liveTrackersQuery.findAll().map { it.objectId!! }.toTypedArray()))
+                                        *trigger.liveTrackerIds)
                 )
             }
             Completable.complete()

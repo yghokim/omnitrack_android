@@ -161,6 +161,15 @@ open class OTTriggerDAO : RealmObject() {
             } else trackers.filter { !it.removed }.size
         }
 
+    val liveTrackerIds: Array<String>
+        get() {
+            return if (this.isManaged) {
+                liveTrackersQuery.findAll()
+            } else {
+                trackers.filter { !it.removed }
+            }.map { it.objectId!! }.toTypedArray()
+        }
+
     var synchronizedAt: Long? = null
 
     @Index
@@ -255,7 +264,8 @@ open class OTTriggerDAO : RealmObject() {
     }
 
     fun getPerformFireCompletable(triggerTime: Long, metadata: JsonObject, configuredContext: ConfiguredContext): Completable {
-        val triggerId = objectId
+        val triggerId = objectId!!
+        val unManagedDAO = this.realm.copyFromRealm(this)
         return (action?.performAction(this, triggerTime, metadata, configuredContext)
                 ?: Completable.error(IllegalStateException("Not proper action instance is generated.")))
                 .doOnComplete {
@@ -265,7 +275,7 @@ open class OTTriggerDAO : RealmObject() {
                                 .putExtra(OTApp.INTENT_EXTRA_TRIGGER_TIME, triggerTime)
                         )
                         configuredContext.configuredAppComponent.getEventLogger()
-                                .logTriggerFireEvent(objectId!!, System.currentTimeMillis(), this@OTTriggerDAO, { content -> content.add("idealTime", triggerTime.toJson()) })
+                                .logTriggerFireEvent(triggerId, System.currentTimeMillis(), unManagedDAO) { content -> content.add("idealTime", triggerTime.toJson()) }
 
                     }
                 }
