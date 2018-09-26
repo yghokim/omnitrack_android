@@ -30,7 +30,7 @@ class ReminderListFragment : ATriggerListFragment<ATriggerListViewModel>() {
                 if (trackerId != null) // editmode
                 {
                     return@map ViewModelProviders.of(this@ReminderListFragment).get(ManagedReminderListViewModel::class.java)
-                            .apply { if (savedInstanceState == null) this.init(trackerId) }
+                            .apply { this.init(trackerId) }
                 } else {
                     //new mode
                     creationSubscriptions.add(parentViewModel.onChangesApplied.subscribe { trackerId ->

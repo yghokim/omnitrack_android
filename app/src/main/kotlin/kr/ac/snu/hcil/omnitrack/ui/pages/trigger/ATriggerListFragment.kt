@@ -118,9 +118,9 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
         if (viewModel.defaultTriggerInterfaceOptions.allowAddNew) {
             ui_button_new_trigger.setOnClickListener(this)
-            ui_button_new_trigger.visibility = View.VISIBLE
+            ui_button_new_trigger.show()
         } else {
-            ui_button_new_trigger.visibility = View.GONE
+            ui_button_new_trigger.hide()
         }
 
         creationSubscriptions.add(
