@@ -111,6 +111,11 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         )
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        this.viewModel.onSaveInstanceState(outState)
+    }
+
     protected open fun onViewModelMounted(viewModel: ViewModelType, savedInstanceState: Bundle?) {
         ui_trigger_list.emptyView = ui_empty_list_message.apply {
             setText(viewModel.emptyMessageResId)

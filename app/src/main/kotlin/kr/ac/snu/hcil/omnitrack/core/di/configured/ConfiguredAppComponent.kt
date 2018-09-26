@@ -51,6 +51,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TrackerAssignPanel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TriggerDetailViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.OfflineTriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerViewModel
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.time.LocalTimeFormats
@@ -126,6 +127,7 @@ interface ConfiguredAppComponent {
     fun inject(realmViewModel: RealmViewModel)
 
     fun inject(triggerViewModel: ATriggerListViewModel)
+    fun inject(offlineTriggerListViewModel: OfflineTriggerListViewModel)
 
     fun inject(loggingManager: OTUsageLoggingManager)
 

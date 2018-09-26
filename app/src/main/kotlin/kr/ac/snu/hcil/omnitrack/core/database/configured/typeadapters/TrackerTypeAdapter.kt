@@ -33,7 +33,12 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
                 BackendDbManager.FIELD_REMOVED_BOOLEAN -> dao.removed = reader.nextBoolean()
                 if (isServerMode) "user" else BackendDbManager.FIELD_USER_ID -> dao.userId = reader.nextString()
                 BackendDbManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
-                BackendDbManager.FIELD_SYNCHRONIZED_AT -> dao.synchronizedAt = reader.nextLong()
+                BackendDbManager.FIELD_SYNCHRONIZED_AT -> if (reader.peek() == JsonToken.NULL) {
+                    dao.synchronizedAt = null
+                    reader.skipValue()
+                } else {
+                    dao.synchronizedAt = reader.nextLong()
+                }
                 BackendDbManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
                 BackendDbManager.FIELD_POSITION -> dao.position = reader.nextInt()
                 BackendDbManager.FIELD_NAME -> dao.name = reader.nextString()

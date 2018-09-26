@@ -169,7 +169,12 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
                     isOnShortcutProperty.isEnabled = isBookmarkChangeable
                     nameProperty.isEnabled = isNameChangeable
-                    newAttributeButton.visibility = if (canAddAttributes) View.VISIBLE else View.GONE
+
+                    if (canAddAttributes) {
+                        newAttributeButton.show()
+                    } else {
+                        newAttributeButton.hide()
+                    }
 
                     //TODO: implement disabling the attribute order change.
                 }

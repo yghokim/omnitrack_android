@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
 import android.app.Application
+import android.os.Bundle
 import android.support.annotation.StringRes
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
@@ -47,6 +48,8 @@ abstract class ATriggerListViewModel(app: Application) : RealmViewModel(app) {
     protected abstract fun addNewTriggerImpl(dao: OTTriggerDAO)
 
     abstract fun removeTrigger(objectId: String)
+
+    open fun onSaveInstanceState(outState: Bundle) {}
 
     protected fun notifyNewTriggerViewModels() {
         _currentTriggerViewModelListObservable.onNext(currentTriggerViewModels)

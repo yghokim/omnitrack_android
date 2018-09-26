@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.app.Application
+import android.os.Bundle
 import android.support.annotation.DrawableRes
 import com.google.gson.JsonObject
 import dagger.Lazy
@@ -24,6 +25,8 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.OTExperimentDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.typeadapters.ServerCompatibleTypeAdapter
+import kr.ac.snu.hcil.omnitrack.core.di.configured.ForTracker
 import kr.ac.snu.hcil.omnitrack.core.di.configured.Research
 import kr.ac.snu.hcil.omnitrack.core.di.global.ColorPalette
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
@@ -60,6 +63,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     @Inject
     protected lateinit var connectionTypeAdapter: Lazy<OTConnection.ConnectionTypeAdapter>
+
+    @field:[Inject ForTracker]
+    protected lateinit var trackerTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTTrackerDAO>>
 
     @field:[Inject Research]
     protected lateinit var researchRealmFactory: Factory<Realm>
@@ -188,7 +194,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         researchRealm = researchRealmFactory.get()
     }
 
-    fun init(trackerId: String?) {
+    fun init(trackerId: String?, savedInstanceState: Bundle?) {
         if (!isInitialized) {
             removedAttributes.clear()
             lastRemovedAttributeId = null
@@ -270,6 +276,30 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             } else {
                 trackerDao = null
                 isInjectedObservable.onNextIfDifferAndNotNull(false)
+
+                if (savedInstanceState != null) {
+                    val serializedStateDao = savedInstanceState.getString("currentDao")
+                    if (serializedStateDao != null) {
+                        val stateDao = trackerTypeAdapter.get().fromJson(serializedStateDao)
+
+                        nameObservable.onNextIfDifferAndNotNull(stateDao.name)
+                        isBookmarkedObservable.onNextIfDifferAndNotNull(stateDao.isBookmarked)
+                        colorObservable.onNextIfDifferAndNotNull(stateDao.color)
+                        //Locked properties ========
+                        lockedPropertiesObservable.onNextIfDifferAndNotNull(Nullable(stateDao.getParsedLockedPropertyInfo()))
+                        //==========================
+                        isInjectedObservable.onNextIfDifferAndNotNull(CreationFlagsHelper.isInjected(stateDao.getParsedCreationFlags()))
+                        experimentIdObservable.onNextIfDifferAndNotNull(Nullable(CreationFlagsHelper.getExperimentId(stateDao.getParsedCreationFlags())))
+
+                        currentAttributeViewModelList.addAll(
+                                stateDao.attributes.map {
+                                    AttributeInformationViewModel(it, realm, attributeManager.get(), connectionTypeAdapter.get())
+                                }
+                        )
+
+                        attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+                    }
+                }
             }
 
             if (BuildConfig.DISABLE_EXTERNAL_ENTITIES == false) {
@@ -293,6 +323,11 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             isInitialized = true
             isInitializedObservable.onNext(true)
         }
+    }
+
+    fun saveInstanceState(out: Bundle) {
+        val currentDao = makeUnmanagedTrackerDaoFromSettings()
+        out.putString("currentDao", trackerTypeAdapter.get().toJson(currentDao))
     }
 
     fun addNewAttribute(name: String, type: Int, processor: ((OTAttributeDAO, Realm) -> OTAttributeDAO)? = null) {
@@ -402,39 +437,41 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             else isNameDirty || isBookmarkedDirty || isColorDirty || areAttributesDirty
         }
 
+    private fun makeUnmanagedTrackerDaoFromSettings(): OTTrackerDAO {
+        val trackerDao = OTTrackerDAO()
+        trackerDao.objectId = UUID.randomUUID().toString()
+        trackerDao.userId = authManager.get().userId
+        trackerDao.name = nameObservable.value ?: ""
+        trackerDao.isBookmarked = isBookmarkedObservable.value ?: false
+        trackerDao.color = colorObservable.value ?: 0
+
+        if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
+            trackerDao.experimentIdInFlags = BuildConfig.DEFAULT_EXPERIMENT_ID
+            trackerDao.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(BuildConfig.DEFAULT_EXPERIMENT_ID).build()
+        } else if (isInjectedObservable.value != true) {
+            trackerDao.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(assignedExperimentId).build()
+        }
+
+        currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
+            attrViewModel.applyChanges()
+            attrViewModel.attributeDAO.localId = attributeManager.get().makeNewAttributeLocalId(attrViewModel.attributeDAO.userCreatedAt)
+            attrViewModel.attributeDAO.trackerId = trackerDao.objectId
+            attrViewModel.attributeDAO.position = index
+            trackerDao.attributes.add(attrViewModel.attributeDAO)
+        }
+
+        return trackerDao
+    }
+
     fun applyChanges(): String {
         if (trackerDao == null) {
+            removedAttributes.clear()
+            val trackerDao = makeUnmanagedTrackerDaoFromSettings()
             realm.executeTransaction {
-                val trackerDao = realm.createObject(OTTrackerDAO::class.java, UUID.randomUUID().toString())
-                trackerDao.userId = authManager.get().userId
-                trackerDao.name = nameObservable.value ?: ""
-                trackerDao.isBookmarked = isBookmarkedObservable.value ?: false
-                trackerDao.color = colorObservable.value ?: 0
-
-                if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
-                    trackerDao.experimentIdInFlags = BuildConfig.DEFAULT_EXPERIMENT_ID
-                    trackerDao.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(BuildConfig.DEFAULT_EXPERIMENT_ID).build()
-                } else if (isInjectedObservable.value != true) {
-                    trackerDao.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(assignedExperimentId).build()
-                }
-
-                currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
-                    if (!attrViewModel.isInDatabase) {
-                        attrViewModel.attributeDAO.localId = attributeManager.get().makeNewAttributeLocalId(attrViewModel.attributeDAO.userCreatedAt)
-                        attrViewModel.attributeDAO.trackerId = trackerDao.objectId
-                        attrViewModel.saveToRealm()
-                    }
-                    attrViewModel.attributeDAO.position = index
-                    attrViewModel.applyChanges()
-                    trackerDao.attributes.add(attrViewModel.attributeDAO)
-                }
-
-                removedAttributes.clear()
-
-                trackerDao.synchronizedAt = null
-
-                this.trackerDao = trackerDao
+                it.copyToRealm(trackerDao)
             }
+
+            this.trackerDao = trackerDao
 
             currentAttributeViewModelList.forEach {
                 it.register()

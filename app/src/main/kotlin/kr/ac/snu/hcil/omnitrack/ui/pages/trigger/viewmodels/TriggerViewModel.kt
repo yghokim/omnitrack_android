@@ -233,8 +233,10 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
     }
 
     fun unregister() {
-        dao.removeChangeListener(this)
-        attachedTrackersRealmResults?.removeChangeListener(this)
+        if (dao.isManaged) {
+            dao.removeChangeListener(this)
+            attachedTrackersRealmResults?.removeChangeListener(this)
+        }
         currentConditionViewModel?.onDispose()
     }
 

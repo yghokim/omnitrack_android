@@ -134,23 +134,28 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         setActionBarButtonMode(Mode.SaveCancel)
         if (isEditMode) {
             val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
-            this.viewModel.init(trackerId)
+            this.viewModel.init(trackerId, savedInstanceState)
             setActionBarButtonMode(Mode.Back)
             title = resources.getString(R.string.title_activity_tracker_edit)
         } else {
-            this.viewModel.init(null)
-            if (intent.hasExtra(INTENT_KEY_NEW_TRACKER_PRESET_NAME)) {
-                this.viewModel.name = intent.getStringExtra(INTENT_KEY_NEW_TRACKER_PRESET_NAME)
+            this.viewModel.init(null, savedInstanceState)
+            if (savedInstanceState == null) {
+                if (intent.hasExtra(INTENT_KEY_NEW_TRACKER_PRESET_NAME)) {
+                    this.viewModel.name = intent.getStringExtra(INTENT_KEY_NEW_TRACKER_PRESET_NAME)
+                }
             }
             setActionBarButtonMode(Mode.SaveCancel)
             title = resources.getString(R.string.title_activity_tracker_new)
         }
 
-        creationSubscriptions.add(
-                viewModel.reminderCountObservable.subscribe { count ->
-                    (tabLayout.getTabAt(TAB_INDEX_REMINDERS)?.customView?.tag as? TabViewHolder)?.setValue(mSectionsPagerAdapter.getPageTitle(TAB_INDEX_REMINDERS) ?: "Reminders", count)
-                }
-        )
+        if (isEditMode) {
+            creationSubscriptions.add(
+                    viewModel.reminderCountObservable.subscribe { count ->
+                        (tabLayout.getTabAt(TAB_INDEX_REMINDERS)?.customView?.tag as? TabViewHolder)?.setValue(mSectionsPagerAdapter.getPageTitle(TAB_INDEX_REMINDERS)
+                                ?: "Reminders", count)
+                    }
+            )
+        }
 
         creationSubscriptions.add(
                 viewModel.hasTrackerRemovedOutside.subscribe { id ->
@@ -173,6 +178,11 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         {
             startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(this))
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        viewModel.saveInstanceState(outState)
     }
 
     private fun tossToHome() {
