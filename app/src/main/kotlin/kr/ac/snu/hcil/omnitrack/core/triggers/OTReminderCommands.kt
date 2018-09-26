@@ -148,7 +148,7 @@ class OTReminderCommands(val context: Context) {
                     trigger.liveTrackersQuery.equalTo(BackendDbManager.FIELD_OBJECT_ID, trackerId).findFirst()?.let {
                         ItemDetailActivity.makeReminderOpenIntent(it.objectId!!, triggerTime, metadata, context)
                     }?.let {
-                        it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                        it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                         context.runOnUiThread {
                             startActivity(it)
                         }
@@ -273,9 +273,9 @@ class OTReminderCommands(val context: Context) {
 
             if (!context.powerManager.isInteractiveCompat && wakeScreen) {
                 //turn on screen when turned off
-                val wakelock = context.powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP or PowerManager.ON_AFTER_RELEASE, "ReminderScreenLock")
+                val wakelock = context.powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP or PowerManager.ON_AFTER_RELEASE, "omnitrack:ReminderScreenLock")
                 wakelock.acquire(1000)
-                val cpuWakelock = context.powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ReminderScreenLockCpu")
+                val cpuWakelock = context.powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "omnitrack:ReminderScreenLockCpu")
                 cpuWakelock.acquire(1000)
             }
         }
@@ -329,7 +329,7 @@ class OTReminderCommands(val context: Context) {
                 .findAll()
         val entriesByTracker = pendingEntries.groupBy { entry -> entry.trackerId!! }
         realm.executeTransactionIfNotIn { realm ->
-            entriesByTracker.forEach { trackerId, entries ->
+            entriesByTracker.forEach { (trackerId, entries) ->
                 if (entries.isNotEmpty()) {
                     if (entries.first().autoExpireAt >= System.currentTimeMillis() + 5000) {
                         val tracker = dbManager.getTrackerQueryWithId(trackerId, realm).findFirst()
@@ -376,7 +376,7 @@ class OTReminderCommands(val context: Context) {
                 .equalTo("dismissed", false)
                 .findAll()
 
-        entries.groupBy { it.level }.forEach { level, entriesInLevel ->
+        entries.groupBy { it.level }.forEach { (level, entriesInLevel) ->
             when (level) {
                 OTReminderAction.NotificationLevel.Noti -> {
                     val notificationIds = entriesInLevel.map { it.systemIntrinsicId }
