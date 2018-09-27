@@ -297,7 +297,7 @@ class NumericUpDownImpl(val context: Context, attrs: AttributeSet?, val view: Vi
             maxValue = source.readInt()
             value = source.readInt()
             displayedValues = source.createStringArray()
-            quantityResId = source.readSerializable() as Int
+            quantityResId = source.readSerializable() as Int?
             zeroPad = source.readInt()
             allowLongPress = source.readByte() == 0.toByte()
         }

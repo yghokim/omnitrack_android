@@ -454,9 +454,6 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
         currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
             attrViewModel.applyChanges()
-            attrViewModel.attributeDAO.localId = attributeManager.get().makeNewAttributeLocalId(attrViewModel.attributeDAO.userCreatedAt)
-            attrViewModel.attributeDAO.trackerId = trackerDao.objectId
-            attrViewModel.attributeDAO.position = index
             trackerDao.attributes.add(attrViewModel.attributeDAO)
         }
 
@@ -467,6 +464,13 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         if (trackerDao == null) {
             removedAttributes.clear()
             val trackerDao = makeUnmanagedTrackerDaoFromSettings()
+
+            currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
+                attrViewModel.attributeDAO.localId = attributeManager.get().makeNewAttributeLocalId(attrViewModel.attributeDAO.userCreatedAt)
+                attrViewModel.attributeDAO.trackerId = trackerDao.objectId
+                attrViewModel.attributeDAO.position = index
+            }
+
             realm.executeTransaction {
                 it.copyToRealm(trackerDao)
             }

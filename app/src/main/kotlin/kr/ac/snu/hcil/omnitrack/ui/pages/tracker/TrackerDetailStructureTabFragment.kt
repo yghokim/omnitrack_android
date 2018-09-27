@@ -29,7 +29,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.attribute_list_element.view.*
 import kotlinx.android.synthetic.main.fragment_tracker_detail_structure.*
-import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
@@ -37,7 +36,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.AdapterLinearLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
@@ -45,7 +43,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.research.ExperimentSelectionSpinnerAdapter
 import kr.ac.snu.hcil.omnitrack.utils.*
 import org.jetbrains.anko.support.v4.act
 import javax.inject.Inject
@@ -180,6 +177,8 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 }
         )
 
+        assignedExperimentProperty.visibility = View.GONE
+        /*
         if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
             assignedExperimentProperty.visibility = View.GONE
         } else {
@@ -221,7 +220,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                         }
                     }
             )
-        }
+        }*/
 
         creationSubscriptions.add(
                 nameProperty.valueChanged.observable.subscribe { result ->

@@ -81,24 +81,21 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                 signedInUserObservable.subscribe { userId ->
                     viewModel = ViewModelProviders.of(this).get(TriggerDetailViewModel::class.java)
                     interfaceOptions = intent.getSerializableExtra(INTENT_EXTRA_INTERFACE_OPTIONS) as TriggerInterfaceOptions
-                    if (savedInstanceState == null) {
-                        val mode = intent.action
-                        when (mode) {
-                            MODE_NEW -> {
+                    val mode = intent.action
+                    when (mode) {
+                        MODE_NEW -> {
+                            val baseDao = configuredContext.daoSerializationComponent.manager().parseTrigger(intent.getStringExtra(INTENT_EXTRA_TRIGGER_DAO))
+                            viewModel.initNew(baseDao, savedInstanceState)
+                        }
+                        MODE_EDIT -> {
+                            if (intent.hasExtra(INTENT_EXTRA_TRIGGER_DAO)) {
                                 val baseDao = configuredContext.daoSerializationComponent.manager().parseTrigger(intent.getStringExtra(INTENT_EXTRA_TRIGGER_DAO))
-                                viewModel.initNew(baseDao)
-                            }
-                            MODE_EDIT -> {
-                                if (intent.hasExtra(INTENT_EXTRA_TRIGGER_DAO)) {
-                                    val baseDao = configuredContext.daoSerializationComponent.manager().parseTrigger(intent.getStringExtra(INTENT_EXTRA_TRIGGER_DAO))
-                                    viewModel.initEdit(baseDao)
-                                } else if (intent.hasExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER)) {
-                                    viewModel.initEdit(intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER), userId)
-                                }
+                                viewModel.initEdit(baseDao, savedInstanceState)
+                            } else if (intent.hasExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER)) {
+                                viewModel.initEdit(intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER), userId, savedInstanceState)
                             }
                         }
                     }
-
 
                     connectViewsToViewModel(viewModel)
 
@@ -149,6 +146,11 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                     }
                 }
         )
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        viewModel.onSaveInstanceState(outState)
     }
 
     private fun connectViewsToViewModel(viewModel: TriggerDetailViewModel) {

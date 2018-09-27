@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.app.Application
 import android.content.Context
+import android.os.Bundle
 import dagger.Lazy
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.OrderedCollectionChangeSet
@@ -10,6 +11,7 @@ import io.realm.RealmResults
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
@@ -64,11 +66,13 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
     private val currentAttachedTrackerInfoList = java.util.ArrayList<OTTrackerDAO.SimpleTrackerInfo>()
     val attachedTrackers = BehaviorSubject.createDefault<List<OTTrackerDAO.SimpleTrackerInfo>>(currentAttachedTrackerInfoList)
 
+    private var ignoreInitialTrackerList = false
+
     override fun onInject(configuredContext: ConfiguredContext) {
         configuredContext.configuredAppComponent.inject(this)
     }
 
-    fun initEdit(triggerId: String, userId: String) {
+    fun initEdit(triggerId: String, userId: String, savedInstanceState: Bundle?) {
         if (!isInitialized) {
             isOffline = false
             viewModelMode.onNext(MODE_EDIT)
@@ -78,30 +82,76 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
                 this.originalTriggerDao = dao
                 this.attachedTrackersRealmResults = dao.liveTrackersQuery.findAllAsync()
                 this.attachedTrackersRealmResults?.addChangeListener(this)
-                applyToFront(dao)
+                if (savedInstanceState != null) {
+                    ignoreInitialTrackerList = true
+                    applySavedInstanceStateToFront(savedInstanceState)
+                } else applyToFront(dao)
             }
             isInitialized = true
         }
     }
 
-    fun initEdit(baseTriggerDao: OTTriggerDAO) {
+    fun initEdit(baseTriggerDao: OTTriggerDAO, savedInstanceState: Bundle?) {
         if (!isInitialized) {
             isOffline = true
             viewModelMode.onNext(MODE_EDIT)
             this.originalTriggerDao = baseTriggerDao
             applyToFront(baseTriggerDao)
+            if (savedInstanceState != null) {
+                ignoreInitialTrackerList = true
+                applySavedInstanceStateToFront(savedInstanceState)
+            }
+            isInitialized = true
         }
-        isInitialized = true
     }
 
-    fun initNew(baseTriggerDao: OTTriggerDAO) {
+    fun initNew(baseTriggerDao: OTTriggerDAO, savedInstanceState: Bundle?) {
         if (!isInitialized) {
             isOffline = true
             viewModelMode.onNext(MODE_NEW)
             triggerId = null
             this.originalTriggerDao = baseTriggerDao
             applyToFront(baseTriggerDao)
+            if (savedInstanceState != null) {
+                ignoreInitialTrackerList = true
+                applySavedInstanceStateToFront(savedInstanceState)
+            }
             isInitialized = true
+        }
+    }
+
+    private fun applySavedInstanceStateToFront(state: Bundle) {
+        actionType.onNextIfDifferAndNotNull(state.getByte("actionType"))
+        conditionType.onNextIfDifferAndNotNull(state.getByte("conditionType"))
+        if (state.containsKey("actionInstance") || state.containsKey("conditionInstance")) {
+            val tempDao = OTTriggerDAO()
+            tempDao.serializedAction = state.getString("actionInstance")
+            tempDao.serializedCondition = state.getString("conditionInstance")
+            actionInstance.onNextIfDifferAndNotNull(tempDao.action)
+            conditionInstance.onNextIfDifferAndNotNull(tempDao.condition)
+        }
+        script.onNextIfDifferAndNotNull(Nullable(state.getString("script")))
+        useScript.onNextIfDifferAndNotNull(state.getBoolean("useScript"))
+
+        val trackerIds = state.getStringArray("trackers")
+        if (trackerIds?.isNotEmpty() == true) {
+            attachedTrackers.onNext(realm.where(OTTrackerDAO::class.java)
+                    .`in`(BackendDbManager.FIELD_OBJECT_ID, trackerIds).findAll().map { it.getSimpleInfo() })
+        } else {
+            attachedTrackers.onNext(emptyList())
+        }
+    }
+
+    fun onSaveInstanceState(outState: Bundle) {
+        actionType.value?.let { outState.putByte("actionType", it) }
+        actionInstance.value?.let { outState.putString("actionInstance", it.getSerializedString()) }
+        conditionType.value?.let { outState.putByte("conditionType", it) }
+        conditionInstance.value?.let { outState.putString("conditionInstance", it.getSerializedString()) }
+        script.value?.datum?.let { outState.putString("script", it) }
+        useScript.value?.let { outState.putBoolean("useScript", it) }
+
+        if (attachedTrackers.value?.isNotEmpty() == true) {
+            outState.putStringArray("trackers", attachedTrackers.value!!.map { it.objectId }.toTypedArray())
         }
     }
 
@@ -125,6 +175,8 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
         if (changeSet.state == OrderedCollectionChangeSet.State.INITIAL) {
             currentAttachedTrackerInfoList.clear()
             currentAttachedTrackerInfoList.addAll(snapshot.map { it.getSimpleInfo() })
+
+            if (ignoreInitialTrackerList) return // if the ViewModel was restored from the savedInstanceState, do not feed the list to front to avoid the race condition.
         } else {
             val removes = changeSet.deletions.map { i -> currentAttachedTrackerInfoList[i] }
             currentAttachedTrackerInfoList.removeAll(removes)
