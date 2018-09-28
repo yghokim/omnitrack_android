@@ -20,7 +20,7 @@ import javax.inject.Provider
 /**
  * Created by Young-Ho Kim on 16. 7. 25
  */
-class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext: ConfiguredContext, val realm: Realm) {
+class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext: ConfiguredContext) {
 
     enum class EAttributeValueState {
         Processing, GettingExternalValue, Idle
@@ -112,7 +112,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext:
                             val attrLocalId = result.first
                             val value = result.second
                             if (applyToBuilder) {
-                                dao.setValue(attrLocalId, value, realm)
+                                dao.setValue(attrLocalId, value)
                             }
 
                             onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.Idle)

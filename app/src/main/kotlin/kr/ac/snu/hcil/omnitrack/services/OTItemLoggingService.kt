@@ -110,7 +110,7 @@ class OTItemLoggingService : WakefulService(TAG) {
                         val builder = OTItemBuilderDAO()
                         builder.holderType = OTItemBuilderDAO.HOLDER_TYPE_SERVICE
                         builder.tracker = unManagedTrackerDao
-                        val wrapper = OTItemBuilderWrapperBase(builder, (application as OTAndroidApp).currentConfiguredContext, realm)
+                        val wrapper = OTItemBuilderWrapperBase(builder, (application as OTAndroidApp).currentConfiguredContext)
                         val trackerName = trackerDao.name
                         val notificationId = OTItemLoggingService.notificationIdSeed.incrementAndGet()
 

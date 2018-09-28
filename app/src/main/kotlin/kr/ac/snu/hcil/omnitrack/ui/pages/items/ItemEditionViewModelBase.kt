@@ -97,13 +97,13 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
                 currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan }.map { AttributeInputViewModel(it) })
                 attributeViewModelListObservable.onNext(currentAttributeViewModelList)
 
-                onInit(trackerDao!!, itemId)
+                onInit(trackerDao!!, itemId, savedInstanceState)
                 return true
             } else throw IllegalArgumentException("No such tracker.")
         } else return false
     }
 
-    abstract fun onInit(trackerDao: OTTrackerDAO, itemId: String?)
+    abstract fun onInit(trackerDao: OTTrackerDAO, itemId: String?, savedInstanceState: Bundle?)
 
     open fun onSaveInstanceState(outState: Bundle) {
 

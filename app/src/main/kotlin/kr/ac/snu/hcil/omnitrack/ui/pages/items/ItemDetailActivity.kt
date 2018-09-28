@@ -77,6 +77,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
         const val KEY_MODE = "viewModelMode"
         const val KEY_ITEM_SAVED = "itemSaved"
+        const val KEY_METADATA = "metadata"
 
         fun makeNewItemPageIntent(trackerId: String, context: Context): Intent {
             val intent = Intent(context, ItemDetailActivity::class.java)
@@ -150,8 +151,11 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
         outState.putInt(KEY_MODE, mode.ordinal)
         outState.putBoolean(KEY_ITEM_SAVED, itemSaved)
+        outState.putString(KEY_METADATA, viewModel.metadataForItem.toString())
 
         super.onSaveInstanceState(outState)
+
+        this.viewModel.onSaveInstanceState(outState)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -194,27 +198,33 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
         val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
 
-        val payloadMetadataJson = intent.getStringExtra(OTApp.INTENT_EXTRA_METADATA)
-        val metadata = if (payloadMetadataJson != null) {
-            val m = genericGson.get().fromJson(payloadMetadataJson, JsonObject::class.java)
-            m.addProperty("accessedDirectlyFromReminder", true)
-            m.addProperty("pairedToReminder", true)
-            m
+
+        val metadata: JsonObject = if (savedInstanceState != null && savedInstanceState.containsKey(KEY_METADATA)) {
+            genericGson.get().fromJson(savedInstanceState.getString(KEY_METADATA)!!)
         } else {
-            //if the tracker was manually opened, get metadata from current reminder.
-            val realm = backendRealmFactory.get()
-            val entries = realm.where(OTTriggerReminderEntry::class.java)
-                    .equalTo("dismissed", false)
-                    .equalTo("trackerId", trackerId)
-                    .findAll()
-            if (entries.size > 0) {
-                val m = entries.last()?.serializedMetadata?.let { genericGson.get().fromJson(it, JsonObject::class.java) }
-                        ?: JsonObject()
-                m.addProperty("accessedDirectlyFromReminder", false)
+            val payloadMetadataJson = intent.getStringExtra(OTApp.INTENT_EXTRA_METADATA)
+            if (payloadMetadataJson != null) {
+                val m = genericGson.get().fromJson(payloadMetadataJson, JsonObject::class.java)
+                m.addProperty("accessedDirectlyFromReminder", true)
                 m.addProperty("pairedToReminder", true)
                 m
-            } else jsonObject("pairedToReminder" to false)
+            } else {
+                //if the tracker was manually opened, get metadata from current reminder.
+                val realm = backendRealmFactory.get()
+                val entries = realm.where(OTTriggerReminderEntry::class.java)
+                        .equalTo("dismissed", false)
+                        .equalTo("trackerId", trackerId)
+                        .findAll()
+                if (entries.size > 0) {
+                    val m = entries.last()?.serializedMetadata?.let { genericGson.get().fromJson(it, JsonObject::class.java) }
+                            ?: JsonObject()
+                    m.addProperty("accessedDirectlyFromReminder", false)
+                    m.addProperty("pairedToReminder", true)
+                    m
+                } else jsonObject("pairedToReminder" to false)
+            }
         }
+
 
         val itemId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM)
         this.mode = if (itemId != null) ItemEditionViewModelBase.ItemMode.Edit else ItemEditionViewModelBase.ItemMode.New

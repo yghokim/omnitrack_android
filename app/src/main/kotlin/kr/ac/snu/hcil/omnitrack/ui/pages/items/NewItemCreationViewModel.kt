@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import android.app.Application
+import android.os.Bundle
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
@@ -12,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTItemBuilderFieldValueEntry
 import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
+import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
@@ -21,11 +23,15 @@ import java.util.*
  */
 class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app) {
 
+    companion object {
+        const val KEY_RESERVED_NEW_ITEM_ID = "reservedNewItemId"
+        const val KEY_REDIRECTED_PAGE_VISIT_STATUS = "redirectedPageVisitStatus"
+        const val KEY_BUILDER_ID = "builderId"
+    }
+
     enum class RedirectedPageStatus {
         RedirectionNotSet, NotVisited, Completed, Canceled
     }
-
-    val loadPendingItemBuilder: Boolean = false
 
     private lateinit var itemBuilderDao: OTItemBuilderDAO
     private lateinit var builderWrapper: OTItemBuilderWrapperBase
@@ -43,7 +49,16 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         configuredContext.configuredAppComponent.inject(this)
     }
 
-    override fun onInit(trackerDao: OTTrackerDAO, itemId: String?) {
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putLong(KEY_BUILDER_ID, this.itemBuilderDao.id)
+        outState.putInt(KEY_REDIRECTED_PAGE_VISIT_STATUS, this.redirectedPageVisitStatusObservable.value?.ordinal
+                ?: RedirectedPageStatus.RedirectionNotSet.ordinal)
+        outState.putString(KEY_RESERVED_NEW_ITEM_ID, reservedNewItemId)
+        val stored = cacheEditingInfo().blockingGet()
+    }
+
+    override fun onInit(trackerDao: OTTrackerDAO, itemId: String?, savedInstanceState: Bundle?) {
 
         if (!trackerDao.redirectUrl.isNullOrBlank()) {
             redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(RedirectedPageStatus.NotVisited)
@@ -51,23 +66,26 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
             redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(RedirectedPageStatus.RedirectionNotSet)
         }
 
-        val builderDaoResult = if (loadPendingItemBuilder) dbManager.get().getItemBuilderQuery(trackerDao.objectId!!, OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst() else null
+        //val builderDaoResult = if (loadPendingItemBuilder) dbManager.get().getItemBuilderQuery(trackerDao.objectId!!, OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst() else null
 
-        if (builderDaoResult != null) {
+        val storedBuilderDao = if (savedInstanceState != null && savedInstanceState.containsKey(KEY_BUILDER_ID)) {
             //there is a pending itemBuilder.
-            this.itemBuilderDao = realm.copyFromRealm(builderDaoResult)
+            realm.where(OTItemBuilderDAO::class.java).equalTo("id", savedInstanceState.getLong(KEY_BUILDER_ID)).findFirst()
+        } else null
 
-        } else {
-            //no pending itemBuilder.
-            realm.executeTransaction {
-                val newBuilderDao = realm.createObject(OTItemBuilderDAO::class.java, (realm.where(OTItemBuilderDAO::class.java).max("id")?.toLong() ?: 0) + 1)
+        if (storedBuilderDao == null) {
+            val newBuilderId = System.currentTimeMillis()
+            realm.executeTransactionIfNotIn {
+                val newBuilderDao = realm.createObject(OTItemBuilderDAO::class.java, newBuilderId)
                 newBuilderDao.tracker = trackerDao
                 newBuilderDao.holderType = OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM
                 this.itemBuilderDao = realm.copyFromRealm(newBuilderDao)
             }
+        } else {
+            this.itemBuilderDao = realm.copyFromRealm(storedBuilderDao)
         }
 
-        this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao, configuredContext, realm)
+        this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao, configuredContext)
 
         for (key in this.builderWrapper.keys) {
             val value = this.builderWrapper.getValueInformationOf(key)
@@ -76,20 +94,25 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
             }
         }
 
-        isBusy = true
-        subscriptions.add(
-                this.builderWrapper.makeAutoCompleteObservable(realmProvider, this).subscribe({ (attrLocalId, valueWithTimestamp) ->
-                    setValueOfAttribute(attrLocalId, valueWithTimestamp)
-                }, {
+        if (savedInstanceState == null) {
+            isBusy = true
+            subscriptions.add(
+                    this.builderWrapper.makeAutoCompleteObservable(realmProvider, this).subscribe({ (attrLocalId, valueWithTimestamp) ->
+                        setValueOfAttribute(attrLocalId, valueWithTimestamp)
+                    }, {
 
-                }, {
-                    isBusy = false
-                })
-        )
+                    }, {
+                        isBusy = false
+                    })
+            )
+        } else {
+            this.reservedNewItemId = savedInstanceState.getString(KEY_RESERVED_NEW_ITEM_ID)
+            this.redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(RedirectedPageStatus.values()[savedInstanceState.getInt(KEY_REDIRECTED_PAGE_VISIT_STATUS)])
+        }
     }
 
     override fun setValueOfAttribute(attributeLocalId: String, valueWithTimestamp: AnyValueWithTimestamp) {
-        itemBuilderDao.setValue(attributeLocalId, valueWithTimestamp, realm)
+        itemBuilderDao.setValue(attributeLocalId, valueWithTimestamp)
         super.setValueOfAttribute(attributeLocalId, valueWithTimestamp)
     }
 
@@ -115,7 +138,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         realm.executeTransaction {
             currentAttributeViewModelList.forEach { attrViewModel ->
                 val value = attrViewModel.value
-                itemBuilderDao.setValue(attrViewModel.attributeLocalId, value, realm)
+                itemBuilderDao.setValue(attrViewModel.attributeLocalId, value)
             }
         }
     }
@@ -127,7 +150,8 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
                 refreshDaoValues()
                 isBusyObservable.filter { !it }.firstOrError().map { isBusy ->
                     if (!isBusy) {
-                        var highestBuilderEntryId = realm.where(OTItemBuilderFieldValueEntry::class.java).max("id")?.toLong() ?: 0L
+                        var highestBuilderEntryId = realm.where(OTItemBuilderFieldValueEntry::class.java).max("id")?.toLong()
+                                ?: 0L
                         itemBuilderDao.data.forEach {
                             if (!it.isManaged && it.id == -1L) {
                                 it.id = ++highestBuilderEntryId
@@ -138,7 +162,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
                         }
                         true
                     } else false
-                        }
+                }
             } else Single.just(false)
         }
     }

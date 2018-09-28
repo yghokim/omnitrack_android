@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels
 
-import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.Index
@@ -30,7 +29,7 @@ open class OTItemBuilderDAO : RealmObject() {
 
     var data = RealmList<OTItemBuilderFieldValueEntry>()
 
-    fun setValue(attributeLocalId: String, value: AnyValueWithTimestamp?, realm: Realm) {
+    fun setValue(attributeLocalId: String, value: AnyValueWithTimestamp?) {
         val match = data.find { it.attributeLocalId == attributeLocalId }
         if (match != null) {
             if (value == null) {
