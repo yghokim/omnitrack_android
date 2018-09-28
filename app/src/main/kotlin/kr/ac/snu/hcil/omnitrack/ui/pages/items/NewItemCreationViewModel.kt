@@ -43,7 +43,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         configuredContext.configuredAppComponent.inject(this)
     }
 
-    override fun onInit(trackerDao: OTTrackerDAO, itemId: String?): Pair<ItemMode, BuilderCreationMode?> {
+    override fun onInit(trackerDao: OTTrackerDAO, itemId: String?) {
 
         if (!trackerDao.redirectUrl.isNullOrBlank()) {
             redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(RedirectedPageStatus.NotVisited)
@@ -56,7 +56,6 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         if (builderDaoResult != null) {
             //there is a pending itemBuilder.
             this.itemBuilderDao = realm.copyFromRealm(builderDaoResult)
-            builderCreationModeObservable.onNext(BuilderCreationMode.Restored)
 
         } else {
             //no pending itemBuilder.
@@ -66,7 +65,6 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
                 newBuilderDao.holderType = OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM
                 this.itemBuilderDao = realm.copyFromRealm(newBuilderDao)
             }
-            builderCreationModeObservable.onNext(BuilderCreationMode.NewBuilder)
         }
 
         this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao, configuredContext, realm)
@@ -78,15 +76,6 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
             }
         }
 
-        return Pair(ItemMode.New, builderCreationModeObservable.value)
-    }
-
-    override fun setValueOfAttribute(attributeLocalId: String, valueWithTimestamp: AnyValueWithTimestamp) {
-        itemBuilderDao.setValue(attributeLocalId, valueWithTimestamp, realm)
-        super.setValueOfAttribute(attributeLocalId, valueWithTimestamp)
-    }
-
-    override fun startAutoComplete() {
         isBusy = true
         subscriptions.add(
                 this.builderWrapper.makeAutoCompleteObservable(realmProvider, this).subscribe({ (attrLocalId, valueWithTimestamp) ->
@@ -97,6 +86,11 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
                     isBusy = false
                 })
         )
+    }
+
+    override fun setValueOfAttribute(attributeLocalId: String, valueWithTimestamp: AnyValueWithTimestamp) {
+        itemBuilderDao.setValue(attributeLocalId, valueWithTimestamp, realm)
+        super.setValueOfAttribute(attributeLocalId, valueWithTimestamp)
     }
 
     override fun isViewModelsDirty(): Boolean {

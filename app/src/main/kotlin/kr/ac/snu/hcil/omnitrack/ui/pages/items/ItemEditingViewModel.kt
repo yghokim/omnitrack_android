@@ -17,7 +17,7 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
 
     private lateinit var originalUnmanagedItemDao: OTItemDAO
 
-    override fun onInit(trackerDao: OTTrackerDAO, itemId: String?): Pair<ItemMode, BuilderCreationMode?> {
+    override fun onInit(trackerDao: OTTrackerDAO, itemId: String?) {
         if (itemId != null) {
             val itemDao = dbManager.get().makeSingleItemQuery(itemId, realm).findFirst()
             if (itemDao != null) {
@@ -25,6 +25,7 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
                 this.metadataForItem = originalUnmanagedItemDao.serializedMetadata?.let {
                     this.getApplication<OTApp>().applicationComponent.genericGson().fromJson(it, JsonObject::class.java)
                 } ?: JsonObject()
+
                 subscriptions.add(
                         itemDao.asFlowable<OTItemDAO>().subscribe { dao ->
                             if (!dao.isValid) {
@@ -33,16 +34,11 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
                         }
                 )
 
-                return Pair(ItemMode.Edit, null)
+                originalUnmanagedItemDao.fieldValueEntries.forEach {
+                    setValueOfAttribute(it.key, AnyValueWithTimestamp(it.value?.let { TypeStringSerializationHelper.deserialize(it) }, null))
+                }
             } else throw IllegalArgumentException("No item with the id.")
         } else throw throw IllegalArgumentException("Did not provide an itemId.")
-    }
-
-
-    override fun startAutoComplete() {
-        originalUnmanagedItemDao.fieldValueEntries.forEach {
-            setValueOfAttribute(it.key, AnyValueWithTimestamp(it.value?.let { TypeStringSerializationHelper.deserialize(it) }, null))
-        }
     }
 
     override fun isViewModelsDirty(): Boolean {

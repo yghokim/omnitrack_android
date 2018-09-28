@@ -24,7 +24,6 @@ import com.github.salomonbrys.kotson.*
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import dagger.internal.Factory
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -118,7 +117,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
     private val attributeListView: RecyclerView by bindView(R.id.ui_attribute_list)
     private val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-    private lateinit var builderRestoredSnackbar: Snackbar
     private lateinit var redirectedPageCanceledSnackbar: Snackbar
 
     private val loadingIndicatorBar: LoadingIndicatorBar by bindView(R.id.ui_loading_indicator)
@@ -187,28 +185,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
         loadingIndicatorBar.setMessage(R.string.msg_indicator_message_item_autocomplete)
 
-        builderRestoredSnackbar = Snackbar.make(ui_root, resources.getText(R.string.msg_builder_restored), Snackbar.LENGTH_INDEFINITE)
-        builderRestoredSnackbar.setAction(resources.getText(R.string.msg_clear_form)) { view ->
-            creationSubscriptions.add(
-                    (viewModel.trackerDao?.makePermissionAssertObservable(this, configuredContext) ?: Observable.just(true))
-                            .subscribe({ approved ->
-                                if (approved) {
-                                    viewModel.clearHistory()
-                                    viewModel.reset()
-                                } else {
-
-                                }
-                            }, {
-                                //TODO handle permission not granted
-                            }, {
-                                println("Finished builder autocomplete.")
-
-                            })
-            )
-
-            builderRestoredSnackbar.dismiss()
-        }
-
         redirectedPageCanceledSnackbar = Snackbar.make(ui_root, resources.getText(R.string.msg_redirected_page_canceled), Snackbar.LENGTH_INDEFINITE)
         redirectedPageCanceledSnackbar.setAction(resources.getText(R.string.msg_reopen_redirected_page)) { view ->
             redirectedPageCanceledSnackbar.dismiss()
@@ -239,20 +215,11 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                 m
             } else jsonObject("pairedToReminder" to false)
         }
-        val initResult = viewModel.init(trackerId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM), metadata)
-        if (initResult != null) {
-            this.mode = initResult.first
 
-            if (initResult.second != null) {
-                if (initResult.second == ItemEditionViewModelBase.BuilderCreationMode.Restored) {
-                    builderRestoredSnackbar.show()
-                } else if (initResult.second == ItemEditionViewModelBase.BuilderCreationMode.NewBuilder) {
-                    viewModel.startAutoComplete()
-                }
-            } else {
-                viewModel.startAutoComplete()
-            }
-        }
+        val itemId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM)
+        this.mode = if (itemId != null) ItemEditionViewModelBase.ItemMode.Edit else ItemEditionViewModelBase.ItemMode.New
+
+        viewModel.init(trackerId, itemId, metadata, savedInstanceState)
 
         if (savedInstanceState != null) {
             this.mode = ItemEditionViewModelBase.ItemMode.values()[savedInstanceState.getInt(KEY_MODE)]
@@ -347,9 +314,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
             val needToStoreBuilder = if (viewModel.isValid) {
                 if (viewModel.isViewModelsDirty()) {
                     true
-                } else if (currentAttributeViewModelList.filter { it.attributeDAO.getHelper(configuredContext).isAttributeValueVolatile(it.attributeDAO) }.isNotEmpty()) {
-                    true
-                } else viewModel.builderCreationModeObservable.value == ItemEditionViewModelBase.BuilderCreationMode.Restored
+                } else currentAttributeViewModelList.filter { it.attributeDAO.getHelper(configuredContext).isAttributeValueVolatile(it.attributeDAO) }.isNotEmpty()
             } else {
                 false
             }
@@ -706,7 +671,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                         inputView.valueChanged.observable.subscribe { (_, args) ->
                             val now = System.currentTimeMillis()
                             attributeViewModel.value = AnyValueWithTimestamp(args, now)
-                            builderRestoredSnackbar.dismiss()
                         }
                 )
 
