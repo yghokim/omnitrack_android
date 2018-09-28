@@ -1,14 +1,17 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.attribute
 
 import android.app.Application
+import android.os.Bundle
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
+import dagger.Lazy
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
+import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
@@ -112,37 +115,52 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
     @Inject
     lateinit var connectionTypeAdapter: OTConnection.ConnectionTypeAdapter
 
+    @Inject
+    lateinit var serializationManager: Lazy<DaoSerializationManager>
+
     override fun onInject(configuredContext: ConfiguredContext) {
         configuredContext.configuredAppComponent.inject(this)
     }
 
-    fun init(attributeDao: OTAttributeDAO) {
+    fun init(attributeDao: OTAttributeDAO, savedInstanceState: Bundle?) {
         if (!isInitialized) {
             this.attributeDAO = attributeDao
-            name = attributeDao.name
-            connection = attributeDao.serializedConnection?.let { connectionTypeAdapter.fromJson(it) }
 
-            isRequired = attributeDao.isRequired
+            val daoForFront = if (savedInstanceState != null) {
+                val serializedFront = savedInstanceState.getString("frontDao")
+                if (serializedFront != null) {
+                    serializationManager.get().parseAttribute(serializedFront)
+                } else attributeDao
+            } else attributeDao
 
-            println("initial policy: ${attributeDao.fallbackValuePolicy}")
+            name = daoForFront.name
+            connection = daoForFront.serializedConnection?.let { connectionTypeAdapter.fromJson(it) }
 
-            defaultValuePolicy = attributeDao.fallbackValuePolicy
-            defaultValuePreset = attributeDao.fallbackPresetSerializedValue
+            isRequired = daoForFront.isRequired
+
+            defaultValuePolicy = daoForFront.fallbackValuePolicy
+            defaultValuePreset = daoForFront.fallbackPresetSerializedValue
 
             propertyTable.clear()
             val helper = attributeHelper
             if (helper != null) {
-                val table = helper.getDeserializedPropertyTable(attributeDao)
+                val table = helper.getDeserializedPropertyTable(daoForFront)
                 for (entry in table) {
                     propertyTable.set(entry.key, entry.value)
                     onPropertyValueChanged.onNext(Pair(entry.key, entry.value))
                 }
             }
 
-            if (typeObservable.value != attributeDao.type)
-                typeObservable.onNext(attributeDao.type)
+            typeObservable.onNextIfDifferAndNotNull(daoForFront.type)
 
             isInitialized = true
+        }
+    }
+
+    fun onSaveInstanceState(outState: Bundle) {
+        val frontDao = makeFrontalChangesToDao()
+        if (frontDao != null) {
+            outState.putString("frontDao", serializationManager.get().serializeAttribute(frontDao, false))
         }
     }
 
@@ -199,6 +217,7 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
     }
 
     fun applyChanges() {
+        println("state name: ${name}, required: ${isRequired}, dao: ${attributeDAO}")
         attributeDAO?.name = name
         attributeDAO?.fallbackValuePolicy = defaultValuePolicy
         attributeDAO?.fallbackPresetSerializedValue = defaultValuePreset
@@ -224,7 +243,8 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
             dao.position = it.position
             dao.trackerId = it.trackerId
             dao.userUpdatedAt = it.userUpdatedAt
-            dao.isRequired = it.isRequired
+
+            dao.isRequired = isRequired
             dao.fallbackValuePolicy = defaultValuePolicy
             dao.fallbackPresetSerializedValue = defaultValuePreset
             dao.name = name

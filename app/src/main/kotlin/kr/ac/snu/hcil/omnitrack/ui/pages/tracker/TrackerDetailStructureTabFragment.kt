@@ -122,6 +122,11 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         super.onActivityCreated(savedInstanceState)
         this.viewModel = ViewModelProviders.of(activity!!).get(TrackerDetailViewModel::class.java)
 
+        if (this.viewModel.attributeViewModelListObservable.hasValue()) {
+            currentAttributeViewModelList.clear()
+            currentAttributeViewModelList.addAll(this.viewModel.attributeViewModelListObservable.value!!)
+        }
+
         //set UI
         nameProperty.value = this.viewModel.name
         nameProperty.showEditedOnTitle = viewModel.isNameDirty
@@ -141,8 +146,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
         creationSubscriptions.add(
                 this.viewModel.attributeViewModelListObservable.subscribe { newList ->
-
-                    println("new attribute viewmodel list: ${newList}, old: ${currentAttributeViewModelList}")
 
                     val diffResult = DiffUtil.calculateDiff(
                             IReadonlyObjectId.DiffUtilCallback(currentAttributeViewModelList, newList)
@@ -368,7 +371,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     fun openAttributeDetailActivity(position: Int) {
         val attrViewModel = currentAttributeViewModelList[position]
-        startActivityForResult(AttributeDetailActivity.makeIntent(act, configuredContext, attrViewModel.makeFrontalChangesToDao(), false), REQUEST_CODE_ATTRIBUTE_DETAIL)
+        startActivityForResult(AttributeDetailActivity.makeIntent(act, configuredContext, attrViewModel.makeFrontalChangesToDao()), REQUEST_CODE_ATTRIBUTE_DETAIL)
     }
 
     fun scrollToBottom() {
@@ -378,10 +381,9 @@ class TrackerDetailStructureTabFragment : OTFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_ATTRIBUTE_DETAIL && resultCode == RESULT_OK && data != null) {
-            println("JSON: ${data.getStringExtra(AttributeDetailActivity.INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO)}")
             val editedDao = serializationManager.get().parseAttribute(data.getStringExtra(AttributeDetailActivity.INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO))
-            println(editedDao)
             val correspondingViewModel = currentAttributeViewModelList.find { it.attributeDAO.objectId == editedDao.objectId }
+
             if (correspondingViewModel != null) {
                 correspondingViewModel.applyDaoChangesToFront(editedDao)
                 if (viewModel.isEditMode) {

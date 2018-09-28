@@ -40,13 +40,11 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     companion object {
         const val INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO = "serializedAttributeDao"
-        const val INTENT_EXTRA_APPLY_TO_DB = "applyToDb"
 
-        fun makeIntent(context: Context, configuredContext: ConfiguredContext, dao: OTAttributeDAO, applyToDb: Boolean): Intent {
+        fun makeIntent(context: Context, configuredContext: ConfiguredContext, dao: OTAttributeDAO): Intent {
 
             val intent = Intent(context, AttributeDetailActivity::class.java)
             intent.putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, configuredContext.daoSerializationComponent.manager().serializeAttribute(dao))
-            intent.putExtra(INTENT_EXTRA_APPLY_TO_DB, applyToDb)
             return intent
         }
     }
@@ -81,14 +79,11 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         )
 
         viewModel = ViewModelProviders.of(this).get(AttributeDetailViewModel::class.java)
-        if (!viewModel.isInitialized) {
-            val serializedAttributeDao = intent.getStringExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO)
-            val applyToDb = intent.getBooleanExtra(INTENT_EXTRA_APPLY_TO_DB, false)
+        val serializedAttributeDao = intent.getStringExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO)
 
-            if (!serializedAttributeDao.isNullOrBlank()) {
-                val attributeDao = serializationManager.get().parseAttribute(serializedAttributeDao)
-                viewModel.init(attributeDao)
-            }
+        if (!serializedAttributeDao.isNullOrBlank()) {
+            val attributeDao = serializationManager.get().parseAttribute(serializedAttributeDao)
+            viewModel.init(attributeDao, savedInstanceState)
         }
 
         setActionBarButtonMode(Mode.SaveCancel)
@@ -99,8 +94,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         nameProperty.addNewValidator(String.format(resources.getString(R.string.msg_format_cannot_be_blank), resources.getString(R.string.msg_column_name)), ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
 
 
-        nameProperty.valueChanged += {
-            sender, value ->
+        nameProperty.valueChanged += { sender, value ->
             if (nameProperty.validate()) {
                 viewModel.name = value
             }
@@ -108,15 +102,13 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             nameProperty.showEditedOnTitle = viewModel.isNameDirty
         }
 
-        requiredProperty.valueChanged += {
-            sender, value ->
+        requiredProperty.valueChanged += { sender, value ->
             viewModel.isRequired = value
 
             requiredProperty.showEditedOnTitle = viewModel.isRequiredDirty
         }
 
-        ui_attribute_connection.onRemoveButtonClicked += {
-            sender, arg ->
+        ui_attribute_connection.onRemoveButtonClicked += { sender, arg ->
             DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_remove_connection), R.string.msg_remove, onYes = {
                 viewModel.connection = null
             }).show()
@@ -249,8 +241,8 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                         val dao = viewModel.makeFrontalChangesToDao()
                         if (dao != null) {
                             if (externalServiceManager.getFilteredMeasureFactories {
-                                it.isAttachableTo(dao)
-                            }.isEmpty()) {
+                                        it.isAttachableTo(dao)
+                                    }.isEmpty()) {
                                 ui_connection_group.visibility = View.GONE
                             } else {
                                 ui_connection_group.visibility = View.VISIBLE
@@ -277,6 +269,11 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         )
 
         setResult(Activity.RESULT_CANCELED)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        this.viewModel.onSaveInstanceState(outState)
     }
 
     private fun refreshFallbackSpinner(dao: OTAttributeDAO, attrHelper: OTAttributeHelper) {
@@ -315,13 +312,13 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                 yesLabel = R.string.msg_save,
                 noLabel = R.string.msg_do_not_save,
                 onYes = {
-            saveChanges()
-            if (backInsteadOfFinish)
-                super.onBackPressed()
-            else {
-                finish()
-            }
-        }, onNo = {
+                    saveChanges()
+                    if (backInsteadOfFinish)
+                        super.onBackPressed()
+                    else {
+                        finish()
+                    }
+                }, onNo = {
             if (backInsteadOfFinish)
                 super.onBackPressed()
             else
@@ -379,7 +376,8 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         viewModel.applyChanges()
         viewModel.attributeDAO?.let {
             if (dirtySignature != null) {
-                eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_EDIT, viewModel.attributeDAO?.localId ?: "", viewModel.attributeDAO?.trackerId) { content ->
+                eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_EDIT, viewModel.attributeDAO?.localId
+                        ?: "", viewModel.attributeDAO?.trackerId) { content ->
                     content[IEventLogger.CONTENT_KEY_NEWVALUE] = dirtySignature
                 }
             }

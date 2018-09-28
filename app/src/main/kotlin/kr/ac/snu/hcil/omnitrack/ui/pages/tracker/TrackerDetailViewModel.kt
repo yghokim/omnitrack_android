@@ -201,6 +201,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             subscriptions.clear()
             if (trackerId != null) {
                 this.trackerId = trackerId
+
                 val dao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirstAsync()
 
                 subscriptions.add(
@@ -276,29 +277,30 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             } else {
                 trackerDao = null
                 isInjectedObservable.onNextIfDifferAndNotNull(false)
+            }
 
-                if (savedInstanceState != null) {
-                    val serializedStateDao = savedInstanceState.getString("currentDao")
-                    if (serializedStateDao != null) {
-                        val stateDao = trackerTypeAdapter.get().fromJson(serializedStateDao)
+            if (savedInstanceState != null) {
+                val serializedStateDao = savedInstanceState.getString("currentDao")
+                if (serializedStateDao != null) {
+                    val stateDao = trackerTypeAdapter.get().fromJson(serializedStateDao)
 
-                        nameObservable.onNextIfDifferAndNotNull(stateDao.name)
-                        isBookmarkedObservable.onNextIfDifferAndNotNull(stateDao.isBookmarked)
-                        colorObservable.onNextIfDifferAndNotNull(stateDao.color)
-                        //Locked properties ========
-                        lockedPropertiesObservable.onNextIfDifferAndNotNull(Nullable(stateDao.getParsedLockedPropertyInfo()))
-                        //==========================
-                        isInjectedObservable.onNextIfDifferAndNotNull(CreationFlagsHelper.isInjected(stateDao.getParsedCreationFlags()))
-                        experimentIdObservable.onNextIfDifferAndNotNull(Nullable(CreationFlagsHelper.getExperimentId(stateDao.getParsedCreationFlags())))
+                    nameObservable.onNextIfDifferAndNotNull(stateDao.name)
+                    isBookmarkedObservable.onNextIfDifferAndNotNull(stateDao.isBookmarked)
+                    colorObservable.onNextIfDifferAndNotNull(stateDao.color)
+                    //Locked properties ========
+                    lockedPropertiesObservable.onNextIfDifferAndNotNull(Nullable(stateDao.getParsedLockedPropertyInfo()))
+                    //==========================
+                    isInjectedObservable.onNextIfDifferAndNotNull(CreationFlagsHelper.isInjected(stateDao.getParsedCreationFlags()))
+                    experimentIdObservable.onNextIfDifferAndNotNull(Nullable(CreationFlagsHelper.getExperimentId(stateDao.getParsedCreationFlags())))
 
-                        currentAttributeViewModelList.addAll(
-                                stateDao.attributes.map {
-                                    AttributeInformationViewModel(it, realm, attributeManager.get(), connectionTypeAdapter.get())
-                                }
-                        )
-
-                        attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+                    val newList = stateDao.attributes.map {
+                        AttributeInformationViewModel(it, realm, attributeManager.get(), connectionTypeAdapter.get())
                     }
+                    currentAttributeViewModelList.addAll(
+                            newList
+                    )
+
+                    attributeViewModelListObservable.onNext(newList)
                 }
             }
 
