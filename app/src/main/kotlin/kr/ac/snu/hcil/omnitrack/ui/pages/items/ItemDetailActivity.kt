@@ -51,7 +51,6 @@ import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import org.jetbrains.anko.notificationManager
-import rx_activity_result2.RxActivityResult
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider
@@ -78,6 +77,8 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         const val KEY_MODE = "viewModelMode"
         const val KEY_ITEM_SAVED = "itemSaved"
         const val KEY_METADATA = "metadata"
+
+        const val REQUEST_CODE_REDIRECT_SURVEY = 23153
 
         fun makeNewItemPageIntent(trackerId: String, context: Context): Intent {
             val intent = Intent(context, ItemDetailActivity::class.java)
@@ -495,45 +496,45 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                         this
                     }
                     .build().toString()
-            creationSubscriptions.add(
-                    RxActivityResult.on(this).startIntent(WebServiceLoginActivity.makeIntent(url, "Qualtrics", "Complete A Survey", this))
-                            .subscribe { result ->
-                                val resultCode = result.resultCode()
-                                val redirectionStatus = when (resultCode) {
-                                    Activity.RESULT_OK -> {
-                                        NewItemCreationViewModel.RedirectedPageStatus.Completed
-                                    }
-                                    else -> NewItemCreationViewModel.RedirectedPageStatus.Canceled
-                                }
 
-                                if (resultCode == Activity.RESULT_OK) {
-                                    viewModel.metadataForItem.removeAll(
-                                            viewModel.metadataForItem.keys().filter { it.startsWith("returned::") }
-                                    )
-
-                                    if (result.data().hasExtra(WebServiceLoginActivity.EXTRA_RETURNED_PARAMETERS)) {
-                                        val returnedParameters = result.data().getBundleExtra(WebServiceLoginActivity.EXTRA_RETURNED_PARAMETERS)
-                                        for (key in returnedParameters.keySet()) {
-                                            viewModel.metadataForItem.set(key, returnedParameters.getString(key))
-                                        }
-                                    }
-                                }
-
-                                viewModel.setResultOfRedirectedPage(redirectionStatus)
-                                if (result.resultCode() == Activity.RESULT_OK) {
-                                    Toast.makeText(this@ItemDetailActivity, "Completed Qualtrics survey.", Toast.LENGTH_LONG).show()
-                                    redirectedPageCanceledSnackbar.dismiss()
-                                } else {
-                                    redirectedPageCanceledSnackbar.show()
-                                }
-                            }
-            )
+            startActivityForResult(WebServiceLoginActivity.makeIntent(url, "Qualtrics", "Complete A Survey", this), REQUEST_CODE_REDIRECT_SURVEY)
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && data != null) {
+
+        if (requestCode == REQUEST_CODE_REDIRECT_SURVEY && viewModel is NewItemCreationViewModel) {
+
+            val redirectionStatus = when (resultCode) {
+                Activity.RESULT_OK -> {
+                    NewItemCreationViewModel.RedirectedPageStatus.Completed
+                }
+                else -> NewItemCreationViewModel.RedirectedPageStatus.Canceled
+            }
+
+            if (resultCode == Activity.RESULT_OK) {
+                viewModel.metadataForItem.removeAll(
+                        viewModel.metadataForItem.keys().filter { it.startsWith("returned::") }
+                )
+
+                if (data?.hasExtra(WebServiceLoginActivity.EXTRA_RETURNED_PARAMETERS) == true) {
+                    val returnedParameters = data.getBundleExtra(WebServiceLoginActivity.EXTRA_RETURNED_PARAMETERS)
+                    for (key in returnedParameters.keySet()) {
+                        viewModel.metadataForItem.set(key, returnedParameters.getString(key))
+                    }
+                }
+            }
+
+            (viewModel as? NewItemCreationViewModel)?.setResultOfRedirectedPage(redirectionStatus)
+            if (resultCode == Activity.RESULT_OK) {
+                Toast.makeText(this@ItemDetailActivity, "Completed Qualtrics survey.", Toast.LENGTH_LONG).show()
+                redirectedPageCanceledSnackbar.dismiss()
+            } else {
+                redirectedPageCanceledSnackbar.show()
+            }
+
+        } else if (resultCode == Activity.RESULT_OK && data != null) {
             val attributePosition = AAttributeInputView.getPositionFromRequestCode(requestCode)
             val inputView = attributeListAdapter.inputViews.find { it.position == attributePosition }
             inputView?.setValueFromActivityResult(data, AAttributeInputView.getRequestTypeFromRequestCode(requestCode))
