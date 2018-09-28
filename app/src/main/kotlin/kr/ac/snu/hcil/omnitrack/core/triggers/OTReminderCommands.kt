@@ -148,7 +148,7 @@ class OTReminderCommands(val context: Context) {
                     trigger.liveTrackersQuery.equalTo(BackendDbManager.FIELD_OBJECT_ID, trackerId).findFirst()?.let {
                         ItemDetailActivity.makeReminderOpenIntent(it.objectId!!, triggerTime, metadata, context)
                     }?.let {
-                        it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                        it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                         context.runOnUiThread {
                             startActivity(it)
                         }
