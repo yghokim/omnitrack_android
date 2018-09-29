@@ -7,10 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.LinearSmoothScroller
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SimpleItemAnimator
+import android.support.v7.widget.*
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -574,7 +571,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
             return currentAttributeViewModelList.size
         }
 
-        inner class ViewHolder(val inputView: AAttributeInputView<out Any>, frame: View) : RecyclerView.ViewHolder(frame) {
+        inner class ViewHolder(val inputView: AAttributeInputView<out Any>, frame: View) : View.OnClickListener, RecyclerView.ViewHolder(frame) {
 
             private val columnNameView: TextView by bindView(R.id.ui_column_name)
             private val requiredMarker: View by bindView(R.id.ui_required_marker)
@@ -583,6 +580,8 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
             private val container: LockableFrameLayout by bindView(R.id.ui_input_view_container)
 
             private val timestampIndicator: TextView by bindView(R.id.ui_timestamp)
+
+            private var itemTimestamp: Long? = null
 
             private val connectionIndicatorStubProxy: ConnectionIndicatorStubProxy
 
@@ -623,6 +622,8 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
                 connectionIndicatorStubProxy = ConnectionIndicatorStubProxy(frame, R.id.ui_connection_indicator_stub)
 
+                timestampIndicator.setOnClickListener(this)
+
                 /*
                 optionButton.setOnClickListener {
                     /*
@@ -635,12 +636,19 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                 }*/
             }
 
+            override fun onClick(v: View?) {
+                if (v === timestampIndicator) {
+                    this.setTimestampIndicatorText(this.itemTimestamp)
+                }
+            }
+
             private fun setTimestampIndicatorText(timestamp: Long?) {
+                this.itemTimestamp = timestamp
                 if (timestamp == null || timestamp == 0L) {
                     timestampIndicator.text = ""
                 } else {
                     val now = System.currentTimeMillis()
-                    timestampIndicator.text = if (now - timestamp < 2 * DateUtils.SECOND_IN_MILLIS) {
+                    timestampIndicator.text = if (now - timestamp < 1 * DateUtils.MINUTE_IN_MILLIS) {
                         resources.getString(R.string.time_just_now)
                     } else {
                         DateUtils.getRelativeTimeSpanString(timestamp, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_ALL)
@@ -730,6 +738,8 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                                 inputView.setAnyValue(valueNullable.datum?.value)
                                 inputView.valueChanged.suspend = false
                             }
+
+                            TooltipCompat.setTooltipText(timestampIndicator, valueNullable.datum?.timestamp?.let { (applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.getLocalTimeFormats().FORMAT_DATETIME.format(Date(it)) })
                             setTimestampIndicatorText(valueNullable.datum?.timestamp)
                         }
                 )
