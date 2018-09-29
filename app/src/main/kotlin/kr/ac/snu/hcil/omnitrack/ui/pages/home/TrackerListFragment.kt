@@ -15,6 +15,7 @@ import android.support.v7.util.DiffUtil
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.TooltipCompat
 import android.text.InputType
 import android.text.Spannable
 import android.text.SpannableString
@@ -50,7 +51,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.common.TooltipHelper
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
@@ -400,8 +400,6 @@ class TrackerListFragment : OTFragment() {
 
             val errorIndicator: AppCompatImageButton by bindView(R.id.ui_invalid_icon)
 
-            private val validationErrorMessages = ArrayList<CharSequence>()
-
             private var trackerId: String? = null
 
             var collapsed = true
@@ -526,13 +524,6 @@ class TrackerListFragment : OTFragment() {
                         collapse(true)
                     }
 
-                } else if (view === errorIndicator) {
-                    if (validationErrorMessages.size > 0) {
-                        TooltipHelper.makeTooltipBuilder(adapterPosition, errorIndicator)
-                                .text(
-                                        validationErrorMessages.joinToString("\n")
-                                ).show()
-                    }
                 }
             }
 
@@ -687,15 +678,9 @@ class TrackerListFragment : OTFragment() {
                 subscriptions.add(viewModel.todayCount.observeOn(AndroidSchedulers.mainThread()).subscribe { count -> setTodayLoggingCount(count) })
                 subscriptions.add(viewModel.totalItemCount.observeOn(AndroidSchedulers.mainThread()).subscribe { count -> setTotalItemCount(count) })
 
-                validationErrorMessages.clear()
-
                 subscriptions.add(
                         viewModel.validationResult.subscribe { (isValid, invalidateMessages) ->
-                            this.validationErrorMessages.clear()
-                            invalidateMessages?.let {
-                                this.validationErrorMessages.addAll(it)
-                            }
-
+                            TooltipCompat.setTooltipText(errorIndicator, if (isValid) null else invalidateMessages?.joinToString("\n"))
                             errorIndicator.visibility = if (isValid) {
                                 View.INVISIBLE
                             } else {

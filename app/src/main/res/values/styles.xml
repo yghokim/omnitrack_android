@@ -450,19 +450,6 @@
 
     </style>
 
-    <style name="tooltipTextAppearance">
-        <item name="android:textColor">#fff</item>
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="tooltipStyle">
-        <item name="ttlm_strokeWeight">0dp</item>
-        <item name="ttlm_cornerRadius">2dp</item>
-        <item name="ttlm_padding">20dp</item>
-        <item name="android:textAppearance">@style/tooltipTextAppearance</item>
-        <item name="ttlm_arrowRatio">1.4</item>
-    </style>
-
     <style name="IntroTitleStyle" parent="Base.TextAppearance.AppCompat.Headline">
         <item name="android:layout_marginBottom">@dimen/activity_vertical_margin</item>
         <item name="android:textAlignment">center</item>

@@ -2,19 +2,18 @@ package kr.ac.snu.hcil.omnitrack.ui.pages
 
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.AppCompatImageView
+import android.support.v7.widget.TooltipCompat
 import android.view.View
-import android.view.View.OnClickListener
 import android.view.ViewStub
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.ui.components.common.TooltipHelper
 import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-11-04.
  */
-class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListener, View.OnAttachStateChangeListener {
+class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : View.OnAttachStateChangeListener {
 
     private val connectionIndicatorStub: ViewStub
     private var connectionIndicator: View? = null
@@ -48,7 +47,6 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListe
                 connectionIndicatorLinkIconView = connectionIndicator?.findViewById(R.id.ui_connection_link_icon)
                 connectionIndicatorSourceNameView = connectionIndicator?.findViewById(R.id.ui_connection_source_name)
                 connectionIndicatorErrorMark = connectionIndicator?.findViewById(R.id.ui_invalid_icon)
-                connectionIndicatorErrorMark?.setOnClickListener(this)
             } else {
                 println("set visible to current connection indicator")
                 setVisibility(View.VISIBLE)
@@ -62,6 +60,9 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListe
                 connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorPointed, null))
                 connectionIndicatorErrorMark?.visibility = View.GONE
                 connectionIndicatorLinkIconView?.setImageResource(R.drawable.link)
+                if (connectionIndicatorErrorMark != null) {
+                    TooltipCompat.setTooltipText(connectionIndicatorErrorMark!!, null)
+                }
             } else {
                 turnOnInvalidMode()
             }
@@ -83,17 +84,9 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListe
         connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorRed_Light, null))
         connectionIndicatorErrorMark?.visibility = View.VISIBLE
         connectionIndicatorLinkIconView?.setImageResource(R.drawable.unlink_dark)
-    }
 
-
-    override fun onClick(view: View?) {
-        if (view === connectionIndicatorErrorMark && connectionIndicatorErrorMark != null) {
-            if (connectionInvalidMessages?.size ?: 0 > 0) {
-                TooltipHelper.makeTooltipBuilder(0, connectionIndicatorErrorMark!!)
-                        .text(connectionInvalidMessages?.joinToString("\n") ?: "")
-                        .show()
-            }
-        }
+        if (connectionIndicatorErrorMark != null)
+            TooltipCompat.setTooltipText(connectionIndicatorErrorMark!!, connectionInvalidMessages?.joinToString("\n"))
     }
 
     override fun onViewDetachedFromWindow(v: View?) {
