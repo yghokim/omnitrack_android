@@ -14,7 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.decorations.SpaceItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.components.decorations.BetweenSpacingItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
 import kotlin.properties.Delegates
@@ -74,7 +74,7 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
 
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
-        addItemDecoration(SpaceItemDecoration(LinearLayoutManager.HORIZONTAL, resources.getDimensionPixelOffset(R.dimen.selection_view_button_spacing)))
+        addItemDecoration(BetweenSpacingItemDecoration(LinearLayoutManager.HORIZONTAL, resources.getDimensionPixelOffset(R.dimen.selection_view_button_spacing)))
 
         adapter = Adapter()
 

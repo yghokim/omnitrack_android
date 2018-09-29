@@ -1,16 +1,18 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.export
 
+import ItemSpacingDecoration
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.widget.RecyclerView
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
-import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
+import com.google.android.flexbox.AlignItems
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_package_export.*
@@ -20,7 +22,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.AttachedTrackerViewHolder
-import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
 import org.jetbrains.anko.backgroundColor
 
@@ -204,11 +205,14 @@ class PackageExportActivity : MultiButtonActionBarActivity(R.layout.activity_pac
         }
 
         init {
-            itemView.ui_children_list.addItemDecoration(SpacingItemDecoration(dipRound(parent.context, 8), dipRound(parent.context, 10)))
-            itemView.ui_children_list.layoutManager = ChipsLayoutManager.newBuilder(itemView.context)
-                    .setChildGravity(Gravity.CENTER_VERTICAL)
-                    .setOrientation(ChipsLayoutManager.HORIZONTAL)
-                    .build()
+
+            itemView.ui_children_list.addItemDecoration(ItemSpacingDecoration.fromDIP(8, 10, parent.context))
+
+            itemView.ui_children_list.layoutManager = FlexboxLayoutManager(parent.context).apply {
+                flexDirection = FlexDirection.ROW
+                flexWrap = FlexWrap.WRAP
+                alignItems = AlignItems.CENTER
+            }
             itemView.color_bar.visibility = View.GONE
         }
 

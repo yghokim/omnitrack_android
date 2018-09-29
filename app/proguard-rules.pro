@@ -90,7 +90,6 @@
 -dontwarn com.google.android.gms.location.DetectedActivity
 
 -dontwarn com.google.errorprone.annotations.*
--dontwarn com.beloo.widget.chipslayoutmanager.Orientation
 
 -dontwarn kr.ac.snu.hcil.omnitrack.core.visualization.models.DurationHeatMapModel
 

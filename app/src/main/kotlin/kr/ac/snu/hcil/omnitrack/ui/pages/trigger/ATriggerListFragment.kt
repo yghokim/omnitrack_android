@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
+import ItemSpacingDecoration
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.BroadcastReceiver
@@ -17,14 +18,15 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
-import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
-import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
 import com.github.salomonbrys.kotson.set
+import com.google.android.flexbox.AlignItems
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -51,7 +53,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerViewModel
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
-import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import org.jetbrains.anko.support.v4.act
 import org.jetbrains.anko.verticalMargin
 
@@ -448,11 +449,12 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                     attachedTrackerListView = itemView.ui_attached_tracker_list_stub.inflate()
                             .apply {
                                 ui_attached_tracker_list.adapter = attachedTrackerListAdapter
-                                ui_attached_tracker_list.addItemDecoration(SpacingItemDecoration(dipRound(context, 8), dipRound(context, 10)))
-                                ui_attached_tracker_list.layoutManager = ChipsLayoutManager.newBuilder(context)
-                                        .setChildGravity(Gravity.CENTER_VERTICAL)
-                                        .setOrientation(ChipsLayoutManager.HORIZONTAL)
-                                        .build()
+                                ui_attached_tracker_list.addItemDecoration(ItemSpacingDecoration.fromDIP(8, 10, context))
+                                ui_attached_tracker_list.layoutManager = FlexboxLayoutManager(context).apply {
+                                    flexDirection = FlexDirection.ROW
+                                    flexWrap = FlexWrap.WRAP
+                                    alignItems = AlignItems.CENTER
+                                }
                             }
                 } else {
                     attachedTrackerListView?.visibility = View.VISIBLE

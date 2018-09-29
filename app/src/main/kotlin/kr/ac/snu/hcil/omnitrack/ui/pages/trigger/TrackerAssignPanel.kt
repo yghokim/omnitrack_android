@@ -1,16 +1,18 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
+import ItemSpacingDecoration
 import android.content.Context
 import android.support.v7.util.DiffUtil
 import android.support.v7.util.ListUpdateCallback
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
-import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
+import com.google.android.flexbox.AlignItems
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
 import dagger.internal.Factory
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
@@ -24,7 +26,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.TrackerPickerDialogBuilder
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
-import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import java.util.*
 import javax.inject.Inject
@@ -79,11 +80,13 @@ class TrackerAssignPanel : RecyclerView {
     }
 
     init {
-        addItemDecoration(SpacingItemDecoration(dipRound(context, 8), dipRound(context, 10)))
-        layoutManager = ChipsLayoutManager.newBuilder(context)
-                .setChildGravity(Gravity.CENTER_VERTICAL)
-                .setOrientation(ChipsLayoutManager.HORIZONTAL)
-                .build()
+        addItemDecoration(ItemSpacingDecoration.fromDIP(8, 10, context))
+        layoutManager = FlexboxLayoutManager(context).apply {
+            flexDirection = FlexDirection.ROW
+            flexWrap = FlexWrap.WRAP
+            alignItems = AlignItems.CENTER
+        }
+
         this.adapter = elementAdapter
     }
 

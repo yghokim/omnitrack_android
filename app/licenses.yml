@@ -191,14 +191,6 @@
   license: The Apache Software License, Version 2.0
   licenseUrl: http://www.apache.org/license/LICENSE-2.0.txt
 
-- artifact: com.beloo.widget:ChipsLayoutManager:+
-  name: ChipsLayoutManager
-  copyrightHolder: Beloy Oleg, Ukraine.
-  license: The Apache Software License, Version 2.0
-  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
-  url: https://github.com/BelooS/ChipsLayoutManager
-
-
 - artifact: javax.inject:javax.inject:+
   name: javax.inject
   copyrightHolder: Javax
