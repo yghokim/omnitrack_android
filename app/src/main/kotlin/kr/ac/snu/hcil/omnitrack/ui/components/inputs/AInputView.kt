@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
-import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
 
@@ -17,7 +16,7 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
 
     val validationFailed = Event<String>()
 
-    private val validators: ArrayList<ReadOnlyPair<CharSequence?, (T) -> Boolean>> = ArrayList<ReadOnlyPair<CharSequence?, (T) -> Boolean>>()
+    private val validators: ArrayList<Pair<CharSequence?, (T) -> Boolean>> = ArrayList()
 
     protected val validationErrorMessageList = ArrayList<CharSequence>()
 
@@ -55,7 +54,7 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
     }
 
     fun addNewValidator(failedMessage: CharSequence?, func: (T) -> Boolean) {
-        validators.add(ReadOnlyPair<CharSequence?, (T) -> Boolean>(failedMessage, func))
+        validators.add(Pair(failedMessage, func))
     }
 
     fun validate(): Boolean {

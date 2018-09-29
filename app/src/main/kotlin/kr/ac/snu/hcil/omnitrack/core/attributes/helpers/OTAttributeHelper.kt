@@ -24,7 +24,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import java.util.ArrayList
 import kotlin.collections.HashMap
@@ -160,10 +159,10 @@ abstract class OTAttributeHelper(protected val configuredContext: ConfiguredCont
         return view
     }
 
-    open fun makePropertyViews(context: Context): Collection<ReadOnlyPair<String, View>> {
-        val result = ArrayList<ReadOnlyPair<String, View>>()
+    open fun makePropertyViews(context: Context): Collection<Pair<String, View>> {
+        val result = ArrayList<Pair<String, View>>()
         for (key in propertyKeys) {
-            result.add(ReadOnlyPair(key, makePropertyView(key, context)))
+            result.add(Pair(key, makePropertyView(key, context)))
         }
         return result
     }

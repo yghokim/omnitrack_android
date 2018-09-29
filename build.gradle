@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 
@@ -19,11 +21,11 @@ keystoreProps.load(new FileInputStream(keystorePropertiesFile))
 
 //load google-services.json
 File googleServicesFile = rootProject.file("google-services.json")
-def googleServicesJson = new groovy.json.JsonSlurper().parseText(googleServicesFile.text)
+def googleServicesJson = new JsonSlurper().parseText(googleServicesFile.text)
 
 //load buildConfig.json
 File buildConfigJsonFile = rootProject.file("omnitrackBuildConfig.json")
-def buildConfigs = new groovy.json.JsonSlurper().parseText(buildConfigJsonFile.text)
+def buildConfigs = new JsonSlurper().parseText(buildConfigJsonFile.text)
 
 
 ext {

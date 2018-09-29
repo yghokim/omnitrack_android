@@ -7,16 +7,18 @@ import android.graphics.drawable.LayerDrawable
 import android.util.AttributeSet
 import android.view.ViewGroup
 import android.widget.TextView
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayout
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
-import org.apmem.tools.layouts.FlowLayout
 import java.util.*
 import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho Kim on 2016-08-17.
  */
-open class WordListView : FlowLayout {
+open class WordListView : FlexboxLayout {
 
     companion object {
         private var _colorPalette: IntArray? = null
@@ -56,6 +58,11 @@ open class WordListView : FlowLayout {
     constructor(context: Context) : super(context)
     constructor(context: Context, attributeSet: AttributeSet) : super(context, attributeSet)
     constructor(context: Context, attributeSet: AttributeSet, defStyle: Int) : super(context, attributeSet, defStyle)
+
+    init {
+        flexDirection = FlexDirection.ROW
+        flexWrap = FlexWrap.WRAP
+    }
 
     fun refresh() {
         val numChildViewToAdd = words.size - childCount
