@@ -552,7 +552,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 viewHolderSubscriptions.add(
                         Observable.combineLatest<Nullable<JsonObject>, Boolean, Boolean>(viewModel.lockedPropertiesObservable, attributeViewModel.isRemovable,
                                 BiFunction { lockedProperties: Nullable<JsonObject>, localRemovable: Boolean ->
-                                    (LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_REMOVE_ATTRIBUTES, lockedProperties.datum) && localRemovable)
+                                    (!LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_REMOVE_ATTRIBUTES, lockedProperties.datum) && localRemovable)
                                 }).subscribe { isRemovable: Boolean ->
                             removeButton.isEnabled = isRemovable
                             removeButton.alpha = if (isRemovable) 1.0f else 0.2f
