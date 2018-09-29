@@ -2,14 +2,17 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.sound
 
 import android.content.Context
 import android.media.MediaMetadataRetriever
+import android.os.Build
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
-import org.threeten.bp.ZoneId
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.ZonedDateTime
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.DateTimeParseException
-import org.threeten.bp.temporal.ChronoField
 import java.io.File
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
+import java.time.temporal.ChronoField
 import java.util.*
 
 /**
@@ -18,26 +21,10 @@ import java.util.*
 data class AudioRecordMetadata(var durationMillis: Int, var fileSizeBytes: Long, var recordedAt: String) {
     companion object {
 
-        val formatterISO8601: DateTimeFormatter by lazy {
-            DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss.SSSX")
-        }
-
-        val formatterDate: DateTimeFormatter by lazy {
-            DateTimeFormatter.ofPattern("yyyy MM dd")
-        }
-
-        val formatterDate2: DateTimeFormatter by lazy {
-            DateTimeFormatter.ofPattern("dd MMMM yyyy")
-        }
-
-        fun readMetadata(filePath: String, context: Context): AudioRecordMetadata? {
-            try {
-                val retriever = MediaMetadataRetriever()
-                retriever.setDataSource(filePath)
-                val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                val dateString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
-                val parsedDateString = try {
-                    val parsed = formatterISO8601.parse(dateString)
+        fun parseDefaultFormat(dateString: String): Long {
+            if (Build.VERSION.SDK_INT >= 26) {
+                try {
+                    val parsed = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss.SSSX").parse(dateString)
                     val date = ZonedDateTime.of(
                             parsed.get(ChronoField.YEAR),
                             parsed.get(ChronoField.MONTH_OF_YEAR),
@@ -47,37 +34,56 @@ data class AudioRecordMetadata(var durationMillis: Int, var fileSizeBytes: Long,
                             parsed.get(ChronoField.SECOND_OF_MINUTE),
                             0,
                             ZoneId.from(parsed))
-                    val timestamp = date.toEpochSecond() * 1000
-                    (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.getLocalTimeFormats().FORMAT_DATETIME.format(Date(timestamp))
-                } catch(ex: DateTimeParseException) {
-                    try {
-                        val parsed = formatterDate.parse(dateString)
-                        val date = ZonedDateTime.of(
-                                parsed.get(ChronoField.YEAR),
-                                parsed.get(ChronoField.MONTH_OF_YEAR),
-                                parsed.get(ChronoField.DAY_OF_MONTH), 0, 0, 0, 0, ZoneOffset.UTC)
+                    return date.toEpochSecond() * 1000
+                } catch (ex: DateTimeParseException) {
+                    throw ParseException(ex.parsedString, ex.errorIndex)
+                }
+            } else {
+                val parsed = SimpleDateFormat("yyyyMMdd'T'HHmmss.SSSX", Locale.ROOT).parse(dateString)
+                return parsed.time
+            }
+        }
 
-                        val timestamp = date.toEpochSecond() * 1000
-                        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.getLocalTimeFormats()
-                                .FORMAT_DAY.format(Date(timestamp))
-                    } catch(ex: DateTimeParseException) {
-                        val parsed = formatterDate2.parse(dateString)
+        fun parseFormatWithoutTimeZone(dateString: String, format: String): Long {
+            if (Build.VERSION.SDK_INT >= 26) {
+                try {
+                    val parsed = DateTimeFormatter.ofPattern(format).parse(dateString)
+                    val date = ZonedDateTime.of(
+                            parsed.get(ChronoField.YEAR),
+                            parsed.get(ChronoField.MONTH_OF_YEAR),
+                            parsed.get(ChronoField.DAY_OF_MONTH), 0, 0, 0, 0, ZoneOffset.UTC)
 
-                        val date = ZonedDateTime.of(
-                                parsed.get(ChronoField.YEAR),
-                                parsed.get(ChronoField.MONTH_OF_YEAR),
-                                parsed.get(ChronoField.DAY_OF_MONTH), 0, 0, 0, 0, ZoneOffset.UTC)
+                    return date.toEpochSecond() * 1000
+                } catch (ex: DateTimeParseException) {
+                    throw ParseException(ex.parsedString, ex.errorIndex)
+                }
+            } else {
+                val parsed = SimpleDateFormat(format, Locale.ROOT).parse(dateString)
+                return parsed.time
+            }
+        }
 
-                        val timestamp = date.toEpochSecond() * 1000
-                        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.getLocalTimeFormats()
-                                .FORMAT_DAY.format(Date(timestamp))
-                    }
+        fun readMetadata(filePath: String, context: Context): AudioRecordMetadata? {
+            try {
+                val retriever = MediaMetadataRetriever()
+                retriever.setDataSource(filePath)
+                val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                val dateString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
+
+                val localTimeFormats = (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.getLocalTimeFormats()
+
+                val parsedDateString = try {
+                    localTimeFormats.FORMAT_DATETIME.format(Date(parseDefaultFormat(dateString)))
+                } catch (ex: ParseException) {
+                    localTimeFormats.FORMAT_DAY.format(Date(parseFormatWithoutTimeZone(dateString, "yyyy MM dd")))
+                } catch (ex: ParseException) {
+                    localTimeFormats.FORMAT_DAY.format(Date(parseFormatWithoutTimeZone(dateString, "dd MMMM yyyy")))
                 }
 
                 val fileSize = File(filePath).length()
                 retriever.release()
                 return AudioRecordMetadata(duration.toInt(), fileSize, parsedDateString)
-            } catch(ex: Exception) {
+            } catch (ex: Exception) {
                 println("Metadata extraction failed:")
                 ex.printStackTrace()
                 return null

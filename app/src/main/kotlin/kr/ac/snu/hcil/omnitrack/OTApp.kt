@@ -14,7 +14,6 @@ import android.os.Looper
 import android.os.SystemClock
 import android.provider.Settings
 import android.support.v7.app.AppCompatDelegate
-import com.jakewharton.threetenabp.AndroidThreeTen
 import com.squareup.leakcanary.LeakCanary
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -233,8 +232,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
             AndroidSchedulers.from(Looper.getMainLooper(), true)
         }
 
-        //Fabric.with(this, Crashlytics())
-        AndroidThreeTen.init(this)
+        //Fabric.with(this, Crashlytics
         RxActivityResult.register(this)
         Realm.init(this)
 
