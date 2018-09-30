@@ -218,13 +218,6 @@
   license: The Apache Software License, Version 2.0
   licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
 
-- artifact: com.jakewharton.threetenabp:threetenabp:+
-  name: ThreeTenAbp
-  copyrightHolder: Jake Wharton
-  license: The Apache Software License, Version 2.0
-  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
-  url: https://github.com/JakeWharton/ThreeTenABP/
-
 - artifact: com.google.dagger:+:+
   name: Dagger
   copyrightHolder: Google, Inc.
@@ -260,19 +253,6 @@
   licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
   url: https://github.com/sjwall/MaterialTapTargetPrompt
 
-- artifact: com.github.Epsiloni:android-target-tooltip:+
-  name: android-target-tooltip
-  copyrightHolder: Epsiloni
-  license: The Apache Software License, Version 2.0
-  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
-
-- artifact: org.apmem.tools:layouts:+
-  name: FlowLayouts
-  copyrightHolder: Artem Votincev (apmem.org)
-  license: The Apache Software License, Version 2.0
-  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
-  url: https://github.com/ApmeM/android-flowlayout
-
 - artifact: org.jetbrains:annotations:+
   name: IntelliJ IDEA Annotations
   copyrightHolder: Jetbrains
@@ -286,13 +266,6 @@
   license: The Apache Software License, Version 2.0
   licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
   url: https://github.com/chrisjenx/Calligraphy
-
-- artifact: org.threeten:threetenbp:+
-  name: ThreeTen backport
-  copyrightHolder: Jake Wharton
-  license: BSD 3-clause
-  licenseUrl: https://raw.githubusercontent.com/ThreeTen/threetenbp/master/LICENSE.txt
-  url: https://www.threeten.org/threetenbp
 
 - artifact: com.google.android:flexbox:+
   name: flexbox-layout
