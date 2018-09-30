@@ -4,29 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/frontal_color_selectable_element_background"
-    android:clickable="true"
+    android:background="@color/frontalBackground"
     android:orientation="vertical">
-    <!--
-        <RelativeLayout
-            android:id="@+id/ui_collapsed_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/transparent_button_background"
-            android:orientation="vertical"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingTop="12dp">
--->
 
     <LinearLayout
         android:id="@+id/ui_wappen_type"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="12dp"
         android:background="@drawable/wappen_frame_dark"
         android:orientation="horizontal"
-        android:paddingLeft="4dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -43,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="6dp"
+            android:layout_marginStart="6dp"
             android:text=""
             android:textColor="#fff"
             android:textSize="12sp"
@@ -80,8 +70,7 @@
         android:id="@+id/ui_left"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:orientation="vertical"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/ui_trigger_switch"
@@ -104,6 +93,17 @@
             android:layout="@layout/layout_attached_tracker_list" />
 
     </LinearLayout>
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/ui_button_proxy"
+        style="Base.Widget.AppCompat.Button.Borderless"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/transparent_button_background"
+        app:layout_constraintBottom_toTopOf="@id/ui_bottom_bar"
+        app:layout_constraintEnd_toStartOf="@id/ui_trigger_switch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.ManualSwitch
         android:id="@+id/ui_trigger_switch"

@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import com.github.salomonbrys.kotson.set
-import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -282,7 +281,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
 
         init {
-            itemView.setOnClickListener(this)
+            itemView.ui_button_proxy.setOnClickListener(this)
             itemView.ui_trigger_switch.setOnClickListener(this)
             itemView.ui_trigger_switch.setOnCheckedChangeListener { sender, switched ->
                 toggleColorFilter(switched)
@@ -293,7 +292,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         }
 
         override fun onClick(view: View) {
-            if (view === itemView) {
+            if (view === itemView.ui_button_proxy) {
                 val intent = if (viewModel is AManagedTriggerListViewModel) {
                     TriggerDetailActivity.makeEditTriggerIntent(context!!, attachedViewModel!!.objectId!!, viewModel.defaultTriggerInterfaceOptions)
                 } else if (viewModel is OfflineTriggerListViewModel) {
@@ -453,7 +452,6 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                                 ui_attached_tracker_list.layoutManager = FlexboxLayoutManager(context).apply {
                                     flexDirection = FlexDirection.ROW
                                     flexWrap = FlexWrap.WRAP
-                                    alignItems = AlignItems.CENTER
                                 }
                             }
                 } else {

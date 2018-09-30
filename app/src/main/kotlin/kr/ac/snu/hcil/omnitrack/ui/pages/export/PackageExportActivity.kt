@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
-import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -211,7 +210,6 @@ class PackageExportActivity : MultiButtonActionBarActivity(R.layout.activity_pac
             itemView.ui_children_list.layoutManager = FlexboxLayoutManager(parent.context).apply {
                 flexDirection = FlexDirection.ROW
                 flexWrap = FlexWrap.WRAP
-                alignItems = AlignItems.CENTER
             }
             itemView.color_bar.visibility = View.GONE
         }

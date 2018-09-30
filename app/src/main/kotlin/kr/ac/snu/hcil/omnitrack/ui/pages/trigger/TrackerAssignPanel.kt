@@ -3,13 +3,11 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import ItemSpacingDecoration
 import android.content.Context
 import android.support.v7.util.DiffUtil
-import android.support.v7.util.ListUpdateCallback
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -62,29 +60,11 @@ class TrackerAssignPanel : RecyclerView {
 
     private val subscriptions = CompositeDisposable()
 
-    private val listUpdateCallback = object : ListUpdateCallback {
-        override fun onChanged(position: Int, count: Int, payload: Any?) {
-            notifyTrackerListChanged()
-        }
-
-        override fun onMoved(fromPosition: Int, toPosition: Int) {
-
-        }
-
-        override fun onInserted(position: Int, count: Int) {
-        }
-
-        override fun onRemoved(position: Int, count: Int) {
-        }
-
-    }
-
     init {
         addItemDecoration(ItemSpacingDecoration.fromDIP(8, 10, context))
         layoutManager = FlexboxLayoutManager(context).apply {
             flexDirection = FlexDirection.ROW
             flexWrap = FlexWrap.WRAP
-            alignItems = AlignItems.CENTER
         }
 
         this.adapter = elementAdapter
@@ -95,7 +75,6 @@ class TrackerAssignPanel : RecyclerView {
         this.trackers.clear()
         this.trackers.addAll(trackers)
         diffResults.dispatchUpdatesTo(elementAdapter)
-        //diffResults.dispatchUpdatesTo(listUpdateCallback)
     }
 
 
@@ -125,28 +104,6 @@ class TrackerAssignPanel : RecyclerView {
             )
         }
     }
-
-    /*
-    override fun onClick(view: View) {
-        val fm = this.getActivity()?.supportFragmentManager
-        if (fm != null) {
-            /*
-            subscriptions.add(
-
-                    OTApplication.instance.currentUserObservable.subscribe {
-                        user ->
-                        val dialog = TrackerPickerDialogBuilder(user.trackers.unObservedList).createDialog(getActivity()!!, trackerIds.toTypedArray(), {
-                            tracker ->
-                            if (tracker != null) {
-                                trackerIds += tracker.objectId
-                                refresh()
-                            }
-                        })
-                        dialog.show()
-                    }
-            )*/
-        }
-    }*/
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
