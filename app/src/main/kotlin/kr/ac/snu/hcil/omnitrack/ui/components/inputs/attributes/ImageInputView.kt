@@ -225,7 +225,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
 
     override fun setValueFromActivityResult(data: Intent, requestType: Int): Boolean {
 
-        if (requestType == REQUEST_CODE_CAMERA) {
+        if (requestType == REQUEST_CODE_CAMERA && data.hasExtra(CameraPickDialogFragment.EXTRA_IMAGE_DATA)) {
             return handleCameraInputData(data.getByteArrayExtra(CameraPickDialogFragment.EXTRA_IMAGE_DATA))
         } else if (requestType == REQUEST_CODE_GALLERY) {
             if (data.data != null) {

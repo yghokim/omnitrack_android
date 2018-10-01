@@ -3,9 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 import android.Manifest
 import android.content.Context
 import android.view.View
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
+import com.squareup.picasso.Picasso
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager.Companion.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE
@@ -86,9 +84,8 @@ class OTImageAttributeHelper(configuredContext: ConfiguredContext) : OTFileInvol
                         }.doOnSuccess { (refreshed, localUri) ->
                             view.context.runOnUiThread {
                                 view.currentMode = PlaceHolderImageView.Mode.IMAGE
-                                Glide.with(view.context)
-                                        .load(localUri.path)
-                                        .apply(RequestOptions().override(Target.SIZE_ORIGINAL))
+                                Picasso.get().load(localUri)
+                                        .error(R.drawable.img_error)
                                         .into(view.imageView)
                             }
                         }.map { true }

@@ -12,8 +12,7 @@ import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
 import android.util.AttributeSet
 import android.view.View
-import android.webkit.URLUtil
-import com.bumptech.glide.Glide
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.component_image_picker.view.*
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
@@ -45,15 +44,6 @@ class ImagePicker : ConstraintLayout, View.OnClickListener {
             if (field != value) {
                 field = value
 
-                if (URLUtil.isNetworkUrl(value.toString())) {
-                    println("uri is network. download the image and put it to the ui_image_view.")
-                    Glide.with(context).load(value.toString()).into(ui_image_view)
-
-                } else {
-                    Glide.with(context).load(value.toString())
-                            .into(ui_image_view)
-                }
-
                 if (value == Uri.EMPTY) {
                     ui_button_cancel.visibility = View.INVISIBLE
                     ui_button_gallery.visibility = View.VISIBLE
@@ -64,6 +54,7 @@ class ImagePicker : ConstraintLayout, View.OnClickListener {
                     ui_button_gallery.visibility = View.INVISIBLE
                     ui_button_camera.visibility = View.INVISIBLE
                     ui_image_view.visibility = View.VISIBLE
+                    Picasso.get().load(value).into(ui_image_view)
                 }
                 uriChanged.invoke(this, value)
             }

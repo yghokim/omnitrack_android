@@ -78,6 +78,14 @@
   license: The Apache Software License, Version 2.0
   licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
 
+- artifact: com.squareup.picasso:picasso:+
+  name: Picasso
+  copyrightHolder: Square, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/square/picasso/
+
+
 - artifact: io.realm:+:+
   name: Realm Java
   copyrightHolder: Realm
@@ -124,13 +132,6 @@
   license: The Apache Software License, Version 2.0
   licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
   url: http://github.com/square/leakcanary/
-
-- artifact: com.github.bumptech.glide:+:+
-  name: Glide
-  copyrightHolder: Google, Inc.
-  license: Simplified BSD License
-  licenseUrl: http://www.opensource.org/licenses/bsd-license
-  url: https://github.com/bumptech/glide
 
 - artifact: org.apache.commons:+:+
   name: Apache Commons

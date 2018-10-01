@@ -73,16 +73,6 @@
 # Retain declared checked exceptions for use by a Proxy instance.
 -keepattributes Exceptions
 
-# Glide settings
--keep public class * implements com.bumptech.glide.module.GlideModule
--keep public class * extends com.bumptech.glide.module.AppGlideModule
--keep class com.bumptech.glide.GeneratedAppGlideModuleImpl
--keep public enum com.bumptech.glide.load.ImageHeaderParser$** {
-  **[] $VALUES;
-  public *;
-}
--dontwarn com.bumptech.glide.load.resource.bitmap.VideoDecoder
-
 #For CameraKit >= 0.13.0
 -dontwarn com.google.android.gms.**
 

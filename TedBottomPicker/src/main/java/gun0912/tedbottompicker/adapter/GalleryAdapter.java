@@ -13,8 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.lang.annotation.Retention;
@@ -159,11 +158,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
         } else {
             Uri uri = pickerTile.getImageUri();
             if (builder.imageProvider == null) {
-                Glide.with(context)
-                        .load(uri)
-                        .thumbnail(0.1f)
-                        .apply(RequestOptions.noAnimation().centerCrop().placeholder(R.drawable.ic_gallery).error(R.drawable.img_error))
-                        .into(holder.iv_thumbnail);
+                Picasso.get().load(uri).fit().centerCrop().noFade().placeholder(R.drawable.ic_gallery).error(R.drawable.img_error).into(holder.iv_thumbnail);
             } else {
                 builder.imageProvider.onProvideImage(holder.iv_thumbnail, uri);
             }

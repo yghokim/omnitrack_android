@@ -11,9 +11,9 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import com.afollestad.materialdialogs.MaterialDialog
-import com.bumptech.glide.Glide
 import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.firebase.jobdispatcher.Job
+import com.squareup.picasso.Picasso
 import dagger.Lazy
 import dagger.internal.Factory
 import de.hdodenhof.circleimageview.CircleImageView
@@ -145,7 +145,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                 }.subscribe { user ->
                     view.ui_user_name.text = user.name
                     view.ui_user_email.text = user.email
-                    Glide.with(parentActivity).load(user.photoServerPath).into(photoView)
+                    Picasso.get().load(user.photoServerPath).fit().into(photoView)
                 })
 
 
