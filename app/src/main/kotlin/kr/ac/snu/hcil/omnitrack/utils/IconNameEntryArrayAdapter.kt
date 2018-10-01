@@ -12,12 +12,10 @@ import kr.ac.snu.hcil.omnitrack.R
 /**
  * Created by younghokim on 16. 8. 24..
  */
-class IconNameEntryArrayAdapter : ArrayAdapter<IconNameEntryArrayAdapter.Entry> {
+class IconNameEntryArrayAdapter(context: Context, objects: Array<out Entry>) : ArrayAdapter<IconNameEntryArrayAdapter.Entry>(context, R.layout.simple_list_element_icon_name, objects) {
 
 
     data class Entry(val iconId: Int, val nameId: Int)
-
-    constructor(context: Context, objects: Array<out Entry>) : super(context, R.layout.simple_list_element_icon_name, objects)
 
 
     override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
