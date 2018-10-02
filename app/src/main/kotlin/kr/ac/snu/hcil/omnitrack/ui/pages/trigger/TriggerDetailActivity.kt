@@ -22,7 +22,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerInterfaceOpti
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
-import org.jetbrains.anko.sdk25.coroutines.onFocusChange
 
 /**
  * Created by younghokim on 2017-10-24.
@@ -72,7 +71,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
 
         setActionBarButtonMode(Mode.ApplyCancel)
 
-        ui_script_form.onFocusChange { v, hasFocus ->
+        ui_script_form.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus)
                 viewModel.script.onNextIfDifferAndNotNull(Nullable(ui_script_form.text.toString().let { if (it.isBlank()) null else it }))
         }

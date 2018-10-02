@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 import android.content.Context
 import android.support.v7.widget.AppCompatTextView
 import android.util.AttributeSet
-import android.widget.TextView
 
 /**
  * Created by younghokim on 2017. 1. 13..

@@ -15,7 +15,6 @@ import com.github.ybq.android.spinkit.SpinKitView
 import com.github.ybq.android.spinkit.style.Circle
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
-import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import org.jetbrains.anko.dip
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -97,7 +96,7 @@ open class PlaceHolderImageView : FrameLayout {
     init {
         setBackgroundColor(ContextCompat.getColor(context, R.color.editTextFormBackground))
 
-        val padding = dipRound(context, 8)
+        val padding = dip(8)
         setPadding(padding, padding, padding, padding)
 
         imageView = ImageView(context)
@@ -115,7 +114,7 @@ open class PlaceHolderImageView : FrameLayout {
                 context.resources.getDimensionPixelSize(R.dimen.image_placeholder_loading_indicator_size),
                 context.resources.getDimensionPixelSize(R.dimen.image_placeholder_loading_indicator_size))
         lp.gravity = Gravity.CENTER
-        val indicatorMargin = dipRound(context, 8)
+        val indicatorMargin = dip(8)
         lp.setMargins(indicatorMargin, indicatorMargin, indicatorMargin, indicatorMargin)
         loadingIndicator.layoutParams = lp
 
@@ -129,7 +128,7 @@ open class PlaceHolderImageView : FrameLayout {
 
             button.setSupportAllCaps(false)
             button.setTextColor(ContextCompat.getColor(context, R.color.colorRed_Light))
-            button.compoundDrawablePadding = dipRound(context, 8)
+            button.compoundDrawablePadding = dip(8)
             button.background = ContextCompat.getDrawable(context, R.drawable.transparent_button_background)
 
             button.setCompoundDrawablesRelativeWithIntrinsicBounds(applyTint(ContextCompat.getDrawable(context, R.drawable.error_dark)!!, ContextCompat.getColor(context, R.color.colorRed)), null, null, null)

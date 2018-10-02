@@ -33,9 +33,9 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.ui.components.common.TintFancyButton
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
-import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingLeft
 import org.jetbrains.anko.backgroundColorResource
+import org.jetbrains.anko.dip
 import java.util.*
 import javax.inject.Inject
 import kotlin.properties.Delegates
@@ -86,7 +86,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
         listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         listView.adapter = adapter
         listView.itemAnimator?.changeDuration = 200
-        listView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light), dipRound(context, 0.8f), resources.getDimensionPixelSize(R.dimen.choice_indicator_size) + resources.getDimensionPixelSize(R.dimen.choice_indicator_spacing)))
+        listView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light), dip(0.8f), resources.getDimensionPixelSize(R.dimen.choice_indicator_size) + resources.getDimensionPixelSize(R.dimen.choice_indicator_spacing)))
 
     }
 

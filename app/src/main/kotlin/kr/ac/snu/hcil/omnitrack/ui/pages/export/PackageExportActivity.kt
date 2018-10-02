@@ -22,7 +22,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.AttachedTrackerViewHolder
 import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
-import org.jetbrains.anko.backgroundColor
 
 class PackageExportActivity : MultiButtonActionBarActivity(R.layout.activity_package_export) {
 
@@ -148,7 +147,7 @@ class PackageExportActivity : MultiButtonActionBarActivity(R.layout.activity_pac
             get() = R.string.msg_text_reminder
 
         override fun onBindEntity(entity: OTTrackerDAO.SimpleTrackerInfo) {
-            itemView.color_bar.backgroundColor = entity.color
+            itemView.color_bar.setBackgroundColor(entity.color)
             title = entity.name
         }
 

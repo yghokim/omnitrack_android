@@ -12,9 +12,9 @@ import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.calculation.SingleNumericComparison
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingTop
+import org.jetbrains.anko.dip
 import java.text.DecimalFormat
 
 /**
@@ -50,7 +50,7 @@ class EventTriggerDisplayView : LinearLayout {
 
             comparedNumberView.setText(R.string.msg_trigger_event_msg_tap_to_configure)
 
-            comparedNumberView.setPaddingTop(dipRound(context, 10f))
+            comparedNumberView.setPaddingTop(dip(10f))
             comparedNumberView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dipSize(context, 20f))
         } else {
             symbolView.visibility = View.VISIBLE

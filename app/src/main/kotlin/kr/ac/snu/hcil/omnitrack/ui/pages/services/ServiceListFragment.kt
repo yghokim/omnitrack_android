@@ -26,8 +26,8 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.MeasureFactoryAdapter
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import org.jetbrains.anko.support.v4.act
+import org.jetbrains.anko.support.v4.dip
 import javax.inject.Inject
 
 /**
@@ -150,7 +150,7 @@ class ServiceListFragment : OTFragment() {
                 measureFactoryListView = view.findViewById(R.id.ui_supported_measure_list)
                 measureFactoryListView.adapter = measureFactoryAdapter
                 measureFactoryListView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-                measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(act, R.color.separator_Light), dipRound(act, 0.6f)))
+                measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(act, R.color.separator_Light), dip(0.6f)))
 
                 activationButton = view.findViewById(R.id.ui_button_activate)
                 activationButton.background.setColorFilter(activateColor, PorterDuff.Mode.MULTIPLY)

@@ -17,7 +17,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
 import kr.ac.snu.hcil.omnitrack.ui.components.common.StringIndicatorPropertyView
-import kr.ac.snu.hcil.omnitrack.utils.dipRound
+import org.jetbrains.anko.dip
 
 /**
  * Created by younghokim on 2017. 4. 18..
@@ -117,7 +117,7 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, View.OnClickL
 
         return MaterialDialog.Builder(context)
                 .customView(view, true)
-                .customViewHorizontalPadding(dipRound(context, 8))
+                .customViewHorizontalPadding(dip(8))
                 .positiveColorRes(R.color.colorPointed)
                 .negativeColorRes(R.color.colorRed_Light)
                 .positiveText(R.string.msg_apply)

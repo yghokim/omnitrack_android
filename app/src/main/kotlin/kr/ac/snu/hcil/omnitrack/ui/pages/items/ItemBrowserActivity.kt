@@ -46,10 +46,14 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMen
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
-import kr.ac.snu.hcil.omnitrack.utils.*
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
+import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
+import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import org.jetbrains.anko.dip
 import org.jetbrains.anko.support.v4.act
 import org.jetbrains.anko.verticalMargin
 import java.text.SimpleDateFormat
@@ -431,7 +435,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                 valueListView.layoutManager = LinearLayoutManager(this@ItemBrowserActivity, LinearLayoutManager.VERTICAL, false)
 
-                valueListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(this@ItemBrowserActivity, R.color.separator_Light), dipRound(this@ItemBrowserActivity, 1)))
+                valueListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(this@ItemBrowserActivity, R.color.separator_Light), dip(1)))
 
                 valueListAdapter = TableRowAdapter()
                 valueListView.adapter = valueListAdapter

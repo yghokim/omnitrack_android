@@ -26,7 +26,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import org.jetbrains.anko.notificationManager
 import java.io.IOException
-import java.lang.Exception
 import javax.inject.Inject
 
 /**

@@ -9,7 +9,7 @@ import android.support.v7.content.res.AppCompatResources
 import android.util.AttributeSet
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
-import kr.ac.snu.hcil.omnitrack.utils.dipRound
+import org.jetbrains.anko.dip
 
 /**
  * Created by younghokim on 2017. 1. 13..
@@ -57,7 +57,7 @@ class CompoundDrawableTintCore {
 
             for (drawable in compoundDrawables) {
                 if (drawable?.bounds?.isEmpty == true) {
-                    drawable.setBounds(0, 0, dipRound(context, 24), dipRound(context, 24))
+                    drawable.setBounds(0, 0, context.dip(24), context.dip(24))
                 }
             }
         } catch (ex: Exception) {

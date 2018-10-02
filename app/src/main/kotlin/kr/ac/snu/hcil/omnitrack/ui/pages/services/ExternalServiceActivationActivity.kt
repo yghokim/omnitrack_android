@@ -26,9 +26,9 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyContro
 import kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyControlViewModel
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
-import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import mehdi.sakout.fancybuttons.FancyButton
+import org.jetbrains.anko.dip
 import javax.inject.Inject
 
 /**
@@ -83,7 +83,7 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
         dependencyListView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         dependencyListView.adapter = dependencyAdapter
         dependencyListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(this, R.color.separator_Light),
-                dipRound(this, 1),
+                dip(1),
                 resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin),
                 resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
         ))

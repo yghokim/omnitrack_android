@@ -12,6 +12,7 @@ import android.util.LruCache
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.annotations.RealmModule
+import org.jetbrains.anko.dip
 import java.io.File
 import java.io.FileOutputStream
 
@@ -73,10 +74,10 @@ object VectorIconHelper {
                 }
 
                 val width: Int = if (sizeDp != null) {
-                    dipRound(context, sizeDp)
+                    context.dip(sizeDp)
                 } else drawable.intrinsicWidth
                 val height: Int = if (sizeDp != null) {
-                    dipRound(context, sizeDp)
+                    context.dip(sizeDp)
                 } else drawable.intrinsicHeight
 
                 val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)

@@ -245,7 +245,14 @@ dependencies {
     // optional - Firebase JobDispatcher support
     implementation "android.arch.work:work-firebase:$work_version"
     kapt "android.arch.lifecycle:compiler:1.1.1"
-    implementation 'org.jetbrains.anko:anko:0.10.5'
+
+    def anko_version = "0.10.5"
+    implementation "org.jetbrains.anko:anko-commons:$anko_version"
+    implementation "org.jetbrains.anko:anko-sqlite:$anko_version"
+    implementation "org.jetbrains.anko:anko-support-v4-commons:$anko_version"
+    implementation "org.jetbrains.anko:anko-sdk19:$anko_version"
+    implementation "org.jetbrains.anko:anko-appcompat-v7:$anko_version"
+
     implementation "com.google.dagger:dagger:$rootProject.ext.dagger_version"
     implementation "com.google.dagger:dagger-android:$rootProject.ext.dagger_version"
     kapt "com.google.dagger:dagger-android-processor:$rootProject.ext.dagger_version"
@@ -284,9 +291,9 @@ dependencies {
     implementation 'com.patloew.rxlocation:rxlocation:1.0.5'
     implementation 'uk.co.samuelwall:material-tap-target-prompt:2.12.1'
     implementation 'com.wdullaer:materialdatetimepicker:3.5.1'
-    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
-    testImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.1'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.1'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.1'
     compileOnly 'javax.annotation:jsr250-api:1.0'
     implementation 'com.larswerkman:lobsterpicker:1.0.1'
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0'

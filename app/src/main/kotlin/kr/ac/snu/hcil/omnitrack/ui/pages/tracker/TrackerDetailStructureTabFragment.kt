@@ -43,8 +43,12 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
-import kr.ac.snu.hcil.omnitrack.utils.*
+import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import org.jetbrains.anko.support.v4.act
+import org.jetbrains.anko.support.v4.dip
 import javax.inject.Inject
 
 /**
@@ -303,7 +307,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
             }*/
 
         attributeListView = rootView.findViewById(R.id.ui_attribute_list)
-        attributeListView.setViewIntervalDistance(dipRound(act, 8))
+        attributeListView.setViewIntervalDistance(dip(8))
         attributeListView.emptyView = rootView.findViewById(R.id.ui_empty_list_message)
 
         attributeListView.addOnLayoutChangeListener { view, a, b, c, d, e, f, g, h ->

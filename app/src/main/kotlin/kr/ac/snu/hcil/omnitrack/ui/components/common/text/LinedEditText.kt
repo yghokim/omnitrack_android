@@ -7,7 +7,6 @@ import android.support.v7.widget.AppCompatEditText
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
-import android.widget.EditText
 
 /**
  * Created by Young-Ho Kim on 16. 7. 24

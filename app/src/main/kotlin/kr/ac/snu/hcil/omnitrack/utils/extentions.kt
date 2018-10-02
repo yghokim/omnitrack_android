@@ -55,14 +55,6 @@ fun isInDozeMode(context: Context): Boolean {
     return context.powerManager.isDeviceIdleMode
 }
 
-fun dipRound(context: Context, value: Float): Int {
-    return (dipSize(context, value) + 0.5f).toInt()
-}
-
-fun dipRound(context: Context, value: Int): Int {
-    return (dipSize(context, value) + 0.5f).toInt()
-}
-
 
 fun dipSize(context: Context, value: Float): Float {
     return value * context.resources.displayMetrics.density
@@ -86,16 +78,6 @@ fun Boolean.toInt(): Int {
 
 fun Int.toBoolean(): Boolean {
     return this != 0
-}
-
-fun AppCompatActivity.startActivityOnDelay(intent: Intent, delay: Long = 50) {
-    val handler = Handler()
-    handler.postDelayed(object : Runnable {
-        override fun run() {
-            startActivity(intent)
-        }
-    }, delay)
-
 }
 
 fun List<*>.isSame(other: List<*>): Boolean {

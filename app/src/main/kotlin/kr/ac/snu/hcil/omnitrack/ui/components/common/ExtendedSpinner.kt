@@ -15,7 +15,6 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
-import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import org.jetbrains.anko.dip
 import kotlin.properties.Delegates
 
@@ -219,7 +218,7 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
                 lp = LinearLayout.LayoutParams(lp)
             }
 
-            val margin = dipRound(context, 6)
+            val margin = dip(6)
             lp.topMargin = margin
             lp.marginStart = margin
             lp.bottomMargin = margin

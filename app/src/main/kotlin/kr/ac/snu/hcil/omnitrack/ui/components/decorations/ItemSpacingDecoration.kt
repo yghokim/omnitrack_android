@@ -2,13 +2,13 @@ import android.content.Context
 import android.graphics.Rect
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import kr.ac.snu.hcil.omnitrack.utils.dipRound
+import org.jetbrains.anko.dip
 
 class ItemSpacingDecoration(private val horizontal: Int, private val vertical: Int) : RecyclerView.ItemDecoration() {
 
     companion object {
         fun fromDIP(horizontal: Int, vertical: Int, context: Context): ItemSpacingDecoration {
-            return ItemSpacingDecoration(dipRound(context, horizontal), dipRound(context, vertical))
+            return ItemSpacingDecoration(context.dip(horizontal), context.dip(vertical))
         }
 
         fun fromPixel(horizontal: Int, vertical: Int): ItemSpacingDecoration {
