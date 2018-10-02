@@ -13,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.VersionCheckDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.WebviewScreenDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.ANDROID_ASSET_PATH
+import kr.ac.snu.hcil.omnitrack.utils.versionName
 
 /**
  * Created by younghokim on 2017. 1. 25..
@@ -43,7 +44,7 @@ class AboutActivity : MaterialAboutActivity() {
                                 .iconTintRes(R.color.buttonIconColorDark)
                                 .text(R.string.msg_version)
                                 .textColorOverrideRes(R.color.textColorMidDark)
-                                .subText(BuildConfig.VERSION_NAME)
+                                .subText(this.versionName())
                                 .setOnClickListener {
                                     val versionCheckDialog = VersionCheckDialogFragment()
                                     versionCheckDialog.show(supportFragmentManager, "VersionCheck")

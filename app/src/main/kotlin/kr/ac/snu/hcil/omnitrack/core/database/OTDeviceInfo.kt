@@ -5,9 +5,9 @@ import android.support.annotation.Keep
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.di.configured.FirebaseComponent
+import kr.ac.snu.hcil.omnitrack.utils.versionName
 
 /**
  * Created by Young-Ho on 9/24/2017.
@@ -18,7 +18,7 @@ class OTDeviceInfo private constructor(context: Context) {
     var deviceId: String = (context.applicationContext as OTAndroidApp).deviceId
     var instanceId: String? = null
     var firstLoginAt: Long = System.currentTimeMillis()
-    var appVersion: String = BuildConfig.VERSION_NAME
+    var appVersion: String = context.versionName()
 
     fun convertToJson(): JsonObject {
         return jsonObject(

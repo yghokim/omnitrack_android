@@ -29,6 +29,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UsageLog
 import kr.ac.snu.hcil.omnitrack.core.di.configured.UsageLogger
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
+import kr.ac.snu.hcil.omnitrack.utils.versionCode
 import org.jetbrains.anko.getStackTraceString
 import javax.inject.Inject
 import javax.inject.Provider
@@ -218,7 +219,7 @@ class OTUsageLoggingManager(val configuredContext: ConfiguredContext) : IEventLo
         }
 
         val content: JsonObject = jsonObject(
-                "versionCode" to BuildConfig.VERSION_CODE,
+                "versionCode" to configuredContext.applicationContext.versionCode(),
                 "experiment" to BuildConfig.DEFAULT_EXPERIMENT_ID,
                 "packageName" to configuredContext.applicationComponent.application().getPackageName(),
                 "message" to throwable.message,

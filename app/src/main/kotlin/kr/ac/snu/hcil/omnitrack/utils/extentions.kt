@@ -40,6 +40,16 @@ import java.util.*
 
 const val ANDROID_ASSET_PATH = "file:///android_asset"
 
+fun Context.versionName(): String {
+    val pInfo = packageManager.getPackageInfo(packageName, 0)
+    return pInfo.versionName
+}
+
+fun Context.versionCode(): Long {
+    val pInfo = packageManager.getPackageInfo(packageName, 0)
+    return if (Build.VERSION.SDK_INT >= 28) pInfo.longVersionCode else pInfo.versionCode.toLong()
+}
+
 @TargetApi(23)
 fun isInDozeMode(context: Context): Boolean {
     return context.powerManager.isDeviceIdleMode

@@ -14,9 +14,9 @@ import android.widget.TextView
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables
-import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.versionName
 
 /**
  * Created by Young-Ho Kim on 2017-04-10.
@@ -91,7 +91,7 @@ class VersionCheckDialogFragment : DialogFragment() {
         latestVersionTextView = view.findViewById(R.id.ui_latest_version)
         storeButton = view.findViewById(R.id.ui_store_button)
 
-        currentVersionTextView.text = BuildConfig.VERSION_NAME
+        currentVersionTextView.text = view.context.versionName()
         storeButton.isEnabled = false
         storeButton.setOnClickListener {
             try {

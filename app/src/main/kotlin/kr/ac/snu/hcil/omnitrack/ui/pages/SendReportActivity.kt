@@ -9,13 +9,13 @@ import com.google.gson.Gson
 import dagger.Lazy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_send_report.*
-import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.net.IUserReportServerAPI
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.versionName
 
 /**
  * Created by younghokim on 2017. 3. 19..
@@ -129,7 +129,7 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
 
 
             inquiry["os"] = OTDeviceInfo.OS
-            inquiry["appVersion"] = BuildConfig.VERSION_NAME
+            inquiry["appVersion"] = this.versionName()
 
             val inquiryJson = Gson().toJsonTree(inquiry).asJsonObject
             println("inquiry json: ${inquiryJson}")
