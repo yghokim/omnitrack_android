@@ -44,7 +44,7 @@ class OTLongTextAttributeHelper(configuredContext: ConfiguredContext) : ATextTyp
 
         InterfaceHelper.setTextAppearance(target, R.style.longTextForItemListTextAppearance)
 
-        target.setLineSpacing(context.resources.getDimension(R.dimen.item_list_element_LongText_LineSpacingExtra), 1.2f)
+        target.setLineSpacing(context.resources.getDimension(R.dimen.item_list_element_longText_lineSpacingExtra), 1.2f)
 
         target.base.drawOuterLines = false
 

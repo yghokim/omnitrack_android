@@ -47,6 +47,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
+import kr.ac.snu.hcil.omnitrack.utils.setPaddingBottom
 import org.jetbrains.anko.notificationManager
 import java.util.*
 import javax.inject.Inject
@@ -226,6 +227,11 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
         val itemId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM)
         this.mode = if (itemId != null) ItemEditionViewModelBase.ItemMode.Edit else ItemEditionViewModelBase.ItemMode.New
+        if (this.mode == ItemEditionViewModelBase.ItemMode.Edit) {
+            this.rightActionBarTextButton?.visibility = View.VISIBLE
+            this.attributeListView.setPaddingBottom(0)
+            this.ui_button_next_container.visibility = View.GONE
+        }
 
         viewModel.init(trackerId, itemId, metadata, savedInstanceState)
 
