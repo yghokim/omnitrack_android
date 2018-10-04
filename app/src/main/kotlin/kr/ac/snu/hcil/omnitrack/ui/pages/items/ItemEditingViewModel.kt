@@ -6,10 +6,8 @@ import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import io.reactivex.Maybe
-import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.getLongCompat
 import kr.ac.snu.hcil.omnitrack.utils.getStringCompat
@@ -22,8 +20,8 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
 
     private lateinit var originalUnmanagedItemDao: OTItemDAO
 
-    override fun onInit(trackerDao: OTTrackerDAO, itemId: String?, savedInstanceState: Bundle?) {
-        if (itemId != null) {
+    fun init(trackerId: String, itemId: String, savedInstanceState: Bundle?) {
+        if (init(trackerId)) {
             val itemDao = dbManager.get().makeSingleItemQuery(itemId, realm).findFirst()
             if (itemDao != null) {
                 originalUnmanagedItemDao = realm.copyFromRealm(itemDao)
@@ -55,7 +53,7 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
                     }
                 }
             } else throw IllegalArgumentException("No item with the id.")
-        } else throw throw IllegalArgumentException("Did not provide an itemId.")
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -93,10 +91,6 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
         return false
     }
 
-    override fun cacheEditingInfo(): Single<Boolean> {
-        return Single.just(false)
-    }
-
     override fun applyEditingToDatabase(): Maybe<String> {
         if (isValid) {
             return isBusyObservable.filter { !it }.firstOrError().flatMapMaybe {
@@ -116,9 +110,5 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
                 } else Maybe.just(originalUnmanagedItemDao.objectId)
             }
         } else return Maybe.just(null)
-    }
-
-    override fun clearHistory() {
-
     }
 }

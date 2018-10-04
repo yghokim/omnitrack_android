@@ -55,7 +55,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.container.FallbackRecyclerV
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.visualization.ChartViewActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
@@ -336,7 +336,7 @@ class TrackerListFragment : OTFragment() {
                         }
                         .show()
             } else {
-                startActivity(ItemDetailActivity.makeNewItemPageIntent(tracker.objectId!!, act))
+                startActivity(NewItemActivity.makeNewItemPageIntent(tracker.objectId!!, act))
             }
         }
     }

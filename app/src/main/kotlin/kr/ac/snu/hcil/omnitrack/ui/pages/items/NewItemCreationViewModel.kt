@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import android.app.Application
 import android.os.Bundle
+import com.google.gson.JsonObject
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
@@ -9,7 +10,6 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTItemBuilderFieldValueEntry
 import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
@@ -38,7 +38,6 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
 
     val redirectedPageVisitStatusObservable = BehaviorSubject.createDefault<RedirectedPageStatus>(RedirectedPageStatus.RedirectionNotSet)
 
-
     private var reservedNewItemId: String? = null
     fun generateNewItemId(): String {
         this.reservedNewItemId = UUID.randomUUID().toString()
@@ -58,56 +57,60 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         val stored = cacheEditingInfo().blockingGet()
     }
 
-    override fun onInit(trackerDao: OTTrackerDAO, itemId: String?, savedInstanceState: Bundle?) {
+    fun init(trackerId: String, metadata: JsonObject, savedInstanceState: Bundle?) {
+        if (init(trackerId)) {
 
-        if (!trackerDao.redirectUrl.isNullOrBlank()) {
-            redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(RedirectedPageStatus.NotVisited)
-        } else {
-            redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(RedirectedPageStatus.RedirectionNotSet)
-        }
+            metadataForItem = metadata
 
-        //val builderDaoResult = if (loadPendingItemBuilder) dbManager.get().getItemBuilderQuery(trackerDao.objectId!!, OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst() else null
-
-        val storedBuilderDao = if (savedInstanceState != null && savedInstanceState.containsKey(KEY_BUILDER_ID)) {
-            //there is a pending itemBuilder.
-            realm.where(OTItemBuilderDAO::class.java).equalTo("id", savedInstanceState.getLong(KEY_BUILDER_ID)).findFirst()
-        } else null
-
-        if (storedBuilderDao == null) {
-            val newBuilderId = System.currentTimeMillis()
-            realm.executeTransactionIfNotIn {
-                val newBuilderDao = realm.createObject(OTItemBuilderDAO::class.java, newBuilderId)
-                newBuilderDao.tracker = trackerDao
-                newBuilderDao.holderType = OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM
-                this.itemBuilderDao = realm.copyFromRealm(newBuilderDao)
+            if (!trackerDao.redirectUrl.isNullOrBlank()) {
+                redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(RedirectedPageStatus.NotVisited)
+            } else {
+                redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(RedirectedPageStatus.RedirectionNotSet)
             }
-        } else {
-            this.itemBuilderDao = realm.copyFromRealm(storedBuilderDao)
-        }
 
-        this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao, configuredContext)
+            //val builderDaoResult = if (loadPendingItemBuilder) dbManager.get().getItemBuilderQuery(trackerDao.objectId!!, OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst() else null
 
-        for (key in this.builderWrapper.keys) {
-            val value = this.builderWrapper.getValueInformationOf(key)
-            if (value != null) {
-                setValueOfAttribute(key, value)
+            val storedBuilderDao = if (savedInstanceState != null && savedInstanceState.containsKey(KEY_BUILDER_ID)) {
+                //there is a pending itemBuilder.
+                realm.where(OTItemBuilderDAO::class.java).equalTo("id", savedInstanceState.getLong(KEY_BUILDER_ID)).findFirst()
+            } else null
+
+            if (storedBuilderDao == null) {
+                val newBuilderId = System.currentTimeMillis()
+                realm.executeTransactionIfNotIn {
+                    val newBuilderDao = realm.createObject(OTItemBuilderDAO::class.java, newBuilderId)
+                    newBuilderDao.tracker = trackerDao
+                    newBuilderDao.holderType = OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM
+                    this.itemBuilderDao = realm.copyFromRealm(newBuilderDao)
+                }
+            } else {
+                this.itemBuilderDao = realm.copyFromRealm(storedBuilderDao)
             }
-        }
 
-        if (savedInstanceState == null) {
-            isBusy = true
-            subscriptions.add(
-                    this.builderWrapper.makeAutoCompleteObservable(realmProvider, this).subscribe({ (attrLocalId, valueWithTimestamp) ->
-                        setValueOfAttribute(attrLocalId, valueWithTimestamp)
-                    }, {
+            this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao, configuredContext)
 
-                    }, {
-                        isBusy = false
-                    })
-            )
-        } else {
-            this.reservedNewItemId = savedInstanceState.getString(KEY_RESERVED_NEW_ITEM_ID)
-            this.redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(RedirectedPageStatus.values()[savedInstanceState.getInt(KEY_REDIRECTED_PAGE_VISIT_STATUS)])
+            for (key in this.builderWrapper.keys) {
+                val value = this.builderWrapper.getValueInformationOf(key)
+                if (value != null) {
+                    setValueOfAttribute(key, value)
+                }
+            }
+
+            if (savedInstanceState == null) {
+                isBusy = true
+                subscriptions.add(
+                        this.builderWrapper.makeAutoCompleteObservable(realmProvider, this).subscribe({ (attrLocalId, valueWithTimestamp) ->
+                            setValueOfAttribute(attrLocalId, valueWithTimestamp)
+                        }, {
+
+                        }, {
+                            isBusy = false
+                        })
+                )
+            } else {
+                this.reservedNewItemId = savedInstanceState.getString(KEY_RESERVED_NEW_ITEM_ID)
+                this.redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(RedirectedPageStatus.values()[savedInstanceState.getInt(KEY_REDIRECTED_PAGE_VISIT_STATUS)])
+            }
         }
     }
 
@@ -143,7 +146,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         }
     }
 
-    override fun cacheEditingInfo(): Single<Boolean> {
+    fun cacheEditingInfo(): Single<Boolean> {
         return Single.defer {
             if (isValid) {
                 println("save builder")
@@ -186,7 +189,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
     }
 
 
-    override fun clearHistory() {
+    fun clearHistory() {
         subscriptions.add(
                 isBusyObservable.filter { !it }.subscribe { isBusy ->
                     realm.executeTransaction { transactionRealm ->

@@ -254,9 +254,9 @@
         <activity
             android:name=".ui.pages.attribute.AttributeDetailActivity"
             android:label="@string/title_activity_attribute_detail" />
-        <activity
-            android:name=".ui.pages.items.ItemDetailActivity"
-            android:label="@string/title_activity_new_item" />
+
+        <activity android:name=".ui.pages.items.NewItemActivity" />
+        <activity android:name=".ui.pages.items.ItemEditActivity" />
         <activity android:name=".ui.pages.items.ItemBrowserActivity" />
         <activity
             android:name=".ui.components.common.activity.WebServiceLoginActivity"

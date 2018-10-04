@@ -205,7 +205,7 @@ interface ConfiguredAppComponent {
     fun inject(viewModel: PackageExportViewModel)
 
     fun inject(activity: ItemBrowserActivity)
-    fun inject(activity: ItemDetailActivity)
+    fun inject(activity: NewItemActivity)
     fun inject(activity: AttributeDetailActivity)
 
     fun inject(fragment: TrackerDetailStructureTabFragment)

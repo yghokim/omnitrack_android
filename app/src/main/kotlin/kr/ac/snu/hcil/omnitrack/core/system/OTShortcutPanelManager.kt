@@ -29,7 +29,7 @@ import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemActivity
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import org.jetbrains.anko.notificationManager
 import javax.inject.Inject
@@ -123,7 +123,7 @@ class OTShortcutPanelManager @Inject constructor(
                     element.setViewVisibility(R.id.ui_button_instant, View.GONE)
                 }
 
-                val openItemActivityIntent = PendingIntent.getActivity(context, i, ItemDetailActivity.makeNewItemPageIntent(trackers[i].objectId!!, context), PendingIntent.FLAG_UPDATE_CURRENT)
+                val openItemActivityIntent = PendingIntent.getActivity(context, i, NewItemActivity.makeNewItemPageIntent(trackers[i].objectId!!, context), PendingIntent.FLAG_UPDATE_CURRENT)
 
                 element.setOnClickPendingIntent(R.id.group, openItemActivityIntent)
             }

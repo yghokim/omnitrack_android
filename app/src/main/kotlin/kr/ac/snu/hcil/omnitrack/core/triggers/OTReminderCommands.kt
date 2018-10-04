@@ -37,7 +37,7 @@ import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
 import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
 import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemActivity
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import kr.ac.snu.hcil.omnitrack.utils.isInteractiveCompat
@@ -146,7 +146,7 @@ class OTReminderCommands(val context: Context) {
                 val trigger = dbManager.getTriggerQueryWithId(triggerId, realm).findFirst()
                 if (trigger != null) {
                     trigger.liveTrackersQuery.equalTo(BackendDbManager.FIELD_OBJECT_ID, trackerId).findFirst()?.let {
-                        ItemDetailActivity.makeReminderOpenIntent(it.objectId!!, triggerTime, metadata, context)
+                        NewItemActivity.makeReminderOpenIntent(it.objectId!!, triggerTime, metadata, context)
                     }?.let {
                         it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                         context.runOnUiThread {
@@ -480,9 +480,9 @@ class OTReminderCommands(val context: Context) {
         /*
         val stackBuilder = TaskStackBuilder.create(this)
         // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(ItemDetailActivity::class.java)
+        stackBuilder.addParentStack(AItemDetailActivity::class.java)
         // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(ItemDetailActivity.makeIntent(trackerId, reminderTime, this))
+        stackBuilder.addNextIntent(AItemDetailActivity.makeIntent(trackerId, reminderTime, this))
         val resultPendingIntent = stackBuilder.getPendingIntent(0,
                 PendingIntent.FLAG_UPDATE_CURRENT)
 */

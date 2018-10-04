@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
-import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditActivity
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 
 /**
@@ -22,10 +22,10 @@ object OTTrackingNotificationFactory {
     fun makeLoggingSuccessNotificationBuilder(context: Context, configuredContext: ConfiguredContext, trackerId: String, trackerName: String, itemId: String, loggedTime: Long, table: List<Pair<String, CharSequence?>>?, notificationId: Int, tag: String): NotificationCompat.Builder {
         val stackBuilder = TaskStackBuilder.create(context)
         // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(ItemDetailActivity::class.java)
+        stackBuilder.addParentStack(ItemEditActivity::class.java)
         // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(
-                ItemDetailActivity.makeItemEditPageIntent(itemId, trackerId, context)
+                ItemEditActivity.makeItemEditPageIntent(itemId, trackerId, context)
                         .putExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID, notificationId)
                         .putExtra(OTApp.INTENT_EXTRA_NOTIFICATON_TAG, tag)
         )

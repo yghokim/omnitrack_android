@@ -5,7 +5,6 @@ import android.os.Bundle
 import com.google.gson.JsonObject
 import io.reactivex.Maybe
 import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
@@ -27,9 +26,6 @@ import javax.inject.Inject
  * Created by Young-Ho on 10/15/2017.
  */
 abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app), OTItemBuilderWrapperBase.AttributeStateChangedListener {
-    enum class ItemMode {
-        Edit, New
-    }
 
     @Inject
     protected lateinit var syncManager: OTSyncManager
@@ -37,7 +33,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
     lateinit var metadataForItem: JsonObject
         protected set
 
-    var trackerDao: OTTrackerDAO? = null
+    lateinit var trackerDao: OTTrackerDAO
         protected set
 
     val hasTrackerRemovedOutside = BehaviorSubject.create<String>()
@@ -67,43 +63,40 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
         configuredContext.configuredAppComponent.inject(this)
     }
 
-    fun init(trackerId: String, itemId: String?, metadata: JsonObject, savedInstanceState: Bundle?): Boolean {
+    protected fun init(trackerId: String): Boolean {
         isValid = true
-        if (trackerDao?.objectId != trackerId) {
+        if (!this::trackerDao.isInitialized || trackerDao.objectId != trackerId) {
+            /*
             this.metadataForItem = metadata
             if (!this.metadataForItem.has("screenAccessedAt")) {
                 this.metadataForItem.addProperty("screenAccessedAt", System.currentTimeMillis())
-            }
+            }*/
 
-            trackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirst()
+            val trackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirst()
             if (trackerDao != null) {
-                trackerNameObservable.onNext(trackerDao?.name ?: "")
+                this.trackerDao = trackerDao
+                trackerNameObservable.onNext(trackerDao.name)
                 subscriptions.clear()
 
                 val unManagedTrackerDao = realm.copyFromRealm(trackerDao)!!
 
                 subscriptions.add(
-                        trackerDao!!.asFlowable<OTTrackerDAO>().filter { it.isLoaded }.subscribe { dao ->
+                        trackerDao.asFlowable<OTTrackerDAO>().filter { it.isLoaded }.subscribe { dao ->
                             if (!dao.isValid) {
                                 hasTrackerRemovedOutside.onNext(unManagedTrackerDao.objectId!!)
                             }
                         }
                 )
 
-
                 currentAttributeViewModelList.forEach { it.unregister() }
                 currentAttributeViewModelList.clear()
 
                 currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan }.map { AttributeInputViewModel(it) })
                 attributeViewModelListObservable.onNext(currentAttributeViewModelList)
-
-                onInit(trackerDao!!, itemId, savedInstanceState)
                 return true
             } else throw IllegalArgumentException("No such tracker.")
         } else return false
     }
-
-    abstract fun onInit(trackerDao: OTTrackerDAO, itemId: String?, savedInstanceState: Bundle?)
 
     open fun onSaveInstanceState(outState: Bundle) {
 
@@ -202,9 +195,6 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
     protected fun syncItemToServer() {
         syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
     }
-
-    abstract fun cacheEditingInfo(): Single<Boolean>
-    abstract fun clearHistory()
 
     abstract fun applyEditingToDatabase(): Maybe<String>
 

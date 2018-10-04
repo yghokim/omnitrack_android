@@ -15,7 +15,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
-import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemActivity
 import javax.inject.Inject
 
 /**
@@ -84,7 +84,7 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
             when (intent.getStringExtra(EXTRA_CLICK_COMMAND)) {
                 CLICK_COMMAND_ROW -> {
                     if (trackerId != null) {
-                        context.startActivity(ItemDetailActivity.makeNewItemPageIntent(trackerId, context).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
+                        context.startActivity(NewItemActivity.makeNewItemPageIntent(trackerId, context).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
                     }
                 }
 
