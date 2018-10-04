@@ -20,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
+import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import javax.inject.Inject
 
 /**
@@ -41,6 +42,8 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
     val trackerNameObservable = BehaviorSubject.create<String>()
     val attributeViewModelListObservable = BehaviorSubject.create<List<AttributeInputViewModel>>()
+
+    val isAllInputCompleteObservable = BehaviorSubject.createDefault(false)
 
     val isBusyObservable = BehaviorSubject.createDefault<Boolean>(false)
 
@@ -93,9 +96,22 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
                 currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan }.map { AttributeInputViewModel(it) })
                 attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+
+                this.checkAllInputCompleteAndReturn()
+
                 return true
             } else throw IllegalArgumentException("No such tracker.")
         } else return false
+    }
+
+    fun checkAllInputCompleteAndReturn(): Boolean {
+        val isComplete = currentAttributeViewModelList.none { attributeViewModel ->
+            attributeViewModel.isRequired && attributeViewModel.value?.value == null
+        }
+
+        this.isAllInputCompleteObservable.onNextIfDifferAndNotNull(isComplete)
+
+        return isComplete
     }
 
     open fun onSaveInstanceState(outState: Bundle) {
@@ -120,6 +136,8 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
                 if (valueObservable.value?.datum != value) {
                     valueObservable.onNext(Nullable(value))
                     validateValue()
+                    if (isRequired)
+                        checkAllInputCompleteAndReturn()
                 }
             }
 

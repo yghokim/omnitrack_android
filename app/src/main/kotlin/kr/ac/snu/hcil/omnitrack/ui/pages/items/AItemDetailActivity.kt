@@ -147,6 +147,22 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
                     invalidOutsideDialogBuilder.show()
                 }
         )
+
+        creationSubscriptions.add(
+                viewModel.isAllInputCompleteObservable.subscribe {
+                    if (it) {
+                        onTrackerInputComplete()
+                    } else onTrackerInputIncomplete()
+                }
+        )
+    }
+
+    protected open fun onTrackerInputComplete() {
+
+    }
+
+    protected open fun onTrackerInputIncomplete() {
+
     }
 
     override fun onPause() {

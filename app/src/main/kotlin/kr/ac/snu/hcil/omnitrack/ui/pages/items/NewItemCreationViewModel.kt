@@ -30,13 +30,15 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
     }
 
     enum class RedirectedPageStatus {
-        RedirectionNotSet, NotVisited, Completed, Canceled
+        RedirectionNotSet, Completed, NotVisited, Canceled
     }
 
     private lateinit var itemBuilderDao: OTItemBuilderDAO
     private lateinit var builderWrapper: OTItemBuilderWrapperBase
 
     val redirectedPageVisitStatusObservable = BehaviorSubject.createDefault<RedirectedPageStatus>(RedirectedPageStatus.RedirectionNotSet)
+
+    val isRedirectionSet: Boolean get() = !trackerDao.redirectUrl.isNullOrBlank()
 
     private var reservedNewItemId: String? = null
     fun generateNewItemId(): String {

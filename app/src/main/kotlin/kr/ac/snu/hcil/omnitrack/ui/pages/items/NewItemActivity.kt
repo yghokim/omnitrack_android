@@ -113,6 +113,7 @@ class NewItemActivity : AItemDetailActivity<NewItemCreationViewModel>(NewItemCre
                     ui_button_next.text = resources.getString(
                             when (it) {
                                 NewItemCreationViewModel.RedirectedPageStatus.NotVisited -> R.string.msg_visit_survey_website
+                                NewItemCreationViewModel.RedirectedPageStatus.Canceled -> R.string.msg_save_item_anyway
                                 else -> R.string.msg_save_current_input
                             }
                     )
@@ -151,6 +152,7 @@ class NewItemActivity : AItemDetailActivity<NewItemCreationViewModel>(NewItemCre
             if (resultCode == Activity.RESULT_OK) {
                 Toast.makeText(this, "Completed Qualtrics survey.", Toast.LENGTH_LONG).show()
                 redirectedPageCanceledSnackbar.dismiss()
+                onToolbarRightButtonClicked()
             } else {
                 redirectedPageCanceledSnackbar.show()
             }
@@ -203,6 +205,18 @@ class NewItemActivity : AItemDetailActivity<NewItemCreationViewModel>(NewItemCre
 
             startActivityForResult(WebServiceLoginActivity.makeIntent(url, "Qualtrics", "Complete A Survey", this), REQUEST_CODE_REDIRECT_SURVEY)
         }
+    }
+
+    override fun onTrackerInputIncomplete() {
+        super.onTrackerInputIncomplete()
+        if (viewModel.isRedirectionSet)
+            ui_button_next.isEnabled = false
+    }
+
+    override fun onTrackerInputComplete() {
+        super.onTrackerInputComplete()
+        if (viewModel.isRedirectionSet)
+            ui_button_next.isEnabled = true
     }
 
     override fun onToolbarRightButtonClicked() {
