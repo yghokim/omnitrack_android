@@ -615,7 +615,8 @@ class BackendDbManager @Inject constructor(
                                 removeRowInDbFunc(match, realm)
                                 //removeItemImpl(match, true, realm)
                             } else {
-                                applier.get().applyToManagedDao(serverPojo, match)
+                                val updated = applier.get().applyToManagedDao(serverPojo, match)
+                                if (updated) afterRowUpdatedFunc?.invoke(match, realm)
                             }
                         }
                     }
