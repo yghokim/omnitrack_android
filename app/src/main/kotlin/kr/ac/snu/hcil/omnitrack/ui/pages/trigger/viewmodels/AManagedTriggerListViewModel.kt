@@ -43,7 +43,7 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
     protected fun init() {
         onDispose()
         currentTriggerRealmResults = hookTriggerQuery(
-                dbManager.get().makeTriggersOfUserQuery(authManager.userId!!, realm))
+                dbManager.get().makeTriggersOfUserVisibleQuery(authManager.userId!!, realm))
                 .findAllAsync()
 
         currentTriggerRealmResults?.addChangeListener { snapshot, changeSet ->

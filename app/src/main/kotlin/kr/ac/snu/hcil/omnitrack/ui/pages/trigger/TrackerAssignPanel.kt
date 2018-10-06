@@ -90,7 +90,7 @@ class TrackerAssignPanel : RecyclerView {
     private fun onAttachButtonClicked() {
         realm?.let {
             subscriptions.add(
-                    dbManager.makeTrackersOfUserQuery(authManager.userId!!, it).findAllAsync()
+                    dbManager.makeTrackersOfUserVisibleQuery(authManager.userId!!, it).findAllAsync()
                             .asFlowable().filter { it.isLoaded && it.isValid }.firstOrError().subscribe { snapshot ->
                         val dialog = TrackerPickerDialogBuilder(snapshot.map { it.getSimpleInfo() }).createDialog(getActivity()!!, trackers.mapNotNull { it.objectId }.toTypedArray()) { trackerId ->
                             snapshot.find { it.objectId == trackerId }?.getSimpleInfo()?.let {

@@ -108,7 +108,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
                 signedInUserObservable.subscribe({
                     userId ->
                     val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(appWidgetId, OTShortcutPanelWidgetUpdateService.getPreferences(this))
-                    trackerList = dbManager.makeTrackersOfUserQuery(userId, realm).findAll().map {
+                    trackerList = dbManager.makeTrackersOfUserVisibleQuery(userId, realm).findAll().map {
                         WritablePair(it.getSimpleInfo(), selectedTrackerIds?.contains(it.objectId) == true)
                     }
                     trackerSelectionAdapter.notifyDataSetChanged()

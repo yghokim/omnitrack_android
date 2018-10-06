@@ -50,7 +50,7 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
                 }
                 "color" -> dao.color = reader.nextInt()
                 "isBookmarked" -> dao.isBookmarked = reader.nextBoolean()
-                BackendDbManager.FIELD_LOCKED_PROPERTIES_SERIALIZED -> dao.serializedLockedPropertyInfo = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
+                BackendDbManager.FIELD_LOCKED_PROPERTIES -> dao.serializedLockedPropertyInfo = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
                 "flags" -> {
                     val flagObject = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java)
                     dao.serializedCreationFlags = flagObject.toString()
@@ -99,7 +99,7 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
         writer.name(BackendDbManager.FIELD_NAME).value(value.name)
         writer.name("color").value(value.color)
         writer.name("isBookmarked").value(value.isBookmarked)
-        writer.name(BackendDbManager.FIELD_LOCKED_PROPERTIES_SERIALIZED).jsonValue(value.serializedLockedPropertyInfo)
+        writer.name(BackendDbManager.FIELD_LOCKED_PROPERTIES).jsonValue(value.serializedLockedPropertyInfo)
         writer.name("flags").jsonValue(value.serializedCreationFlags)
         writer.name("attributes").beginArray()
         for (attribute in value.attributes)

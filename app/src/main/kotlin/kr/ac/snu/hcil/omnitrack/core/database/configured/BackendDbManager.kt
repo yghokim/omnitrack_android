@@ -61,7 +61,9 @@ class BackendDbManager @Inject constructor(
         const val FIELD_IS_IN_TRASHCAN = "isInTrashcan"
         const val FIELD_IS_HIDDEN = "isHidden"
 
-        const val FIELD_LOCKED_PROPERTIES_SERIALIZED = "lockedProperties"
+        const val FIELD_LOCKED_PROPERTIES = "lockedProperties"
+
+        const val FIELD_LOCKED_PROPERTIES_SERIALIZED = "serializedLockedPropertyInfo"
 
         const val FIELD_METADATA_SERIALIZED = "serializedMetadata"
 
@@ -83,6 +85,16 @@ class BackendDbManager @Inject constructor(
                 query.equalTo(BackendDbManager.FIELD_EXPERIMENT_ID_IN_FLAGS, BuildConfig.DEFAULT_EXPERIMENT_ID)
             } else query
         }
+
+        fun <T> filterVisibleInAppFlag(query: RealmQuery<T>): RealmQuery<T> {
+            return query
+                    .not()
+                    .beginGroup()
+                    .contains(BackendDbManager.FIELD_LOCKED_PROPERTIES_SERIALIZED, "\"visibleInApp\":true", Case.INSENSITIVE)
+                    .or()
+                    .contains(BackendDbManager.FIELD_LOCKED_PROPERTIES_SERIALIZED, "\"visibleInApp\" : true", Case.INSENSITIVE)
+                    .endGroup()
+        }
     }
 
     fun makeNewRealmInstance(): Realm = Realm.getInstance(config)
@@ -97,14 +109,11 @@ class BackendDbManager @Inject constructor(
         return realm.where(OTTriggerDAO::class.java).equalTo(FIELD_OBJECT_ID, objectId).equalTo(FIELD_REMOVED_BOOLEAN, false)
     }
 
-
-    fun makeBookmarkedTrackersQuery(userId: String, realm: Realm): RealmQuery<OTTrackerDAO> = realm.where(OTTrackerDAO::class.java).equalTo(FIELD_REMOVED_BOOLEAN, false).equalTo(FIELD_USER_ID, userId).equalTo("isBookmarked", true)
-
     fun makeBookmarkedTrackersObservable(userId: String, realm: Realm): Flowable<RealmResults<OTTrackerDAO>> {
         return realm.where(OTTrackerDAO::class.java)
                 .equalTo(FIELD_REMOVED_BOOLEAN, false)
                 .run {
-                    branchCheckDefaultExperimentId(this)
+                    filterVisibleInAppFlag(branchCheckDefaultExperimentId(this))
                 }
                 .equalTo(FIELD_USER_ID, userId).equalTo("isBookmarked", true)
                 .sort("position", Sort.ASCENDING).findAllAsync()
@@ -269,22 +278,22 @@ class BackendDbManager @Inject constructor(
         return realm.where(OTItemBuilderDAO::class.java).equalTo("tracker.objectId", trackerId).equalTo("holderType", holderType)
     }
 
-    fun makeTriggersOfUserQuery(userId: String, realm: Realm): RealmQuery<OTTriggerDAO> {
+    fun makeTriggersOfUserVisibleQuery(userId: String, realm: Realm): RealmQuery<OTTriggerDAO> {
         return realm
                 .where(OTTriggerDAO::class.java)
                 .equalTo(FIELD_REMOVED_BOOLEAN, false)
                 .equalTo(FIELD_USER_ID, userId)
                 .run {
-                    branchCheckDefaultExperimentId(this)
+                    filterVisibleInAppFlag(branchCheckDefaultExperimentId(this))
                 }
     }
 
-    fun makeTrackersOfUserQuery(userId: String, realm: Realm): RealmQuery<OTTrackerDAO> {
+    fun makeTrackersOfUserVisibleQuery(userId: String, realm: Realm): RealmQuery<OTTrackerDAO> {
         return realm.where(OTTrackerDAO::class.java)
                 .equalTo(FIELD_REMOVED_BOOLEAN, false)
                 .equalTo(FIELD_USER_ID, userId)
                 .run {
-                    branchCheckDefaultExperimentId(this)
+                    filterVisibleInAppFlag(branchCheckDefaultExperimentId(this))
                 }
     }
 

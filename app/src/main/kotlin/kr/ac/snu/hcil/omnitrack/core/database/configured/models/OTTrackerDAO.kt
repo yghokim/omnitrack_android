@@ -181,7 +181,7 @@ open class OTTrackerDAO : RealmObject() {
     }
 
     fun isIndependentInputLocked(): Boolean {
-        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_INDEPENDENT_INPUT, getParsedLockedPropertyInfo())
+        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_SELF_INITIATED_INPUT, getParsedLockedPropertyInfo())
     }
 
 

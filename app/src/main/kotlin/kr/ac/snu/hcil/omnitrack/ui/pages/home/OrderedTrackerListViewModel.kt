@@ -51,7 +51,7 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
 
     override fun onUserAttached(newUserId: String) {
         super.onUserAttached(newUserId)
-        trackerQueryResults = dbManager.get().makeTrackersOfUserQuery(newUserId, realm)
+        trackerQueryResults = dbManager.get().makeTrackersOfUserVisibleQuery(newUserId, realm)
                 .sort(arrayOf("position", BackendDbManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
                 .findAllAsync()
 

@@ -77,7 +77,7 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
             isOffline = false
             viewModelMode.onNext(MODE_EDIT)
             this.triggerId = triggerId
-            val dao = dbManager.get().makeTriggersOfUserQuery(userId, realm).equalTo("objectId", triggerId).findFirst()
+            val dao = dbManager.get().makeTriggersOfUserVisibleQuery(userId, realm).equalTo("objectId", triggerId).findFirst()
             if (dao != null) {
                 this.originalTriggerDao = dao
                 this.attachedTrackersRealmResults = dao.liveTrackersQuery.findAllAsync()

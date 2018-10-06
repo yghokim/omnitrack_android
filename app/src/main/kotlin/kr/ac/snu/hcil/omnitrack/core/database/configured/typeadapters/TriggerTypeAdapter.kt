@@ -101,7 +101,7 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
         writer.name("action").jsonValue(value.serializedAction)
         writer.name("script").value(value.additionalScript)
         writer.name("checkScript").value(value.checkScript)
-        writer.name(BackendDbManager.FIELD_LOCKED_PROPERTIES_SERIALIZED).jsonValue(value.serializedLockedPropertyInfo)
+        writer.name(BackendDbManager.FIELD_LOCKED_PROPERTIES).jsonValue(value.serializedLockedPropertyInfo)
 
         if (!isServerMode)
             writer.name(BackendDbManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
@@ -145,7 +145,7 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                 BackendDbManager.FIELD_POSITION -> applyTo.position = json.getIntCompat(key) ?: 0
                 BackendDbManager.FIELD_SYNCHRONIZED_AT -> applyTo.synchronizedAt = json.getLongCompat(key)
                 "alias" -> applyTo.alias = json.getStringCompat(key) ?: ""
-                BackendDbManager.FIELD_LOCKED_PROPERTIES_SERIALIZED -> applyTo.serializedLockedPropertyInfo = json[key]?.toString() ?: "null"
+                BackendDbManager.FIELD_LOCKED_PROPERTIES -> applyTo.serializedLockedPropertyInfo = json[key]?.toString() ?: "null"
                 "isOn" ->{
                     val switchValue = json.getBooleanCompat(key) ?: false
                     if(switchValue != applyTo.isOn)

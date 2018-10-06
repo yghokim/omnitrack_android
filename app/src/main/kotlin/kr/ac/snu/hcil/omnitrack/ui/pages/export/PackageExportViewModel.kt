@@ -48,11 +48,11 @@ class PackageExportViewModel(application: Application) : UserAttachedViewModel(a
         this.selectedTriggerIds.clear()
 
         trackerInfoListSubject.onNext(dbManager.get()
-                .makeTrackersOfUserQuery(newUserId, realm)
+                .makeTrackersOfUserVisibleQuery(newUserId, realm)
                 .findAll().map { it.getSimpleInfo(true) }.toList())
 
         loggingTriggerInfoListSubject.onNext(dbManager.get()
-                .makeTriggersOfUserQuery(newUserId, realm)
+                .makeTriggersOfUserVisibleQuery(newUserId, realm)
                 .equalTo("actionType", OTTriggerDAO.ACTION_TYPE_LOG)
                 .findAll().map { it.getSimpleInfo(true) }.toList())
     }

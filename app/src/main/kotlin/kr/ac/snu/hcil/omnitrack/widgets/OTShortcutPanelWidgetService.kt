@@ -75,12 +75,12 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
             val realm = dbManager.makeNewRealmInstance()
             if(userId!=null) {
                 when (mode) {
-                    OTShortcutPanelWidgetUpdateService.MODE_ALL -> trackers.addAll(dbManager.makeTrackersOfUserQuery(userId, realm).findAll().map { it.getSimpleInfo() })
-                    OTShortcutPanelWidgetUpdateService.MODE_SHORTCUT -> trackers.addAll(dbManager.makeTrackersOfUserQuery(userId, realm).equalTo("isBookmarked", true).findAll().map { it.getSimpleInfo() })
+                    OTShortcutPanelWidgetUpdateService.MODE_ALL -> trackers.addAll(dbManager.makeTrackersOfUserVisibleQuery(userId, realm).findAll().map { it.getSimpleInfo() })
+                    OTShortcutPanelWidgetUpdateService.MODE_SHORTCUT -> trackers.addAll(dbManager.makeTrackersOfUserVisibleQuery(userId, realm).equalTo("isBookmarked", true).findAll().map { it.getSimpleInfo() })
                     OTShortcutPanelWidgetUpdateService.MODE_SELECTIVE -> {
                         val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(widgetId, pref)?.toTypedArray()
                         if (selectedTrackerIds?.isNotEmpty() == true) {
-                            trackers.addAll(dbManager.makeTrackersOfUserQuery(userId, realm).`in`("objectId", selectedTrackerIds).findAll().map { it.getSimpleInfo() })
+                            trackers.addAll(dbManager.makeTrackersOfUserVisibleQuery(userId, realm).`in`("objectId", selectedTrackerIds).findAll().map { it.getSimpleInfo() })
                         }
                     }
                 }
