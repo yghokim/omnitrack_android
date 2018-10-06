@@ -32,4 +32,8 @@ class Fraction {
             other.upper == upper && other.under == under
         } else false
     }
+
+    override fun toString(): String {
+        return "Fraction(upper:$upper, under: $under, float: ${toFloat()})"
+    }
 }

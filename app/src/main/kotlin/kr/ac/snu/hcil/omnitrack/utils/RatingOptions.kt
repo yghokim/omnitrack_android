@@ -151,7 +151,7 @@ class RatingOptions {
             }
 
             DisplayType.Likert -> {
-                var upper = Math.round((fraction.toFloat() * under))
+                var upper = (fraction.toFloat() * under).nearestInt()
                 if (fraction.upper > 0) {
                     upper = Math.max(upper, 1)
                 }
@@ -160,6 +160,6 @@ class RatingOptions {
             }
         }
 
-        return (score * 10 + .5f).toInt() / 10f
+        return (score * 10).nearestInt() / 10f
     }
 }

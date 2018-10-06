@@ -72,6 +72,10 @@ fun Long.toDateString(): String {
     return TimeHelper.FORMAT_YYYY_MM_DD.format(Date(this))
 }
 
+fun Float.nearestInt(): Int {
+    return (Math.abs(this) + .5f).toInt() * (if (this < 0) -1 else 1)
+}
+
 fun Boolean.toInt(): Int {
     return if (this) 1 else 0
 }

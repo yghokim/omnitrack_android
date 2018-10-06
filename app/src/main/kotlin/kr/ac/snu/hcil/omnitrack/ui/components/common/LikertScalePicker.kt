@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
 import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import kr.ac.snu.hcil.omnitrack.utils.nearestInt
 import kotlin.properties.Delegates
 
 /**
@@ -96,6 +97,12 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
             if (fraction == null) {
                 value = null
             } else {
+                value = if (isFractional) {
+                    (fraction.toFloat() * (rightMost - leftMost) + leftMost) * 10f.nearestInt().toFloat() / 10f
+                } else {
+                    (fraction.toFloat() * (rightMost - leftMost) + leftMost).nearestInt().toFloat()
+                }
+                /*
                 val under = if (isFractional) {
                     (rightMost - leftMost) * 10
                 } else {
@@ -106,7 +113,8 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
                     upper = Math.max(upper, 1)
                 }
 
-                value = (((upper.toFloat() / under) * (rightMost - leftMost) + leftMost) * 10 + .5f).toInt() / 10f
+                value = (((upper.toFloat() / under) * (rightMost - leftMost) + leftMost) * 10).nearestInt() / 10f*/
+
             }
         }
 
@@ -229,7 +237,6 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
             return 0
         } else {
             val dl = makeMultilineStaticLayout(text, paint, maxWidth, Layout.Alignment.ALIGN_CENTER)
-            println("text: text length: ${text.length}, lineCount: ${dl.lineCount}, height: ${dl.height}")
             return dl.height
         }
     }
@@ -316,7 +323,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
 
     fun getSnappedValue(original: Float): Float {
         return if (isFractional) {
-            (original * 10 + .5f).toInt() / 10f
+            (original * 10).nearestInt() / 10f
         } else {
             Math.round(original).toFloat()
         }
@@ -327,7 +334,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
     }
 
     fun convertCoordinateToValue(x: Float): Float {
-        return getSnappedValue((rightMost - leftMost) * ((x - _lineLeft) / (_lineRight - _lineLeft)) + leftMost)
+        return (rightMost - leftMost) * ((x - _lineLeft) / (_lineRight - _lineLeft)) + leftMost
     }
 
     override fun onSingleTapUp(p0: MotionEvent): Boolean {
