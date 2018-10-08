@@ -179,8 +179,10 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
 
 
     override fun onSingleTapUp(p0: MotionEvent): Boolean {
-        handleTouchEvent(p0)
-        return true
+        if (!isLightMode) {
+            handleTouchEvent(p0)
+            return true
+        } else return false
     }
 
     override fun onDown(p0: MotionEvent?): Boolean {
