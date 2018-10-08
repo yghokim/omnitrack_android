@@ -83,7 +83,7 @@ class UniqueStringEntryList : IStringSerializable {
     private var increment = -1
     private val list: ArrayList<Entry>
 
-    protected val getNewId: Int get() {
+    protected fun getNewId(): Int {
         return ++increment
     }
 
@@ -116,7 +116,7 @@ class UniqueStringEntryList : IStringSerializable {
 
     constructor(vararg entryNames: String) {
         list = ArrayList<Entry>(entryNames.size)
-        entryNames.map { Entry(getNewId, it) }.toCollection(list)
+        entryNames.map { Entry(getNewId(), it) }.toCollection(list)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -191,8 +191,10 @@ class UniqueStringEntryList : IStringSerializable {
 
     val size: Int get() = list.size
 
-    fun appendNewEntry(text: String = "") {
-        list.add(Entry(getNewId, text))
+    fun appendNewEntry(text: String = ""): Int {
+        val newId = getNewId()
+        list.add(Entry(newId, text))
+        return newId
     }
 
     fun move(fromPosition: Int, toPosition: Int) {

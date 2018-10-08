@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 
 import android.content.Context
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.InputType
@@ -19,6 +20,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import dagger.internal.Factory
 import io.realm.Realm
 import kotlinx.android.synthetic.main.input_choice.view.*
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -32,12 +34,14 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.ui.components.common.TintFancyButton
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingLeft
 import org.jetbrains.anko.backgroundColorResource
 import org.jetbrains.anko.dip
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.HashSet
 import kotlin.properties.Delegates
 
 /**
@@ -54,6 +58,8 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     private var appendNewRowButton: TintFancyButton? = null
 
+    private val appendedEntryIds = HashSet<Int>()
+
 
     @field:[Inject Backend]
     lateinit var realmProvider: Factory<Realm>
@@ -69,13 +75,13 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
                 .inputRangeRes(1, 30, R.color.colorRed)
                 .cancelable(true)
                 .negativeText(R.string.msg_cancel)
-                .input("Insert new choice entry", null, false, { dialog, text ->
+                .input(R.string.msg_insert_new_choice_entry, 0, false) { dialog, text ->
                     if (entries.find { it.text == text } == null) {
-                        setAppendNewRow(text)
+                        appendNewRow(text)
                     } else {
                         Toast.makeText(context, R.string.msg_duplicate_choice_entry, Toast.LENGTH_LONG).show()
                     }
-                })
+                }
     }
 
     init {
@@ -155,7 +161,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     }
 
-    private fun setAppendNewRow(text: CharSequence) {
+    private inline fun modifyEntryList(modifyFunc: (UniqueStringEntryList) -> Boolean) {
         if (boundAttributeObjectId != null) {
             this.realmProvider.get().use { realm ->
                 val attribute = realm.where(OTAttributeDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, boundAttributeObjectId).findFirst()
@@ -164,24 +170,43 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
                     val helper = attribute.getHelper(configuredContext) as OTChoiceAttributeHelper
                     val originalEntryList = helper.getChoiceEntries(attribute)
                     if (originalEntryList != null) {
-                        originalEntryList.appendNewEntry(text.toString())
-                        realm.executeTransaction {
-                            helper.setPropertyValue(OTChoiceAttributeHelper.PROPERTY_ENTRIES, originalEntryList, attribute, realm)
-                        }
-                        attribute.trackerId?.let {
-                            val tracker = realm.where(OTTrackerDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, attribute.trackerId).findFirst()
-                            if (tracker != null) {
-                                realm.executeTransaction {
-                                    tracker.synchronizedAt = null
-                                }
-                                syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
+                        if (modifyFunc(originalEntryList)) {
+                            realm.executeTransaction {
+                                helper.setPropertyValue(OTChoiceAttributeHelper.PROPERTY_ENTRIES, originalEntryList, attribute, realm)
                             }
+                            attribute.trackerId?.let {
+                                val tracker = realm.where(OTTrackerDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, attribute.trackerId).findFirst()
+                                if (tracker != null) {
+                                    realm.executeTransaction {
+                                        tracker.synchronizedAt = null
+                                    }
+                                    syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
+                                }
+                            }
+                            this.entries = originalEntryList.toArray()
                         }
-                        this.entries = originalEntryList.toArray()
                     }
                 }
 
             }
+        }
+    }
+
+    private fun appendNewRow(text: CharSequence) {
+        modifyEntryList { list ->
+            this.appendedEntryIds.add(list.appendNewEntry(text.toString()))
+        }
+    }
+
+    private fun removeAppendedRow(id: Int) {
+        modifyEntryList {
+            val index = it.indexOf(id)
+            if (index != -1) {
+                it.removeAt(it.indexOf(id))
+                this.appendedEntryIds.remove(id)
+                this.selectedIds.remove(id)
+                true
+            } else false
         }
     }
 
@@ -229,6 +254,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
             private val indicator: ImageView = view.findViewById(R.id.ui_checked)
             private val textView: TextView = view.findViewById(R.id.ui_text)
+            private val removeAppendedEntryButton: AppCompatImageButton = view.findViewById(R.id.ui_button_delete)
 
             private var id: Int = -1
 
@@ -257,6 +283,14 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
                             })
                     //textView.setTextColor(resources.getColor(R.color.textColorLight, null))
                 }
+
+                if (appendedEntryIds.contains(id)) {
+                    removeAppendedEntryButton.visibility = View.VISIBLE
+                    removeAppendedEntryButton.setOnClickListener(this)
+                } else {
+                    removeAppendedEntryButton.visibility = View.GONE
+                    removeAppendedEntryButton.setOnClickListener(null)
+                }
             }
 
             val comparer = object : Comparator<Int> {
@@ -275,40 +309,46 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
 
             override fun onClick(view: View?) {
-                if (multiSelectionMode) {
-                    if (selectedIds.contains(id)) {
-                        selectedIds.remove(id)
+                if (view === this.itemView) {
+                    if (multiSelectionMode) {
+                        if (selectedIds.contains(id)) {
+                            selectedIds.remove(id)
+                        } else {
+                            selectedIds.add(id)
+                            sortSelectedIdsByEntryPosition()
+                        }
+
                     } else {
-                        selectedIds.add(id)
-                        sortSelectedIdsByEntryPosition()
-                    }
 
-                } else {
+                        if (!selectedIds.contains(id)) {
+                            if (selectedIds.size > 0) {
+                                for (i in selectedIds.size - 1..0) {
+                                    val selectedId = selectedIds[i]
+                                    selectedIds.removeAt(i)
 
-                    if (!selectedIds.contains(id)) {
-                        if (selectedIds.size > 0) {
-                            for (i in selectedIds.size - 1..0) {
-                                val selectedId = selectedIds[i]
-                                selectedIds.removeAt(i)
-
-                                for (entry in entries.withIndex()) {
-                                    if (entry.value.id == selectedId) {
-                                        notifyItemChanged(entry.index)
-                                        break
+                                    for (entry in entries.withIndex()) {
+                                        if (entry.value.id == selectedId) {
+                                            notifyItemChanged(entry.index)
+                                            break
+                                        }
                                     }
                                 }
                             }
+
+                            selectedIds.add(id)
+                            sortSelectedIdsByEntryPosition()
                         }
-
-                        selectedIds.add(id)
-                        sortSelectedIdsByEntryPosition()
                     }
+
+                    notifyItemChanged(adapterPosition)
+
+                    value = selectedIds.toIntArray()
+
+                } else if (view === this.removeAppendedEntryButton) {
+                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(context, BuildConfig.APP_NAME, context.resources.getString(R.string.msg_confirm_remove_appended_entry), R.string.msg_remove, R.string.msg_cancel, {
+                        removeAppendedRow(id)
+                    }).show()
                 }
-
-
-                notifyItemChanged(adapterPosition)
-
-                value = selectedIds.toIntArray()
             }
 
         }

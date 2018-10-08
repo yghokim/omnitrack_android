@@ -1,27 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/button_height_normal"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/transparent_button_background">
 
     <ImageView
         android:id="@+id/ui_checked"
         android:layout_width="@dimen/choice_indicator_size"
         android:layout_height="@dimen/choice_indicator_size"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="@dimen/choice_indicator_spacing"
         android:scaleType="fitStart"
-        android:src="@drawable/checkbox_checked" />
+        android:src="@drawable/checkbox_checked"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/ui_text"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toEndOf="@+id/ui_checked"
         android:text="Choice Entry 1"
         android:textColor="@color/textColorMid"
         android:textSize="16sp"
-        android:textStyle="bold" />
-</RelativeLayout>
+        android:layout_marginStart="@dimen/choice_indicator_spacing"
+        android:layout_marginEnd="@dimen/choice_indicator_spacing"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/ui_button_delete"
+        app:layout_constraintStart_toEndOf="@id/ui_checked"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginEnd="0dp" />
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/ui_button_delete"
+        style="@style/TransparentButtonStyle"
+        android:layout_width="@dimen/button_height_tiny"
+        android:layout_height="@dimen/button_height_tiny"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:tint="@color/buttonIconColorDark"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ex" />
+</android.support.constraint.ConstraintLayout>

@@ -647,5 +647,7 @@
     <string name="msg_sampling_range">Sampling Range</string>
     <string name="msg_unsupported_connection">Unsupported connection in this version</string>
     <string name="msg_menu_details">Details</string>
+    <string name="msg_insert_new_choice_entry">Insert new choice entry</string>
+    <string name="msg_confirm_remove_appended_entry">Remove the appended entry?</string>
 
 </resources>
