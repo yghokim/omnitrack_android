@@ -21,5 +21,7 @@ Seoul National University
 ## License
 
 ### Source Code
+MIT License
 
-### Design Resources including Logos and Assets
+### Original Design Resources including Logos and Assets
+CC BY 4.0
