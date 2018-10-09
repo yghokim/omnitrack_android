@@ -261,6 +261,8 @@
             android:launchMode="singleTop"
             android:taskAffinity="" />
 
+        <activity android:name=".ui.pages.items.ItemEditActivity" />
+
         <activity android:name=".ui.pages.items.ItemBrowserActivity" />
         <activity
             android:name=".ui.components.common.activity.WebServiceLoginActivity"
