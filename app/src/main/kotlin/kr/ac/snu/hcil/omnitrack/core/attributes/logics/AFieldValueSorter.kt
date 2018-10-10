@@ -16,11 +16,11 @@ abstract class AFieldValueSorter(val attributeLocalId: String) : ItemComparator(
         return if (valueA != null && valueB != null) {
             return compareValues(valueA, valueB)
         } else {
-            if (valueA != null) {
-                1
-            } else if (valueB != null) {
-                -1
-            } else 0
+            when {
+                valueA != null -> 1
+                valueB != null -> -1
+                else -> 0
+            }
         }
     }
 }

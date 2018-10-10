@@ -46,7 +46,7 @@ class OTTimeAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeH
     }
 
 
-    val formats = mapOf<Int, SimpleDateFormat>(
+    val formats = mapOf(
             Pair(GRANULARITY_DAY, SimpleDateFormat(configuredContext.applicationContext.getString(R.string.property_time_format_granularity_day))),
             Pair(GRANULARITY_MINUTE, SimpleDateFormat(configuredContext.applicationContext.getString(R.string.property_time_format_granularity_minute))),
             Pair(GRANULARITY_SECOND, SimpleDateFormat(configuredContext.applicationContext.getString(R.string.property_time_format_granularity_second)))
@@ -92,7 +92,7 @@ class OTTimeAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeH
     override fun <T> getPropertyHelper(propertyKey: String): OTPropertyHelper<T> {
         return when (propertyKey) {
             GRANULARITY -> propertyManager.getHelper(OTPropertyManager.EPropertyType.Selection)
-            else -> throw IllegalArgumentException("Unsupported property type ${propertyKey}")
+            else -> throw IllegalArgumentException("Unsupported property type $propertyKey")
         } as OTPropertyHelper<T>
     }
 

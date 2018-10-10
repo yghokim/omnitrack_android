@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncQueueDbHelper
 /**
  * Created by younghokim on 2017. 11. 4..
  */
-@Module(includes = arrayOf(BackendDatabaseModule::class))
+@Module(includes = [BackendDatabaseModule::class])
 class SynchronizationModule {
 
     @Provides

@@ -98,7 +98,7 @@ class MultiLineChartDrawer(context: Context) : ATimelineChartDrawer(context) {
                 it as ILineChartOnTime.TimeSeriesTrendData
             })
 
-            println("data : ${data}")
+            println("data : $data")
 
             val dataArray = data.toTypedArray()
             val minValue = ILineChartOnTime.TimeSeriesTrendData.minValue(*dataArray).toFloat()

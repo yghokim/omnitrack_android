@@ -42,11 +42,11 @@ class TimeSeriesPlotModel(tracker: OTTrackerDAO, protected val timeAttribute: OT
             if (yAttributeHelper is ISingleNumberAttributeHelper) {
                 val items = dbManager.getItemsQueriedWithTimeAttribute(tracker.objectId, getTimeScope(), timeAttributeLocalId, realm)
                 return@defer Single.just(
-                        items.filter { it.getValueOf(yValueAttributeLocalId) != null }.map {
+                        items.asSequence().filter { it.getValueOf(yValueAttributeLocalId) != null }.map {
                             Pair(
                                     (it.getValueOf(timeAttributeLocalId) as TimePoint).timestamp,
                                     yAttributeHelper.convertValueToSingleNumber(it.getValueOf(yValueAttributeLocalId)!!, yAttribute))
-                        }
+                        }.toList()
                 )
             } else return@defer Single.just<List<Pair<Long, Double>>>(emptyList())
         }
@@ -54,7 +54,7 @@ class TimeSeriesPlotModel(tracker: OTTrackerDAO, protected val timeAttribute: OT
 
     override fun getDataInJsonString(): String {
         val timeScope = getTimeScope()
-        val json = "{\"range\":{\"from\":${timeScope.from}, \"to\":${timeScope.to}, \"timezone\":\"${timeScope.timeZone.id}\"}, \"labels\":{\"t\":\"$timeAttributeName\", \"y\":\"${yAttributeName}\"}, \"data\":[${cachedData.map { "{\"t\":${it.first}, \"y\": ${it.second}}" }.joinToString(", ")}]}"
+        val json = "{\"range\":{\"from\":${timeScope.from}, \"to\":${timeScope.to}, \"timezone\":\"${timeScope.timeZone.id}\"}, \"labels\":{\"t\":\"$timeAttributeName\", \"y\":\"$yAttributeName\"}, \"data\":[${cachedData.joinToString(", ") { "{\"t\":${it.first}, \"y\": ${it.second}}" }}]}"
         println(json)
         return json
     }

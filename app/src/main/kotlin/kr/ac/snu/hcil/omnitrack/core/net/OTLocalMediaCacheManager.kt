@@ -24,7 +24,8 @@ class OTLocalMediaCacheManager(val context: Context, val authManager: Lazy<OTAut
 
 
     fun getDefaultItemCacheDir(trackerId: String, createIfNotExist: Boolean = true): File {
-        val file = context.externalCacheDir.resolve("${authManager.get().userId ?: "anonymous"}/${trackerId}")
+        val file = context.externalCacheDir.resolve("${authManager.get().userId
+                ?: "anonymous"}/$trackerId")
         if (createIfNotExist && !file.exists()) {
             file.mkdirs()
         }

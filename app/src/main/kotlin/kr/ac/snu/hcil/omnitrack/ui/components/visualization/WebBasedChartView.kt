@@ -157,7 +157,7 @@ class WebBasedChartView : FrameLayout, IChartView {
     inner class ChartWebViewClient : WebViewClient() {
         override fun onPageFinished(view: WebView, url: String) {
             super.onPageFinished(view, url)
-            println("webview page finished for ${url}")
+            println("webview page finished for $url")
             if (!isWebViewReady && url.startsWith(INITIALIZE_URL)) {
                 println("webview chart is now ready.")
                 spinner.visibility = View.GONE
@@ -178,12 +178,12 @@ class WebBasedChartView : FrameLayout, IChartView {
 
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
             super.onPageStarted(view, url, favicon)
-            println("webview page started: ${url}")
+            println("webview page started: $url")
         }
 
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
             super.onReceivedError(view, request, error)
-            println("webview error when ${request}")
+            println("webview error when $request")
             println(error)
         }
 
@@ -196,7 +196,7 @@ class WebBasedChartView : FrameLayout, IChartView {
 
         override fun onReceivedHttpError(view: WebView, request: WebResourceRequest, errorResponse: WebResourceResponse) {
             super.onReceivedHttpError(view, request, errorResponse)
-            println("http error when ${request}")
+            println("http error when $request")
         }
 
         override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {

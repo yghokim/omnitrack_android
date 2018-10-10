@@ -25,8 +25,8 @@ class OTBinaryLocalCacheService : Service() {
         const val TAG = "OTBinaryLocalCacheService"
 
         const val PREFIX_ACTION = "${OTApp.PREFIX_ACTION}.item_media_cache"
-        const val INTENT_ACTION_REQUEST_CACHE = "${PREFIX_ACTION}.request_cache"
-        const val INTENT_ACTION_RESPONSE_CACHE_STATUS = "${PREFIX_ACTION}.response_cache_status"
+        const val INTENT_ACTION_REQUEST_CACHE = "$PREFIX_ACTION.request_cache"
+        const val INTENT_ACTION_RESPONSE_CACHE_STATUS = "$PREFIX_ACTION.response_cache_status"
 
         const val INTENT_EXTRA_SERVER_PATH = "${BuildConfig.APPLICATION_ID}.intent.extra.serverPath"
         const val INTENT_EXTRA_STATUS = "${BuildConfig.APPLICATION_ID}.intent.extra.status"

@@ -20,10 +20,7 @@ class PermissionDependencyResolver(vararg permissions: String) : OTSystemDepende
 
     override fun checkDependencySatisfied(context: Context, selfResolve: Boolean): Single<DependencyCheckResult> {
         return Single.just(
-                if (
-                permissionNames.map { permission -> ContextCompat.checkSelfPermission(context, permission) }
-                        .filter { it != PackageManager.PERMISSION_GRANTED }
-                        .isEmpty()) {
+                if (permissionNames.asSequence().map { permission -> ContextCompat.checkSelfPermission(context, permission) }.none { it != PackageManager.PERMISSION_GRANTED }) {
                     DependencyCheckResult(DependencyState.Passed, "Permissions are all granted", "")
                 } else {
                     DependencyCheckResult(DependencyState.FatalFailed, "Need some additional permissions to be granted", "Request")
@@ -35,7 +32,7 @@ class PermissionDependencyResolver(vararg permissions: String) : OTSystemDepende
         return RxPermissions(activity)
                 .request(*(this.permissionNames.toTypedArray()))
                 .toList()
-                .map { list -> list.filter { it == false }.isEmpty() }
+                .map { list -> list.none { it == false } }
     }
 
 

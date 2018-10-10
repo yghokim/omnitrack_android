@@ -39,7 +39,6 @@ class AttributeEditDialogFragment : DialogFragment() {
 
     companion object {
         const val TAG = "AttributeEditDialog"
-        const val EXTRA_SERIALIZED_VALUE = "serializedValue"
 
         fun makeInstance(itemId: String, attributeLocalId: String, trackerId: String, listener: Listener): AttributeEditDialogFragment {
             val args = Bundle()
@@ -275,7 +274,7 @@ class AttributeEditDialogFragment : DialogFragment() {
         }
 
         fun init(trackerId: String, itemId: String, attributeLocalId: String) {
-            if (initialized == false) {
+            if (!initialized) {
                 this.trackerId = trackerId
                 this.attributeLocalId = attributeLocalId
                 this.itemId = itemId

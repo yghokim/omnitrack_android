@@ -28,7 +28,7 @@ open class OfflineTriggerListViewModel(app: Application) : ATriggerListViewModel
 
         if (savedInstanceState != null) {
             val serializedDaos = savedInstanceState.getStringArray("triggerDaos")
-            if (serializedDaos != null && serializedDaos.size > 0) {
+            if (serializedDaos != null && serializedDaos.isNotEmpty()) {
                 currentTriggerViewModels.addAll(serializedDaos.map { TriggerViewModel(configuredContext, triggerTypeAdapter.get().fromJson(it), realm) })
                 notifyNewTriggerViewModels()
             }

@@ -113,7 +113,7 @@ class OTReminderAction : OTTriggerAction() {
             if (triggerTime != null && popupTriggersQueue.isNotEmpty()) {
                 val TAG = "ReminderPopup"
 
-                Log.d(TAG, "notify popup for ${popupTriggersQueue.size} triggers at ${popupTriggerQueueTime}")
+                Log.d(TAG, "notify popup for ${popupTriggersQueue.size} triggers at $popupTriggerQueueTime")
                 val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
                 val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
 

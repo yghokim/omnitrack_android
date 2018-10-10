@@ -60,12 +60,11 @@ class OTTableExportService : WakefulService(TAG) {
 
 
         fun makeIntent(context: Context, trackerId: String, exportUri: String, includeFiles: Boolean, tableFileType: TableFileType): Intent {
-            val intent = Intent(context, OTTableExportService::class.java)
+            return Intent(context, OTTableExportService::class.java)
                     .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
                     .putExtra(EXTRA_EXPORT_URI, exportUri)
                     .putExtra(EXTRA_EXPORT_CONFIG_INCLUDE_FILE, includeFiles)
                     .putExtra(EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE, tableFileType.toString())
-            return intent
         }
 
         fun makeConfigurationDialog(context: Context, configuredContext: ConfiguredContext, tracker: OTTrackerDAO, onConfigured: (includeFiles: Boolean, tableFileType: TableFileType) -> Unit): MaterialDialog.Builder {
@@ -84,7 +83,7 @@ class OTTableExportService : WakefulService(TAG) {
             val excelRadioButton = view.findViewById<RadioButton>(R.id.ui_radio_export_type_excel)
             val csvRadioButton = view.findViewById<RadioButton>(R.id.ui_radio_export_type_csv)
 
-            val builder = MaterialDialog.Builder(context)
+            return MaterialDialog.Builder(context)
                     .title(context.getString(R.string.msg_configure_export))
                     .cancelable(true)
                     .customView(view, false)
@@ -99,8 +98,6 @@ class OTTableExportService : WakefulService(TAG) {
                             TableFileType.CSV
                         })
                     }
-
-            return builder
         }
 
     }
@@ -147,8 +144,8 @@ class OTTableExportService : WakefulService(TAG) {
             val externalFilesInvolved: Boolean = intent.getBooleanExtra(EXTRA_EXPORT_CONFIG_INCLUDE_FILE, false)
             val tableType = TableFileType.valueOf(intent.getStringExtra(EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE))
 
-            println("include external files:${externalFilesInvolved}")
-            println("table file type: ${tableType}")
+            println("include external files:$externalFilesInvolved")
+            println("table file type: $tableType")
 
             var cacheDirectory: File? = null
 
@@ -218,7 +215,7 @@ class OTTableExportService : WakefulService(TAG) {
                                         cacheDirectory?.mkdirs()
                                 }
 
-                                involvedFileList = ArrayList<String>()
+                                involvedFileList = ArrayList()
                             }
 
                             table.columns.add("index")

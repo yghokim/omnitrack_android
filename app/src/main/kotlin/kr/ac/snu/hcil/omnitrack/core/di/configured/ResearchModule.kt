@@ -43,7 +43,7 @@ class ResearchModule {
     @Configured
     @Research
     fun makeResearchDbRealmProvider(@Research configuration: RealmConfiguration): Factory<Realm> {
-        return Factory<Realm> { Realm.getInstance(configuration) }
+        return Factory { Realm.getInstance(configuration) }
     }
 
     @Provides

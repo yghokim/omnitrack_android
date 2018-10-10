@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.system
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
@@ -37,9 +38,10 @@ class OTExternalSettingsPrompter(private val context: Context) {
     }
 
     fun isBatteryOptimizationWhiteListed(): Boolean {
-        return Companion.isBatteryOptimizationWhiteListed(context)
+        return isBatteryOptimizationWhiteListed(context)
     }
 
+    @SuppressLint("BatteryLife")
     fun askUserBatterOptimizationWhitelist() {
         if (Build.VERSION.SDK_INT >= 23) {
 

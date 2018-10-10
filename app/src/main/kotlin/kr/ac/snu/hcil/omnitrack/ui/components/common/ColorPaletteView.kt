@@ -85,7 +85,7 @@ class ColorPaletteView : ConstraintLayout, View.OnClickListener {
             }
         }
 
-        if (colorPalette.size > 0) {
+        if (colorPalette.isNotEmpty()) {
             val constraints = ConstraintSet()
             constraints.clone(this)
 

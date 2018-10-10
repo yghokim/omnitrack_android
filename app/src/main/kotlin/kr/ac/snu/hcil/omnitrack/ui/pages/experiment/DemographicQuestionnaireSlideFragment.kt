@@ -61,8 +61,8 @@ class DemographicQuestionnaireSlideFragment : ExperimentSignUpActivity.SlideFrag
 
     @JavascriptInterface
     fun onSubmitted(serializedError: String?, serializedValues: String?) {
-        println("serializedError: ${serializedError}")
-        println("serializedValues: ${serializedValues}")
+        println("serializedError: $serializedError")
+        println("serializedValues: $serializedValues")
         if (serializedError != null) {
             val errorObj = (act.applicationContext as OTAndroidApp).serializationComponent.genericGson().fromJson(serializedError, JsonObject::class.java)
             if (errorObj.getStringCompat("error") == "RequiredFields") {
@@ -85,7 +85,7 @@ class DemographicQuestionnaireSlideFragment : ExperimentSignUpActivity.SlideFrag
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
             if (url?.startsWith(INITIALIZE_URL) == true) {
-                view?.evaluateJavascript("init(${schemaString})") { result ->
+                view?.evaluateJavascript("init($schemaString)") { result ->
                     println("initResult:")
                     println(result)
                 }

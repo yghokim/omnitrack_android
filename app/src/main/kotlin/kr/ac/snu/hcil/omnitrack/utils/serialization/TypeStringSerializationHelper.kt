@@ -12,7 +12,7 @@ import java.util.*
  */
 
 fun LatLng.serialize(): String {
-    return "${latitude},${longitude}"
+    return "$latitude,$longitude"
 }
 
 fun deserializeLatLng(serialized: String): LatLng {

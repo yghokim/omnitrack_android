@@ -162,7 +162,7 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
         } else if (event.x > paddingLeft + currentCellWidth * adapter.numDrawables) {
             score = levels.toFloat()
         } else {
-            for (i in 0..adapter.numDrawables - 1) {
+            for (i in 0 until adapter.numDrawables) {
                 val left = paddingLeft + i * currentCellWidth
                 val right = left + currentCellWidth
 

@@ -20,7 +20,7 @@ class DateTimePickerDialogFragment : DialogFragment() {
     companion object {
         private fun setDateLabel(tabHost: TabHost, year: Int, zeroBasedMonth: Int, day: Int) {
             val labelView: TextView = tabHost.tabWidget.getChildAt(0).findViewById(android.R.id.title)
-            labelView.text = "${year}-${zeroBasedMonth + 1}-${day}"
+            labelView.text = "$year-${zeroBasedMonth + 1}-$day"
         }
 
         private fun setTimeLabel(tabHost: TabHost, hourOfDay: Int, minute: Int) {

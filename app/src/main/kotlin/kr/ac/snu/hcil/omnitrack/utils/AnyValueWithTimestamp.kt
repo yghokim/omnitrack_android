@@ -10,12 +10,14 @@ data class AnyValueWithTimestamp(override var value: Any?, override var timestam
     constructor(nullable: Nullable<out Any>):this(nullable.datum, if(nullable.datum==null)null else System.currentTimeMillis())
 
     override fun toString(): String {
-        return "TimestampValueInfo{ timestamp: ${timestamp}, value: ${value}, valueType: ${value?.javaClass}}"
+        return "TimestampValueInfo{ timestamp: $timestamp, value: $value, valueType: ${value?.javaClass}}"
     }
 
     override fun equals(other: Any?): Boolean {
-        return if (other === this) true else if (other is AnyValueWithTimestamp) {
-            other.timestamp == timestamp && other.value == value
-        } else false
+        return when {
+            other === this -> true
+            other is AnyValueWithTimestamp -> other.timestamp == timestamp && other.value == value
+            else -> false
+        }
     }
 }

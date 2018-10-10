@@ -204,7 +204,7 @@ class DateTimePicker : ConstraintLayout {
         dateFormat = SimpleDateFormat(resources.getString(R.string.dateformat_ymd))
         //android.text.format.DateFormat.getMediumDateFormat()
 
-        hourNames = Array<String>(24) {
+        hourNames = Array(24) {
             index ->
             String.format(resources.getString(if (index < 12) {
                 R.string.format_hour_am

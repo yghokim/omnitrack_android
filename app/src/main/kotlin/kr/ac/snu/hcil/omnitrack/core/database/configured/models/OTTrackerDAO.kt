@@ -149,7 +149,7 @@ open class OTTrackerDAO : RealmObject() {
             } else {
                 triggers?.filter { it.removed == false && it.actionType == OTTriggerDAO.ACTION_TYPE_REMIND }
             }?.map { it.getSimpleInfo(false) }
-                    ?.toTypedArray() ?: emptyArray<OTTriggerDAO.SimpleTriggerInfo>()
+                    ?.toTypedArray() ?: emptyArray()
         } else {
             null
         })

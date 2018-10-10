@@ -150,7 +150,6 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
         }
     }
 
-    val recordingComplete = Event<Long>()
     val fileRemoved = Event<Long>()
 
     private val mainButton: AudioRecordingButton
@@ -269,7 +268,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
 
     private fun tryStartRecordService() {
 
-        println("start recording: ${mediaSessionId}")
+        println("start recording: $mediaSessionId")
 
         if (OTAudioRecordService.isRecording) {
             tryStopRecordService()
@@ -293,7 +292,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
     }
 
     private fun tryStopRecordService() {
-        println("stop recording: ${mediaSessionId}")
+        println("stop recording: $mediaSessionId")
         LocalBroadcastManager.getInstance(context)
                 .sendBroadcast(OTAudioRecordService.makeStopIntent(context, mediaSessionId))
     }
@@ -351,7 +350,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
         if (state == State.RECORDING) {
             tryStopRecordService()
             return stateObservable.filter {
-                println("state: ${it}")
+                println("state: $it")
                 it == State.FILE_MOUNTED
             }.firstOrError().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).timeout(2, TimeUnit.SECONDS).onErrorReturn { State.FILE_MOUNTED }.map { state -> Nullable(audioFileUri) }
         } else {
@@ -369,7 +368,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
                 OTAudioPlayService.INTENT_ACTION_EVENT_AUDIO_COMPLETED -> {
                     val sessionId = intent.getStringExtra(OTAudioPlayService.INTENT_EXTRA_SESSION_ID)
                     if (sessionId == mediaSessionId) {
-                        println("audio stopped: ${mediaSessionId}")
+                        println("audio stopped: $mediaSessionId")
                         playBar.clear()
                         refreshTimeViews(0)
                         playerButton.setImageResource(R.drawable.play_dark)
@@ -388,7 +387,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
                 OTAudioRecordService.INTENT_ACTION_EVENT_RECORD_START_CALLBACK -> {
                     println("received recording callback.")
                     val sessionId = intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_SESSION_ID)
-                    println("this sessionId: ${mediaSessionId} / intent session id: ${sessionId}")
+                    println("this sessionId: $mediaSessionId / intent session id: $sessionId")
                     if (sessionId == mediaSessionId) {
                         playBar.currentProgressRatio = 0f
                         playBar.amplitudeTimelineProvider = OTAudioRecordService.currentRecordingModule
@@ -414,7 +413,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
                     val sessionId = intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_SESSION_ID)
                     val resultUri = Uri.parse(intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_RECORD_URI))
                     if (sessionId == mediaSessionId) {
-                        println("this recorder view was completed - ${sessionId}")
+                        println("this recorder view was completed - $sessionId")
                         refreshTimeViews(0)
                         playBar.clear()
                         audioFileUri = resultUri

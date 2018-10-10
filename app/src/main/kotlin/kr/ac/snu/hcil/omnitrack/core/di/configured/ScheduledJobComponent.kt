@@ -11,7 +11,7 @@ import javax.inject.Provider
  * Created by Young-Ho on 11/3/2017.
  */
 @Configured
-@Subcomponent(modules = arrayOf(ScheduledJobModule::class))
+@Subcomponent(modules = [ScheduledJobModule::class])
 interface ScheduledJobComponent {
 
     @Subcomponent.Builder

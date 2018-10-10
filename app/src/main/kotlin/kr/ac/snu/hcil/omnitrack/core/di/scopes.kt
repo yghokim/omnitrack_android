@@ -7,11 +7,3 @@ import javax.inject.Scope
  */
 @Scope
 @Retention(AnnotationRetention.RUNTIME) annotation class Configured
-
-@Scope
-@Retention(AnnotationRetention.RUNTIME)
-annotation class ForFragment
-
-@Scope
-@Retention(AnnotationRetention.RUNTIME)
-annotation class ForActivity

@@ -106,14 +106,14 @@ class NumberStyle {
         val formatStringBuilder = StringBuilder().append('#')
         if (commaUnit > 0) {
             formatStringBuilder.append(",")
-            for (i in 0..commaUnit - 1) {
+            for (i in 0 until commaUnit) {
                 formatStringBuilder.append('#')
             }
         }
 
         if (fractionPart > 0) {
             formatStringBuilder.append('.')
-            for (i in 0..fractionPart - 1) {
+            for (i in 0 until fractionPart) {
                 formatStringBuilder.append('#')
             }
         }

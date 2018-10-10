@@ -95,7 +95,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     val hasTrackerRemovedOutside = BehaviorSubject.create<String>()
     val trackerIdObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable(null))
 
-    val reminderCountObservable = BehaviorSubject.createDefault<Int>(0)
+    val reminderCountObservable = BehaviorSubject.createDefault(0)
 
     val nameObservable = BehaviorSubject.createDefault<String>("")
     val isBookmarkedObservable = BehaviorSubject.createDefault<Boolean>(false)
@@ -304,7 +304,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 }
             }
 
-            if (BuildConfig.DISABLE_EXTERNAL_ENTITIES == false) {
+            if (!BuildConfig.DISABLE_EXTERNAL_ENTITIES) {
                 subscriptions.add(
                         researchRealm.where(OTExperimentDAO::class.java)
                                 .isNull("droppedAt")
@@ -358,7 +358,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     fun moveAttribute(from: Int, to: Int) {
         if (trackerDao != null) {
-            val attributes = currentAttributeViewModelList.map { it.attributeDAO }.toMutableList()
+            val attributes = currentAttributeViewModelList.asSequence().map { it.attributeDAO }.toMutableList()
             attributes.move(from, to)
             realm.executeTransactionIfNotIn {
                 trackerDao?.attributes?.removeAll(attributes)
@@ -529,11 +529,11 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
         val nameObservable = BehaviorSubject.createDefault<String>("")
         val isRequiredObservable = BehaviorSubject.createDefault<Boolean>(false)
-        val typeObservable = BehaviorSubject.createDefault<Int>(-1)
+        val typeObservable = BehaviorSubject.createDefault(-1)
         val iconObservable = BehaviorSubject.createDefault<Int>(R.drawable.icon_small_longtext)
         val connectionObservable = BehaviorSubject.create<Nullable<OTConnection>>()
         val defaultValuePolicyObservable = BehaviorSubject.createDefault<Int>(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL)
-        val defaultValuePresetObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable<String>(null))
+        val defaultValuePresetObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable(null))
 
         val isHiddenObservable = BehaviorSubject.createDefault(false)
 

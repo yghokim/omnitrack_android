@@ -45,7 +45,7 @@ class JawboneUpService(context: Context) : OTExternalService(context, "JawboneUp
     }
 
     fun makeIntraDayRequestQueryParams(start: Date, end: Date, data: HashMap<String, Long>?): HashMap<String, Long> {
-        val result = data ?: HashMap<String, Long>()
+        val result = data ?: HashMap()
 
         result.put("date", makeFormattedDateInteger(start.time).toLong())
         result.put("start_date", start.time)

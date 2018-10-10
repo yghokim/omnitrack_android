@@ -5,7 +5,7 @@ import kr.ac.snu.hcil.omnitrack.utils.Ticker
 /**
  * Created by Young-Ho Kim on 2016-09-29.
  */
-abstract class AAudioModule(val progressTerm: Int = 200) {
+abstract class AAudioModule(private val progressTerm: Int = 200) {
 
     private val ticker: Ticker
 

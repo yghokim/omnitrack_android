@@ -44,7 +44,7 @@ abstract class OTFileInvolvedAttributeHelper(configuredContext: ConfiguredContex
                         val outputStream = FileOutputStream(outputUri.path)
                         FileHelper.dumpStreamToOther(inputStream, outputStream)
                         inputStream.close()
-                    println("copied local cached file - ${resultUri}.")
+                    println("copied local cached file - $resultUri.")
                     }
                 return@flatMap Single.just(outputUri)
             }

@@ -41,9 +41,9 @@ abstract class OAuth2BasedExternalService(context: Context, identifier: String, 
             val cd = credential
             if (cd != null) {
                 return@defer authClient.signOut(cd).doOnError {
-                    println("${identifier} OAuth2 sign out failed.")
+                    println("$identifier OAuth2 sign out failed.")
                 }.doOnComplete {
-                    println("${identifier} OAuth2 signed out.")
+                    println("$identifier OAuth2 signed out.")
                     credential = null
                 }
             } else return@defer Completable.complete()

@@ -84,9 +84,21 @@ fun Int.toBoolean(): Boolean {
     return this != 0
 }
 
+fun <T> arrayEquals(a: Array<T>?, b: Array<T>?): Boolean {
+    return if (a != null && b != null) {
+        a.contentEquals(b)
+    } else a == null && b == null
+}
+
+fun arrayEquals(a: IntArray?, b: IntArray?): Boolean {
+    return if (a != null && b != null) {
+        a.contentEquals(b)
+    } else a == null && b == null
+}
+
 fun List<*>.isSame(other: List<*>): Boolean {
     if (this.size == other.size) {
-        for (i in 0..this.size - 1) {
+        for (i in 0 until this.size) {
             if (this[i] != other[i]) {
                 return false
             }
@@ -215,7 +227,7 @@ fun HashMap<String, Any?>.toJson(gson: Gson): String {
 fun List<*>.move(fromPosition: Int, toPosition: Int): Boolean {
     if (fromPosition != toPosition) {
         if (fromPosition < toPosition) {
-            for (i in fromPosition..toPosition - 1) {
+            for (i in fromPosition until toPosition) {
                 Collections.swap(this, i, i + 1)
             }
         } else {

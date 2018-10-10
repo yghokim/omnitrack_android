@@ -72,8 +72,8 @@ class RescueTimeComputerUsageDurationMeasureFactory(context: Context, service: R
 
     val usageDurationCalculator = object : RescueTimeService.ISummaryCalculator<Double> {
         override fun calculate(list: List<JSONObject>, startDate: Date, endDate: Date): Double? {
-            return if (list.size > 0)
-                list.map { it.getDouble(RescueTimeService.SUMMARY_VARIABLE_TOTAL_HOURS) }.sum()
+            return if (list.isNotEmpty())
+                list.asSequence().map { it.getDouble(RescueTimeService.SUMMARY_VARIABLE_TOTAL_HOURS) }.sum()
             else null
         }
 

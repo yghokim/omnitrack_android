@@ -83,7 +83,7 @@ class ConnectionWizardView : WizardView {
 
 
     inner class Adapter(attribute: OTAttributeDAO, context: Context) : AWizardViewPagerAdapter(context) {
-        val pages = Array<AWizardPage>(3) {
+        val pages = Array(3) {
             index ->
             when (index) {
                 PAGE_INDEX_SOURCE_SELECTION -> SourceSelectionPage(this@ConnectionWizardView, attribute)

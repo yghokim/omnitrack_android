@@ -14,7 +14,6 @@ import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.*
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
@@ -81,7 +80,7 @@ class BackendDbManager @Inject constructor(
 
 
         fun <T> branchCheckDefaultExperimentId(query: RealmQuery<T>): RealmQuery<T> {
-            return if (BuildConfig.DISABLE_EXTERNAL_ENTITIES == true) {
+            return if (BuildConfig.DISABLE_EXTERNAL_ENTITIES) {
                 query.equalTo(BackendDbManager.FIELD_EXPERIMENT_ID_IN_FLAGS, BuildConfig.DEFAULT_EXPERIMENT_ID)
             } else query
         }
@@ -271,11 +270,6 @@ class BackendDbManager @Inject constructor(
 
     fun makeSingleItemQuery(itemId: String, realm: Realm): RealmQuery<OTItemDAO> {
         return realm.where(OTItemDAO::class.java).equalTo("objectId", itemId)
-    }
-
-
-    fun getItemBuilderQuery(trackerId: String, holderType: Int, realm: Realm): RealmQuery<OTItemBuilderDAO> {
-        return realm.where(OTItemBuilderDAO::class.java).equalTo("tracker.objectId", trackerId).equalTo("holderType", holderType)
     }
 
     fun makeTriggersOfUserVisibleQuery(userId: String, realm: Realm): RealmQuery<OTTriggerDAO> {

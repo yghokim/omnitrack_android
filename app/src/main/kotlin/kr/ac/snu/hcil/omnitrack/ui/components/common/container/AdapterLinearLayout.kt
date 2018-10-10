@@ -206,7 +206,7 @@ class AdapterLinearLayout : DragLinearLayout {
             adapter?.let {
                 adapter ->
 
-                for (i in position..childCount - 1) {
+                for (i in position until childCount) {
                     val vh = getChildAt(i)?.tag as? AViewHolder
                     if (vh != null) {
                         vh.adapterPosition++
@@ -227,7 +227,7 @@ class AdapterLinearLayout : DragLinearLayout {
             adapter?.let {
                 adapter ->
 
-                for (i in position + 1..childCount - 1) {
+                for (i in position + 1 until childCount) {
                     val vh = getChildAt(i)?.tag as? AViewHolder
                     if (vh != null) {
                         vh.adapterPosition--
@@ -318,7 +318,7 @@ class AdapterLinearLayout : DragLinearLayout {
     fun refreshAllViews() {
 
         //shrink
-        for (i in 0..this.childCount - 1) {
+        for (i in 0 until this.childCount) {
             val removed = getChildAt(i)
 
             val tag = removed.tag
@@ -331,7 +331,7 @@ class AdapterLinearLayout : DragLinearLayout {
 
         adapter?.let {
             adapter ->
-            for (i in 0..adapter.count - 1) {
+            for (i in 0 until adapter.count) {
                 val view = makeView(i)
 
                 if (this.indexOfChild(view) == -1) {
@@ -343,7 +343,7 @@ class AdapterLinearLayout : DragLinearLayout {
 
                 requestLayout()
 
-                println("refresh finished. child count: ${childCount}, adapter count: ${adapter.count}")
+                println("refresh finished. child count: $childCount, adapter count: ${adapter.count}")
             }
         }
     }

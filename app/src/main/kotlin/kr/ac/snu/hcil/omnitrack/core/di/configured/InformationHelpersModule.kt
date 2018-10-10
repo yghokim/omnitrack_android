@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.di.Configured
 /**
  * Created by Young-Ho on 11/3/2017.
  */
-@Module(includes = arrayOf(AuthModule::class))
+@Module(includes = [AuthModule::class])
 class InformationHelpersModule {
 
     @Provides

@@ -178,13 +178,13 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
     override fun makeInformationText(): CharSequence {
         return when (timeConditionType) {
             TIME_CONDITION_SAMPLING -> {
-                "Random ${samplingCount} times per day"
+                "Random $samplingCount times per day"
             }
             TIME_CONDITION_ALARM -> {
                 "Alarm at ${String.format("%02d", this.alarmTimeHour)}:${String.format("%02d", this.alarmTimeMinute)}"
             }
             TIME_CONDITION_INTERVAL -> {
-                "With ${intervalSeconds} secs interval"
+                "With $intervalSeconds secs interval"
             }
             else -> "Unsupported condition"
         }

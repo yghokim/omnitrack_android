@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTT
 class BackendRealmMigration : RealmMigration {
 
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
-        println("migrate realm from ${oldVersion} to ${newVersion}")
+        println("migrate realm from $oldVersion to $newVersion")
 
         val schema = realm.schema
 

@@ -63,7 +63,5 @@ class UsageLoggingModule {
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class UsageLogger
 
-@RealmModule(classes = arrayOf(
-        UsageLog::class
-))
+@RealmModule(classes = [UsageLog::class])
 class UsageLogsRealmModule

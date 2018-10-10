@@ -53,7 +53,7 @@ class IntervalTimeScheduleCalculator : TimeScheduleCalculator() {
 
     override fun calculateInfiniteNextTime(last: Long?, now: Long): WritablePair<Long, JsonObject?>? {
 
-        println("trigger time last: ${last}, now: ${now}")
+        println("trigger time last: $last, now: $now")
         OTApp.logger.writeSystemLog("calc next alarm. last: ${last?.let { LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(last)) }}, now: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(now))}", "IntervalTimeScheduleCalculator")
         val realPivot: Long = last ?: now
         val isHourRangeBound = fromHourOfDay != toHourOfDay
@@ -145,7 +145,7 @@ class IntervalTimeScheduleCalculator : TimeScheduleCalculator() {
                 cacheCalendar.timeInMillis = TimeHelper.cutTimePartFromEpoch(timePoint) + offset * DateUtils.DAY_IN_MILLIS
                 if (isAvailableDayOfWeek(cacheCalendar.getDayOfWeek())) {
                     val rangeStartAt = cacheCalendar.timeInMillis + rangeOffsetHour * DateUtils.HOUR_IN_MILLIS
-                    if (timePoint in (rangeStartAt..rangeStartAt + rangeLengthHour * DateUtils.HOUR_IN_MILLIS - 1)) {
+                    if (timePoint in (rangeStartAt until rangeStartAt + rangeLengthHour * DateUtils.HOUR_IN_MILLIS)) {
                         currentPivotStartValue = rangeStartAt
                         break
                     }

@@ -97,7 +97,7 @@ object TimeHelper {
         if (dateDiff <= 0) {
             points = arrayOf(start, end)
         } else {
-            points = arrayOfNulls<Long>(if (end % DateUtils.DAY_IN_MILLIS == 0L) {
+            points = arrayOfNulls(if (end % DateUtils.DAY_IN_MILLIS == 0L) {
                 (2 + dateDiff - 1)
             } else {
                 2 + dateDiff
@@ -151,7 +151,7 @@ object TimeHelper {
     }
 
     fun durationToText(duration: Long, useShortUnits: Boolean, context: Context): String {
-        if (duration.equals(0)) {
+        if (duration == 0L) {
             return context.getString(R.string.time_duration_no_difference)
         }
 

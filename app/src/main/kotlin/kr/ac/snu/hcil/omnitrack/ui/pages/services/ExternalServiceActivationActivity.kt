@@ -146,7 +146,7 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
         creationSubscriptions.add(
                 viewModel.currentState.observeOn(AndroidSchedulers.mainThread()).subscribe {
                     state ->
-                    println("Service Activation ViewModel state changed to ${state}")
+                    println("Service Activation ViewModel state changed to $state")
                     when (state) {
                         ServiceActivationViewModel.State.Satisfied -> {
                             progressBar.visibility = View.GONE

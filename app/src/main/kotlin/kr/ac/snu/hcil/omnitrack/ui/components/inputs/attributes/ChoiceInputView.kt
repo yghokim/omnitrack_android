@@ -36,6 +36,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.TintFancyButton
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
+import kr.ac.snu.hcil.omnitrack.utils.arrayEquals
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingLeft
 import org.jetbrains.anko.backgroundColorResource
 import org.jetbrains.anko.dip
@@ -101,7 +102,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
             UniqueStringEntryList.Entry(1, "Entry 2"),
             UniqueStringEntryList.Entry(2, "Entry 3"))
         set(value) {
-            if (field != value) {
+            if (!arrayEquals(field, value)) {
                 field = value
                 idPivotedEntryIndexTable.clear()
                 for (entry in value.withIndex()) {
@@ -115,7 +116,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
     override var value: IntArray? = null
         set(_value) {
             val value = if (_value?.isEmpty() == false) _value else null
-            if (field != value) {
+            if (!arrayEquals(field, value)) {
                 field = value
                 if ((field == null && value?.size == 0) || (field?.size == 0 && value == null)) {
 
@@ -131,8 +132,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
         }
 
 
-    var multiSelectionMode: Boolean by Delegates.observable(false) {
-        prop, old, new ->
+    var multiSelectionMode: Boolean by Delegates.observable(false) { _, old, new ->
         if (old != new) {
             if (!new && selectedIds.size > 1) {
                 val first = selectedIds.first()
@@ -157,9 +157,6 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     override val typeId: Int = VIEW_TYPE_CHOICE
 
-    private fun notifyUpdatedValue() {
-
-    }
 
     private inline fun modifyEntryList(modifyFunc: (UniqueStringEntryList) -> Boolean) {
         if (boundAttributeObjectId != null) {
@@ -174,10 +171,10 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
                             realm.executeTransaction {
                                 helper.setPropertyValue(OTChoiceAttributeHelper.PROPERTY_ENTRIES, originalEntryList, attribute, realm)
                             }
-                            attribute.trackerId?.let {
+                            attribute.trackerId?.let { _ ->
                                 val tracker = realm.where(OTTrackerDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, attribute.trackerId).findFirst()
                                 if (tracker != null) {
-                                    realm.executeTransaction {
+                                    realm.executeTransaction { _ ->
                                         tracker.synchronizedAt = null
                                     }
                                     syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
@@ -211,7 +208,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
     }
 
     private fun setAppendNewEntryVisibility(visible: Boolean) {
-        if (visible == true) {
+        if (visible) {
             if (appendNewRowButton == null) {
                 val newButton = TintFancyButton(context)
                 newButton.text = context.getString(R.string.msg_append_new_row)
@@ -293,13 +290,11 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
                 }
             }
 
-            val comparer = object : Comparator<Int> {
-                override fun compare(a: Int, b: Int): Int {
-                    return if (idPivotedEntryIndexTable[a] > idPivotedEntryIndexTable[b]) {
-                        1
-                    } else if (idPivotedEntryIndexTable[a] == idPivotedEntryIndexTable[b]) {
-                        0
-                    } else -1
+            val comparer = Comparator<Int> { a, b ->
+                when {
+                    idPivotedEntryIndexTable[a] > idPivotedEntryIndexTable[b] -> 1
+                    idPivotedEntryIndexTable[a] == idPivotedEntryIndexTable[b] -> 0
+                    else -> -1
                 }
             }
 

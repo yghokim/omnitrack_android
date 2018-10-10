@@ -27,7 +27,7 @@ open class WakefulService(val tag: String) : Service() {
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, tag)
         if (wakeLock?.isHeld != true) {
             wakeLock?.acquire(300000)
-            OTApp.logger.writeSystemLog("Aquire wakelock on the creation of service: ${tag}", tag)
+            OTApp.logger.writeSystemLog("Aquire wakelock on the creation of service: $tag", tag)
         }
     }
 
@@ -36,7 +36,7 @@ open class WakefulService(val tag: String) : Service() {
 
         if (wakeLock?.isHeld == true) {
             wakeLock?.release()
-            OTApp.logger.writeSystemLog("Released the wakelock.: ${tag}", tag)
+            OTApp.logger.writeSystemLog("Released the wakelock.: $tag", tag)
         }
     }
 }

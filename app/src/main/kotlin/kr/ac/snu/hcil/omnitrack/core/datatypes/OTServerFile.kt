@@ -72,7 +72,7 @@ class OTServerFile {
 
     override fun equals(other: Any?): Boolean {
         return if (other is OTServerFile) {
-            serverPath.equals(other.serverPath)
+            serverPath == other.serverPath
                     && fileSize == other.fileSize
                     && mimeType == other.mimeType
                     && originalFileName == other.originalFileName

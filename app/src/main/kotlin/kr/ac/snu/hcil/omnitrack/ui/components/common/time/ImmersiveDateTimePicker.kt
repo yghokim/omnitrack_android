@@ -154,13 +154,16 @@ class ImmersiveDateTimePicker : ConstraintLayout, NumberPicker.OnValueChangeList
             out.writeLong(timeMillis)
         }
 
-        val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
-            override fun createFromParcel(`in`: Parcel): SavedState {
-                return SavedState(`in`)
-            }
+        companion object {
+            @JvmField
+            val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
+                override fun createFromParcel(`in`: Parcel): SavedState {
+                    return SavedState(`in`)
+                }
 
-            override fun newArray(size: Int): Array<SavedState?> {
-                return arrayOfNulls(size)
+                override fun newArray(size: Int): Array<SavedState?> {
+                    return arrayOfNulls(size)
+                }
             }
         }
     }

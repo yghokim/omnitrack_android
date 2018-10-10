@@ -61,7 +61,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, val configuredCon
          */
 
         //make 2D array
-        val countMatrix = Array<IntArray>(xScale.numTicks) { index ->
+        val countMatrix = Array(xScale.numTicks) { index ->
             IntArray(24 / hoursInYBin)
         }
 
@@ -198,7 +198,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, val configuredCon
             verticalAxis.drawGridLines = true
             verticalAxis.drawBar = false
 
-            yScale.setCategories(*Array<String>(24 / hoursInYBin) { index ->
+            yScale.setCategories(*Array(24 / hoursInYBin) { index ->
                 val cal = Calendar.getInstance()
                 cal.setHourOfDay(index * hoursInYBin)
                 (index * hoursInYBin).toString()

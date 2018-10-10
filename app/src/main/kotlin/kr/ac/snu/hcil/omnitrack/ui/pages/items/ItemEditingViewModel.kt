@@ -96,7 +96,7 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
             return isBusyObservable.filter { !it }.firstOrError().flatMapMaybe {
                 if (isViewModelsDirty()) {
                     return@flatMapMaybe Maybe.defer {
-                        val originalItemFieldKeys = originalUnmanagedItemDao.fieldValueEntries.map { it.key }.toMutableList()
+                        val originalItemFieldKeys = originalUnmanagedItemDao.fieldValueEntries.asSequence().map { it.key }.toMutableList()
                         for (viewModel in currentAttributeViewModelList) {
                             if (originalUnmanagedItemDao.setValueOf(viewModel.attributeLocalId, viewModel.value?.value?.let { TypeStringSerializationHelper.serialize(it) })) {
                                 //changed value

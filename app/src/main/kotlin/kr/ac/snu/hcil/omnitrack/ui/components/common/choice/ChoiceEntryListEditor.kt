@@ -105,7 +105,7 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
 
     fun getNotBlankEntryList(): UniqueStringEntryList {
         val clone = entryList.clone()
-        clone.filterSelf { !it.text.isNullOrBlank() }
+        clone.filterSelf { !it.text.isBlank() }
         return clone
     }
 

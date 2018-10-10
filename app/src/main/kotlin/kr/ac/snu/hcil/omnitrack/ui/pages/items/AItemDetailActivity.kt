@@ -46,9 +46,6 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
     companion object {
 
-        const val INTENT_ACTION_NEW = "new_item"
-        const val INTENT_ACTION_EDIT = "edit_item"
-
         const val KEY_ITEM_SAVED = "itemSaved"
         const val KEY_METADATA = "metadata"
 
@@ -207,9 +204,9 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
         return Single.zip(
                 attributeListAdapter.inputViews.map { it.forceApplyValueAsync() }
         ) { zipped -> zipped }.flatMapCompletable {
-            val incompleteFieldLocalIds = currentAttributeViewModelList.filter { attributeViewModel ->
+            val incompleteFieldLocalIds = currentAttributeViewModelList.asSequence().filter { attributeViewModel ->
                 attributeViewModel.isRequired && attributeViewModel.value?.value == null
-            }.map { it.attributeLocalId }
+            }.map { it.attributeLocalId }.toList()
 
             if (incompleteFieldLocalIds.isNotEmpty()) {
                 throw RequiredFieldsNotCompleteException(incompleteFieldLocalIds.toTypedArray())
@@ -218,7 +215,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
             }
         }.doOnError { ex ->
             if (ex is RequiredFieldsNotCompleteException) {
-                val incompleteFields = currentAttributeViewModelList.mapIndexed { index, attributeInputViewModel -> Pair(index, attributeInputViewModel) }.filter { ex.inCompleteFieldLocalIds.contains(it.second.attributeLocalId) }
+                val incompleteFields = currentAttributeViewModelList.asSequence().mapIndexed { index, attributeInputViewModel -> Pair(index, attributeInputViewModel) }.filter { ex.inCompleteFieldLocalIds.contains(it.second.attributeLocalId) }.toList()
 
                 val minPosition = incompleteFields.minBy { it.first }?.first
                 if (minPosition != null) {

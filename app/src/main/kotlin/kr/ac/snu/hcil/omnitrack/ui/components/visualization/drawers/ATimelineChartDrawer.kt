@@ -17,10 +17,10 @@ abstract class ATimelineChartDrawer(val context: Context) : AChartDrawer() {
     val horizontalAxis = Axis(context, Axis.Pivot.BOTTOM)
 
     init {
-        paddingBottom = context.resources.getDimension(R.dimen.vis_axis_height).toFloat()
-        paddingLeft = context.resources.getDimension(R.dimen.vis_axis_width).toFloat()
-        paddingTop = context.resources.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
-        paddingRight = context.resources.getDimension(R.dimen.vis_right_margin).toFloat()
+        paddingBottom = context.resources.getDimension(R.dimen.vis_axis_height)
+        paddingLeft = context.resources.getDimension(R.dimen.vis_axis_width)
+        paddingTop = context.resources.getDimension(R.dimen.vis_axis_label_numeric_size)
+        paddingRight = context.resources.getDimension(R.dimen.vis_right_margin)
 
         horizontalAxis.drawBar = true
         horizontalAxis.drawGridLines = true

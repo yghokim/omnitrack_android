@@ -118,7 +118,7 @@ open class DurationHeatMapModel(tracker: OTTrackerDAO, timeSpanAttribute: OTAttr
     }
 
     override fun getDataInJsonString(): String {
-        val string = "{\"dates\":[${cachedDates?.joinToString(", ")}], \"intrinsicValueRange\":{\"from\":${intrinsicValueMin}, \"to\":${intrinsicValueMax}, \"level\": ${intrinsicValueLevels}}, \"data\":[${cachedData.map { it.toJsonString() }.joinToString(", ")}]}"
+        val string = "{\"dates\":[${cachedDates?.joinToString(", ")}], \"intrinsicValueRange\":{\"from\":$intrinsicValueMin, \"to\":$intrinsicValueMax, \"level\": $intrinsicValueLevels}, \"data\":[${cachedData.joinToString(", ") { it.toJsonString() }}]}"
         println(string)
         return string
     }

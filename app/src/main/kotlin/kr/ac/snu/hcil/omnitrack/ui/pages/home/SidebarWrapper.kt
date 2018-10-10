@@ -215,7 +215,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                 }, true)
         ).apply {
 
-            if (BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank() == true) {
+            if (BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
                 add(
                         RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_plask, "Research", null, {
                             val intent = Intent(parentActivity, ResearchActivity::class.java)

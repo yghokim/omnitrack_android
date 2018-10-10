@@ -80,7 +80,7 @@ class ShortDurationPicker : ConstraintLayout {
                 if (s.toString() == "0" || (s.toString().toIntOrNull() ?: -1 < 0) || s.toString().isBlank()) {
                     ui_digit_input.setText("1", TextView.BufferType.NORMAL)
                 } else if (s.toString().toInt() * getTimeMultiplier(ui_unit_spinner.selectedIndex) > max) {
-                    ui_digit_input.setText((max / getTimeMultiplier(ui_unit_spinner.selectedIndex)).toInt().toString(), TextView.BufferType.NORMAL)
+                    ui_digit_input.setText((max / getTimeMultiplier(ui_unit_spinner.selectedIndex)).toString(), TextView.BufferType.NORMAL)
                 } else {
                     durationChanged.invoke(this, durationSeconds)
                 }

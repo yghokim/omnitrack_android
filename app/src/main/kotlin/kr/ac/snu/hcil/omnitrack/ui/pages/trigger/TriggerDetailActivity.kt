@@ -192,7 +192,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
 
                 viewModel.script.subscribe { (scriptText) ->
                     val text = scriptText ?: ""
-                    if (!ui_script_form.text.toString().trim().equals(text)) {
+                    if (ui_script_form.text.toString().trim() != text) {
                         ui_script_form.setText(text, TextView.BufferType.EDITABLE)
                     }
                 },

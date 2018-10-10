@@ -134,6 +134,7 @@
             android:textColor="@color/textColorMid"
             android:textSize="14sp"
             app:fontPath="fonts/Roboto-Light.ttf"
+            tools:ignore="MissingPrefix"
             tools:text="Trigger summary" />
 
 

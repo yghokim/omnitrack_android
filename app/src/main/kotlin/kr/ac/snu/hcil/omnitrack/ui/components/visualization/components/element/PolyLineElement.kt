@@ -78,7 +78,7 @@ class PolyLineElement<T> : ADataEncodedDrawer<T> {
     fun fitNumPoints(count: Int) {
         val countDiff = count * 2 - _points.size
         if (countDiff > 0) {
-            for (i in 0..countDiff - 1) {
+            for (i in 0 until countDiff) {
                 _points.add(0f)
             }
         } else {
@@ -92,10 +92,10 @@ class PolyLineElement<T> : ADataEncodedDrawer<T> {
     fun refreshPath() {
         path = Path()
         if (numPoints > 1) {
-            println("num points: ${numPoints}")
+            println("num points: $numPoints")
             path.moveTo(getX(0), getY(0))
 
-            for (i in 1..numPoints - 1) {
+            for (i in 1 until numPoints) {
                 path.lineTo(getX(i), getY(i))
             }
         }
@@ -112,14 +112,14 @@ class PolyLineElement<T> : ADataEncodedDrawer<T> {
             markerPaint.strokeWidth = markerThickness
             markerPaint.style = Paint.Style.FILL
             markerPaint.color = Color.WHITE
-            for (i in 0..numPoints - 1) {
+            for (i in 0 until numPoints) {
 
                 canvas.drawCircle(getX(i), getY(i), markerRadius, markerPaint)
             }
 
             markerPaint.style = Paint.Style.STROKE
             markerPaint.color = color
-            for (i in 0..numPoints - 1) {
+            for (i in 0 until numPoints) {
                 canvas.drawCircle(getX(i), getY(i), markerRadius, markerPaint)
             }
         }

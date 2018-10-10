@@ -58,13 +58,13 @@ object TextHelper {
         val nameSet = HashSet<String>()
         for (loc in locales) {
             val country = loc.displayCountry
-            if (country.length > 0 && !nameSet.contains(country)) {
+            if (country.isNotEmpty() && !nameSet.contains(country)) {
                 list.add(CountryInfo(country, loc.country))
                 nameSet.add(country)
             }
         }
 
-        list.sortWith(Comparator<kr.ac.snu.hcil.omnitrack.utils.TextHelper.CountryInfo> { a, b ->
+        list.sortWith(Comparator { a, b ->
             a.localizedName.compareTo(b.localizedName)
         })
 

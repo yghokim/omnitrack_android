@@ -57,9 +57,9 @@ object OTTrackingNotificationFactory {
                         val inboxStyle = NotificationCompat.InboxStyle()
                         fun makeRowCharSequence(key: String, value: CharSequence?): CharSequence {
                             return if (value != null) {
-                                TextHelper.fromHtml("<b>${key}</b> : ${value}")
+                                TextHelper.fromHtml("<b>$key</b> : $value")
                             } else {
-                                TextHelper.fromHtml("<b>${key}</b> : [${context.getString(R.string.msg_empty_value)}]")
+                                TextHelper.fromHtml("<b>$key</b> : [${context.getString(R.string.msg_empty_value)}]")
                             }
                         }
 

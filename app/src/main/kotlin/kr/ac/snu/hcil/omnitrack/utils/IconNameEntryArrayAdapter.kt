@@ -14,9 +14,7 @@ import kr.ac.snu.hcil.omnitrack.R
  */
 class IconNameEntryArrayAdapter(context: Context, objects: Array<out Entry>) : ArrayAdapter<IconNameEntryArrayAdapter.Entry>(context, R.layout.simple_list_element_icon_name, objects) {
 
-
     data class Entry(val iconId: Int, val nameId: Int)
-
 
     override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
 
@@ -33,9 +31,11 @@ class IconNameEntryArrayAdapter(context: Context, objects: Array<out Entry>) : A
 
         val holder = view.tag as ViewHolder
 
-        holder.iconView.setImageResource(getItem(position).iconId)
-        holder.nameView.setText(getItem(position).nameId)
-
+        val entry = getItem(position)
+        if (entry != null) {
+            holder.iconView.setImageResource(entry.iconId)
+            holder.nameView.setText(entry.nameId)
+        }
         return view
     }
 

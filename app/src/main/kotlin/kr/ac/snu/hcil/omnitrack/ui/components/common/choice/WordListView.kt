@@ -46,7 +46,7 @@ open class WordListView : FlexboxLayout {
             if (field != value) {
                 field = value
 
-                for (i in 0..childCount - 1) {
+                for (i in 0 until childCount) {
                     val c = getChildAt(i)
                     if (c is TextView) {
                         InterfaceHelper.setTextAppearance(c, textAppearanceId)
@@ -70,12 +70,12 @@ open class WordListView : FlexboxLayout {
             removeViews(childCount + numChildViewToAdd, -numChildViewToAdd)
         } else if (numChildViewToAdd > 0) {
 
-            for (i in 0..numChildViewToAdd - 1) {
+            for (i in 0 until numChildViewToAdd) {
                 addView(makeChildView(i))
             }
         }
 
-        for (i in 0..words.size - 1) {
+        for (i in 0 until words.size) {
             val view = (getChildAt(i) as TextView)
             view.text = words[i]
 

@@ -55,7 +55,7 @@ class OTAttributeManager @Inject constructor(val configuredContext: ConfiguredCo
                 TYPE_RATING -> OTRatingAttributeHelper(configuredContext)
                 TYPE_IMAGE -> OTImageAttributeHelper(configuredContext)
                 TYPE_AUDIO -> OTAudioRecordAttributeHelper(configuredContext)
-                else -> throw Exception("Unsupported type key: ${type}")
+                else -> throw Exception("Unsupported type key: $type")
             }
             this.attributeCharacteristicsTable.setValueAt(type, fallback)
             return fallback
@@ -68,7 +68,7 @@ class OTAttributeManager @Inject constructor(val configuredContext: ConfiguredCo
         val nanoStamp = attributeLocalIdGenerator.getNewUniqueLong(createdAt)
 
         val id = authManager.get().getDeviceLocalKey() + "_" + nanoStamp.toString(36)
-        println("new attribute local id: ${id}")
+        println("new attribute local id: $id")
         return id
     }
 

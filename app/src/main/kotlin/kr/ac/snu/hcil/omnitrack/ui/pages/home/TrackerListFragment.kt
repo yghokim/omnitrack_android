@@ -202,7 +202,7 @@ class TrackerListFragment : OTFragment() {
         addTrackerFloatingButton = rootView.findViewById(R.id.fab)
 
         if (BuildConfig.DISABLE_TRACKER_CREATION) {
-            addTrackerFloatingButton.visibility = View.GONE
+            addTrackerFloatingButton.hide()
             addTrackerFloatingButton.isEnabled = false
         } else {
             addTrackerFloatingButton.setOnClickListener { view ->
@@ -528,7 +528,7 @@ class TrackerListFragment : OTFragment() {
             }
 
             private fun setLastLoggingTime(timestamp: Long?) {
-                println("Last logging time: ${timestamp}")
+                println("Last logging time: $timestamp")
                 if (timestamp != null) {
                     InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle)
                     val dateText = TimeHelper.getDateText(timestamp, act).toUpperCase()

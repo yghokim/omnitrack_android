@@ -206,7 +206,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
     override fun onSetPreviewMode(mode: Boolean) {
         super.onSetPreviewMode(mode)
-        if (mode == true) {
+        if (mode) {
             setToMyLocation(false)
 
         }

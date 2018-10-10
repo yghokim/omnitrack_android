@@ -19,10 +19,10 @@ object DefaultNameGenerator {
         }
 
 
-        while (existingNames.contains("${prefix} ${++counter}")) {
+        while (existingNames.contains("$prefix ${++counter}")) {
         }
 
-        return "${prefix} ${counter}"
+        return "$prefix $counter"
     }
 
 }

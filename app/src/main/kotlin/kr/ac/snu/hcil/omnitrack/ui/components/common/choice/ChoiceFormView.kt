@@ -13,6 +13,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.arrayEquals
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kotlin.properties.Delegates
 
@@ -39,7 +40,7 @@ class ChoiceFormView : LinearLayout {
 
     var entries: Array<Entry>? by Delegates.observable(null as Array<Entry>?) {
         prop, old, new ->
-        if (old != new) {
+        if (!arrayEquals(old, new)) {
             selectedIndices.clear()
             adapter.notifyDataSetChanged()
         }
@@ -197,7 +198,7 @@ class ChoiceFormView : LinearLayout {
             }
 
             override fun onClick(view: View) {
-                if (view === itemView && entry?.text?.isNullOrBlank() == true && !selectedIndices.contains(adapterPosition)) {
+                if (view === itemView && entry?.text?.isBlank() == true && !selectedIndices.contains(adapterPosition)) {
                     showCustomAnswerDialog(false)
                 } else super.onClick(view)
 

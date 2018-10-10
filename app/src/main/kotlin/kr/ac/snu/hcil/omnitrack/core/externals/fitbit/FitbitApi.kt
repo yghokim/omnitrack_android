@@ -52,7 +52,7 @@ object FitbitApi {
                     if (count == 0) {
                         continue
                     } else {
-                        for (i in 0..count - 1) {
+                        for (i in 0 until count) {
                             values += extractValueFromDatum(intradayDataSet.getJSONObject(i))
                         }
                     }

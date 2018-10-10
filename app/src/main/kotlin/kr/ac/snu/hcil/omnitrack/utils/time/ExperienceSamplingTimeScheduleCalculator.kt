@@ -205,9 +205,9 @@ class ExperienceSamplingTimeScheduleCalculator(
             cacheCal.add(Calendar.DAY_OF_YEAR, 1)
         } while (result == null)
 
-        OTApp.logger.writeSystemLog("EMA trigger calculation: Last: ${last?.let { it.toDatetimeString() }
+        OTApp.logger.writeSystemLog("EMA trigger calculation: Last: ${last?.toDatetimeString()
                 ?: "null"}, now: ${now.toDatetimeString()} " +
-                "EMA trigger timestamp list: \n" + currentRandomPoints.map { it.toDatetimeString() }.joinToString("\n") + "\npicked timestamp: " + result.pingIndex, TAG)
+                "EMA trigger timestamp list: \n" + currentRandomPoints.joinToString("\n") { it.toDatetimeString() } + "\npicked timestamp: " + result.pingIndex, TAG)
 
         return result
     }

@@ -59,7 +59,7 @@ class AboutActivity : MaterialAboutActivity() {
                                         .text(R.string.msg_open_source_license)
                                         .setOnClickListener {
 
-                                            val licenseScreenFragment = WebviewScreenDialogFragment.makeInstance(resources.getString(R.string.msg_open_source_license), "${ANDROID_ASSET_PATH}/licenses.html"/*, "${ANDROID_ASSET_PATH}/licenses/style.css"*/)
+                                            val licenseScreenFragment = WebviewScreenDialogFragment.makeInstance(resources.getString(R.string.msg_open_source_license), "$ANDROID_ASSET_PATH/licenses.html"/*, "${ANDROID_ASSET_PATH}/licenses/style.css"*/)
 
                                             licenseScreenFragment.show(supportFragmentManager, "Open Source License Fragment")
                                         }

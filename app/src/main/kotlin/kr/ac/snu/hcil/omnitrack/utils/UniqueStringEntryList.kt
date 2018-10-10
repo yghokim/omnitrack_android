@@ -89,24 +89,24 @@ class UniqueStringEntryList : IStringSerializable {
 
     constructor() {
         increment = -1
-        list = ArrayList<Entry>()
+        list = ArrayList()
     }
 
     constructor(increment: Int, entries: Collection<Entry>) {
         this.increment = increment
-        list = ArrayList<Entry>(entries)
+        list = ArrayList(entries)
     }
 
     constructor(serialized: String) {
         val parcel = Gson().fromJson(serialized, SerializationParcel::class.java)
         increment = parcel.increment
-        list = ArrayList<Entry>(parcel.entries.size)
+        list = ArrayList(parcel.entries.size)
         list.addAll(parcel.entries)
     }
 
     constructor(entries: Collection<Entry>) {
         this.increment = entries.size - 1
-        list = ArrayList<Entry>(entries)
+        list = ArrayList(entries)
     }
 
     constructor(entries: Array<Entry>) {
@@ -115,7 +115,7 @@ class UniqueStringEntryList : IStringSerializable {
     }
 
     constructor(vararg entryNames: String) {
-        list = ArrayList<Entry>(entryNames.size)
+        list = ArrayList(entryNames.size)
         entryNames.map { Entry(getNewId(), it) }.toCollection(list)
     }
 

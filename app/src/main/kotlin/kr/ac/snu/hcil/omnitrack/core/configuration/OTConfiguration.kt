@@ -16,7 +16,7 @@ class OTConfiguration {
                 Uri.Builder().path(url).scheme("http").build().toString()
             } else url
 
-            println("fallback url: ${result}")
+            println("fallback url: $result")
 
             return result
         }

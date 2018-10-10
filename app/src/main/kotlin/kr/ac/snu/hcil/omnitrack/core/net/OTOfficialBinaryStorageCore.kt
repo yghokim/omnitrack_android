@@ -74,7 +74,7 @@ class OTOfficialBinaryStorageCore(val context: Context, val retrofit: Lazy<Retro
     }
 
     override fun makeServerPath(userId: String, trackerId: String, itemId: String, attributeLocalId: String, fileIdentifier: String): String {
-        return "${trackerId}/${itemId}/${attributeLocalId}/${fileIdentifier}"
+        return "$trackerId/$itemId/$attributeLocalId/$fileIdentifier"
     }
 
     override fun decodeTrackerIdFromServerPath(serverPath: String): String? {

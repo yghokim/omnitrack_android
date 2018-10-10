@@ -75,7 +75,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
                                     val fbInstanceId = configuredContext.firebaseComponent.getFirebaseInstanceId()
                                     val token = fbInstanceId.getToken(config.firebaseCloudMessagingSenderId, "FCM")
                                     if (token != null) {
-                                        println("FirebaseInstanceId token - ${token}")
+                                        println("FirebaseInstanceId token - $token")
                                         val currentUserId = configuredContext.configuredAppComponent.getAuthManager().userId
                                         if (currentUserId != null) {
                                             val jobBuilder = configuredContext.scheduledJobComponent.getInformationUploadJobBuilderProvider().get()
@@ -108,7 +108,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
                     Completable.defer {
                         val configuredContext = configController.currentConfiguredContext
                         val data = remoteMessage.data
-                        if (data != null && data.size > 0) {
+                        if (data != null && data.isNotEmpty()) {
 
                             configuredContext.configuredAppComponent.getEventLogger().logEvent(TAG, "received_gcm_command", jsonObject("command" to data.get("command")))
                             try {

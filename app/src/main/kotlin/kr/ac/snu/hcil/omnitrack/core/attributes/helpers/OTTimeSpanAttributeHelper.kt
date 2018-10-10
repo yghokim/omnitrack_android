@@ -42,7 +42,7 @@ class OTTimeSpanAttributeHelper(configuredContext: ConfiguredContext) : OTAttrib
         const val GRANULARITY_MINUTE = 1
     }
 
-    val formats = mapOf<Int, SimpleDateFormat>(
+    val formats = mapOf(
             Pair(OTTimeAttributeHelper.GRANULARITY_DAY, SimpleDateFormat(configuredContext.applicationContext.getString(R.string.property_time_format_granularity_day))),
             Pair(OTTimeAttributeHelper.GRANULARITY_MINUTE, SimpleDateFormat(configuredContext.applicationContext.getString(R.string.property_time_format_granularity_minute)))
     )
@@ -73,7 +73,7 @@ class OTTimeSpanAttributeHelper(configuredContext: ConfiguredContext) : OTAttrib
         return when (propertyKey) {
         //PROPERTY_TYPE->OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.Selection).parseValue(serializedValue)
             PROPERTY_GRANULARITY -> propertyManager.getHelper(OTPropertyManager.EPropertyType.Selection)
-            else -> throw IllegalArgumentException("Unsupported property type ${propertyKey}")
+            else -> throw IllegalArgumentException("Unsupported property type $propertyKey")
         } as OTPropertyHelper<T>
     }
 

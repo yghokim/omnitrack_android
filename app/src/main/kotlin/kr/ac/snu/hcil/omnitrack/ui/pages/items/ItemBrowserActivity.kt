@@ -205,7 +205,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         creationSubscriptions.add(
                 viewModel.onItemContentChanged.subscribe { changeRanges ->
-                    println("changeRanges: ${changeRanges}")
+                    println("changeRanges: $changeRanges")
                     changeRanges.forEach {
                         itemListViewAdapter.notifyItemRangeChanged(it.startIndex, it.length)
                     }
@@ -226,7 +226,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     override fun onOkAttributeEditDialog(changed: Boolean, value: Any?, trackerId: String, attributeLocalId: String, itemId: String?) {
         println("dismiss handler")
-        Log.d(AttributeEditDialogFragment.TAG, "changed: ${changed}, value: ${value}")
+        Log.d(AttributeEditDialogFragment.TAG, "changed: $changed, value: $value")
 
 
         if (this.viewModel.trackerId == trackerId) {
@@ -305,7 +305,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
     private fun reSort() {
         val comparator = getCurrentSort()
         if (comparator != null) {
-            println("sort items by ${comparator}")
+            println("sort items by $comparator")
             viewModel.setSorter(comparator)
         }
     }
@@ -676,8 +676,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             const val REQUEST_CODE_FILE_LOCATION_PICK = 300
 
             fun getInstance(): BottomSheetDialogFragment {
-                val fragment = SettingsDialogFragment()
-                return fragment
+                return SettingsDialogFragment()
             }
         }
 
@@ -715,9 +714,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             dialogSubscriptions.add(
                     viewModel.sortedItemsObservable.subscribe { items ->
                         val count = items.count()
-                        println("item count: ${count}")
+                        println("item count: $count")
                         if (count > 0) {
-                            deletionMenuItem.description = "Item count: ${count}"
+                            deletionMenuItem.description = "Item count: $count"
                             deletionMenuItem.isEnabled = true
 
                             exportMenuItem.isEnabled = true
@@ -781,7 +780,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             purgeMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.clear_cache, getString(R.string.msg_purge_cache), null, isEnabled = false, onClick = {
                 dialogSubscriptions.add(
                         localCacheManager.purgeSynchronizedCacheFiles(viewModel.trackerId).subscribe { count ->
-                            Toast.makeText(act, "Removed ${count} files", Toast.LENGTH_LONG).show()
+                            Toast.makeText(act, "Removed $count files", Toast.LENGTH_LONG).show()
                             refreshPurgeButton()
                         }
                 )

@@ -121,7 +121,7 @@ class OTDeviceStatusService : Service() {
                     val batteryPercentage = getBatteryPercentage(batteryStatus)
                     val isCharging = isBatteryCharging(batteryStatus)
 
-                    OTApp.logger.writeSystemLog("Battery percentage: ${batteryPercentage}, isCharging: ${isCharging}", TAG)
+                    OTApp.logger.writeSystemLog("Battery percentage: $batteryPercentage, isCharging: $isCharging", TAG)
                     eventLogger.logDeviceStatusChangeEvent(
                             when (intent.action) {
                                 Intent.ACTION_BATTERY_LOW -> IEventLogger.SUB_DEVICE_BATTERY_LOW

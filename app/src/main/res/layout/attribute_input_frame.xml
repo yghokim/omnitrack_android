@@ -86,7 +86,7 @@
             app:layout_flexShrink="0"
             tools:text="Just now"
 
-            />
+            tools:ignore="MissingPrefix" />
     </com.google.android.flexbox.FlexboxLayout>
 
     <LinearLayout

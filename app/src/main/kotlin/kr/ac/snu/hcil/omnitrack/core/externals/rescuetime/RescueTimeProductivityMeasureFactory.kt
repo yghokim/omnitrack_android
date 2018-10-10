@@ -69,8 +69,8 @@ class RescueTimeProductivityMeasureFactory(context: Context, service: RescueTime
 
     val productivityCalculator = object : RescueTimeService.ISummaryCalculator<Double> {
         override fun calculate(list: List<JSONObject>, startDate: Date, endDate: Date): Double? {
-            return if (list.size > 0) {
-                list.map { it.getDouble(RescueTimeService.SUMMARY_VARIABLE_PRODUCTIVITY) }.sum() / list.size
+            return if (list.isNotEmpty()) {
+                list.asSequence().map { it.getDouble(RescueTimeService.SUMMARY_VARIABLE_PRODUCTIVITY) }.sum() / list.size
             } else null
         }
 

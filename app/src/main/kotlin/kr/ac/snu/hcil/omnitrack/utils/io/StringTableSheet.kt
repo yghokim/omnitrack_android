@@ -14,8 +14,8 @@ import java.util.*
  * Created by Young-Ho on 3/8/2017.
  */
 class StringTableSheet {
-    val columns: MutableList<String> = ArrayList<String>()
-    val rows: MutableList<MutableList<String?>> = ArrayList<MutableList<String?>>()
+    val columns: MutableList<String> = ArrayList()
+    val rows: MutableList<MutableList<String?>> = ArrayList()
 
     fun validate(): Boolean {
         return rows.find { it.size != columns.size } == null

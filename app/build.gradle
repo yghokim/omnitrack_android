@@ -227,13 +227,13 @@ dependencies {
     implementation "com.android.support:animated-vector-drawable:$rootProject.ext.android_support_version"
     implementation "com.android.support:exifinterface:$rootProject.ext.android_support_version"
 
-    implementation 'com.google.android.gms:play-services-maps:15.0.1'
-    implementation 'com.google.android.gms:play-services-fitness:16.0.0'
-    implementation 'com.google.android.gms:play-services-auth:16.0.0'
+    implementation 'com.google.android.gms:play-services-maps:16.0.0'
+    implementation 'com.google.android.gms:play-services-fitness:16.0.1'
+    implementation 'com.google.android.gms:play-services-auth:16.0.1'
 
-    implementation 'com.google.firebase:firebase-core:16.0.3'
-    implementation 'com.google.firebase:firebase-auth:16.0.3'
-    implementation 'com.google.firebase:firebase-messaging:17.3.2'
+    implementation 'com.google.firebase:firebase-core:16.0.4'
+    implementation 'com.google.firebase:firebase-auth:16.0.4'
+    implementation 'com.google.firebase:firebase-messaging:17.3.3'
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
 
     implementation 'android.arch.lifecycle:extensions:1.1.1'

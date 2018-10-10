@@ -61,7 +61,7 @@ class OTExternalServiceManager @Inject constructor(
     }
 
     fun getMeasureFactoryByCode(typeCode: String): OTMeasureFactory? {
-        if (availableServices.size > 0)
+        if (availableServices.isNotEmpty())
             return factoryCodeDict[typeCode]
         else return null
     }

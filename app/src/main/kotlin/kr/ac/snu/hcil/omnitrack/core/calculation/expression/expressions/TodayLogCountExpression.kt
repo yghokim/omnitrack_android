@@ -14,7 +14,7 @@ class TodayLogCountExpression(configuredContext: ConfiguredContext) : RealmLazyF
         val trackerId = lazyParams?.get(0)?.string
         if(trackerId != null)
         {
-            println("extracted tracker id: ${trackerId}")
+            println("extracted tracker id: $trackerId")
             val realm = realmProvider.get()
             val todayItemCount = dbManager.get().makeItemsQueryOfTheDay(trackerId, realm).count()
             realm.close()

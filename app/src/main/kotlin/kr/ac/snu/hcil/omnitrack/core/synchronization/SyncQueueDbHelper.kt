@@ -40,7 +40,7 @@ class SyncQueueDbHelper(context: Context, dbName: String) : ManagedSQLiteOpenHel
                 )*/
         println("create syncQueue db table")
 
-        db.execSQL("CREATE TABLE ${TABLE_SYNC_ENTRY}(${COLUMN_ID} INTEGER PRIMARY KEY AUTOINCREMENT, ${COLUMN_TYPE} TEXT, ${COLUMN_DIRECTION} INTEGER, ${COLUMN_TIMESTAMP} INTEGER, ${COLUMN_IGNORE_FLAGS} INTEGER)")
+        db.execSQL("CREATE TABLE $TABLE_SYNC_ENTRY($COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, $COLUMN_TYPE TEXT, $COLUMN_DIRECTION INTEGER, $COLUMN_TIMESTAMP INTEGER, $COLUMN_IGNORE_FLAGS INTEGER)")
     }
 
     override fun onUpgrade(p0: SQLiteDatabase, p1: Int, p2: Int) {
@@ -79,7 +79,7 @@ class SyncQueueDbHelper(context: Context, dbName: String) : ManagedSQLiteOpenHel
         if(ids.isNotEmpty()) {
             use {
                 transaction{
-                    this.delete(TABLE_SYNC_ENTRY, "${COLUMN_ID} in (${ids.joinToString(",")})")
+                    this.delete(TABLE_SYNC_ENTRY, "$COLUMN_ID in (${ids.joinToString(",")})")
                 }
             }
         }

@@ -55,7 +55,7 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
                 attrPivotedPoints[it.localId] = ArrayList()
             }
 
-            for (xIndex in 0..xScale.numTicks - 1) {
+                    for (xIndex in 0 until xScale.numTicks) {
                 val from = xScale.binPointsOnDomain[xIndex]
                 val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
                 else getTimeScope().to
@@ -93,7 +93,7 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
                         }
                     }
                     if (count > 0) {
-                        attrPivotedPoints[attribute.localId]?.add(Pair(from, BigDecimal(values.map { it.toFloat() }.average())))
+                        attrPivotedPoints[attribute.localId]?.add(Pair(from, BigDecimal(values.asSequence().map { it.toFloat() }.average())))
                     }
                 }
             }

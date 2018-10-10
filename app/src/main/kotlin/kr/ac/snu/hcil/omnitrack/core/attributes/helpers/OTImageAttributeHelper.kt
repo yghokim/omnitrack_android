@@ -55,14 +55,13 @@ class OTImageAttributeHelper(configuredContext: ConfiguredContext) : OTFileInvol
     }
 
     override fun getViewForItemList(attribute: OTAttributeDAO, context: Context, recycledView: View?): View {
-        val target = if (recycledView is PlaceHolderImageView) {
+
+        return if (recycledView is PlaceHolderImageView) {
             recycledView
         } else {
             val view = PlaceHolderImageView(context)
             view
         }
-
-        return target
     }
 
     override fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {

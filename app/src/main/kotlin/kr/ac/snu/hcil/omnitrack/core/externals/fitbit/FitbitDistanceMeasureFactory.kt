@@ -68,8 +68,7 @@ class FitbitDistanceMeasureFactory(context: Context, parentService: FitbitServic
                 val json = JSONObject(requestResultStrings.first())
                 println("convert $json")
                 if (json.has("summary")) {
-                    val distance = Math.round(json.getJSONObject("summary").getJSONArray("distances").getJSONObject(0).getDouble("distance") * 100) / 100f
-                    return distance
+                    return Math.round(json.getJSONObject("summary").getJSONArray("distances").getJSONObject(0).getDouble("distance") * 100) / 100f
 
                 } else return null
             }
@@ -81,7 +80,7 @@ class FitbitDistanceMeasureFactory(context: Context, parentService: FitbitServic
             }
 
             override fun processValues(values: List<Float>): Float {
-                return (Math.round(values.sum() * 100) / 100f).toFloat()
+                return (Math.round(values.sum() * 100) / 100f)
             }
 
         }

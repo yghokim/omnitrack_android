@@ -68,7 +68,7 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, val configuredCo
                     .sort("timestamp", Sort.ASCENDING)
                     .findAllAsync()
                     .asFlowable()
-                    .filter { it.isLoaded == true }
+                    .filter { it.isLoaded }
                     .firstOrError()
         }.map { items ->
                     DataHelper.ConvertSortedListToBinWithLong((xScale.binPointsOnDomain + getTimeScope().to).toTypedArray(),

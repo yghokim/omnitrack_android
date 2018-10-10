@@ -63,7 +63,7 @@ class OTRatingAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
     override fun <T> getPropertyHelper(propertyKey: String): OTPropertyHelper<T> {
         return when (propertyKey) {
             PROPERTY_OPTIONS -> propertyManager.getHelper(OTPropertyManager.EPropertyType.RatingOptions)
-            else -> throw IllegalArgumentException("Unsupported property type: ${propertyKey}")
+            else -> throw IllegalArgumentException("Unsupported property type: $propertyKey")
         } as OTPropertyHelper<T>
     }
 
@@ -134,8 +134,7 @@ class OTRatingAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
                     target.overridenIntrinsicHeight = target.overridenIntrinsicWidth
                     return target
                 } else {
-                    val target = recycledView as? StarScoreView ?: StarScoreView(context)
-                    return target
+                    return recycledView as? StarScoreView ?: StarScoreView(context)
                 }
             }
 

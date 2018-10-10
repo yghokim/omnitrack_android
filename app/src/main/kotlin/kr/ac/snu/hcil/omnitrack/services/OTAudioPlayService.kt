@@ -360,7 +360,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
                 val sessionId = intent.getStringExtra(INTENT_EXTRA_SESSION_ID)
                 title = intent.getStringExtra(INTENT_EXTRA_AUDIO_TITLE)
                 if (filePath != null && sessionId != null) {
-                    Log.d(TAG, "Play audio file: ${filePath}, ${sessionId}")
+                    Log.d(TAG, "Play audio file: $filePath, $sessionId")
                     if (currentSessionId != sessionId && currentPlayer?.isPlaying == true) {
                         disposePlayer()
                     }

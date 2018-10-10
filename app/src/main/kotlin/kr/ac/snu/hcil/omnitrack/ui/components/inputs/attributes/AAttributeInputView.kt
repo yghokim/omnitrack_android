@@ -47,7 +47,7 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
                 VIEW_TYPE_RATING_LIKERT -> LikertScaleInputView(context)
                 VIEW_TYPE_IMAGE -> ImageInputView(context)
                 VIEW_TYPE_AUDIO_RECORD -> AudioRecordInputView(context)
-                else -> throw IllegalArgumentException("attribute view data type ${type} is not supported yet.")
+                else -> throw IllegalArgumentException("attribute view data type $type is not supported yet.")
             }
         }
 

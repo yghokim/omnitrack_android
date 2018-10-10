@@ -8,8 +8,6 @@ import kr.ac.snu.hcil.omnitrack.utils.events.Event
  * Created by Young-Ho Kim on 2016-08-30.
  */
 abstract class AWizardPage(protected open val parent: WizardView) {
-    val goNextAvailableChanged = Event<Pair<Int, Boolean>>()
-    val goBackAvailableChanged = Event<Pair<Int, Boolean>>()
     val isCompleteButtonAvailableChanged = Event<Boolean>()
 
     val goNextRequested = Event<Int>()
@@ -36,7 +34,7 @@ abstract class AWizardPage(protected open val parent: WizardView) {
         return view
     }
 
-    abstract protected fun makeViewInstance(context: Context): View
+    protected abstract fun makeViewInstance(context: Context): View
 
     protected fun requestGoNextPage(nextPosition: Int) {
         goNextRequested.invoke(this, nextPosition)

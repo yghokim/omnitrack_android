@@ -156,7 +156,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
 
     override fun onAlarmFired(systemAlarmId: Int): Completable {
         return Completable.defer {
-            OTApp.logger.writeSystemLog("System alarm is fired. alarmId: ${systemAlarmId}", TAG)
+            OTApp.logger.writeSystemLog("System alarm is fired. alarmId: $systemAlarmId", TAG)
             val realm = realmProvider.get()
             return@defer handleFiredAlarmAndGetTriggerInfo(systemAlarmId, realm).flatMapCompletable { (list) ->
                 if (list?.isNotEmpty() == true) {
@@ -204,7 +204,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                 } else {
                     Completable.complete()
                 }.subscribeOn(AndroidSchedulers.mainThread()).doOnComplete {
-                    OTApp.logger.writeSystemLog("System alarm fire was succesfully handled. alarmId: ${systemAlarmId}", TAG)
+                    OTApp.logger.writeSystemLog("System alarm fire was succesfully handled. alarmId: $systemAlarmId", TAG)
                 }.doOnTerminate {
                     context.runOnUiThread { realm.close() }
                 }
@@ -362,7 +362,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
 
     private fun handleFiredAlarmAndGetTriggerInfo(alarmId: Int, realm: Realm): Single<Nullable<List<OTTriggerSchedule>>> {
         return Single.defer {
-            println("find alarm instance with id: ${alarmId}")
+            println("find alarm instance with id: $alarmId")
             val alarmInstance = realm.where(OTTriggerAlarmInstance::class.java)
                     .equalTo(OTTriggerAlarmInstance.FIELD_ALARM_ID, alarmId)
                     .equalTo(OTTriggerAlarmInstance.FIELD_FIRED, false)

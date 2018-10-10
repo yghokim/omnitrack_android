@@ -71,10 +71,10 @@ class NumericScale : IAxisScale<Float> {
     fun nice(isInteger: Boolean): NumericScale {
 
         niceScale.calculate(domainDataMin, domainDataMax, isInteger)
-        domainExtendedMin = niceScale.niceMin.toFloat()
+        domainExtendedMin = niceScale.niceMin
 
-        domainExtendedMax = niceScale.niceMax.toFloat()
-        tickSpacingInDomain = niceScale.niceTickSpacing.toFloat()
+        domainExtendedMax = niceScale.niceMax
+        tickSpacingInDomain = niceScale.niceTickSpacing
         _numTicks = ((domainExtendedMax - domainExtendedMin) / tickSpacingInDomain).toInt() + 1
 
         println("nice min: $domainExtendedMin, max: $domainExtendedMax, numTicks: $_numTicks")
@@ -106,9 +106,8 @@ class NumericScale : IAxisScale<Float> {
 
 
     override fun get(domain: Float): Float {
-        val converted = rangeFrom + (rangeTo - rangeFrom) * (domain - domainExtendedMin) / (domainExtendedMax - domainExtendedMin)
 
-        return converted
+        return rangeFrom + (rangeTo - rangeFrom) * (domain - domainExtendedMin) / (domainExtendedMax - domainExtendedMin)
     }
 
 }

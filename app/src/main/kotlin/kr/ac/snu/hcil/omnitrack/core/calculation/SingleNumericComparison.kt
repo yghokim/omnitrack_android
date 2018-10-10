@@ -53,7 +53,7 @@ class SingleNumericComparison : AConditioner {
     }
 
     override fun toString(): String {
-        return "Single Numeric Comparison: ${method} ${comparedTo}"
+        return "Single Numeric Comparison: $method $comparedTo"
     }
 
 }

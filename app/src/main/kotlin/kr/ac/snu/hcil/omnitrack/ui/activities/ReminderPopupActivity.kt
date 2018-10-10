@@ -150,7 +150,7 @@ class ReminderPopupActivity : OTActivity(false, false), View.OnClickListener {
 
     private fun onFinishWithAction(action: Action) {
         this.resultAction = action
-        Log.d(TAG, "Result Action: ${action}")
+        Log.d(TAG, "Result Action: $action")
 
 
     }

@@ -17,9 +17,8 @@ class OTSelectionPropertyHelper : OTPropertyHelper<Int>() {
     }
 
     override fun makeView(context: Context): APropertyView<Int> {
-        val result = SelectionPropertyView(context, null)
         //result.setEntries(entries)
-        return result
+        return SelectionPropertyView(context, null)
     }
 
 }

@@ -20,7 +20,7 @@ import java.io.FileOutputStream
  * Created by Young-Ho on 5/23/2017.
  */
 
-@RealmModule(classes = arrayOf(VectorIconBitmapCache::class))
+@RealmModule(classes = [VectorIconBitmapCache::class])
 class VectorIconCacheRealmModule
 
 object VectorIconHelper {
@@ -61,7 +61,7 @@ object VectorIconHelper {
             val realm = Realm.getInstance(realmConfiguration)
             val cache = realm.where(VectorIconBitmapCache::class.java).equalTo("resourceId", vectorDrawableRes).equalTo("sizeDp", sizeDp).equalTo("tint", tint).findAll().toTypedArray()
 
-            val finalBitmap = if (cache.size > 0) {
+            val finalBitmap = if (cache.isNotEmpty()) {
                 BitmapFactory.decodeFile(cache[0].uri)
             } else {
                 var drawable = AppCompatResources.getDrawable(context, vectorDrawableRes)!!

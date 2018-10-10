@@ -33,7 +33,7 @@ class LocationHeatmapModel(val trackerId: String, locationAttribute: OTAttribute
                     .sort("timestamp", Sort.ASCENDING)
                     .findAllAsync()
                     .asFlowable()
-                    .filter { it.isLoaded == true }
+                    .filter { it.isLoaded }
                     .firstOrError()
         }.map { items ->
             items.mapNotNull { item ->

@@ -110,10 +110,10 @@ class ThirdPartyAppDependencyResolver(val packageName: String, val appName: Text
     override fun tryResolve(activity: Activity): Single<Boolean> {
         return Single.defer {
             try {
-                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=${packageName}")))
+                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
             } catch(ex: ActivityNotFoundException) {
                 ex.printStackTrace()
-                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=${packageName}")))
+                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName")))
             } finally {
 
             }

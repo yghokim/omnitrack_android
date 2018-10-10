@@ -101,7 +101,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
 
     private fun refreshTracker(trackerDao: OTTrackerDAO) {
         this.trackerDao = trackerDao
-        this.attributes =  trackerDao.attributes.filter { it.isHidden == false && it.isInTrashcan == false }.toList()
+        this.attributes = trackerDao.attributes.asSequence().filter { it.isHidden == false && it.isInTrashcan == false }.toList()
         trackerName = trackerDao.name
 
         currentSorterSet.clear()

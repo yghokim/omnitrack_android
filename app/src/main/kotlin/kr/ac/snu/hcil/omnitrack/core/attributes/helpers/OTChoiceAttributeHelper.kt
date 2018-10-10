@@ -64,7 +64,7 @@ class OTChoiceAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
             PROPERTY_MULTISELECTION -> propertyManager.getHelper(OTPropertyManager.EPropertyType.Boolean)
             PROPERTY_ALLOW_APPENDING_FROM_VIEW -> propertyManager.getHelper(OTPropertyManager.EPropertyType.Boolean)
             PROPERTY_ENTRIES -> propertyManager.getHelper(OTPropertyManager.EPropertyType.ChoiceEntryList)
-            else -> throw IllegalArgumentException("Unsupported property key ${propertyKey}")
+            else -> throw IllegalArgumentException("Unsupported property key $propertyKey")
         } as OTPropertyHelper<T>
     }
 

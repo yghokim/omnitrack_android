@@ -83,7 +83,7 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
     }
 
     fun onFired(triggerTime: Long) {
-        println("trigger fired at ${triggerTime}")
+        println("trigger fired at $triggerTime")
         currentConditionViewModel?.afterTriggerFired(triggerTime)
     }
 

@@ -24,7 +24,7 @@ class TutorialManager(val context: Context) {
     data class TapTargetInfo(val primaryTextRes: Int, val secondaryTextRes: Int, val backgroundColor: Int, val target: View, val focalColorAlpha: Int = 255)
 
     private fun makeFlagKey(tag: String): String {
-        return "pref_tutorial_shown_flag_${tag}"
+        return "pref_tutorial_shown_flag_$tag"
     }
 
     private val preferences: SharedPreferences by lazy {
@@ -42,8 +42,8 @@ class TutorialManager(val context: Context) {
     fun checkAndShowSequence(tag: String, closeFlagAfterClose: Boolean, activity: Activity, stopWhenTappedTarget: Boolean, sequenceList: List<TapTargetInfo>): Boolean {
         if ((DEBUG_ALWAYS_SHOW_TUTORIAL || !hasShownTutorials(tag)) && BuildConfig.SHOW_TUTORIALS) {
 
-            val list = sequenceList.mapIndexed { index, sequence ->
-                val sequenceFlagKey = "${tag}_seq_${index}"
+            val list = sequenceList.asSequence().mapIndexed { index, sequence ->
+                val sequenceFlagKey = "${tag}_seq_$index"
                 if (!hasShownTutorials(sequenceFlagKey)) {
                     Pair(
                             MaterialTapTargetPrompt.Builder(activity)
@@ -55,7 +55,7 @@ class TutorialManager(val context: Context) {
                                     .setCaptureTouchEventOutsidePrompt(true)
                                     .setBackgroundColour(sequence.backgroundColor), sequenceFlagKey)
                 } else null
-            }.filter { it != null }.map { it as Pair<MaterialTapTargetPrompt.Builder, String> }
+            }.filter { it != null }.map { it as Pair<MaterialTapTargetPrompt.Builder, String> }.toList()
 
             for (builder in list.withIndex()) {
                 builder.value.first.setPromptStateChangeListener(object : MaterialTapTargetPrompt.PromptStateChangeListener {

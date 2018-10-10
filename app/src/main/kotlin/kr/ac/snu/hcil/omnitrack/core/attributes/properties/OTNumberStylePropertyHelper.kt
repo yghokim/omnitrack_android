@@ -21,7 +21,7 @@ class OTNumberStylePropertyHelper : OTPropertyHelper<NumberStyle>() {
         } catch (ex: Exception) {
             println("NumberStyle parsing error - 1st")
             ex.printStackTrace()
-            Gson().fromJson<NumberStyle>(serialized)
+            Gson().fromJson(serialized)
         } catch (ex: Exception) {
             println("NumberStyle naive parsing error - return new object")
             ex.printStackTrace()

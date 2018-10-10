@@ -132,7 +132,7 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
             inquiry["appVersion"] = this.versionName()
 
             val inquiryJson = Gson().toJsonTree(inquiry).asJsonObject
-            println("inquiry json: ${inquiryJson}")
+            println("inquiry json: $inquiryJson")
 
             creationSubscriptions.add(
                     userReportServerController.get().sendUserReport(inquiryJson).observeOn(AndroidSchedulers.mainThread()).subscribe({ success ->

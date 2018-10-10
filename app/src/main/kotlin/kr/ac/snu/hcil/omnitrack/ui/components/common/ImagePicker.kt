@@ -103,7 +103,7 @@ class ImagePicker : ConstraintLayout, View.OnClickListener {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val imageFileName = "JPEG_" + timeStamp + "_"
         val storageDir = this.overrideLocalUriFolderPath ?: context.externalCacheDir
-        println("store file to ${storageDir}")
+        println("store file to $storageDir")
 
         val image = File.createTempFile(
                 imageFileName, /* prefix */

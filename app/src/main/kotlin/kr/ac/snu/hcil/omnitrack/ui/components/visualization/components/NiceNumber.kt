@@ -41,7 +41,7 @@ Author: Incongruous
         this.niceTickSpacing = niceNum(range / (maxTicks - 1), true)
         this.niceMin = Math.floor(minPoint / niceTickSpacing) * niceTickSpacing
         this.niceMax = Math.ceil(maxPoint / niceTickSpacing) * niceTickSpacing
-        println("${niceMin} ~ ${niceMax}, interval: ${niceTickSpacing}")
+        println("$niceMin ~ $niceMax, interval: $niceTickSpacing")
     }
 
     /**

@@ -88,7 +88,7 @@ abstract class OTMeasureFactory(val context: Context, val parentService: OTExter
     }
 
     val typeCode: String by lazy {
-        "${parentService.identifier}_${factoryTypeName}"
+        "${parentService.identifier}_$factoryTypeName"
     }
 
     open val supportedConditionerTypes: IntArray = intArrayOf()

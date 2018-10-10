@@ -8,7 +8,7 @@ import java.util.*
 interface ICategoricalBarChart : IChartInterface<ICategoricalBarChart.Point> {
     data class Point(val label: String, val value: Double, val category: Int) {
         override fun toString(): String {
-            return "$label : $value, in category: ${category}"
+            return "$label : $value, in category: $category"
         }
 
         class ValueComparator : Comparator<Point> {

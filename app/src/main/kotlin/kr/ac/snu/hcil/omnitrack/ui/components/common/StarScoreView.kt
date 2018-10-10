@@ -47,7 +47,7 @@ class StarScoreView : LinearLayout {
             score.toInt().toString()
         } else score.toString()
 
-        val spannable = SpannableString("${scoreString}/${maxScoreString}").apply {
+        val spannable = SpannableString("$scoreString/$maxScoreString").apply {
             this.setSpan(scoreTypeSpan, 0, scoreString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             this.setSpan(scoreSizeSpan, 0, scoreString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             this.setSpan(scoreColorSpan, 0, scoreString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)

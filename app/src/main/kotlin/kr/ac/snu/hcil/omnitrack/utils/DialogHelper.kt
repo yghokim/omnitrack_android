@@ -12,7 +12,8 @@ import kr.ac.snu.hcil.omnitrack.R
 
 object DialogHelper {
     fun makeYesNoDialogBuilder(context: Context, title: String, message: String, yesLabel: Int = R.string.msg_yes, noLabel: Int = R.string.msg_no, onYes: ((Dialog) -> Unit)?, onNo: ((Dialog) -> Unit)? = null, cancelable: Boolean = true, onCancel: ((Any) -> Unit)? = null): MaterialDialog.Builder {
-        val builder = MaterialDialog.Builder(context)
+
+        return MaterialDialog.Builder(context)
                 .title(title)
                 .content(message)
                 .positiveColorRes(R.color.colorPointed)
@@ -31,8 +32,6 @@ object DialogHelper {
                 .cancelListener { dialog ->
                     if (onCancel != null) onCancel(dialog)
                 }
-
-        return builder
     }
 
     fun makeNegativePhrasedYesNoDialogBuilder(context: Context, title: String, message: String, yesLabel: Int = R.string.msg_yes, noLabel: Int = R.string.msg_no, onYes: ((Dialog) -> Unit)?, onNo: ((Dialog) -> Unit)? = null): MaterialDialog.Builder {

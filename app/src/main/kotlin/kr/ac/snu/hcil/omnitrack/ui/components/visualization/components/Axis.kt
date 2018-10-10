@@ -44,7 +44,6 @@ class Axis(val context: Context, var pivot: Pivot) : IDrawer {
         abstract fun applyStyle(axis: Axis)
     }
 
-    var drawPin: Boolean = false
     var drawBar: Boolean = true
     var drawGridLines: Boolean = false
 
@@ -109,7 +108,7 @@ class Axis(val context: Context, var pivot: Pivot) : IDrawer {
             }
         }
 
-        for (i in 0..(scale?.numTicks ?: 0) - 1) {
+        for (i in 0 until (scale?.numTicks ?: 0)) {
             val tickCoord = scale?.getTickCoordAt(i) ?: 0f
 
             val tickLabel = scale?.getTickLabelAt(i)

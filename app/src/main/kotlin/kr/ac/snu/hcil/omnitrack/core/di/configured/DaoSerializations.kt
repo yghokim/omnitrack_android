@@ -83,7 +83,7 @@ class DaoSerializationModule {
 }
 
 @Configured
-@Subcomponent(modules = arrayOf(DaoSerializationModule::class, BackendDatabaseModule::class))
+@Subcomponent(modules = [DaoSerializationModule::class, BackendDatabaseModule::class])
 interface DaoSerializationComponent {
 
     @Subcomponent.Builder

@@ -224,7 +224,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
 
 
     private fun makeMultilineStaticLayout(text: String, paint: TextPaint, maxWidth: Int, align: Layout.Alignment): StaticLayout {
-        return StaticLayout(text, paint, maxWidth.toInt(), align, 1f, 1f, false)
+        return StaticLayout(text, paint, maxWidth, align, 1f, 1f, false)
     }
 
     private fun textHeight(text: String, paint: Paint): Int {
@@ -233,7 +233,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
     }
 
     private fun textHeight(text: String, paint: TextPaint, maxWidth: Int): Int {
-        if (text.isNullOrBlank()) {
+        if (text.isBlank()) {
             return 0
         } else {
             val dl = makeMultilineStaticLayout(text, paint, maxWidth, Layout.Alignment.ALIGN_CENTER)
@@ -251,7 +251,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
 
         canvas.drawLine(_lineLeft, _lineY, _lineRight, _lineY, linePaint)
 
-        for (i in 0..numPoints - 1) {
+        for (i in 0 until numPoints) {
             val centerX = _lineLeft + _pointDistance * i
             val numberText = (i + leftMost).toString()
 
@@ -278,7 +278,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
         val middleLabelLayout = makeMultilineStaticLayout(middleLabel, labelTextPaint, contentWidth / 5, Layout.Alignment.ALIGN_CENTER)
         canvas.save()
 
-        canvas.translate(((_lineLeft + _lineRight) / 2 - (middleLabelLayout.width shr 1)).toFloat(), _labelY)
+        canvas.translate(((_lineLeft + _lineRight) / 2 - (middleLabelLayout.width shr 1)), _labelY)
         middleLabelLayout.draw(canvas)
         canvas.restore()
 
@@ -418,9 +418,9 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
         if (heightMode == MeasureSpec.EXACTLY) {
             measuredHeight = heightSize
         } else if (heightMode == MeasureSpec.AT_MOST) {
-            measuredHeight = Math.min(intrinsicHeight + paddingTop + paddingBottom, heightSize).toInt()
+            measuredHeight = Math.min(intrinsicHeight + paddingTop + paddingBottom, heightSize)
         } else {
-            measuredHeight = intrinsicHeight.toInt() + paddingTop + paddingBottom
+            measuredHeight = intrinsicHeight + paddingTop + paddingBottom
         }
 
         setMeasuredDimension(measuredWidth, measuredHeight)

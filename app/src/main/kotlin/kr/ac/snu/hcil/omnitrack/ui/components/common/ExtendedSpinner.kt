@@ -179,7 +179,7 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
         val end = Math.min(adapter.count, start + 15)
         val count = end - start
         start = Math.max(0, start - (15 - count))
-        for (i in start..end - 1) {
+        for (i in start until end) {
             val positionType = adapter.getItemViewType(i)
             if (positionType != itemType) {
                 itemType = positionType

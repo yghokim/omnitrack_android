@@ -73,7 +73,7 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
             val trackerDao = realm.where(OTTrackerDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, trackerId).findFirst()
             if (trackerDao?.isIndependentInputLocked() == true) {
                 val reminderCommands = OTReminderCommands(context)
-                if (reminderCommands.isReminderPromptingToTracker(trackerId) == false) {
+                if (!reminderCommands.isReminderPromptingToTracker(trackerId)) {
                     Toast.makeText(context, "You cannot add new entry unless you are prompted by reminders.", Toast.LENGTH_LONG).show()
                     realm.close()
                     return

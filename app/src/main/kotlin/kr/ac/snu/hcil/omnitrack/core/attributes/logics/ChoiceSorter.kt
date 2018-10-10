@@ -15,7 +15,7 @@ class ChoiceSorter(override val name: String, val entries: UniqueStringEntryList
                 val valueA = entries.findWithId(idA)
                 val valueB = entries.findWithId(idB)
                 if (valueA != null && valueB != null) {
-                    println("${valueA} compare ${valueB} :  ${valueA.text.compareTo(valueB.text)}")
+                    println("$valueA compare $valueB :  ${valueA.text.compareTo(valueB.text)}")
                     return valueA.text.compareTo(valueB.text)
                 } else if (valueA == null) {
                     return -1

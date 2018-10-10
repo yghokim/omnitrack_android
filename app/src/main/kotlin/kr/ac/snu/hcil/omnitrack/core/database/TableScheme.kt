@@ -14,7 +14,7 @@ abstract class TableScheme {
     abstract val intrinsicColumnNames: Array<String>
 
     val columnNames: Array<String> by lazy {
-        Array<String>((intrinsicColumnNames.size) + 3) {
+        Array((intrinsicColumnNames.size) + 3) {
             index ->
             when (index) {
                 0 -> _ID
@@ -27,7 +27,7 @@ abstract class TableScheme {
 
 
     val creationQueryString: String by lazy {
-        "CREATE TABLE ${tableName} (${_ID} INTEGER PRIMARY KEY AUTOINCREMENT, ${creationColumnContentString}, ${LOGGED_AT} INTEGER, ${UPDATED_AT} INTEGER);"
+        "CREATE TABLE $tableName ($_ID INTEGER PRIMARY KEY AUTOINCREMENT, $creationColumnContentString, $LOGGED_AT INTEGER, $UPDATED_AT INTEGER);"
     }
 
     abstract val creationColumnContentString: String

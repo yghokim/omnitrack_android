@@ -232,7 +232,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         override fun onPreferenceChange(preference: Preference, newValue: Any?): Boolean {
-            println("preference changed - ${preference.key}, ${newValue}")
+            println("preference changed - ${preference.key}, $newValue")
             if (preference.key == PREF_REMINDER_NOTI_RINGTONE) {
                 if (newValue is String) {
                     val ringtone = RingtoneManager.getRingtone(activity, Uri.parse(newValue))
@@ -295,7 +295,7 @@ class SettingsActivity : AppCompatActivity() {
                     (act.application as OTAndroidApp).refreshConfiguration(activity)
                     Toast.makeText(activity, R.string.msg_language_change_applied_after_exit_this_screen, Toast.LENGTH_LONG).show()
                     setResult(Activity.RESULT_OK, Intent().apply { putExtra(FLAG_CONFIGURATION_CHANGED, true) })
-                    println("activity: ${activity}")
+                    println("activity: $activity")
                 }
             }
         }

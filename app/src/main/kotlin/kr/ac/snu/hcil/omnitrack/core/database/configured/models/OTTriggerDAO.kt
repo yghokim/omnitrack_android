@@ -282,18 +282,16 @@ open class OTTriggerDAO : RealmObject() {
     }
 
     fun getSimpleInfo(populateTracker: Boolean = false): SimpleTriggerInfo {
-        val info = SimpleTriggerInfo(objectId!!, conditionType, condition, actionType, action,
+        return SimpleTriggerInfo(objectId!!, conditionType, condition, actionType, action,
                 if (populateTracker) {
                     if (isManaged) {
                         if (liveTrackerCount > 0) {
                             liveTrackersQuery.findAll().map { it.getSimpleInfo() }.toTypedArray()
-                        } else emptyArray<OTTrackerDAO.SimpleTrackerInfo>()
+                        } else emptyArray()
                     } else {
-                        trackers.filter { !it.removed }.map { it.getSimpleInfo() }.toTypedArray()
+                        trackers.asSequence().filter { !it.removed }.map { it.getSimpleInfo() }.toList().toTypedArray()
                     }
                 } else null
         )
-
-        return info
     }
 }

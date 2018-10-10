@@ -6,7 +6,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 /**
  * Created by younghokim on 16. 7. 12..
  */
-abstract class OTPropertyHelper<T>() {
+abstract class OTPropertyHelper<T> {
 
     abstract fun getSerializedValue(value: T): String
 

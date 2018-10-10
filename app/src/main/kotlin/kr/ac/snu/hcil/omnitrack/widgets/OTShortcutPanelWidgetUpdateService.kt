@@ -56,7 +56,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
         }
 
         fun makePrefKey(keyPrefix: String, widgetId: Int): String {
-            return "${keyPrefix}$DELIMITER${widgetId}"
+            return "$keyPrefix$DELIMITER$widgetId"
         }
 
         fun removeVariables(widgetId: Int, editor: SharedPreferences.Editor) {
@@ -150,7 +150,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
 
         fun applyOptionsToRemoteViews(rv: RemoteViews, options: Bundle) {
             val minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 9999)
-            Log.d("WIDGET", "min height: ${minHeight}")
+            Log.d("WIDGET", "min height: $minHeight")
             if (minHeight < MINIMUM_HEIGHT_SHOW_HEADER) {
                 rv.setViewVisibility(R.id.ui_header, View.GONE)
             } else {

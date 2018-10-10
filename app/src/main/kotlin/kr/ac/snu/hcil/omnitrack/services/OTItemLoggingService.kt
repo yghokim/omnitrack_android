@@ -128,7 +128,7 @@ class OTItemLoggingService : WakefulService(TAG) {
                                                 .setTaskProgressNotification(this, NOTIFICATION_TAG,
                                                         notificationId,
                                                         "Logging...",
-                                                        "Logging ${trackerName}...",
+                                                        "Logging $trackerName...",
                                                         OTTaskNotificationManager.PROGRESS_INDETERMINATE,
                                                         null
                                                 )
@@ -137,9 +137,8 @@ class OTItemLoggingService : WakefulService(TAG) {
                                     if (result != BackendDbManager.SAVE_RESULT_FAIL) {
                                         val table = ArrayList<Pair<String, CharSequence?>>()
                                         val item = pushedItemDao
-                                        val tracker = unManagedTrackerDao
-                                        if (item != null && tracker != null) {
-                                            tracker.attributes.filter { !it.isHidden && !it.isInTrashcan }.forEach {
+                                        if (item != null && unManagedTrackerDao != null) {
+                                            unManagedTrackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan }.forEach {
                                                 val value = item.getValueOf(it.localId)
                                                 if (value != null) {
                                                     table.add(Pair(it.name, it.getHelper((application as OTAndroidApp).currentConfiguredContext).formatAttributeValue(it, value)))

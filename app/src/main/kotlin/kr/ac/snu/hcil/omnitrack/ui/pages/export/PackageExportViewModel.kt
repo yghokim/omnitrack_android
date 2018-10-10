@@ -28,9 +28,9 @@ class PackageExportViewModel(application: Application) : UserAttachedViewModel(a
     val loggingTriggerInfoListObservable: Observable<List<OTTriggerDAO.SimpleTriggerInfo>> get() = loggingTriggerInfoListSubject
 
 
-    private val trackerSelectionListSubject = BehaviorSubject.createDefault<List<String>>(emptyList<String>())
-    private val loggingTriggerSelectionListSubject = BehaviorSubject.createDefault<List<String>>(emptyList<String>())
-    private val reminderSelectionListSubject = BehaviorSubject.createDefault<List<String>>(emptyList<String>())
+    private val trackerSelectionListSubject = BehaviorSubject.createDefault<List<String>>(emptyList())
+    private val loggingTriggerSelectionListSubject = BehaviorSubject.createDefault<List<String>>(emptyList())
+    private val reminderSelectionListSubject = BehaviorSubject.createDefault<List<String>>(emptyList())
     val trackerSelectionListObservable: Observable<List<String>> get() = trackerSelectionListSubject
     val loggingTriggerSelectionListObservable: Observable<List<String>> get() = loggingTriggerSelectionListSubject
     val reminderSelectionListObservable: Observable<List<String>> get() = reminderSelectionListSubject

@@ -95,5 +95,5 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
         this.value = value as T
     }
 
-    abstract fun focus(): Unit
+    abstract fun focus()
 }

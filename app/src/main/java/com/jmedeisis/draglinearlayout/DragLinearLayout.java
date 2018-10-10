@@ -316,18 +316,15 @@ public class DragLinearLayout extends LinearLayout {
         draggedItem.settleAnimation = ValueAnimator.ofFloat(draggedItem.totalDragOffset,
                 draggedItem.totalDragOffset - draggedItem.targetTopOffset)
                 .setDuration(getTranslateAnimationDuration(draggedItem.targetTopOffset));
-        draggedItem.settleAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                if (!draggedItem.detecting) return; // already stopped
+        draggedItem.settleAnimation.addUpdateListener(animation -> {
+            if (!draggedItem.detecting) return; // already stopped
 
-                draggedItem.setTotalOffset(((Float) animation.getAnimatedValue()).intValue());
+            draggedItem.setTotalOffset(((Float) animation.getAnimatedValue()).intValue());
 
-                final int shadowAlpha = (int) ((1 - animation.getAnimatedFraction()) * 255);
-                if (null != dragTopShadowDrawable) dragTopShadowDrawable.setAlpha(shadowAlpha);
-                dragBottomShadowDrawable.setAlpha(shadowAlpha);
-                invalidate();
-            }
+            final int shadowAlpha = (int) ((1 - animation.getAnimatedFraction()) * 255);
+            if (null != dragTopShadowDrawable) dragTopShadowDrawable.setAlpha(shadowAlpha);
+            dragBottomShadowDrawable.setAlpha(shadowAlpha);
+            invalidate();
         });
         draggedItem.settleAnimation.addListener(new AnimatorListenerAdapter() {
             @Override

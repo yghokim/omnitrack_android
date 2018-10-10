@@ -50,9 +50,8 @@ class OTAudioRecordAttributeHelper(configuredContext: ConfiguredContext) : OTFil
     }
 
     override fun getViewForItemList(attribute: OTAttributeDAO, context: Context, recycledView: View?): View {
-        val view = recycledView as? AudioItemListView ?: AudioItemListView(context)
 
-        return view
+        return recycledView as? AudioItemListView ?: AudioItemListView(context)
     }
 
     override fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {

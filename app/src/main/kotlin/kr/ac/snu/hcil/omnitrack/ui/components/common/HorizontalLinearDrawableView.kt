@@ -64,7 +64,7 @@ open class HorizontalLinearDrawableView : View {
         intrinsicWidth = 0
         intrinsicHeight = 0
         if (adapter != null) {
-            for (i in 0..adapter!!.numDrawables - 1) {
+            for (i in 0 until adapter!!.numDrawables) {
                 intrinsicWidth += if (overridenIntrinsicWidth != null) {
                     overridenIntrinsicWidth!!
                 } else {
@@ -93,11 +93,11 @@ open class HorizontalLinearDrawableView : View {
             useIntrinsicWidth = false
         } else if (widthMode == MeasureSpec.AT_MOST) {
 
-            measuredWidth = Math.min(intrinsicWidth + paddingStart + paddingEnd, widthSize).toInt()
+            measuredWidth = Math.min(intrinsicWidth + paddingStart + paddingEnd, widthSize)
             measuredHeight = measuredWidth / (adapter?.numDrawables ?: 1)
             useIntrinsicWidth = true
         } else {
-            measuredWidth = intrinsicWidth.toInt() + paddingStart + paddingEnd
+            measuredWidth = intrinsicWidth + paddingStart + paddingEnd
             measuredHeight = intrinsicHeight
             useIntrinsicWidth = true
         }
@@ -123,7 +123,7 @@ open class HorizontalLinearDrawableView : View {
 
     override fun onDraw(canvas: Canvas) {
         if (adapter != null) {
-            for (i in 0..adapter!!.numDrawables - 1) {
+            for (i in 0 until adapter!!.numDrawables) {
                 val drawable = adapter!!.getDrawable(i)
                 boundRect.set(0, 0, cellWidth, cellHeight)
                 boundRect.offset(paddingLeft + i * cellWidth, paddingTop)

@@ -257,10 +257,8 @@ class OTReminderCommands(val context: Context) {
             }
                     ?: String.format(context.getString(R.string.msg_format_reminder_noti_title), tracker.name)
 
-            val notiBuilder = makeReminderNotificationBuilderBase(notificationId, entry.triggerId!!, entry.trackerId!!, tracker.name, entry.id, entry.intrinsicTriggerTime, entry.autoExpireAt, entry.timeoutDuration?.toLong(), 0, message)
 
-
-            return notiBuilder
+            return makeReminderNotificationBuilderBase(notificationId, entry.triggerId!!, entry.trackerId!!, tracker.name, entry.id, entry.intrinsicTriggerTime, entry.autoExpireAt, entry.timeoutDuration?.toLong(), 0, message)
         } else return null
     }
 

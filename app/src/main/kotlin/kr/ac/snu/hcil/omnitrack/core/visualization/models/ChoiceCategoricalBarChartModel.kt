@@ -40,7 +40,7 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm, va
 
     override fun reloadData(): Single<List<ICategoricalBarChart.Point>> {
         val trackerId = attribute.trackerId
-        println("reload data for tracker ${trackerId} - ChoiceCategorical")
+        println("reload data for tracker $trackerId - ChoiceCategorical")
         if (trackerId != null) {
             return dbManager
                     .makeItemsQuery(trackerId, getTimeScope(), realm)
@@ -85,8 +85,6 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm, va
                         }
                     }
                 }
-
-                println("result data: " + data)
 
                 categoriesCache.clear()
                 counterDictCache.clear()

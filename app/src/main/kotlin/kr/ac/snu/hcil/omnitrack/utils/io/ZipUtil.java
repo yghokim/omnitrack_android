@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.utils.io;
 
-/**
- * Copyright (c) 2014 CoderKiss
- * <p>
- * CoderKiss[AT]gmail.com
+/*
+  Copyright (c) 2014 CoderKiss
+  <p>
+  CoderKiss[AT]gmail.com
  */
 
 import android.util.Log;
@@ -18,7 +18,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class ZipUtil {
-    public static final String TAG = "ZipUtil";
+    private static final String TAG = "ZipUtil";
 
     private final static int BUFFER_SIZE = 8192;
 

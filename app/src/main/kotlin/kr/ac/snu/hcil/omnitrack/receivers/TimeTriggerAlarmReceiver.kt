@@ -114,8 +114,8 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
                                 OTApp.logger.writeSystemLog("Released wake lock for AlarmReceiver.", TAG)
                                 stopSelf(startId)
                             }.subscribe({
-                                println("successfully handled fired alarm: ${alarmId}")
-                                OTApp.logger.writeSystemLog("successfully handled fired alarm: ${alarmId}", TAG)
+                                println("successfully handled fired alarm: $alarmId")
+                                OTApp.logger.writeSystemLog("successfully handled fired alarm: $alarmId", TAG)
                             }, { err ->
                                 println("trigger alarm handling error")
                                 err.printStackTrace()

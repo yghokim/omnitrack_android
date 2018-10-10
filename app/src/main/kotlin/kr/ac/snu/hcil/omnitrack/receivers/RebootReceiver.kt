@@ -7,6 +7,7 @@ import android.os.PowerManager
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import dagger.Lazy
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
@@ -20,7 +21,7 @@ import javax.inject.Inject
  */
 class RebootReceiver : BroadcastReceiver() {
     companion object {
-        const val TAG = "RebootReceiver"
+        const val TAG = "${BuildConfig.APPLICATION_ID}:RebootReceiver"
     }
 
     @Inject

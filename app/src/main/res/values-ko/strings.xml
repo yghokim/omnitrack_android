@@ -2,14 +2,11 @@
 <resources>
 
     <plurals name="field">
-        <item quantity="zero">0개의 필드</item>
-        <item quantity="one">한 개의 필드</item>
         <item quantity="other">%d개의 필드</item>
     </plurals>
 
 
     <plurals name="msg_reminder_omitted">
-        <item quantity="zero">누락된 리마인더 없음</item>
         <item quantity="other">%d개 누락</item>
     </plurals>
 

@@ -94,7 +94,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
                 currentAttributeViewModelList.forEach { it.unregister() }
                 currentAttributeViewModelList.clear()
 
-                currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan }.map { AttributeInputViewModel(it) })
+                currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.asSequence().filter { !it.isHidden && !it.isInTrashcan }.map { AttributeInputViewModel(it) }.toList())
                 attributeViewModelListObservable.onNext(currentAttributeViewModelList)
 
                 this.checkAllInputCompleteAndReturn()
@@ -145,7 +145,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
             get() = (validationObservable as BehaviorSubject).value ?: true
             internal set(value) {
                 if ((validationObservable as BehaviorSubject).value != value) {
-                    println("validation changed: ${attributeLocalId}, ${value}")
+                    println("validation changed: $attributeLocalId, $value")
                     validationObservable.onNext(value)
                 }
             }

@@ -70,7 +70,7 @@ class OTUsageLogUploadService : JobService() {
         } else {
             subscriptions.add(
                     fetchPendingUsageLogsSerialized().flatMap { list ->
-                        OTApp.logger.writeSystemLog("Try uploading the usage logs. count: ${list.size}, average JSON length: ${list.map { it.length }.average()} bytes", "OTUsageLogUploadService")
+                        OTApp.logger.writeSystemLog("Try uploading the usage logs. count: ${list.size}, average JSON length: ${list.asSequence().map { it.length }.average()} bytes", "OTUsageLogUploadService")
                         return@flatMap usageLogUploadApi.get().uploadLocalUsageLogs(list)
                     }.doOnSuccess { storedIds ->
                         val realm = realmFactory.get()

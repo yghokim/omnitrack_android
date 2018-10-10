@@ -22,7 +22,7 @@ class DailyLogCountExpression(configuredContext: ConfiguredContext) : RealmLazyF
         val overrideAttributeLocalId = lazyParams?.get(2)?.string
 
         if (trackerId != null) {
-            println("extracted tracker id: ${trackerId}")
+            println("extracted tracker id: $trackerId")
             val realm = realmProvider.get()
             val itemCount = dbManager.get().getItemCountDuring(trackerId, realm, offset ?: 0, overrideAttributeLocalId)
             realm.close()

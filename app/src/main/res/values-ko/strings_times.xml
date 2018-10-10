@@ -26,44 +26,30 @@
     <string name="time_just_now">방금 전</string>
 
     <plurals name="time_duration_day">
-        <item quantity="zero">0일</item>
-        <item quantity="one">1일</item>
         <item quantity="other">%d일</item>
     </plurals>
 
     <plurals name="time_duration_hour">
-        <item quantity="zero">0시간</item>
-        <item quantity="one">1시간</item>
         <item quantity="other">%d시간</item>
     </plurals>
 
     <plurals name="time_duration_minute">
-        <item quantity="zero">0분</item>
-        <item quantity="one">1분</item>
         <item quantity="other">%d분</item>
     </plurals>
 
     <plurals name="time_duration_second">
-        <item quantity="zero">0초</item>
-        <item quantity="one">1초</item>
         <item quantity="other">%d초</item>
     </plurals>
 
     <plurals name="time_duration_hour_short">
-        <item quantity="zero">0시간</item>
-        <item quantity="one">1시간</item>
         <item quantity="other">%d시간</item>
     </plurals>
 
     <plurals name="time_duration_minute_short">
-        <item quantity="zero">0분</item>
-        <item quantity="one">1분</item>
         <item quantity="other">%d분</item>
     </plurals>
 
     <plurals name="time_duration_second_short">
-        <item quantity="zero">0초</item>
-        <item quantity="one">1초</item>
         <item quantity="other">%d초</item>
     </plurals>
 

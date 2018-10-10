@@ -99,7 +99,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         tabLayout.setupWithViewPager(mViewPager)
         val numPages = mSectionsPagerAdapter.count
         val inflater = LayoutInflater.from(this)
-        for (i in 0..numPages - 1) {
+        for (i in 0 until numPages) {
             val tabView = inflater.inflate(R.layout.layout_tracker_detail_tab_view, tabLayout, false)
             tabLayout.getTabAt(i)?.customView = tabView
 

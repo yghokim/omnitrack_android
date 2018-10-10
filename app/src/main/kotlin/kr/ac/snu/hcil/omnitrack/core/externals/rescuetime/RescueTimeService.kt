@@ -99,7 +99,7 @@ class RescueTimeService(context: Context) : OAuth2BasedExternalService(context, 
 
                 val list = ArrayList<JSONObject>()
 
-                for (i in 0..array.length() - 1) {
+                for (i in 0 until array.length()) {
                     val element = array.getJSONObject(i)
                     val date = AuthConstants.DATE_FORMAT.parse(element.getString("date"))
                     if (date >= startDate && date < endDate) {

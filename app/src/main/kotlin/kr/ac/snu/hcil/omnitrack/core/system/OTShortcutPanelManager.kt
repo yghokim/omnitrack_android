@@ -66,7 +66,7 @@ class OTShortcutPanelManager @Inject constructor(
 
     private fun buildNewNotificationShortcutViews(trackerList: List<OTTrackerDAO>, context: Context, bigStyle: Boolean): RemoteViews {
         val trackers = trackerList.filter {
-            it.isIndependentInputLocked() == false
+            !it.isIndependentInputLocked()
         }
 
         val rv = RemoteViews(context.packageName, if (bigStyle) R.layout.remoteview_shortcut_notification_big else R.layout.remoteview_shortcut_notification_normal)
@@ -93,7 +93,7 @@ class OTShortcutPanelManager @Inject constructor(
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
         paint.style = Paint.Style.FILL
 
-        for (i in 0..MAX_NUM_SHORTCUTS - 1) {
+        for (i in 0 until MAX_NUM_SHORTCUTS) {
             val element = RemoteViews(context.packageName, if (bigStyle) R.layout.remoteview_shortcut_notification_element else R.layout.remoteview_shortcut_notification_element_normal)
 
             if (trackers.size - 1 < i) {

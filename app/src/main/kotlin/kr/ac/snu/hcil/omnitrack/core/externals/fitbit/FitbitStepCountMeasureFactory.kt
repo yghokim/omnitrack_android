@@ -67,8 +67,7 @@ class FitbitStepCountMeasureFactory(context: Context, parentService: FitbitServi
                 val json = JSONObject(requestResultStrings.first())
                 println("convert $json")
                 if (json.has("summary")) {
-                    val steps = json.getJSONObject("summary").getInt("steps")
-                    return steps
+                    return json.getJSONObject("summary").getInt("steps")
 
                 } else return null
             }

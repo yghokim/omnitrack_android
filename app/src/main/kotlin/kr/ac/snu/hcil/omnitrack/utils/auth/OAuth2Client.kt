@@ -188,7 +188,7 @@ class OAuth2Client(val context: Context, val config: OAuth2Config) {
     private fun <T> requestAwait(credential: Credential, converter: OAuth2RequestConverter<T>, credentialRefreshedListener: OAuth2CredentialRefreshedListener?, vararg urls: String): T? {
         val result = ArrayList<String>()
         for (url in urls) {
-            println("fetching ${url}")
+            println("fetching $url")
             var response = requestAwait(credential, url)
 
             println("fetching finished")

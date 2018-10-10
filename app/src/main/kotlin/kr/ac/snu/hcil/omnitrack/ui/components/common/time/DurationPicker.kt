@@ -44,7 +44,7 @@ class DurationPicker : ConstraintLayout, View.OnClickListener {
     private val digitButtonUp: View by bindView(R.id.ui_keypad_up)
 
     private val buttons: List<View> by lazy {
-        digitButtons + listOf<View>(
+        digitButtons + listOf(
                 digitButton00, digitButtonUp
         )
     }
@@ -286,7 +286,7 @@ class DurationPicker : ConstraintLayout, View.OnClickListener {
     }
 
     private fun shiftDigit(vararg newDigits: Byte) {
-        for (i in newDigits.size..digits.size - 1) {
+        for (i in newDigits.size until digits.size) {
             digits[i - newDigits.size] = digits[i]
         }
 

@@ -100,7 +100,7 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
 
         creationSubscriptions.add(
                 viewModel.chartViewModels.subscribe { newList ->
-                    println("new chart data list: ${newList}")
+                    println("new chart data list: $newList")
                     val diffResult = DiffUtil.calculateDiff(
                             TrackerChartViewListViewModel.ChartViewModelListDiffUtilCallback(currentChartViewModelList, newList)
                     )
@@ -177,9 +177,11 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
 
         override fun getItemViewType(position: Int): Int {
             val model = currentChartViewModelList[position]
-            return if (model is INativeChartModel) {
-                VIEW_TYPE_NATIVE
-            } else if (model is IWebBasedChartModel) VIEW_TYPE_WEB else throw IllegalArgumentException("model should implement either INativeChartModel or IWebBasedChartModel.")
+            return when (model) {
+                is INativeChartModel -> VIEW_TYPE_NATIVE
+                is IWebBasedChartModel -> VIEW_TYPE_WEB
+                else -> throw IllegalArgumentException("model should implement either INativeChartModel or IWebBasedChartModel.")
+            }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChartViewHolder {

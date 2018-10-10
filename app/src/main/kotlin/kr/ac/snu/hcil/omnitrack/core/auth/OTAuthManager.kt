@@ -119,7 +119,7 @@ class OTAuthManager @Inject constructor(
             SignedInLevel.NONE
         }
 
-        println("Current signed in level: ${result}")
+        println("Current signed in level: $result")
         return result
     }
 
@@ -138,7 +138,7 @@ class OTAuthManager @Inject constructor(
             if (user != null) {
                 val task = user.getIdToken(true).addOnCompleteListener { result ->
                     if (result.isSuccessful) {
-                        val token = result.result.token!!
+                        val token = result.result?.token!!
                         if (!disposable.isDisposed) {
                             disposable.onSuccess(token)
                         }

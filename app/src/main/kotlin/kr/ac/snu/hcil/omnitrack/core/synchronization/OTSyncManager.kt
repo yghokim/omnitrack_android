@@ -79,7 +79,7 @@ class OTSyncManager @Inject constructor(
             return@defer Single.zip(downEntries.map { (type, direction, ignoreFlags) -> syncClient.get().getDirtyRowsToSync(type, ignoreFlags).map { Pair(type, it) } }) { clientDirtyRowsArray ->
                 clientDirtyRowsArray.map { it as Pair<ESyncDataType, List<String>> }
             }.flatMap {
-                println("sync send dirty rows to server: ${it}")
+                println("sync send dirty rows to server: $it")
                 syncServer.get().postDirtyRows(*it.map { entry -> ISynchronizationServerSideAPI.DirtyRowBatchParameter(entry.first, entry.second.toTypedArray()) }.toTypedArray())
             }.flatMapCompletable { result ->
                 Completable.merge(result.map { entry -> syncClient.get().setTableSynchronizationFlags(entry.key, entry.value.toList()) })

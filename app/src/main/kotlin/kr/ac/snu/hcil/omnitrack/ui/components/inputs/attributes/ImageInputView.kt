@@ -49,7 +49,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
 
     override var value: OTServerFile? = null
         set(rawValue) {
-            println("image serverUri rawvalue: ${rawValue}")
+            println("image serverUri rawvalue: $rawValue")
             val value = if (rawValue?.serverPath?.isBlank() == true) null else rawValue
             if (field != value) {
                 field = value
@@ -116,7 +116,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
             println("picker uri changed to $uri")
             if (uri == Uri.EMPTY) {
                 value = null
-            } else if (!uri.equals(value?.let { localCacheManager.get().getCachedUriImmediately(it.serverPath) } ?: Uri.EMPTY)) {
+            } else if (uri != value?.let { localCacheManager.get().getCachedUriImmediately(it.serverPath) } ?: Uri.EMPTY) {
                 val newServerPath = localCacheManager.get().generateRandomServerPath(uri)
                 val newServerFile = OTServerFile.fromLocalFile(newServerPath, uri, context)
                 subscriptions.add(
@@ -207,7 +207,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     }
 
     private fun handleCameraInputData(imageBytes: ByteArray): Boolean {
-        println("camerapick result: ${imageBytes}")
+        println("camerapick result: $imageBytes")
 
         try {
             val image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)

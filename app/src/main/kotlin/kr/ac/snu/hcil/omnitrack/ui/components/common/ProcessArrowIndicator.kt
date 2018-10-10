@@ -118,7 +118,7 @@ class ProcessArrowIndicator : View {
         val numPoints = 6
         val pointGapY = (arrowPointBottomCenterY - (paddingTop + arrowPointRadius)) / (numPoints - 1)
 
-        for (pi in 0..numPoints - 1) {
+        for (pi in 0 until numPoints) {
             canvas.drawCircle(horizontalCenter, paddingTop + arrowPointRadius + pi * pointGapY, arrowPointRadius, arrowPointPaint)
         }
 

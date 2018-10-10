@@ -23,9 +23,7 @@ import javax.inject.Inject
  * Created by Young-Ho on 10/8/2017.
  */
 class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
-    companion object {
-        const val CONNECTION_NULL = "null"
-    }
+    companion object
 
     var isInitialized: Boolean = false
         private set
@@ -45,8 +43,8 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
 
     val typeObservable = BehaviorSubject.create<Int>()
 
-    val defaultValuePolicyObservable = BehaviorSubject.createDefault<Int>(-1)
-    val defaultValuePresetObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable<String>(null))
+    val defaultValuePolicyObservable = BehaviorSubject.createDefault(-1)
+    val defaultValuePresetObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable(null))
 
     val isRequiredObservable = BehaviorSubject.createDefault<Boolean>(false)
 
@@ -217,7 +215,7 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
     }
 
     fun applyChanges() {
-        println("state name: ${name}, required: ${isRequired}, dao: ${attributeDAO}")
+        println("state name: $name, required: $isRequired, dao: $attributeDAO")
         attributeDAO?.name = name
         attributeDAO?.fallbackValuePolicy = defaultValuePolicy
         attributeDAO?.fallbackPresetSerializedValue = defaultValuePreset

@@ -48,7 +48,7 @@ class TimeSpan : IStringSerializable {
     }
 
     override fun getSerializedString(): String {
-        return "${from}@${duration}@${timeZone.id}"
+        return "$from@$duration@${timeZone.id}"
     }
 
     override fun fromSerializedString(serialized: String): Boolean {

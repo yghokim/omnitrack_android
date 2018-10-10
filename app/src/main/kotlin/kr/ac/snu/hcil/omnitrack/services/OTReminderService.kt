@@ -18,11 +18,11 @@ class OTReminderService : WakefulService(TAG) {
 
     companion object {
         const val TAG = "OTReminderService"
-        const val ACTION_PREFIX = "${BuildConfig.APPLICATION_ID}.${TAG}.action"
+        const val ACTION_PREFIX = "${BuildConfig.APPLICATION_ID}.$TAG.action"
         //const val ACTION_REMIND = "${ACTION_PREFIX}.remind"
-        const val ACTION_ON_USER_ACCESS = "${ACTION_PREFIX}.user_accessed"
-        const val ACTION_ON_USER_DISMISS = "${ACTION_PREFIX}.dismissed"
-        const val ACTION_ON_USER_LOGGED = "${ACTION_PREFIX}.user_logged"
+        const val ACTION_ON_USER_ACCESS = "$ACTION_PREFIX.user_accessed"
+        const val ACTION_ON_USER_DISMISS = "$ACTION_PREFIX.dismissed"
+        const val ACTION_ON_USER_LOGGED = "$ACTION_PREFIX.user_logged"
 
         const val INTENT_EXTRA_ENTRY_ID = "entryId"
         const val INTENT_EXTRA_LOGGED_AT = "loggedAt"

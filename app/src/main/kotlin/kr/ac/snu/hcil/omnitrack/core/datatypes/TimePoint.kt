@@ -33,7 +33,7 @@ class TimePoint : IStringSerializable, Comparable<TimePoint> {
     }
 
     override fun getSerializedString(): String {
-        return "${timestamp}@${timeZone.id}"
+        return "$timestamp@${timeZone.id}"
     }
 
     override fun fromSerializedString(serialized: String): Boolean {

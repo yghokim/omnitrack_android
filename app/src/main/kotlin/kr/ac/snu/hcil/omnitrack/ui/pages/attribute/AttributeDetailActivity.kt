@@ -187,7 +187,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
         creationSubscriptions.add(
                 viewModel.typeObservable.subscribe { type ->
-                    println("type changed: ${type}")
+                    println("type changed: $type")
                     try {
                         val attrHelper = attributeManager.getAttributeHelper(type)
                         ui_recyclerview_with_fallback.removeAllViewsInLayout()

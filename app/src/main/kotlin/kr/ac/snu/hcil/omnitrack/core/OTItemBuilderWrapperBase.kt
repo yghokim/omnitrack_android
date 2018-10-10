@@ -30,7 +30,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext:
         fun onAttributeStateChanged(attributeLocalId: String, state: EAttributeValueState)
     }
 
-    val keys: Set<String> by lazy { dao.data.mapNotNull { it.attributeLocalId }.toSet() }
+    val keys: Set<String> by lazy { dao.data.asSequence().mapNotNull { it.attributeLocalId }.toSet() }
 
     fun getValueInformationOf(attributeLocalId: String): AnyValueWithTimestamp? {
         return this.dao.data.find { it.attributeLocalId == attributeLocalId }?.let {
@@ -97,9 +97,9 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext:
                                 }.toObservable()
                     } else {
 
-                        println("No connection. use fallback value: ${attrLocalId}")
+                        println("No connection. use fallback value: $attrLocalId")
                         return@mapIndexed attr.getFallbackValue(configuredContext, realm).map { nullable ->
-                            println("No connection. received fallback value: ${attrLocalId}, ${nullable.datum}")
+                            println("No connection. received fallback value: $attrLocalId, ${nullable.datum}")
                             Pair(attrLocalId, AnyValueWithTimestamp(nullable))
                         }.doOnSubscribe {
                             onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.Processing)

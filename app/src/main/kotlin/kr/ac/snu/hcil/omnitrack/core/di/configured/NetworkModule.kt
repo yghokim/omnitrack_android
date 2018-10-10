@@ -76,7 +76,7 @@ class NetworkModule {
                             .addHeader("OTRole", "ServiceUser")
                             .addHeader("OTLocale", LocaleHelper.getLanguageCode(context))
                             .apply {
-                                if (BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank() != true) {
+                                if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
                                     this.addHeader("OTExperiment", BuildConfig.DEFAULT_EXPERIMENT_ID)
                                 }
                             }
@@ -248,6 +248,5 @@ enum class MediaTypeValue {
 annotation class ServerResponsive
 
 
-
-@RealmModule(classes = arrayOf(UploadTaskInfo::class, LocalMediaCacheEntry::class))
+@RealmModule(classes = [UploadTaskInfo::class, LocalMediaCacheEntry::class])
 class UploadTaskQueueRealmModule

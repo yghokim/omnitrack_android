@@ -108,7 +108,7 @@ class LinedTextBase(val textView: View, attrs: AttributeSet?, defStyleAttr: Int 
         }
 
         for (i in start..end) {
-            val y = (baseline + i * lineHeight).toFloat()
+            val y = (baseline + i * lineHeight)
             canvas.drawLine(lineBounds.left.toFloat(), y, lineBounds.right.toFloat(), y, linePaint)
         }
     }

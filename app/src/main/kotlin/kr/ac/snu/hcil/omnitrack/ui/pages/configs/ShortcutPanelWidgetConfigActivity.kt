@@ -121,7 +121,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
     private fun initializeWidget(appWidgetId: Int): Boolean {
 
         if (modeRadioGroup.checkedRadioButtonId == R.id.ui_radio_mode_selective) {
-            if (trackerList?.filter { it.second == true }?.isNotEmpty() != true) {
+            if (trackerList?.any { it.second == true } != true) {
                 DialogHelper.makeSimpleAlertBuilder(this,
                         getString(R.string.msg_at_least_one_tracker_must_be_selected)).show()
                 return false
@@ -140,7 +140,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
         }, editor)
 
         trackerList?.let {
-            OTShortcutPanelWidgetUpdateService.setSelectedTrackerIds(appWidgetId, it.filter { it.second }.map { it.first.objectId!! }.toSet(), editor)
+            OTShortcutPanelWidgetUpdateService.setSelectedTrackerIds(appWidgetId, it.asSequence().filter { it.second }.map { it.first.objectId!! }.toSet(), editor)
         }
         editor.apply()
 

@@ -66,10 +66,9 @@ object OTTriggerViewFactory {
                 }
 
                 override fun getTriggerConfigurationPanel(original: View?, uiContext: Context, configuredContext: ConfiguredContext): IConditionConfigurationView {
-                    val configPanel = if (original is TimeTriggerConfigurationPanel) {
+                    return if (original is TimeTriggerConfigurationPanel) {
                         original
-                    } else kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TimeTriggerConfigurationPanel(uiContext)
-                    return configPanel
+                    } else TimeTriggerConfigurationPanel(uiContext)
                 }
 
                 override fun connectViewModelToDisplayView(viewModel: ATriggerConditionViewModel, displayView: View, outSubscription: CompositeDisposable) {

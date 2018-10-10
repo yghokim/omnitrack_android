@@ -327,7 +327,7 @@ class NumericUpDownImpl(val context: Context, attrs: AttributeSet?, val view: Vi
         displayedValues = state.displayedValues
         quantityResId = state.quantityResId
         zeroPad = state.zeroPad
-        allowLongPress = allowLongPress
+        allowLongPress = state.allowLongPress
 
         valueChanged.suspend = false
         suspendInvalidateValue = false

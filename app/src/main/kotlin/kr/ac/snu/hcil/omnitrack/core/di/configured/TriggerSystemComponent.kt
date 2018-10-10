@@ -13,7 +13,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TimeConditionViewMod
  * Created by younghokim on 2017. 11. 9..
  */
 @Configured
-@Subcomponent(modules = arrayOf(TriggerSystemModule::class, BackendDatabaseModule::class))
+@Subcomponent(modules = [TriggerSystemModule::class, BackendDatabaseModule::class])
 interface TriggerSystemComponent {
 
     @Subcomponent.Builder

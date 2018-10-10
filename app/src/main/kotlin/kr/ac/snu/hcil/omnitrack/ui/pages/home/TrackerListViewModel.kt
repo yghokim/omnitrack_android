@@ -227,7 +227,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                             currentAttributeValidationResultDict[localId] = validationResult
                         }.subscribe {
                             if (attributesResult.find { currentAttributeValidationResultDict[it.localId]?.first == false } == null) {
-                                if ((validationResult.value?.first != false) == false) {
+                                if (!(validationResult.value?.first != false)) {
                                     validationResult.onNext(Pair<Boolean, List<CharSequence>?>(true, null))
                                 }
                             } else {
@@ -278,7 +278,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
             isVisualizationAllowed.onNextIfDifferAndNotNull(!snapshot.isVisualizationLocked())
 
             CreationFlagsHelper.getExperimentId(trackerDao.getParsedCreationFlags())?.let { experimentId ->
-                println("Observe the name of the experiment : ${experimentId}")
+                println("Observe the name of the experiment : $experimentId")
                 subscriptions.add(
                         researchRealm.where(OTExperimentDAO::class.java)
                                 .equalTo("id", experimentId)

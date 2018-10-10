@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import ItemSpacingDecoration
-import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Intent
@@ -174,9 +173,8 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_tracker_detail_triggers, container, false)
 
-        return rootView
+        return inflater.inflate(R.layout.fragment_tracker_detail_triggers, container, false)
     }
 
     override fun onStart() {
@@ -273,8 +271,6 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
         private var attachedTrackerListView: View? = null
 
-        private var currentAlertAnimation: ValueAnimator? = null
-
         private var attachedTrackerInfoList = ArrayList<OTTrackerDAO.SimpleTrackerInfo>()
         private val attachedTrackerListAdapter = AttachedTrackerAdapter()
 
@@ -292,17 +288,18 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         }
 
         override fun onClick(view: View) {
-            if (view === itemView.ui_button_proxy) {
-                val intent = if (viewModel is AManagedTriggerListViewModel) {
-                    TriggerDetailActivity.makeEditTriggerIntent(context!!, attachedViewModel!!.objectId!!, viewModel.defaultTriggerInterfaceOptions)
-                } else if (viewModel is OfflineTriggerListViewModel) {
-                    TriggerDetailActivity.makeEditTriggerIntent(context!!, configuredContext, attachedViewModel!!.dao, viewModel.defaultTriggerInterfaceOptions)
-                } else throw UnsupportedOperationException()
+            when {
+                view === itemView.ui_button_proxy -> {
+                    val intent = if (viewModel is AManagedTriggerListViewModel) {
+                        TriggerDetailActivity.makeEditTriggerIntent(context!!, attachedViewModel!!.objectId!!, viewModel.defaultTriggerInterfaceOptions)
+                    } else if (viewModel is OfflineTriggerListViewModel) {
+                        TriggerDetailActivity.makeEditTriggerIntent(context!!, configuredContext, attachedViewModel!!.dao, viewModel.defaultTriggerInterfaceOptions)
+                    } else throw UnsupportedOperationException()
 
-                startActivityForResult(intent, DETAIL_REQUEST_CODE)
+                    startActivityForResult(intent, DETAIL_REQUEST_CODE)
 
-            } else if (view === itemView.ui_trigger_switch) {
-                attachedViewModel?.toggleSwitchAsync()
+                }
+                view === itemView.ui_trigger_switch -> attachedViewModel?.toggleSwitchAsync()
                         ?.let {
                             subscriptions.add(
                                     it.observeOn(AndroidSchedulers.mainThread()).subscribe({
@@ -330,9 +327,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                                     })
                             )
                         }
-            } else if (view === itemView.ui_button_remove) {
-
-                DialogHelper.makeNegativePhrasedYesNoDialogBuilder(act,
+                view === itemView.ui_button_remove -> DialogHelper.makeNegativePhrasedYesNoDialogBuilder(act,
                         "OmniTrack",
                         String.format(getString(R.string.msg_format_confirm_remove_trigger), getString(OTTriggerInformationHelper.getActionNameResId(viewModel.defaultTriggerInterfaceOptions.defaultActionType)
                                 ?: 0)),
@@ -344,8 +339,6 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                         )
                     }
                 }, onNo = null).show()
-
-
             }
         }
 

@@ -42,7 +42,7 @@ class DayOfWeekSelector : LinearLayout, View.OnClickListener {
             flags = flags or ((if (flag.value) 1 else 0) shl (6 - flag.index))
         }
 
-        println("checked day of week flags: ${flags}")
+        println("checked day of week flags: $flags")
 
         return flags
     }
@@ -77,7 +77,7 @@ class DayOfWeekSelector : LinearLayout, View.OnClickListener {
         val oneLetterDayNames = context.resources.getStringArray(R.array.days_of_week_oneletter)
 
 
-        buttons = Array<CircleBackgroundButton>(7) {
+        buttons = Array(7) {
             index ->
             val button = CircleBackgroundButton(context)
 

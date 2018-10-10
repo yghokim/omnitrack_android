@@ -61,7 +61,7 @@ class OTTriggerSystemManager(
 
     fun tryCheckInToSystem(managedTrigger: OTTriggerDAO): Boolean {
         println("TriggerSystemManager: tryCheckInToSystem: ${managedTrigger.objectId}")
-        if (BuildConfig.DISABLE_EXTERNAL_ENTITIES == false || managedTrigger.experimentIdInFlags == BuildConfig.DEFAULT_EXPERIMENT_ID) {
+        if (!BuildConfig.DISABLE_EXTERNAL_ENTITIES || managedTrigger.experimentIdInFlags == BuildConfig.DEFAULT_EXPERIMENT_ID) {
             if (managedTrigger.isOn) {
 
                 when (managedTrigger.conditionType) {

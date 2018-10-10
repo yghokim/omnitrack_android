@@ -21,7 +21,7 @@ class OTRatingOptionsPropertyHelper : OTPropertyHelper<RatingOptions>() {
         } catch (ex: Exception) {
             println("RatingOptions parsing error - 1st")
             ex.printStackTrace()
-            Gson().fromJson<RatingOptions>(serialized)
+            Gson().fromJson(serialized)
         } catch (ex: Exception) {
             println("RatingOptions naive parsing error - return new object")
             ex.printStackTrace()

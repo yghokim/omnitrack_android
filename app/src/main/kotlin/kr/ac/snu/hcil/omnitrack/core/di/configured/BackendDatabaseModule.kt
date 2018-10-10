@@ -38,7 +38,7 @@ class BackendDatabaseModule {
     @Configured
     @Backend
     fun makeBackendDbRealmProvider(@Backend configuration: RealmConfiguration): Factory<Realm> {
-        return Factory<Realm> { Realm.getInstance(configuration) }
+        return Factory { Realm.getInstance(configuration) }
     }
 }
 

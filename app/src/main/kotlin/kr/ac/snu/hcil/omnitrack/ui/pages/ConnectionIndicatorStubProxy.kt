@@ -53,7 +53,7 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : View.OnAttac
             }
 
             if (connectionInvalidMessages == null) {
-                connectionInvalidMessages = ArrayList<CharSequence>()
+                connectionInvalidMessages = ArrayList()
             }
             connectionInvalidMessages?.clear()
             if (connection.isAvailableToRequestValue(connectionInvalidMessages)) {

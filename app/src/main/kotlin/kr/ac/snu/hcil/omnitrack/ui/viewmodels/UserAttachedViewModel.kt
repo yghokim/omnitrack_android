@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.utils.Nullable
  */
 open class UserAttachedViewModel(application: Application) : RealmViewModel(application) {
 
-    private val _userIdSubject = BehaviorSubject.createDefault<Nullable<String>>(Nullable<String>(null))
+    private val _userIdSubject = BehaviorSubject.createDefault<Nullable<String>>(Nullable(null))
     var userId: String?
         get() = _userIdSubject.value?.datum
         set(value) {
