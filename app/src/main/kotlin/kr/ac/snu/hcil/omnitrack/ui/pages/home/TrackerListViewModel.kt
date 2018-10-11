@@ -1,6 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.app.Application
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.support.v4.content.LocalBroadcastManager
 import dagger.Lazy
 import dagger.internal.Factory
 import io.reactivex.Flowable
@@ -22,6 +27,7 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
+import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import kr.ac.snu.hcil.omnitrack.utils.*
 import java.util.*
@@ -52,10 +58,27 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
     private val currentTrackerViewModelList = ArrayList<TrackerInformationViewModel>()
 
+    private val requiredPermissionsSubject: BehaviorSubject<Array<String>> = BehaviorSubject.create()
+
     private lateinit var researchRealm: Realm
 
     val trackerViewModels: Observable<List<TrackerInformationViewModel>>
         get() = trackerViewModelListSubject
+
+    val requiredPermissions: Observable<Array<String>>
+        get() = requiredPermissionsSubject
+
+    private val syncIntentFilter: IntentFilter by lazy {
+        IntentFilter(OTSynchronizationService.BROADCAST_ACTION_SYNCHRONIZATION_FINISHED)
+    }
+    private val syncBroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == OTSynchronizationService.BROADCAST_ACTION_SYNCHRONIZATION_FINISHED) {
+                val entityTypes = intent.getIntArrayExtra(OTSynchronizationService.BROADCAST_EXTRA_ENTITY_TYPES).map { ESyncDataType.values()[it] }
+                println("synchronization finished: ${entityTypes.joinToString(", ")}")
+            }
+        }
+    }
 
     override fun onInject(configuredContext: ConfiguredContext) {
         configuredContext.configuredAppComponent.inject(this)
@@ -65,7 +88,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
     override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet) {
         if (snapshot.isLoaded && snapshot.isValid) {
             if (changeSet.state == OrderedCollectionChangeSet.State.INITIAL) {
-                println("Viewmodel first time limit")
+                println("Viewmodel first time emit")
                 //first time emit
                 clearTrackerViewModelList()
                 val viewModels = snapshot.map { TrackerInformationViewModel(it, realm, researchRealm, dbManager.get(), configuredContext) }
@@ -93,14 +116,20 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         }
     }
 
-    fun getPermissionsRequiredForFields(): Set<String> {
-        val set = HashSet<String>()
-        for (tracker in currentTrackerViewModelList) {
-            tracker.trackerDao.attributes
-                    .mapNotNull { it.getHelper(configuredContext).getRequiredPermissions(it) }
-                    .forEach { set.addAll(it) }
-        }
-        return set
+    private fun makeTrackerPermissions(): Flowable<Set<String>> {
+        return realm.where(OTTrackerDAO::class.java)
+                .equalTo(BackendDbManager.FIELD_REMOVED_BOOLEAN, false)
+                .equalTo(BackendDbManager.FIELD_USER_ID, userId)
+                .findAllAsync().asFlowable().filter { it.isValid == true && it.isLoaded == true }
+                .map { trackers ->
+                    val set = HashSet<String>()
+                    for (tracker in trackers) {
+                        tracker.attributes
+                                .mapNotNull { it.getHelper(configuredContext).getRequiredPermissions(it) }
+                                .forEach { set.addAll(it) }
+                    }
+                    set
+                }
     }
 
     fun generateNewTrackerName(): String {
@@ -117,6 +146,14 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         trackersRealmResults?.addChangeListener(this)
 
         shortcutPanelManager.get().registerShortcutRefreshSubscription(newUserId, TAG)
+
+        LocalBroadcastManager.getInstance(getApplication()).registerReceiver(syncBroadcastReceiver, syncIntentFilter)
+
+        this.subscriptions.add(
+                makeTrackerPermissions().subscribe { permissions ->
+                    this.requiredPermissionsSubject.onNext(permissions.toTypedArray())
+                }
+        )
     }
 
     override fun onCleared() {
@@ -129,6 +166,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         researchRealm.close()
         clearTrackerViewModelList()
         shortcutPanelManager.get().unregisterShortcutRefreshSubscription(TAG)
+        LocalBroadcastManager.getInstance(getApplication()).unregisterReceiver(syncBroadcastReceiver)
     }
 
     private fun clearTrackerViewModelList() {

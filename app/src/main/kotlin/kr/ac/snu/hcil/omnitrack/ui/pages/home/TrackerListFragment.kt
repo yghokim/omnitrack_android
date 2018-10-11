@@ -193,6 +193,12 @@ class TrackerListFragment : OTFragment() {
 
         viewModel = ViewModelProviders.of(this).get(TrackerListViewModel::class.java)
         viewModel.userId = authManager.userId
+
+        creationSubscriptions.add(
+                viewModel.requiredPermissions.subscribe { permissions ->
+                    appendNewPermissions(*permissions.filter { ContextCompat.checkSelfPermission(act, it) != PackageManager.PERMISSION_GRANTED }.toTypedArray())
+                }
+        )
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -271,8 +277,6 @@ class TrackerListFragment : OTFragment() {
         super.onStart()
         startSubscriptions.add(
                 viewModel.trackerViewModels.subscribe { trackerViewModelList ->
-
-                    appendNewPermissions(*viewModel.getPermissionsRequiredForFields().filter { ContextCompat.checkSelfPermission(act, it) != PackageManager.PERMISSION_GRANTED }.toTypedArray())
 
                     val diffResult = DiffUtil.calculateDiff(
                             IReadonlyObjectId.DiffUtilCallback(currentTrackerViewModelList, trackerViewModelList)

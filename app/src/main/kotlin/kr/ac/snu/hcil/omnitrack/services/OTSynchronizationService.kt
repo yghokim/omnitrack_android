@@ -1,11 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.services
 
+import android.content.Intent
+import android.support.v4.content.LocalBroadcastManager
 import com.firebase.jobdispatcher.JobParameters
 import com.firebase.jobdispatcher.JobService
 import com.github.salomonbrys.kotson.jsonObject
 import dagger.Lazy
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
@@ -24,6 +27,8 @@ class OTSynchronizationService : JobService() {
         val TAG = OTSynchronizationService::class.java.simpleName
         const val EXTRA_KEY_ONESHOT = "isOneShot"
         const val EXTRA_KEY_FULLSYNC = "fullSync"
+        const val BROADCAST_ACTION_SYNCHRONIZATION_FINISHED = "${BuildConfig.APPLICATION_ID}:synchronization_finished"
+        const val BROADCAST_EXTRA_ENTITY_TYPES = "entityTypes"
     }
 
 
@@ -95,6 +100,11 @@ class OTSynchronizationService : JobService() {
                 }
                         .subscribe({ batchData ->
                             println(batchData)
+                            LocalBroadcastManager.getInstance(this).sendBroadcast(Intent(
+                                    BROADCAST_ACTION_SYNCHRONIZATION_FINISHED
+                            ).apply {
+                                putExtra(BROADCAST_EXTRA_ENTITY_TYPES, batchData.data.map { it.first.ordinal }.toIntArray())
+                            })
                         }, { err ->
                             err.printStackTrace()
                             onStopped()
