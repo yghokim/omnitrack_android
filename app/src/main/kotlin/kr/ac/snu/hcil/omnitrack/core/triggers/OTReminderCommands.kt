@@ -151,6 +151,7 @@ class OTReminderCommands(val context: Context) {
                         it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                         context.runOnUiThread {
                             startActivity(it)
+
                         }
                     }
                 }

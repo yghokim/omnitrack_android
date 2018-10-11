@@ -195,14 +195,11 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
         val userId = configuredContext.configuredAppComponent.getAuthManager().userId
         println("received a test trigger ping - ${triggerId}")
         if (triggerId != null && triggerId.isNotBlank() && userId != null) {
-            val realm = configuredContext.configuredAppComponent.backendRealmFactory().get()
-            val trigger = configuredContext.configuredAppComponent.getBackendDbManager().getTriggerQueryWithId(triggerId, realm).equalTo(BackendDbManager.FIELD_USER_ID, userId).findFirst()
-            if (trigger != null) {
-                subscriptions.add(
-                        trigger.getPerformFireCompletable(System.currentTimeMillis(), jsonObject("source" to "ping_test"), configuredContext).subscribe {
-                            println("trigger fire for ping test complete.")
-                        })
+            configuredContext.configuredAppComponent.backendRealmFactory().get().use { realm ->
+                val trigger = configuredContext.configuredAppComponent.getBackendDbManager().getTriggerQueryWithId(triggerId, realm).equalTo(BackendDbManager.FIELD_USER_ID, userId).findFirst()
+                trigger?.getPerformFireCompletable(System.currentTimeMillis(), jsonObject("source" to "ping_test"), configuredContext)?.blockingAwait()
             }
+
         }
     }
 }

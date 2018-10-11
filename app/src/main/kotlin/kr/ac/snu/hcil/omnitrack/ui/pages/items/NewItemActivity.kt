@@ -98,9 +98,12 @@ class NewItemActivity : AItemDetailActivity<NewItemCreationViewModel>(NewItemCre
         viewModel.init(trackerId, metadata, savedInstanceState)
     }
 
+    init {
+        println("intialized")
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
         redirectedPageCanceledSnackbar = Snackbar.make(ui_root, resources.getText(R.string.msg_redirected_page_canceled), Snackbar.LENGTH_INDEFINITE)
         redirectedPageCanceledSnackbar.setAction(resources.getText(R.string.msg_reopen_redirected_page)) { view ->

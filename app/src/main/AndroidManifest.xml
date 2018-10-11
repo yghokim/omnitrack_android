@@ -258,8 +258,7 @@
         <activity
             android:name=".ui.pages.items.NewItemActivity"
             android:autoRemoveFromRecents="true"
-            android:launchMode="singleTop"
-            android:taskAffinity="" />
+            android:taskAffinity="${applicationId}.new_item" />
 
         <activity android:name=".ui.pages.items.ItemEditActivity" />
 
