@@ -19,6 +19,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfigurationController
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
@@ -44,6 +45,8 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
 
         const val COMMAND_NEW_UPDATE_RELEASED = "update_released"
         const val COMMAND_EXPERIMENT_DROPPED = "experiment_dropped"
+
+        const val COMMAND_TEST_TRIGGER_PING = "test_trigger_ping"
     }
 
     @Inject
@@ -118,6 +121,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
                                     COMMAND_DUMP_DB -> handleDumpCommand(data, configuredContext)
                                     COMMAND_EXPERIMENT_DROPPED -> handleExperimentDropout(data, configuredContext)
                                     COMMAND_TEXT_MESSAGE -> handleMessageCommand(data, configuredContext)
+                                    COMMAND_TEST_TRIGGER_PING -> handleTestTriggerPing(data, configuredContext)
                                 }
                             } catch (ex: Exception) {
                                 ex.printStackTrace()
@@ -184,5 +188,21 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
                 .setStyle(NotificationCompat.BigTextStyle().setBigContentTitle(title).bigText(contentHtml))
 
         notificationManager.notify(TAG, System.currentTimeMillis().toInt(), notificationBuilder.build())
+    }
+
+    private fun handleTestTriggerPing(data: Map<String, String>, configuredContext: ConfiguredContext) {
+        val triggerId = data.get("triggerId")
+        val userId = configuredContext.configuredAppComponent.getAuthManager().userId
+        println("received a test trigger ping - ${triggerId}")
+        if (triggerId != null && triggerId.isNotBlank() && userId != null) {
+            val realm = configuredContext.configuredAppComponent.backendRealmFactory().get()
+            val trigger = configuredContext.configuredAppComponent.getBackendDbManager().getTriggerQueryWithId(triggerId, realm).equalTo(BackendDbManager.FIELD_USER_ID, userId).findFirst()
+            if (trigger != null) {
+                subscriptions.add(
+                        trigger.getPerformFireCompletable(System.currentTimeMillis(), jsonObject("source" to "ping_test"), configuredContext).subscribe {
+                            println("trigger fire for ping test complete.")
+                        })
+            }
+        }
     }
 }
