@@ -4,7 +4,6 @@ import android.app.Application
 import android.os.Bundle
 import com.google.gson.JsonObject
 import io.reactivex.Maybe
-import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
@@ -56,7 +55,17 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         outState.putInt(KEY_REDIRECTED_PAGE_VISIT_STATUS, this.redirectedPageVisitStatusObservable.value?.ordinal
                 ?: RedirectedPageStatus.RedirectionNotSet.ordinal)
         outState.putString(KEY_RESERVED_NEW_ITEM_ID, reservedNewItemId)
-        val stored = cacheEditingInfo().blockingGet()
+        refreshDaoValues()
+        var highestBuilderEntryId = realm.where(OTItemBuilderFieldValueEntry::class.java).max("id")?.toLong()
+                ?: 0L
+        itemBuilderDao.data.forEach {
+            if (!it.isManaged && it.id == -1L) {
+                it.id = ++highestBuilderEntryId
+            }
+        }
+        realm.executeTransaction {
+            realm.insertOrUpdate(itemBuilderDao)
+        }
     }
 
     fun init(trackerId: String, metadata: JsonObject, savedInstanceState: Bundle?) {
@@ -74,6 +83,8 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
 
             val storedBuilderDao = if (savedInstanceState != null && savedInstanceState.containsKey(KEY_BUILDER_ID)) {
                 //there is a pending itemBuilder.
+
+                println("restore the itemBuilder")
                 realm.where(OTItemBuilderDAO::class.java).equalTo("id", savedInstanceState.getLong(KEY_BUILDER_ID)).findFirst()
             } else null
 
@@ -145,30 +156,6 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
                 val value = attrViewModel.value
                 itemBuilderDao.setValue(attrViewModel.attributeLocalId, value)
             }
-        }
-    }
-
-    fun cacheEditingInfo(): Single<Boolean> {
-        return Single.defer {
-            if (isValid) {
-                println("save builder")
-                refreshDaoValues()
-                isBusyObservable.filter { !it }.firstOrError().map { isBusy ->
-                    if (!isBusy) {
-                        var highestBuilderEntryId = realm.where(OTItemBuilderFieldValueEntry::class.java).max("id")?.toLong()
-                                ?: 0L
-                        itemBuilderDao.data.forEach {
-                            if (!it.isManaged && it.id == -1L) {
-                                it.id = ++highestBuilderEntryId
-                            }
-                        }
-                        realm.executeTransaction {
-                            realm.insertOrUpdate(itemBuilderDao)
-                        }
-                        true
-                    } else false
-                }
-            } else Single.just(false)
         }
     }
 
