@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.datatypes
 
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
+import kr.ac.snu.hcil.omnitrack.utils.toDatetimeString
 import java.util.*
 
 /**
@@ -47,4 +48,7 @@ class TimePoint : IStringSerializable, Comparable<TimePoint> {
         }
     }
 
+    override fun toString(): String {
+        return "TimePoint{${timestamp.toDatetimeString()}, ${timeZone.displayName}}"
+    }
 }

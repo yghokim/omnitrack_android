@@ -134,9 +134,6 @@ class OTTimeAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeH
                 GRANULARITY_MINUTE -> inputView.setPickerMode(DateTimePicker.MINUTE)
                 GRANULARITY_SECOND -> inputView.setPickerMode(DateTimePicker.SECOND)
             }
-
-            inputView.value = TimePoint(System.currentTimeMillis(), configuredContext.configuredAppComponent.getPreferredTimeZone().id)
-
         }
     }
 

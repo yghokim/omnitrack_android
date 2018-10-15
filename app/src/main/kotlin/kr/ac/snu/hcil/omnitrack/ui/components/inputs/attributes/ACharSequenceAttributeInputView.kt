@@ -15,7 +15,6 @@ abstract class ACharSequenceAttributeInputView(layoutId: Int, context: Context, 
     override var value: CharSequence? = null
         set(rawValue) {
             val value: String? = if (rawValue?.isNotBlank() == true) rawValue.toString().trimEnd() else null
-            println("TextView comparison. original: $field | new: $value | isDifferent: ${field != value}")
             if (field != value) {
                 field = value
                 if (valueView.text.toString() != value || !(valueView.text.toString().isBlank() && value.isNullOrBlank())) {
