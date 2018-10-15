@@ -284,6 +284,11 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
             return currentAttributeViewModelList.size
         }
 
+        override fun onViewRecycled(holder: ViewHolder) {
+            super.onViewRecycled(holder)
+            holder.validationIndicator.cancelAnimation()
+        }
+
         inner class ViewHolder(val inputView: AAttributeInputView<out Any>, frame: View) : View.OnClickListener, RecyclerView.ViewHolder(frame) {
 
             private val columnNameView: TextView by bindView(R.id.ui_column_name)
@@ -300,31 +305,30 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
             private val loadingIndicatorInContainer: View by bindView(R.id.ui_container_indicator)
 
-            private val validationIndicator: LottieAnimationView by bindView(R.id.ui_validation_indicator)
+            internal val validationIndicator: LottieAnimationView by bindView(R.id.ui_validation_indicator)
 
             private val internalSubscriptions = CompositeDisposable()
 
             private var currentValidationState: Boolean by Delegates.observable(true) { property, old, new ->
-                if (old != new) {
-                    if (new) {
-
-                        //validation
-                        if (validationIndicator.progress != 1f || validationIndicator.progress != 0f) {
-                            validationIndicator.setMinProgress(0.5f)
-                            validationIndicator.setMaxProgress(1.0f)
-                            validationIndicator.progress = 0.5f
-                            validationIndicator.playAnimation()
-                        }
-                    } else {
-                        //invalidated
-                        if (validationIndicator.progress != 0.5f) {
-                            validationIndicator.setMinProgress(0.0f)
-                            validationIndicator.setMaxProgress(0.5f)
-                            validationIndicator.progress = 0f
-                            validationIndicator.playAnimation()
-                        }
+                /*if (new) {
+                    //valid
+                    if (validationIndicator.progress != 1f || validationIndicator.progress != 0f) {
+                        validationIndicator.setMinProgress(0.5f)
+                        validationIndicator.setMaxProgress(1.0f)
+                        validationIndicator.progress = 0.5f
+                        validationIndicator.playAnimation()
                     }
-                }
+                } else {
+                    //invalid
+                    if (validationIndicator.progress != 0.5f) {
+                        validationIndicator.setMinProgress(0.0f)
+                        validationIndicator.setMaxProgress(0.5f)
+                        validationIndicator.progress = 0f
+                        validationIndicator.playAnimation()
+                    }
+                }*/
+
+                validationIndicator.progress = if (new) 1.0f else 0.5f
             }
 
 
