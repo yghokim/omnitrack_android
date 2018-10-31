@@ -46,7 +46,7 @@ buildscript {
     ext.rxandroid_version = '2.1.0'
     ext.retrofit_version = '2.4.0'
     ext.okhttp_version = '3.10.0'
-    ext.gradle_version = '3.2.0'
+    ext.gradle_version = '3.2.1'
 
     repositories {
         jcenter()

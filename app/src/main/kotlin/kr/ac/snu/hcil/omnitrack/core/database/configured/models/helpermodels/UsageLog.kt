@@ -6,6 +6,7 @@ import com.google.gson.stream.JsonWriter
 import io.realm.RealmObject
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 
 /**
  * Created by younghokim on 2017. 11. 28..
@@ -41,6 +42,10 @@ open class UsageLog : RealmObject() {
             out.name("user").value(value.userId)
             out.name("deviceId").value(value.deviceId)
             out.name("timestamp").value(value.timestamp)
+
+            if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
+                out.name("experiment").value(BuildConfig.DEFAULT_EXPERIMENT_ID)
+            }
 
             out.endObject()
         }
