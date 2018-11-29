@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.work.Worker
+import androidx.work.WorkerParameters
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -111,7 +112,7 @@ class OTReminderService : WakefulService(TAG) {
         return START_NOT_STICKY
     }
 
-    class ReminderDismissWorker : Worker() {
+    class ReminderDismissWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
         override fun doWork(): Result {
             return try {
@@ -132,7 +133,7 @@ class OTReminderService : WakefulService(TAG) {
         }
     }
 
-    class SystemRebootWorker : Worker() {
+    class SystemRebootWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
         override fun doWork(): Result {
             return try {
                 //this.applicationContext.startService(OTReminderService.makeReminderDismissedIntent(this.applicationContext, configId, triggerId, entryId))

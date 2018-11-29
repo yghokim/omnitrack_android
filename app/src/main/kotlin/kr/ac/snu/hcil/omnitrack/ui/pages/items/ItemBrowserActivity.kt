@@ -54,7 +54,6 @@ import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import org.jetbrains.anko.dip
-import org.jetbrains.anko.support.v4.act
 import org.jetbrains.anko.verticalMargin
 import java.text.SimpleDateFormat
 import java.util.*
@@ -708,7 +707,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
-            (act.application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+            (activity.application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
             viewModel = ViewModelProviders.of(activity!!).get(ItemListViewModel::class.java)
 
             dialogSubscriptions.add(
@@ -780,7 +779,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             purgeMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.clear_cache, getString(R.string.msg_purge_cache), null, isEnabled = false, onClick = {
                 dialogSubscriptions.add(
                         localCacheManager.purgeSynchronizedCacheFiles(viewModel.trackerId).subscribe { count ->
-                            Toast.makeText(act, "Removed $count files", Toast.LENGTH_LONG).show()
+                            Toast.makeText(activity, "Removed $count files", Toast.LENGTH_LONG).show()
                             refreshPurgeButton()
                         }
                 )
@@ -798,7 +797,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                 viewModel.trackerDao.let {
 
-                    val configDialog = OTTableExportService.makeConfigurationDialog(act, configuredContext, it) { includeFile, tableFileType ->
+                    val configDialog = OTTableExportService.makeConfigurationDialog(activity, configuredContext, it) { includeFile, tableFileType ->
                         exportConfigIncludeFile = includeFile
                         exportConfigTableFileType = tableFileType
 
@@ -808,9 +807,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                         val intent = FileHelper.makeSaveLocationPickIntent("omnitrack_export_${it.name}_${SimpleDateFormat("yyyyMMddHHmmss").format(Date())}.$extension")
 
                         if (includeFile) {
-                            val currentNetworkConnectionInfo = NetworkHelper.getCurrentNetworkConnectionInfo(act)
+                            val currentNetworkConnectionInfo = NetworkHelper.getCurrentNetworkConnectionInfo(activity)
                             if (currentNetworkConnectionInfo.internetConnected && !currentNetworkConnectionInfo.isUnMetered) {
-                                DialogHelper.makeYesNoDialogBuilder(act, "OmniTrack", getString(R.string.msg_export_warning_mobile_network), R.string.msg_export, onYes = {
+                                DialogHelper.makeYesNoDialogBuilder(activity, "OmniTrack", getString(R.string.msg_export_warning_mobile_network), R.string.msg_export, onYes = {
                                     this@SettingsDialogFragment.startActivityForResult(intent, ItemBrowserActivity.SettingsDialogFragment.REQUEST_CODE_FILE_LOCATION_PICK)
                                 })
                                         .show()
@@ -860,7 +859,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     if (exportUri != null) {
                         println(exportUri.toString())
                         viewModel.trackerDao.objectId?.let {
-                            val serviceIntent = OTTableExportService.makeIntent(act, it, exportUri.toString(), exportConfigIncludeFile, exportConfigTableFileType)
+                            val serviceIntent = OTTableExportService.makeIntent(requireActivity(), it, exportUri.toString(), exportConfigIncludeFile, exportConfigTableFileType)
                             this@SettingsDialogFragment.dismiss()
                             activity?.startService(serviceIntent)
                         }

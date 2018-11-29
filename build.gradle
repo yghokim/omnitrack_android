@@ -36,16 +36,16 @@ ext {
 }
 
 buildscript {
-    ext.kotlin_version = '1.2.71'
+    ext.kotlin_version = '1.3.10'
     ext.android_support_version = '28.0.0'
-    ext.dagger_version = '2.16'
+    ext.dagger_version = '2.19'
     ext.gson_version = '2.8.5'
     ext.glide_version = '4.7.1'
     ext.picasso_version = '2.71828'
-    ext.rxjava_version = '2.2.2'
+    ext.rxjava_version = '2.2.4'
     ext.rxandroid_version = '2.1.0'
     ext.retrofit_version = '2.4.0'
-    ext.okhttp_version = '3.10.0'
+    ext.okhttp_version = '3.11.0'
     ext.gradle_version = '3.2.1'
 
     repositories {
@@ -55,7 +55,7 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:$gradle_version"
         classpath 'com.google.gms:google-services:3.1.2'
-        classpath "io.realm:realm-gradle-plugin:5.7.0"
+        classpath "io.realm:realm-gradle-plugin:5.8.0"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.cookpad.android.licensetools:license-tools-plugin:1.4.0'
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.3'
