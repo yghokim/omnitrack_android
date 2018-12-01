@@ -707,7 +707,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
-            (activity.application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+            (requireActivity().application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
             viewModel = ViewModelProviders.of(activity!!).get(ItemListViewModel::class.java)
 
             dialogSubscriptions.add(
@@ -797,7 +797,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                 viewModel.trackerDao.let {
 
-                    val configDialog = OTTableExportService.makeConfigurationDialog(activity, configuredContext, it) { includeFile, tableFileType ->
+                    val configDialog = OTTableExportService.makeConfigurationDialog(requireActivity(), configuredContext, it) { includeFile, tableFileType ->
                         exportConfigIncludeFile = includeFile
                         exportConfigTableFileType = tableFileType
 
@@ -807,9 +807,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                         val intent = FileHelper.makeSaveLocationPickIntent("omnitrack_export_${it.name}_${SimpleDateFormat("yyyyMMddHHmmss").format(Date())}.$extension")
 
                         if (includeFile) {
-                            val currentNetworkConnectionInfo = NetworkHelper.getCurrentNetworkConnectionInfo(activity)
+                            val currentNetworkConnectionInfo = NetworkHelper.getCurrentNetworkConnectionInfo(requireActivity())
                             if (currentNetworkConnectionInfo.internetConnected && !currentNetworkConnectionInfo.isUnMetered) {
-                                DialogHelper.makeYesNoDialogBuilder(activity, "OmniTrack", getString(R.string.msg_export_warning_mobile_network), R.string.msg_export, onYes = {
+                                DialogHelper.makeYesNoDialogBuilder(requireActivity(), "OmniTrack", getString(R.string.msg_export_warning_mobile_network), R.string.msg_export, onYes = {
                                     this@SettingsDialogFragment.startActivityForResult(intent, ItemBrowserActivity.SettingsDialogFragment.REQUEST_CODE_FILE_LOCATION_PICK)
                                 })
                                         .show()
