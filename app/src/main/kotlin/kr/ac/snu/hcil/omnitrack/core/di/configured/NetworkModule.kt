@@ -204,6 +204,7 @@ class NetworkModule {
 
         return ReactiveNetwork.checkInternetConnectivity(
                 InternetObservingSettings
+                        .builder()
                         .host(serverUri.host)
                         .port(serverUri.port)
                         .strategy(SocketInternetObservingStrategy())

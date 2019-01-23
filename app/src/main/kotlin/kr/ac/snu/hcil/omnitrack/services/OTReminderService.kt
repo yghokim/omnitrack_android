@@ -125,10 +125,10 @@ class OTReminderService : WakefulService(TAG) {
                 commands.dismissSyncImpl(entryId, realm)
                 realm.close()
                 OTApp.logger.writeSystemLog("Successfully dismissed reminder by Worker. entryId: $entryId", "ReminderDismissWorker")
-                Result.SUCCESS
+                Result.success()
             } catch (ex: Exception) {
                 OTApp.logger.writeSystemLog("ReminderDismissWorker doWork error: \n${Log.getStackTraceString(ex)}", "ReminderDismissWorker")
-                Result.FAILURE
+                Result.failure()
             }
         }
     }
@@ -142,10 +142,10 @@ class OTReminderService : WakefulService(TAG) {
                 commands.handlSystemRebootSyncImpl(realm)
                 realm.close()
                 OTApp.logger.writeSystemLog("Successfully handled reboot for reminder by Worker.", "OTReminderService.SystemRebootWorker")
-                Result.SUCCESS
+                Result.success()
             } catch (ex: Exception) {
                 OTApp.logger.writeSystemLog("Reminder Reboot Handling failed: \n ${Log.getStackTraceString(ex)}", "OTReminderService.SystemRebootWorker")
-                Result.RETRY
+                Result.retry()
             }
         }
     }
