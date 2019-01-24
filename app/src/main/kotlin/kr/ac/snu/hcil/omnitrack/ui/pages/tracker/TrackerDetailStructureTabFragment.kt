@@ -88,7 +88,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
     private val viewHolderSubscriptions = CompositeDisposable()
 
     private val columnNameDialogBuilder: MaterialDialog.Builder by lazy {
-        MaterialDialog.Builder(activity)
+        MaterialDialog.Builder(requireContext())
                 .title(R.string.msg_change_field_name)
                 .inputType(InputType.TYPE_CLASS_TEXT)
                 .inputRangeRes(1, 20, R.color.colorRed)
@@ -270,7 +270,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         checkRequiredInformationVisibility()
 
         if (savedInstanceState == null) {
-            tutorialManager.checkAndShowTargetPrompt("TrackerDetail_add_attribute", true, activity, newAttributeButton, R.string.msg_tutorial_add_attribute_primary, R.string.msg_tutorial_add_attribute_secondary, this.viewModel.color)
+            tutorialManager.checkAndShowTargetPrompt("TrackerDetail_add_attribute", true, requireActivity(), newAttributeButton, R.string.msg_tutorial_add_attribute_primary, R.string.msg_tutorial_add_attribute_secondary, this.viewModel.color)
         }
     }
 
@@ -373,7 +373,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     fun openAttributeDetailActivity(position: Int) {
         val attrViewModel = currentAttributeViewModelList[position]
-        startActivityForResult(AttributeDetailActivity.makeIntent(activity, configuredContext, attrViewModel.makeFrontalChangesToDao()), REQUEST_CODE_ATTRIBUTE_DETAIL)
+        startActivityForResult(AttributeDetailActivity.makeIntent(requireContext(), configuredContext, attrViewModel.makeFrontalChangesToDao()), REQUEST_CODE_ATTRIBUTE_DETAIL)
     }
 
     fun scrollToBottom() {
@@ -640,14 +640,14 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 viewHolderSubscriptions.add(
                         attributeViewModel.typeObservable.subscribe { args ->
 
-                            preview = attributeManager.getAttributeHelper(args).getInputView(activity, true, attributeViewModel.makeFrontalChangesToDao(), preview)
+                            preview = attributeManager.getAttributeHelper(args).getInputView(requireContext(), true, attributeViewModel.makeFrontalChangesToDao(), preview)
                         }
                 )
 
                 viewHolderSubscriptions.add(
                         attributeViewModel.onPropertyChanged.subscribe {
                             attributeViewModel.typeObservable.value?.let { type ->
-                                preview = attributeManager.getAttributeHelper(type).getInputView(activity, true, attributeViewModel.makeFrontalChangesToDao(), preview)
+                                preview = attributeManager.getAttributeHelper(type).getInputView(requireContext(), true, attributeViewModel.makeFrontalChangesToDao(), preview)
                             }
                         }
                 )

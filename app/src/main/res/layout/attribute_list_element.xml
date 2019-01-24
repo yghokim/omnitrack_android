@@ -27,117 +27,129 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/drag_handle" />
 
-        <LinearLayout
-            android:id="@+id/ui_attribute_card_header"
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/ui_attribute_type"
+            android:layout_width="@dimen/attribute_list_element_header_type_icon_width"
+            android:layout_height="@dimen/attribute_list_element_header_height"
+            android:layout_marginStart="8dp"
+            android:paddingTop="@dimen/attribute_list_element_header_type_icon_padding"
+            android:paddingBottom="@dimen/attribute_list_element_header_type_icon_padding"
+            android:tint="@color/titleTextColor"
+
+            app:layout_constraintStart_toEndOf="@+id/ui_drag_handle"
+            app:layout_constraintTop_toTopOf="@id/ui_button_remove"
+            app:srcCompat="@drawable/icon_small_location" />
+
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/ui_required_marker"
+            android:layout_width="9dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="2.5dp"
+            android:clickable="false"
+            android:scaleType="fitStart"
+            android:tint="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="@+id/ui_attribute_type"
+            app:layout_constraintStart_toEndOf="@id/ui_attribute_type"
+            app:layout_constraintTop_toTopOf="@id/ui_attribute_type"
+            app:srcCompat="@drawable/icon_asterisk" />
+
+        <TextView
+            android:id="@+id/ui_column_name"
+            style="@style/AttributeDetailFieldName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/ui_drag_handle"
-            android:minHeight="45dp"
-            android:orientation="horizontal"
-            android:paddingEnd="0dp"
-            app:layout_constraintLeft_toRightOf="@+id/ui_drag_handle"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:clickable="false"
+            android:paddingBottom="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/ui_button_visible"
+            app:layout_constraintStart_toEndOf="@id/ui_required_marker"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Very very long asdlfkja ;fljf ;sifi djf; lsajf as;dlkf jds; lkdsaj fdls; kfjas;d lfkdjs;al fdfkj s;lkfj  " />
 
-            <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/ui_attribute_type"
-                android:layout_width="@dimen/attribute_list_element_header_type_icon_width"
-                android:layout_height="@dimen/attribute_list_element_header_height"
-                android:layout_gravity="top"
-                android:paddingBottom="@dimen/attribute_list_element_header_type_icon_padding"
-                android:paddingTop="@dimen/attribute_list_element_header_type_icon_padding"
-                android:tint="@color/titleTextColor"
-                app:srcCompat="@drawable/icon_small_location" />
+        <View
+            android:id="@+id/ui_column_name_button"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/transparent_button_background"
 
-            <LinearLayout
-                android:id="@+id/ui_column_name_button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/transparent_button_background"
-                android:orientation="horizontal">
+            app:layout_constraintBottom_toBottomOf="@id/barrier_header"
+            app:layout_constraintEnd_toStartOf="@id/ui_button_visible"
+            app:layout_constraintStart_toEndOf="@id/ui_attribute_type"
+            app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/ui_column_name"
-                    style="@style/AttributeDetailFieldName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="7dp"
-                    android:clickable="false"
-                    tools:text="Very very long attribute name" />
-
-                <android.support.v7.widget.AppCompatImageView
-                    android:id="@+id/ui_required_marker"
-                    android:layout_width="9dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="2.5dp"
-                    android:clickable="false"
-                    android:scaleType="fitStart"
-                    android:tint="@color/colorAccent"
-                    app:srcCompat="@drawable/icon_asterisk" />
-            </LinearLayout>
-
-            <ImageButton
-                android:id="@+id/ui_button_visible"
-                android:layout_width="@dimen/attribute_list_element_header_height"
-                android:layout_height="@dimen/attribute_list_element_header_height"
-                android:background="@drawable/transparent_button_background"
-                android:tint="@color/textColorLight"
-                app:srcCompat="@drawable/icon_visible" />
+        <ImageButton
+            android:id="@+id/ui_button_visible"
+            android:layout_width="@dimen/attribute_list_element_header_height"
+            android:layout_height="@dimen/attribute_list_element_header_height"
+            android:background="@drawable/transparent_button_background"
+            android:tint="@color/textColorLight"
+            app:layout_constraintBottom_toBottomOf="@+id/ui_button_edit"
+            app:layout_constraintEnd_toStartOf="@id/ui_button_edit"
+            app:layout_constraintTop_toTopOf="@+id/ui_button_edit"
+            app:srcCompat="@drawable/icon_visible" />
 
 
-            <ImageButton
-                android:id="@+id/ui_button_edit"
-                android:layout_width="@dimen/attribute_list_element_header_height"
-                android:layout_height="@dimen/attribute_list_element_header_height"
-                android:layout_gravity="top"
-                android:background="@drawable/transparent_button_background"
-                android:padding="@dimen/attribute_list_element_edit_padding"
-                android:scaleType="fitCenter"
-                android:tint="@color/textColorLight"
-                app:srcCompat="@drawable/edit_dark" />
+        <ImageButton
+            android:id="@+id/ui_button_edit"
+            android:layout_width="@dimen/attribute_list_element_header_height"
+            android:layout_height="@dimen/attribute_list_element_header_height"
+            android:background="@drawable/transparent_button_background"
+            android:padding="@dimen/attribute_list_element_edit_padding"
+            android:scaleType="fitCenter"
+            android:tint="@color/textColorLight"
+            app:layout_constraintBottom_toBottomOf="@+id/ui_button_remove"
+            app:layout_constraintEnd_toStartOf="@id/ui_button_remove"
+            app:layout_constraintTop_toTopOf="@+id/ui_button_remove"
+            app:srcCompat="@drawable/edit_dark" />
 
-            <ImageButton
-                android:id="@+id/ui_button_remove"
-                android:layout_width="@dimen/attribute_list_element_header_height"
-                android:layout_height="@dimen/attribute_list_element_header_height"
-                android:layout_gravity="top"
-                android:background="@drawable/transparent_button_background"
-                android:padding="@dimen/attribute_list_element_remove_padding"
-                android:scaleType="fitCenter"
-                android:tint="@color/textColorLight"
-                app:srcCompat="@drawable/icon_ex_big" />
+        <ImageButton
+            android:id="@+id/ui_button_remove"
+            android:layout_width="@dimen/attribute_list_element_header_height"
+            android:layout_height="@dimen/attribute_list_element_header_height"
+            android:background="@drawable/transparent_button_background"
+            android:baseline="30dp"
+            android:padding="@dimen/attribute_list_element_remove_padding"
+            android:scaleType="fitCenter"
+            android:tint="@color/textColorLight"
+            app:layout_constraintBaseline_toBaselineOf="@id/ui_column_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/icon_ex_big" />
 
-        </LinearLayout>
+        <android.support.constraint.Barrier
+            android:id="@+id/barrier_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="ui_attribute_type, ui_column_name, ui_button_remove" />
+
 
         <kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
             android:id="@+id/ui_preview_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ui_attribute_card_header"
             android:layout_toEndOf="@+id/ui_drag_handle"
             android:background="@drawable/top_separator_light_light"
 
             android:minHeight="15dp"
             android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingStart="0dp"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/activity_vertical_margin"
             app:layout_constraintLeft_toRightOf="@+id/ui_drag_handle"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ui_attribute_card_header" />
+            app:layout_constraintTop_toBottomOf="@+id/barrier_header" />
         <ViewStub
             android:id="@+id/ui_connection_indicator_stub"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ui_preview_container"
-            android:layout_gravity="left"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
             android:layout_toEndOf="@+id/ui_drag_handle"
             android:inflatedId="@+id/ui_connection_indicator"
             android:layout="@layout/layout_connection_indicator_light"
