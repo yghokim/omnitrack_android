@@ -466,6 +466,7 @@
     <string name="msg_at_least_one_tracker_must_be_selected">At least one tracker must be selected.</string>
     <string name="msg_remove_field">Remove Field</string>
     <string name="msg_format_confirm_move_to_trashcan_field">Do you want to remove %1$s field?</string>
+    <string name="msg_format_confirm_remove_can_hide">Do you want to remove %1$s field? You can also hide the field temporarily.</string>
 
     <string name="msg_next">Next</string>
     <string name="msg_current_version">Current Version</string>
@@ -649,5 +650,6 @@
     <string name="msg_menu_details">Details</string>
     <string name="msg_insert_new_choice_entry">Insert new choice entry</string>
     <string name="msg_confirm_remove_appended_entry">Remove the appended entry?</string>
+    <string name="msg_hide_field">Hide Field</string>
 
 </resources>

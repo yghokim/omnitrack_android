@@ -1,4 +1,3 @@
-
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.app.Activity.RESULT_OK
@@ -9,6 +8,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.support.v4.widget.NestedScrollView
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.AppCompatImageView
@@ -319,8 +319,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
         //val snackBarContainer: CoordinatorLayout = rootView.findViewById(R.id.ui_snackbar_container) as CoordinatorLayout
         removalSnackbar = Snackbar.make(rootView, resources.getText(R.string.msg_attribute_removed_message), 5000)
-        removalSnackbar.setAction(resources.getText(R.string.msg_undo)) {
-            view ->
+        removalSnackbar.setAction(resources.getText(R.string.msg_undo)) { view ->
             createViewSubscriptions.add(
                     viewModel.undoRemove().subscribe({
 
@@ -495,42 +494,63 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 if (view === editButton || view === previewContainer) {
                     openAttributeDetailActivity(adapterPosition)
                 } else if (view === removeButton) {
-                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(act,
+                    val attrViewModel = currentAttributeViewModelList[adapterPosition]
+                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(activity!!,
                             getString(R.string.msg_remove_field),
-                            String.format(getString(R.string.msg_format_confirm_move_to_trashcan_field),
-                                    currentAttributeViewModelList[adapterPosition].name
+                            String.format(getString(if (!attrViewModel.isHidden) R.string.msg_format_confirm_remove_can_hide else R.string.msg_format_confirm_move_to_trashcan_field),
+                                    attrViewModel.name
                             ),
                             R.string.msg_remove, R.string.msg_cancel, {
-                        val removedViewModel = currentAttributeViewModelList[adapterPosition]
-                        viewModel.removeAttribute(removedViewModel)
+                        viewModel.removeAttribute(attrViewModel)
                         showRemovalSnackbar()
 
-                        eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_REMOVE, removedViewModel.attributeDAO.localId, viewModel.trackerId)
+                        eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_REMOVE, attrViewModel.attributeDAO.localId, viewModel.trackerId)
 
-                    }, onNo = null).show()
+                    }, onNo = null)
+                            .let {
+                                if (!attrViewModel.isHidden) {
+                                    it.neutralText(getString(R.string.msg_hide_field))
+                                            .neutralColor(ContextCompat.getColor(requireContext(), R.color.colorAccent))
+                                            .onNeutral { dialog, which ->
+                                                setFieldHidden(true)
+                                            }
+                                } else {
+                                    it
+                                }
+                            }.show()
                 } else if (view === columnNameButton) {
 
                     columnNameDialogBuilder
-                                .input(null, currentAttributeViewModelList[adapterPosition].name, false) {
-                                    dialog, input ->
-                                    if (currentAttributeViewModelList[adapterPosition].name.compareTo(input.toString()) != 0) {
-                                        currentAttributeViewModelList[adapterPosition].name = input.toString()
-                                        if (currentAttributeViewModelList[adapterPosition].isInDatabase) {
-                                            currentAttributeViewModelList[adapterPosition].applyChanges()
-                                        }
-                                        attributeListAdapter.notifyItemChanged(adapterPosition)
+                            .input(null, currentAttributeViewModelList[adapterPosition].name, false) { dialog, input ->
+                                if (currentAttributeViewModelList[adapterPosition].name.compareTo(input.toString()) != 0) {
+                                    currentAttributeViewModelList[adapterPosition].name = input.toString()
+                                    if (currentAttributeViewModelList[adapterPosition].isInDatabase) {
+                                        currentAttributeViewModelList[adapterPosition].applyChanges()
                                     }
-                                }.show()
+                                    attributeListAdapter.notifyItemChanged(adapterPosition)
+                                }
+                            }.show()
                 } else if (view === itemView.ui_button_visible) {
-                    val attrViewModel = currentAttributeViewModelList[adapterPosition]
-                    attrViewModel.isHidden = !attrViewModel.isHidden
+                    setFieldHidden(!currentAttributeViewModelList[adapterPosition].isHidden)
+                }
+            }
+
+            private fun setFieldHidden(isHidden: Boolean): Boolean {
+                val attrViewModel = currentAttributeViewModelList[adapterPosition]
+                if (attrViewModel.isHidden != isHidden) {
+                    attrViewModel.isHidden = isHidden
                     if (attrViewModel.isInDatabase) {
                         attrViewModel.applyChanges()
                     }
                     attributeListAdapter.notifyItemChanged(adapterPosition)
-                }
+                    eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_EDIT, attrViewModel.attributeDAO.localId, viewModel.trackerId)
+                    { it ->
+                        it.addProperty(IEventLogger.CONTENT_KEY_PROPERTY, "isHidden")
+                        it.addProperty(IEventLogger.CONTENT_KEY_NEWVALUE, isHidden)
+                    }
+                    return true
+                } else return false
             }
-
 
             fun bindAttribute(attributeViewModel: TrackerDetailViewModel.AttributeInformationViewModel) {
                 typeIconView.setImageResource(attributeViewModel.icon)
@@ -589,8 +609,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 )
 
                 viewHolderSubscriptions.add(
-                        attributeViewModel.nameObservable.subscribe {
-                            args ->
+                        attributeViewModel.nameObservable.subscribe { args ->
                             columnNameView.text = args
                         }
                 )

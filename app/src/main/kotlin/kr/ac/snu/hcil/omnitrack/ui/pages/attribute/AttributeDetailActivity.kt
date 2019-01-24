@@ -15,6 +15,7 @@ import com.github.salomonbrys.kotson.set
 import com.jaredrummler.materialspinner.MaterialSpinner
 import dagger.Lazy
 import kotlinx.android.synthetic.main.activity_attribute_detail.*
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
@@ -108,7 +109,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         }
 
         ui_attribute_connection.onRemoveButtonClicked += { sender, arg ->
-            DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_remove_connection), R.string.msg_remove, onYes = {
+            DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this, BuildConfig.APP_NAME, resources.getString(R.string.msg_confirm_remove_connection), R.string.msg_remove, onYes = {
                 viewModel.connection = null
             }).show()
         }

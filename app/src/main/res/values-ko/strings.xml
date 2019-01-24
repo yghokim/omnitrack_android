@@ -353,6 +353,8 @@
     <string name="msg_at_least_one_tracker_must_be_selected">한 개 이상의 트래커를 선택하여야 합니다.</string>
     <string name="msg_remove_field">필드 삭제</string>
     <string name="msg_format_confirm_move_to_trashcan_field">%1$s 필드를 삭제하시겠습니까?</string>
+    <string name="msg_format_confirm_remove_can_hide">%1$s 필드를 삭제하시겠습니까? 영구히 삭제하는 대신 임시로 감출 수도 있습니다.</string>
+
 
     <string name="msg_next">다음</string>
     <string name="msg_current_version">설치된 버젼</string>
@@ -461,6 +463,7 @@
     <string name="msg_menu_details">상세보기</string>
     <string name="msg_insert_new_choice_entry">새로 추가할 선택항목을 입력하세요.</string>
     <string name="msg_confirm_remove_appended_entry">선택지를 삭제하시겠습니까?</string>
+    <string name="msg_hide_field">필드 감추기</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>
