@@ -1,150 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/frontalBackground"
-    android:orientation="vertical"
     android:paddingBottom="20dp"
-    android:paddingRight="@dimen/activity_horizontal_margin">
+    android:paddingStart="0dp"
+    android:paddingEnd="@dimen/activity_horizontal_margin"
+    android:paddingTop="17dp">
 
-    <com.google.android.flexbox.FlexboxLayout
-        android:id="@+id/header"
-        android:layout_width="match_parent"
+    <!--start header-->
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/ui_validation_indicator"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="12dp"
+        android:baseline="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBaseline_toBaselineOf="@id/ui_column_name"
+        app:lottie_autoPlay="false"
+        app:lottie_cacheStrategy="weak"
+
+        app:lottie_fileName="lottie/lottie_circle_color_transition_cycle.json"
+        app:lottie_loop="false"
+        app:lottie_progress="0.5" />
+
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/ui_required_marker"
+        android:layout_width="11dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:minHeight="?attr/actionBarSize"
-        android:paddingBottom="12dp"
-        android:paddingTop="12dp"
-        app:flexWrap="nowrap">
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:minWidth="11dp"
+        android:paddingBottom="5dp"
+        android:scaleType="fitStart"
+        android:tint="@color/colorAccent"
+        app:layout_alignSelf="center"
+        app:layout_constraintBottom_toBottomOf="@+id/ui_validation_indicator"
 
+        app:layout_constraintStart_toEndOf="@+id/ui_validation_indicator"
+        app:layout_constraintTop_toTopOf="@+id/ui_validation_indicator"
+        app:layout_flexShrink="0"
+        app:srcCompat="@drawable/icon_asterisk" />
+
+    <TextView
+        android:id="@+id/ui_column_name"
+        style="@style/PropertyHeaderStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="12dp"
+        android:lineSpacingMultiplier="1.2"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/ui_timestamp"
+        app:layout_constraintStart_toEndOf="@+id/ui_required_marker"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum" />
+
+
+    <TextView
+        android:id="@+id/ui_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:fontFamily="sans-serif-light"
+        android:gravity="end"
+        android:maxLines="1"
+        android:textColor="@color/textColorMid"
+        android:textSize="14sp"
+        android:textStyle="italic"
+        app:fontPath="fonts/Roboto-Light.ttf"
+        app:layout_alignSelf="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBaseline_toBaselineOf="@id/ui_column_name"
+        app:layout_constraintHorizontal_weight="1"
+
+        tools:ignore="MissingPrefix"
+        tools:text="Just now" />
+
+    <android.support.constraint.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="ui_validation_indicator, ui_column_name, ui_required_marker, ui_timestamp" />
+
+
+    <!--end header-->
+
+    <FrameLayout
+        android:id="@+id/sidebar"
+        android:layout_width="?attr/actionBarSize"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/barrier"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
         <!--
-        <View
-            android:id="@+id/ui_state_indicator"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:layout_gravity="center"
-            android:layout_marginLeft="17dp"
-            android:layout_marginRight="17dp"
-            android:background="@drawable/green_circle"
-            app:layout_alignSelf="center"
-            app:layout_flexShrink="0" />-->
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/ui_validation_indicator"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            app:layout_alignSelf="center"
-            app:layout_flexShrink="0"
-            app:lottie_autoPlay="false"
-            app:lottie_cacheStrategy="weak"
-            app:lottie_fileName="lottie/lottie_circle_color_transition_cycle.json"
-            app:lottie_loop="false"
-            app:lottie_progress="0.5" />
+                    <ImageButton
+                        android:id="@+id/ui_button_option"
+                        android:visibility="gone"
+                        android:layout_width="@dimen/button_height_tiny"
+                        android:layout_height="@dimen/button_height_tiny"
+                        android:layout_gravity="bottom|center_horizontal"
+                        android:background="@drawable/transparent_button_background"
+                        android:padding="6dp"
+                        android:scaleType="centerInside"
+                        android:tint="@color/textColorLight"
+                        app:srcCompat="@drawable/more" />-->
+    </FrameLayout>
 
-        <TextView
-            android:id="@+id/ui_column_name"
-            style="@style/PropertyHeaderStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:lineSpacingMultiplier="1.2"
-            android:textSize="16sp"
-            app:layout_alignSelf="center"
-            tools:text="Text aoewfi af; ioeadk awdfk djk jaw;oefij ao;ewij ew;ofkj wdkfj dw;kfj " />
-
-        <android.support.v7.widget.AppCompatImageView
-            android:id="@+id/ui_required_marker"
-            android:layout_width="11dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="8dp"
-            android:minWidth="11dp"
-            android:paddingBottom="5dp"
-            android:scaleType="fitStart"
-            android:tint="@color/colorAccent"
-            app:layout_alignSelf="center"
-            app:layout_flexShrink="0"
-            app:srcCompat="@drawable/icon_asterisk" />
-
-        <TextView
-            android:id="@+id/ui_timestamp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:fontFamily="sans-serif-light"
-            android:gravity="right"
-            android:maxLines="1"
-            android:textColor="@color/textColorMid"
-            android:textSize="14sp"
-            android:textStyle="italic"
-            app:fontPath="fonts/Roboto-Light.ttf"
-            app:layout_alignSelf="center"
-            app:layout_flexGrow="100000"
-            app:layout_flexShrink="0"
-            tools:text="Just now"
-
-            tools:ignore="MissingPrefix" />
-    </com.google.android.flexbox.FlexboxLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
+        android:id="@+id/ui_input_view_container"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        tools:layout_height="200dp"
+        android:layout_marginBottom="12dp"
 
-        <FrameLayout
-            android:id="@+id/sidebar"
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="match_parent">
-            <!--
-                        <ImageButton
-                            android:id="@+id/ui_button_option"
-                            android:visibility="gone"
-                            android:layout_width="@dimen/button_height_tiny"
-                            android:layout_height="@dimen/button_height_tiny"
-                            android:layout_gravity="bottom|center_horizontal"
-                            android:background="@drawable/transparent_button_background"
-                            android:padding="6dp"
-                            android:scaleType="centerInside"
-                            android:tint="@color/textColorLight"
-                            app:srcCompat="@drawable/more" />-->
-        </FrameLayout>
+        app:layout_constraintTop_toTopOf="@id/sidebar"
+        app:layout_constraintBottom_toTopOf="@id/ui_connection_indicator"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/sidebar"
 
-        <LinearLayout
-            android:id="@+id/ui_content_container"
-            android:layout_width="match_parent"
+        >
+
+        <com.github.ybq.android.spinkit.SpinKitView
+            android:id="@+id/ui_container_indicator"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_gravity="center"
+            android:visibility="gone"
+            app:SpinKit_Color="@color/colorPointed"
+            app:SpinKit_Style="ThreeBounce" />
+    </kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout>
 
-            <kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
-                android:id="@+id/ui_input_view_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout_height="200dp">
+    <ViewStub
+        android:id="@+id/ui_connection_indicator_stub"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:inflatedId="@+id/ui_connection_indicator"
+        android:layout="@layout/layout_connection_indicator_light"
 
-                <com.github.ybq.android.spinkit.SpinKitView
-                    android:id="@+id/ui_container_indicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:visibility="gone"
-                    app:SpinKit_Color="@color/colorPointed"
-                    app:SpinKit_Style="ThreeBounce" />
-            </kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout>
-
-            <ViewStub
-                android:id="@+id/ui_connection_indicator_stub"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:layout_marginTop="12dp"
-                android:inflatedId="@+id/ui_connection_indicator"
-                android:layout="@layout/layout_connection_indicator_light" />
-        </LinearLayout>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/sidebar"
+        />
 
 
-    </LinearLayout>
-
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>
