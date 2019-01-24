@@ -36,7 +36,7 @@ ext {
 }
 
 buildscript {
-    ext.kotlin_version = '1.3.11'
+    ext.kotlin_version = '1.3.20'
     ext.android_support_version = '28.0.0'
     ext.dagger_version = '2.19'
     ext.gson_version = '2.8.5'

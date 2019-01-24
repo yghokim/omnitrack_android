@@ -1,0 +1,4 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/bookmarked_empty" android:state_activated="false" />
+    <item android:drawable="@drawable/bookmarked_fill" android:state_activated="true" />
+</selector>

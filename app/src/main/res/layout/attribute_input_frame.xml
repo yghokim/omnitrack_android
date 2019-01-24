@@ -12,21 +12,17 @@
 
     <!--start header-->
 
-    <com.airbnb.lottie.LottieAnimationView
+    <android.support.v7.widget.AppCompatImageView
         android:id="@+id/ui_validation_indicator"
         android:layout_width="30dp"
         android:layout_height="30dp"
+        android:padding="8dp"
         android:layout_gravity="center"
         android:layout_marginStart="12dp"
         android:baseline="20dp"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBaseline_toBaselineOf="@id/ui_column_name"
-        app:lottie_autoPlay="false"
-        app:lottie_cacheStrategy="weak"
-
-        app:lottie_fileName="lottie/lottie_circle_color_transition_cycle.json"
-        app:lottie_loop="false"
-        app:lottie_progress="0.5" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/validation_indicator_toggle" />
 
 
     <android.support.v7.widget.AppCompatImageView

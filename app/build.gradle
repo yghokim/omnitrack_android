@@ -277,7 +277,6 @@ dependencies {
     implementation "com.squareup.retrofit2:adapter-rxjava2:$rootProject.ext.retrofit_version"
     implementation "com.squareup.retrofit2:converter-scalars:$rootProject.ext.retrofit_version"
     implementation "com.squareup.picasso:picasso:$rootProject.ext.picasso_version"
-    implementation 'com.airbnb.android:lottie:2.6.1'
     implementation 'org.atteo:evo-inflector:1.2.2'
     implementation 'us.feras.mdv:markdownview:1.1.0'
     implementation 'com.jaredrummler:material-spinner:1.2.5'

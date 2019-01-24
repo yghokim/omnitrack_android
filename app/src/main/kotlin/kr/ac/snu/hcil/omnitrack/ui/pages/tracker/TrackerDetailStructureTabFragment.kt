@@ -47,7 +47,6 @@ import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import org.jetbrains.anko.support.v4.act
 import org.jetbrains.anko.support.v4.dip
 import javax.inject.Inject
 
@@ -89,7 +88,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
     private val viewHolderSubscriptions = CompositeDisposable()
 
     private val columnNameDialogBuilder: MaterialDialog.Builder by lazy {
-        MaterialDialog.Builder(act)
+        MaterialDialog.Builder(activity)
                 .title(R.string.msg_change_field_name)
                 .inputType(InputType.TYPE_CLASS_TEXT)
                 .inputRangeRes(1, 20, R.color.colorRed)
@@ -139,7 +138,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         nameProperty.dialogTitle = String.format(getString(R.string.msg_format_change_name), getString(R.string.msg_text_tracker))
 
 
-        isOnShortcutProperty.setToggleMode(this.viewModel.isBookmarked, false)
+        isOnShortcutProperty.value = this.viewModel.isBookmarked
         isOnShortcutProperty.showEditedOnTitle = this.viewModel.isBookmarkedDirty
 
         applyColorTheme(this.viewModel.color, false)
@@ -271,7 +270,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         checkRequiredInformationVisibility()
 
         if (savedInstanceState == null) {
-            tutorialManager.checkAndShowTargetPrompt("TrackerDetail_add_attribute", true, act, newAttributeButton, R.string.msg_tutorial_add_attribute_primary, R.string.msg_tutorial_add_attribute_secondary, this.viewModel.color)
+            tutorialManager.checkAndShowTargetPrompt("TrackerDetail_add_attribute", true, activity, newAttributeButton, R.string.msg_tutorial_add_attribute_primary, R.string.msg_tutorial_add_attribute_secondary, this.viewModel.color)
         }
     }
 
@@ -374,7 +373,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     fun openAttributeDetailActivity(position: Int) {
         val attrViewModel = currentAttributeViewModelList[position]
-        startActivityForResult(AttributeDetailActivity.makeIntent(act, configuredContext, attrViewModel.makeFrontalChangesToDao()), REQUEST_CODE_ATTRIBUTE_DETAIL)
+        startActivityForResult(AttributeDetailActivity.makeIntent(activity, configuredContext, attrViewModel.makeFrontalChangesToDao()), REQUEST_CODE_ATTRIBUTE_DETAIL)
     }
 
     fun scrollToBottom() {
@@ -641,14 +640,14 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 viewHolderSubscriptions.add(
                         attributeViewModel.typeObservable.subscribe { args ->
 
-                            preview = attributeManager.getAttributeHelper(args).getInputView(act, true, attributeViewModel.makeFrontalChangesToDao(), preview)
+                            preview = attributeManager.getAttributeHelper(args).getInputView(activity, true, attributeViewModel.makeFrontalChangesToDao(), preview)
                         }
                 )
 
                 viewHolderSubscriptions.add(
                         attributeViewModel.onPropertyChanged.subscribe {
                             attributeViewModel.typeObservable.value?.let { type ->
-                                preview = attributeManager.getAttributeHelper(type).getInputView(act, true, attributeViewModel.makeFrontalChangesToDao(), preview)
+                                preview = attributeManager.getAttributeHelper(type).getInputView(activity, true, attributeViewModel.makeFrontalChangesToDao(), preview)
                             }
                         }
                 )

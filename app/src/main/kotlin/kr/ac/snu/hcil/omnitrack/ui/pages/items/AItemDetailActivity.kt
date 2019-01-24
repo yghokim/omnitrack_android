@@ -13,7 +13,6 @@ import android.widget.TextView
 import android.widget.Toast
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
-import com.airbnb.lottie.LottieAnimationView
 import com.github.salomonbrys.kotson.*
 import com.google.gson.JsonObject
 import io.reactivex.Completable
@@ -284,11 +283,6 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
             return currentAttributeViewModelList.size
         }
 
-        override fun onViewRecycled(holder: ViewHolder) {
-            super.onViewRecycled(holder)
-            holder.validationIndicator.cancelAnimation()
-        }
-
         inner class ViewHolder(val inputView: AAttributeInputView<out Any>, frame: View) : View.OnClickListener, RecyclerView.ViewHolder(frame) {
 
             private val columnNameView: TextView by bindView(R.id.ui_column_name)
@@ -305,7 +299,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
             private val loadingIndicatorInContainer: View by bindView(R.id.ui_container_indicator)
 
-            internal val validationIndicator: LottieAnimationView by bindView(R.id.ui_validation_indicator)
+            internal val validationIndicator: AppCompatImageView by bindView(R.id.ui_validation_indicator)
 
             private val internalSubscriptions = CompositeDisposable()
 
@@ -328,12 +322,11 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
                     }
                 }*/
 
-                validationIndicator.progress = if (new) 1.0f else 0.5f
+                validationIndicator.isActivated = new
             }
 
 
             init {
-                validationIndicator.progress = 0.0f
 
                 container.addView(inputView, 0)
 
@@ -374,15 +367,10 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
             }
 
             fun bind(attributeViewModel: ItemEditionViewModelBase.AttributeInputViewModel) {
-                validationIndicator.pauseAnimation()
 
                 InterfaceHelper.alertBackground(this.itemView)
 
-                if (attributeViewModel.isValidated) {
-                    validationIndicator.progress = 0.0f
-                } else {
-                    validationIndicator.progress = 0.5f
-                }
+                validationIndicator.isActivated = attributeViewModel.isValidated
 
                 internalSubscriptions.clear()
 
