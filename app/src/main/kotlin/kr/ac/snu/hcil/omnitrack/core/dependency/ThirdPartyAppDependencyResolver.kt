@@ -1,12 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.dependency
 
-import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
+import androidx.fragment.app.FragmentActivity
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
@@ -107,7 +107,7 @@ class ThirdPartyAppDependencyResolver(val packageName: String, val appName: Text
         }
     }
 
-    override fun tryResolve(activity: Activity): Single<Boolean> {
+    override fun tryResolve(activity: FragmentActivity): Single<Boolean> {
         return Single.defer {
             try {
                 activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))

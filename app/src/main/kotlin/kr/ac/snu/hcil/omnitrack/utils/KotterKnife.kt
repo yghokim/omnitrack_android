@@ -2,12 +2,12 @@ package butterknife
 
 import android.app.Activity
 import android.app.Dialog
-import android.support.v7.widget.RecyclerView.ViewHolder
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.AdapterLinearLayout
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
-import android.support.v4.app.Fragment as SupportFragment
+import androidx.fragment.app.Fragment as SupportFragment
 
 fun <V : View> View.bindView(id: Int)
         : ReadOnlyProperty<View, V> = required(id, viewFinder)

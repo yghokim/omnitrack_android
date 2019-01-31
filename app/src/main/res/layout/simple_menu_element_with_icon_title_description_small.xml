@@ -7,7 +7,7 @@
     android:minHeight="@dimen/button_height_normal"
     android:orientation="horizontal">
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/icon"
         android:layout_width="@dimen/button_height_small"
         android:layout_height="@dimen/button_height_small"

@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.di.global.ColorPalette

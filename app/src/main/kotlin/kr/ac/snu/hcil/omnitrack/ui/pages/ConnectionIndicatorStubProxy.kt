@@ -1,11 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages
 
-import android.support.v4.content.res.ResourcesCompat
-import android.support.v7.widget.AppCompatImageView
-import android.support.v7.widget.TooltipCompat
 import android.view.View
 import android.view.ViewStub
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.TooltipCompat
+import androidx.core.content.res.ResourcesCompat
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import java.util.*

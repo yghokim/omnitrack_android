@@ -2,11 +2,11 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.support.design.widget.BottomSheetBehavior
-import android.support.design.widget.BottomSheetDialogFragment
-import android.support.design.widget.CoordinatorLayout
-import android.support.v4.app.DialogFragment
 import android.view.View
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.fragment.app.DialogFragment
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 /**
  * Created by younghokim on 2017. 9. 23..

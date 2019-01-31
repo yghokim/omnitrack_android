@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.visualization
 
 import android.app.Application
-import android.support.v7.util.DiffUtil
+import androidx.recyclerview.widget.DiffUtil
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTApp

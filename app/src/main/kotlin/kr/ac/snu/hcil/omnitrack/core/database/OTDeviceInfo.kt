@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.database
 
 import android.content.Context
-import android.support.annotation.Keep
+import androidx.annotation.Keep
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
 import io.reactivex.Single

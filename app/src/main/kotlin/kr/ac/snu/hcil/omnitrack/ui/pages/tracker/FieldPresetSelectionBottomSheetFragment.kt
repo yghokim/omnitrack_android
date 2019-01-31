@@ -2,13 +2,13 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.app.Dialog
 import android.os.Bundle
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -22,7 +22,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTChoiceAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeSpanAttributeHelper
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
-import org.jetbrains.anko.support.v4.act
 import javax.inject.Inject
 
 /**
@@ -48,7 +47,7 @@ class FieldPresetSelectionBottomSheetFragment : DismissingBottomSheetDialogFragm
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        (act.application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (requireActivity().application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -169,7 +168,7 @@ class FieldPresetSelectionBottomSheetFragment : DismissingBottomSheetDialogFragm
                     val typeInfo = presets?.get(adapterPosition)
                     if (typeInfo != null) {
 
-                        attributeManager.showPermissionCheckDialog(this@FieldPresetSelectionBottomSheetFragment.act,
+                        attributeManager.showPermissionCheckDialog(this@FieldPresetSelectionBottomSheetFragment,
                                 typeInfo.typeId, typeInfo.name,
                                 {
                                     dismiss()

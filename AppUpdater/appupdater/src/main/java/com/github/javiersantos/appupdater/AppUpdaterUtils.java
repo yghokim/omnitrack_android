@@ -1,12 +1,13 @@
 package com.github.javiersantos.appupdater;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.github.javiersantos.appupdater.enums.AppUpdaterError;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
 import com.github.javiersantos.appupdater.objects.GitHub;
 import com.github.javiersantos.appupdater.objects.Update;
+
+import androidx.annotation.NonNull;
 
 public class AppUpdaterUtils {
     private Context context;

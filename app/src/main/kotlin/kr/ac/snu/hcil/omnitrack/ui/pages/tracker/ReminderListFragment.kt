@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import androidx.lifecycle.ViewModelProviders
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.fragment_tracker_detail_triggers.*
 import kr.ac.snu.hcil.omnitrack.R

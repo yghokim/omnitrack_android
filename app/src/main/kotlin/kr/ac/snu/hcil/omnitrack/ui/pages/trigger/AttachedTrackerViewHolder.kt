@@ -2,11 +2,11 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
-import android.support.annotation.LayoutRes
-import android.support.v4.graphics.drawable.DrawableCompat
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.LayoutRes
+import androidx.core.graphics.drawable.DrawableCompat
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.layout_attached_tracker_list_element.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import org.jetbrains.anko.backgroundDrawable

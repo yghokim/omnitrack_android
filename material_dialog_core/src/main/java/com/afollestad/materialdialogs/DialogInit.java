@@ -4,10 +4,6 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.StyleRes;
-import android.support.annotation.UiThread;
 import android.text.InputType;
 import android.text.method.LinkMovementMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -32,6 +28,11 @@ import com.github.ybq.android.spinkit.style.ThreeBounce;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.StyleRes;
+import androidx.annotation.UiThread;
 
 
 /**

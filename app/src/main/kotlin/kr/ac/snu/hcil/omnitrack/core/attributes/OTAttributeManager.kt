@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
-import android.app.Activity
 import android.content.pm.PackageManager
-import android.support.v4.content.ContextCompat
 import android.util.SparseArray
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import dagger.Lazy
@@ -72,16 +72,16 @@ class OTAttributeManager @Inject constructor(val configuredContext: ConfiguredCo
         return id
     }
 
-    fun showPermissionCheckDialog(activity: Activity, typeId: Int, typeName: String, onGranted: (Boolean) -> Unit, onDenied: (() -> Unit)? = null): MaterialDialog? {
+    fun showPermissionCheckDialog(fragment: Fragment, typeId: Int, typeName: String, onGranted: (Boolean) -> Unit, onDenied: (() -> Unit)? = null): MaterialDialog? {
         val requiredPermissions = getAttributeHelper(typeId).getRequiredPermissions(null)
         if (requiredPermissions != null) {
-            val notGrantedPermissions = requiredPermissions.filter { ContextCompat.checkSelfPermission(activity, it) != PackageManager.PERMISSION_GRANTED }
+            val notGrantedPermissions = requiredPermissions.filter { ContextCompat.checkSelfPermission(fragment.requireContext(), it) != PackageManager.PERMISSION_GRANTED }
             if (notGrantedPermissions.isNotEmpty()) {
-                val dialog = DialogHelper.makeYesNoDialogBuilder(activity, activity.resources.getString(R.string.msg_permission_required),
-                        String.format(activity.resources.getString(R.string.msg_format_permission_request_of_field), typeName),
+                val dialog = DialogHelper.makeYesNoDialogBuilder(fragment.requireActivity(), fragment.resources.getString(R.string.msg_permission_required),
+                        String.format(fragment.resources.getString(R.string.msg_format_permission_request_of_field), typeName),
                         cancelable = false,
                         onYes = {
-                            val rxPermissions = RxPermissions(activity)
+                            val rxPermissions = RxPermissions(fragment)
                             rxPermissions.request(*requiredPermissions)
                                     .subscribe { granted ->
                                         if (granted) {

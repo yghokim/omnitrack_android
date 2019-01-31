@@ -5,7 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.IDrawer
 import java.util.*

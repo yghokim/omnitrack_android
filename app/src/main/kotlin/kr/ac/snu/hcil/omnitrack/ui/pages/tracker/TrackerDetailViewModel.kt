@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.app.Application
 import android.os.Bundle
-import android.support.annotation.DrawableRes
+import androidx.annotation.DrawableRes
 import com.google.gson.JsonObject
 import dagger.Lazy
 import dagger.internal.Factory

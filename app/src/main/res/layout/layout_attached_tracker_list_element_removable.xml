@@ -20,7 +20,7 @@
         android:textColor="@color/textColorMid"
         android:textSize="16sp" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_remove"
         android:layout_width="@dimen/button_height_small"
         android:layout_height="match_parent"

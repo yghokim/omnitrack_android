@@ -1,8 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
-import android.support.v7.widget.AppCompatTextView
 import android.util.AttributeSet
+import androidx.appcompat.widget.AppCompatTextView
 
 /**
  * Created by younghokim on 2017. 1. 13..

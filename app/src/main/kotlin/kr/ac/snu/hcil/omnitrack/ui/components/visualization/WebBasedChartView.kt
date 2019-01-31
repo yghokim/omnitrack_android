@@ -4,13 +4,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.http.SslError
-import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
 import android.webkit.*
 import android.widget.FrameLayout
 import android.widget.ProgressBar
+import androidx.core.content.ContextCompat
 import com.github.ybq.android.spinkit.SpinKitView
 import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.R

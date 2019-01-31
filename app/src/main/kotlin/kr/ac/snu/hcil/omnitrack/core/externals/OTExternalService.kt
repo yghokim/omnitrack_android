@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single

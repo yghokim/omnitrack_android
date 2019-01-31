@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.services
 
-import android.arch.lifecycle.ViewModel
 import android.content.Context
+import androidx.lifecycle.ViewModel
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable

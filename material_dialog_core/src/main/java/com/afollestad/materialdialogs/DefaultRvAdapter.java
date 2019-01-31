@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.res.Configuration;
 import android.os.Build;
-import android.support.annotation.LayoutRes;
-import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +16,9 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.internal.MDTintHelper;
 import com.afollestad.materialdialogs.util.DialogUtils;
+
+import androidx.annotation.LayoutRes;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -155,8 +156,8 @@ class DefaultRvAdapter extends RecyclerView.Adapter<DefaultRvAdapter.DefaultVH> 
 
         public DefaultVH(View itemView, DefaultRvAdapter adapter) {
             super(itemView);
-            control = (CompoundButton) itemView.findViewById(R.id.md_control);
-            title = (TextView) itemView.findViewById(R.id.md_title);
+            control = itemView.findViewById(R.id.md_control);
+            title = itemView.findViewById(R.id.md_title);
             this.adapter = adapter;
             itemView.setOnClickListener(this);
             if (adapter.dialog.mBuilder.listLongCallback != null)

@@ -3,11 +3,6 @@ package com.github.javiersantos.appupdater;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -17,6 +12,12 @@ import com.github.javiersantos.appupdater.enums.Duration;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
 import com.github.javiersantos.appupdater.objects.GitHub;
 import com.github.javiersantos.appupdater.objects.Update;
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
 
 public class AppUpdater implements IAppUpdater {
 

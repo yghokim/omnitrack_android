@@ -32,7 +32,7 @@
             android:textSize="16sp" />
     </RadioGroup>
 
-    <android.support.v7.widget.AppCompatCheckBox
+    <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/ui_include_external_files"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height_normal"

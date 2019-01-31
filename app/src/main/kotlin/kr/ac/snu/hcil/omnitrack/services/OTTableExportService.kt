@@ -4,13 +4,13 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.support.v4.app.NotificationCompat
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.AppCompatCheckBox
 import android.view.LayoutInflater
 import android.webkit.MimeTypeMap
 import android.widget.RadioButton
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatCheckBox
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.afollestad.materialdialogs.MaterialDialog
 import dagger.Lazy
 import dagger.internal.Factory

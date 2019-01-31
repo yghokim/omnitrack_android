@@ -15,7 +15,7 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:text="" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_cancel"
         android:layout_width="@dimen/button_height_normal"
         android:layout_height="@dimen/button_height_tall"

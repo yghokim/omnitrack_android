@@ -2,10 +2,10 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import android.app.Dialog
 import android.os.Bundle
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import androidx.recyclerview.widget.RecyclerView
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment

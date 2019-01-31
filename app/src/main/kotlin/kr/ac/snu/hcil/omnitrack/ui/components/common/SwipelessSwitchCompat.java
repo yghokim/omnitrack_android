@@ -27,16 +27,6 @@ import android.graphics.Region;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.annotation.Nullable;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.view.MotionEventCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.appcompat.R;
-import android.support.v7.content.res.AppCompatResources;
-import android.support.v7.text.AllCapsTransformationMethod;
-import android.support.v7.widget.DrawableUtils;
-import android.support.v7.widget.TintTypedArray;
-import android.support.v7.widget.ViewUtils;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -53,6 +43,17 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.CompoundButton;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.R;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.text.AllCapsTransformationMethod;
+import androidx.appcompat.widget.DrawableUtils;
+import androidx.appcompat.widget.TintTypedArray;
+import androidx.appcompat.widget.ViewUtils;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.MotionEventCompat;
+import androidx.core.view.ViewCompat;
 
 /**
  * SwitchCompat is a version of the Switch widget which on devices back to API v7. It does not
@@ -73,14 +74,14 @@ import android.widget.CompoundButton;
  * <p>See the <a href="{@docRoot}guide/topics/ui/controls/togglebutton.html">Toggle Buttons</a>
  * guide.</p>
  *
- * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_android_textOn
- * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_android_textOff
- * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_switchMinWidth
- * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_switchPadding
- * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_switchTextAppearance
- * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_android_thumb
- * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_thumbTextPadding
- * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_track
+ * @attr ref androidx.appcompat.R.styleable#SwitchCompat_android_textOn
+ * @attr ref androidx.appcompat.R.styleable#SwitchCompat_android_textOff
+ * @attr ref androidx.appcompat.R.styleable#SwitchCompat_switchMinWidth
+ * @attr ref androidx.appcompat.R.styleable#SwitchCompat_switchPadding
+ * @attr ref androidx.appcompat.R.styleable#SwitchCompat_switchTextAppearance
+ * @attr ref androidx.appcompat.R.styleable#SwitchCompat_android_thumb
+ * @attr ref androidx.appcompat.R.styleable#SwitchCompat_thumbTextPadding
+ * @attr ref androidx.appcompat.R.styleable#SwitchCompat_track
  */
 @SuppressLint("RestrictedApi")
 public class SwipelessSwitchCompat extends CompoundButton {
@@ -275,7 +276,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * Sets the switch text color, size, style, hint color, and highlight color
      * from the specified TextAppearance resource.
      *
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_switchTextAppearance
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_switchTextAppearance
      */
     @SuppressLint("RestrictedApi")
     public void setSwitchTextAppearance(Context context, int resid) {
@@ -371,7 +372,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * Get the amount of horizontal padding between the switch and the associated text.
      *
      * @return Amount of padding in pixels
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_switchPadding
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_switchPadding
      */
     public int getSwitchPadding() {
         return mSwitchPadding;
@@ -381,7 +382,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * Set the amount of horizontal padding between the switch and the associated text.
      *
      * @param pixels Amount of padding in pixels
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_switchPadding
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_switchPadding
      */
     public void setSwitchPadding(int pixels) {
         mSwitchPadding = pixels;
@@ -393,7 +394,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * of this value and its measured width as determined by the switch drawables and text used.
      *
      * @return Minimum width of the switch in pixels
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_switchMinWidth
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_switchMinWidth
      */
     public int getSwitchMinWidth() {
         return mSwitchMinWidth;
@@ -404,7 +405,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * of this value and its measured width as determined by the switch drawables and text used.
      *
      * @param pixels Minimum width of the switch in pixels
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_switchMinWidth
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_switchMinWidth
      */
     public void setSwitchMinWidth(int pixels) {
         mSwitchMinWidth = pixels;
@@ -415,7 +416,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * Get the horizontal padding around the text drawn on the switch itself.
      *
      * @return Horizontal padding for switch thumb text in pixels
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_thumbTextPadding
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_thumbTextPadding
      */
     public int getThumbTextPadding() {
         return mThumbTextPadding;
@@ -425,7 +426,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * Set the horizontal padding around the text drawn on the switch itself.
      *
      * @param pixels Horizontal padding for switch thumb text in pixels
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_thumbTextPadding
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_thumbTextPadding
      */
     public void setThumbTextPadding(int pixels) {
         mThumbTextPadding = pixels;
@@ -436,7 +437,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * Set the drawable used for the track that the switch slides within.
      *
      * @param resId Resource ID of a track drawable
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_track
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_track
      */
     public void setTrackResource(int resId) {
         setTrackDrawable(AppCompatResources.getDrawable(getContext(), resId));
@@ -446,7 +447,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * Get the drawable used for the track that the switch slides within.
      *
      * @return Track drawable
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_track
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_track
      */
     public Drawable getTrackDrawable() {
         return mTrackDrawable;
@@ -456,7 +457,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * Set the drawable used for the track that the switch slides within.
      *
      * @param track Track drawable
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_track
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_track
      */
     public void setTrackDrawable(Drawable track) {
         if (mTrackDrawable != null) {
@@ -471,7 +472,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
 
     /**
      * @return the tint applied to the track drawable
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_trackTint
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_trackTint
      * @see #setTrackTintList(ColorStateList)
      */
     @Nullable
@@ -488,7 +489,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * mode using {@link DrawableCompat#setTintList(Drawable, ColorStateList)}.
      *
      * @param tint the tint to apply, may be {@code null} to clear tint
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_trackTint
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_trackTint
      * @see #getTrackTintList()
      */
     public void setTrackTintList(@Nullable ColorStateList tint) {
@@ -500,7 +501,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
     /**
      * @return the blending mode used to apply the tint to the track
      * drawable
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_trackTintMode
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_trackTintMode
      * @see #setTrackTintMode(PorterDuff.Mode)
      */
     @Nullable
@@ -515,7 +516,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      *
      * @param tintMode the blending mode used to apply the tint, may be
      *                 {@code null} to clear tint
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_trackTintMode
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_trackTintMode
      * @see #getTrackTintMode()
      */
     public void setTrackTintMode(@Nullable PorterDuff.Mode tintMode) {
@@ -546,7 +547,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * can physically touch and drag along the track.
      *
      * @param resId Resource ID of a thumb drawable
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_android_thumb
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_android_thumb
      */
     public void setThumbResource(int resId) {
         setThumbDrawable(AppCompatResources.getDrawable(getContext(), resId));
@@ -557,7 +558,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * can physically touch and drag along the track.
      *
      * @return Thumb drawable
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_android_thumb
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_android_thumb
      */
     public Drawable getThumbDrawable() {
         return mThumbDrawable;
@@ -568,7 +569,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * can physically touch and drag along the track.
      *
      * @param thumb Thumb drawable
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_android_thumb
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_android_thumb
      */
     public void setThumbDrawable(Drawable thumb) {
         if (mThumbDrawable != null) {
@@ -583,7 +584,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
 
     /**
      * @return the tint applied to the thumb drawable
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_thumbTint
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_thumbTint
      * @see #setThumbTintList(ColorStateList)
      */
     @Nullable
@@ -600,7 +601,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * mode using {@link DrawableCompat#setTintList(Drawable, ColorStateList)}.
      *
      * @param tint the tint to apply, may be {@code null} to clear tint
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_thumbTint
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_thumbTint
      * @see #getThumbTintList()
      * @see Drawable#setTintList(ColorStateList)
      */
@@ -613,7 +614,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
     /**
      * @return the blending mode used to apply the tint to the thumb
      * drawable
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_thumbTintMode
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_thumbTintMode
      * @see #setThumbTintMode(PorterDuff.Mode)
      */
     @Nullable
@@ -628,7 +629,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      *
      * @param tintMode the blending mode used to apply the tint, may be
      *                 {@code null} to clear tint
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_thumbTintMode
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_thumbTintMode
      * @see #getThumbTintMode()
      * @see Drawable#setTintMode(PorterDuff.Mode)
      */
@@ -658,7 +659,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
     /**
      * Returns whether the track should be split by the thumb.
      *
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_splitTrack
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_splitTrack
      */
     public boolean getSplitTrack() {
         return mSplitTrack;
@@ -670,7 +671,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * then the thumb will be drawn into the resulting gap.
      *
      * @param splitTrack Whether the track should be split by the thumb
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_splitTrack
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_splitTrack
      */
     public void setSplitTrack(boolean splitTrack) {
         mSplitTrack = splitTrack;
@@ -680,7 +681,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
     /**
      * Returns the text displayed when the button is in the checked state.
      *
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_android_textOn
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_android_textOn
      */
     public CharSequence getTextOn() {
         return mTextOn;
@@ -689,7 +690,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
     /**
      * Sets the text displayed when the button is in the checked state.
      *
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_android_textOn
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_android_textOn
      */
     public void setTextOn(CharSequence textOn) {
         mTextOn = textOn;
@@ -699,7 +700,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
     /**
      * Returns the text displayed when the button is not in the checked state.
      *
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_android_textOff
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_android_textOff
      */
     public CharSequence getTextOff() {
         return mTextOff;
@@ -708,7 +709,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
     /**
      * Sets the text displayed when the button is not in the checked state.
      *
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_android_textOff
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_android_textOff
      */
     public void setTextOff(CharSequence textOff) {
         mTextOff = textOff;
@@ -717,7 +718,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
 
     /**
      * @return whether the on/off text should be displayed
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_showText
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_showText
      */
     public boolean getShowText() {
         return mShowText;
@@ -727,7 +728,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      * Sets whether the on/off text should be displayed.
      *
      * @param showText {@code true} to display on/off text
-     * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_showText
+     * @attr ref androidx.appcompat.R.styleable#SwitchCompat_showText
      */
     public void setShowText(boolean showText) {
         if (mShowText != showText) {

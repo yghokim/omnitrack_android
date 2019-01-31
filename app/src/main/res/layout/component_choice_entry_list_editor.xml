@@ -5,7 +5,7 @@
     tools:orientation="vertical"
     tools:parentTag="android.widget.LinearLayout">
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ui_recyclerview_with_fallback"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

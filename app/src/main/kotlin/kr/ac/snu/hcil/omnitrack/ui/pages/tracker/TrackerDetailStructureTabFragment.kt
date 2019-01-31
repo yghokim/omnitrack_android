@@ -1,27 +1,27 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.app.Activity.RESULT_OK
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat
-import android.support.v4.widget.NestedScrollView
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.AppCompatImageView
-import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.content.ContextCompat
+import androidx.core.widget.NestedScrollView
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.salomonbrys.kotson.set
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonObject
 import dagger.Lazy
 import io.reactivex.Observable
@@ -47,7 +47,6 @@ import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import org.jetbrains.anko.support.v4.dip
 import javax.inject.Inject
 
 /**

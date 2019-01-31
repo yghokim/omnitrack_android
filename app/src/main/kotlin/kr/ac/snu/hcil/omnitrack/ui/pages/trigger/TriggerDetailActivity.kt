@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.app.Activity
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -9,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProviders
 import kotlinx.android.synthetic.main.activity_trigger_detail.*
 import kotlinx.android.synthetic.main.layout_tracker_assign_panel.view.*
 import kr.ac.snu.hcil.omnitrack.OTApp

@@ -1,4 +1,4 @@
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,7 +7,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     tools:context=".ui.pages.SignInActivity">
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_settings"
         android:layout_width="@dimen/button_height_small"
         android:layout_height="@dimen/button_height_small"
@@ -71,7 +71,7 @@
         app:layout_constraintVertical_bias="0.37"
         app:layout_constraintVertical_chainStyle="packed">
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/g_login_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -122,14 +122,14 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_logo_left"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.2" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_logo_right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -138,7 +138,7 @@
         app:layout_constraintGuide_percent="0.8" />
 
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_logo_bottom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -146,18 +146,18 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.55" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_team_logo_left"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.22" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_team_logo_right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.78" />
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

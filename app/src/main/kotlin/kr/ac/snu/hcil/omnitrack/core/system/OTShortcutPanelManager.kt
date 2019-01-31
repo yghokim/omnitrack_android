@@ -7,11 +7,11 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.support.v4.app.NotificationCompat
-import android.support.v4.app.TaskStackBuilder
-import android.support.v4.graphics.ColorUtils
 import android.view.View
 import android.widget.RemoteViews
+import androidx.core.app.NotificationCompat
+import androidx.core.app.TaskStackBuilder
+import androidx.core.graphics.ColorUtils
 import dagger.Lazy
 import dagger.internal.Factory
 import io.reactivex.Completable

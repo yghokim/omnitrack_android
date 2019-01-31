@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/ui_sidebar"
@@ -55,7 +55,7 @@
         app:layout_constraintTop_toBottomOf="@+id/ui_user_photo"
         tools:text="Talkative Armadilo" />
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ui_pen"
         android:layout_width="wrap_content"
         android:layout_height="15dp"
@@ -98,7 +98,7 @@
 
         tools:text="yhkim@hcil.snu.ac.kr" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_profile_menu"
         android:layout_width="@dimen/button_height_small"
         android:layout_height="@dimen/button_height_small"
@@ -116,7 +116,7 @@
         android:layout_below="@+id/ui_profile_panel"
         android:orientation="vertical">
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/ui_button_about"
             style="@style/SidebarButtonStyle"
             android:layout_width="match_parent"
@@ -125,7 +125,7 @@
             android:text="@string/msg_about" />
     </LinearLayout>-->
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ui_menu_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -136,7 +136,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ui_profile_panel">
 
-    </android.support.v7.widget.RecyclerView>
+    </androidx.recyclerview.widget.RecyclerView>
 
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

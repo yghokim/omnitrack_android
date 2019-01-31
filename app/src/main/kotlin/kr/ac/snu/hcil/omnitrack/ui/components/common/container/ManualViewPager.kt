@@ -1,11 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.container
 
 import android.content.Context
-import android.support.v4.view.ViewPager
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.animation.DecelerateInterpolator
 import android.widget.Scroller
+import androidx.viewpager.widget.ViewPager
 
 /**
  * Created by Young-Ho Kim on 2016-08-31.

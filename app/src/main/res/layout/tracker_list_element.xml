@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -29,7 +29,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible">
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="14dp"
             android:layout_height="14dp"
             android:tint="@color/colorPointed.Light"
@@ -74,7 +74,7 @@
             app:layout_alignSelf="center"
             tools:text="Project" />
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ui_bookmark_indicator"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -82,7 +82,7 @@
             android:tint="@color/starGold"
             app:srcCompat="@drawable/bookmarked_fill" />
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ui_locked_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -95,7 +95,7 @@
             app:layout_flexShrink="0"
             app:srcCompat="@drawable/lock_filled" />
 
-        <android.support.v7.widget.AppCompatImageButton
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/ui_invalid_icon"
             android:layout_width="@dimen/button_height_small"
             android:layout_height="wrap_content"
@@ -107,7 +107,7 @@
     </com.google.android.flexbox.FlexboxLayout>
 
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/alarm_icon"
         android:layout_width="16dp"
         android:layout_height="16dp"
@@ -176,7 +176,7 @@
         tools:text="total\n34" />
 
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_expand_button"
         android:layout_width="45dp"
         android:layout_height="0dp"
@@ -231,4 +231,4 @@
             app:fb_text="@string/msg_remove" />
     </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

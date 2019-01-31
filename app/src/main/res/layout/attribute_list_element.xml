@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="wrap_content">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
             app:srcCompat="@drawable/drag_handle" />
 
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ui_attribute_type"
             android:layout_width="@dimen/attribute_list_element_header_type_icon_width"
             android:layout_height="@dimen/attribute_list_element_header_height"
@@ -42,7 +42,7 @@
             app:srcCompat="@drawable/icon_small_location" />
 
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ui_required_marker"
             android:layout_width="9dp"
             android:layout_height="wrap_content"
@@ -121,7 +121,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/icon_ex_big" />
 
-        <android.support.constraint.Barrier
+        <androidx.constraintlayout.widget.Barrier
             android:id="@+id/barrier_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -157,5 +157,5 @@
             app:layout_constraintLeft_toRightOf="@+id/ui_drag_handle"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ui_preview_container" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

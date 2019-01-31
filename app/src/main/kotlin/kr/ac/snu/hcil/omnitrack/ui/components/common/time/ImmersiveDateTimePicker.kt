@@ -3,10 +3,10 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.time
 import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.constraint.ConstraintLayout
 import android.text.format.DateUtils
 import android.util.AttributeSet
 import android.view.MotionEvent
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.shawnlin.numberpicker.NumberPicker
 import kotlinx.android.synthetic.main.component_datetime_picker_immersive.view.*
 import kr.ac.snu.hcil.omnitrack.R

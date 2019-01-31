@@ -3,11 +3,10 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kr.ac.snu.hcil.omnitrack.OTApp
-
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity

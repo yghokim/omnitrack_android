@@ -1,13 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.content.Context
-import android.support.v7.widget.AppCompatImageView
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageView
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.calculation.SingleNumericComparison

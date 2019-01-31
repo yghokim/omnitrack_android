@@ -7,10 +7,10 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
-import android.support.v4.content.res.ResourcesCompat
-import android.support.v7.widget.AppCompatButton
 import android.util.AttributeSet
 import android.view.animation.DecelerateInterpolator
+import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.res.ResourcesCompat
 import kr.ac.snu.hcil.omnitrack.R
 
 class ColorSelectionButton : AppCompatButton, ValueAnimator.AnimatorUpdateListener {

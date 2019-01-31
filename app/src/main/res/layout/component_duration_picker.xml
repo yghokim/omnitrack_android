@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:parentTag="android.support.constraint.ConstraintLayout">
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <TextView
         android:id="@+id/ui_digit_hour"
@@ -66,7 +66,7 @@
         app:layout_constraintBaseline_toBaselineOf="@id/ui_digit_hour"
         app:layout_constraintStart_toEndOf="@id/ui_digit_second" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_digit_area"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -76,7 +76,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_backspace"
         android:layout_width="@dimen/button_height_normal"
         android:layout_height="@dimen/button_height_normal"
@@ -95,7 +95,7 @@
         app:srcCompat="@drawable/backspace_dark"
         tools:visibility="visible" />
 
-    <android.support.constraint.Group
+    <androidx.constraintlayout.widget.Group
         android:id="@+id/ui_keypad_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -214,7 +214,7 @@
         app:layout_constraintStart_toEndOf="@id/ui_keypad_00"
         app:layout_constraintTop_toTopOf="@id/ui_keypad_00" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_keypad_up"
         style="@style/durationPickerKeyPadStyle"
         android:layout_width="0dp"

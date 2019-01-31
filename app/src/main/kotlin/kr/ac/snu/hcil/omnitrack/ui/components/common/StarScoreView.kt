@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
-import android.support.v4.content.ContextCompat
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -10,6 +9,7 @@ import android.text.style.TypefaceSpan
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 

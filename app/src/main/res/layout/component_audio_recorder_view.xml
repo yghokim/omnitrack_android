@@ -57,7 +57,7 @@
             android:layout_marginBottom="5dp"
             android:orientation="horizontal">
 
-            <android.support.v7.widget.AppCompatImageButton
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/ui_player_button"
                 style="@style/audioPlayerControlButton"
                 android:visibility="gone"

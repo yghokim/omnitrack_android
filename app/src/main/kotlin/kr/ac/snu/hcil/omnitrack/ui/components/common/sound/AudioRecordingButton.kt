@@ -8,10 +8,10 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
-import android.support.v4.content.ContextCompat
-import android.support.v4.graphics.ColorUtils
-import android.support.v7.widget.AppCompatButton
 import android.util.AttributeSet
+import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kotlin.properties.Delegates

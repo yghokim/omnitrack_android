@@ -3,14 +3,14 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.export
 import android.app.AlertDialog
 import android.app.Application
 import android.app.Dialog
-import android.arch.lifecycle.AndroidViewModel
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.transition.TransitionManager
-import android.support.v4.app.DialogFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModelProviders
+import androidx.transition.TransitionManager
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
@@ -19,8 +19,6 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
-import org.jetbrains.anko.bundleOf
-import org.jetbrains.anko.support.v4.act
 import javax.inject.Inject
 
 class UploadTemporaryPackageDialogFragment : DialogFragment(), View.OnClickListener {
@@ -28,7 +26,7 @@ class UploadTemporaryPackageDialogFragment : DialogFragment(), View.OnClickListe
     companion object {
         fun makeInstance(jsonString: String): UploadTemporaryPackageDialogFragment {
             return UploadTemporaryPackageDialogFragment().apply {
-                arguments = bundleOf(PackageHandlingBottomSheetFragment.KEY_JSON_CONTENT_STRING to jsonString)
+                arguments = bundleOf(arrayOf<Pair<String, Any?>>(PackageHandlingBottomSheetFragment.KEY_JSON_CONTENT_STRING to jsonString))
             }
         }
     }

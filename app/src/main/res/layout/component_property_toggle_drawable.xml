@@ -15,7 +15,7 @@
         android:layout_gravity="center_vertical|start"
         tools:text="Text" />
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ui_image_view"
         android:layout_width="@dimen/button_height_tiny"
         android:layout_height="@dimen/button_height_tiny"

@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditionerviews
 
 import android.content.Context
-import android.support.v7.widget.AppCompatImageView
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.calculation.SingleNumericComparison
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner

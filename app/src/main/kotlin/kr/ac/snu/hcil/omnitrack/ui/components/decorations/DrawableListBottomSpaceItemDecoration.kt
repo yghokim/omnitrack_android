@@ -3,8 +3,8 @@ package kr.ac.snu.hcil.omnitrack.ui.components.decorations
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
-import android.support.annotation.DrawableRes
-import android.support.v4.content.ContextCompat
+import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
 
 /**
  * Created by younghokim on 16. 8. 14..

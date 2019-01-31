@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.experiment
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
+import androidx.lifecycle.AndroidViewModel
 import com.google.gson.JsonObject
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject

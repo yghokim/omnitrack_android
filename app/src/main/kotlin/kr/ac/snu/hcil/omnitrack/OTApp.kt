@@ -2,10 +2,6 @@ package kr.ac.snu.hcil.omnitrack
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleObserver
-import android.arch.lifecycle.OnLifecycleEvent
-import android.arch.lifecycle.ProcessLifecycleOwner
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -13,7 +9,11 @@ import android.os.Build
 import android.os.Looper
 import android.os.SystemClock
 import android.provider.Settings
-import android.support.v7.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.squareup.leakcanary.LeakCanary
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -118,7 +118,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         val deviceUUID: UUID
         val cached: String? = applicationComponent.defaultPreferences().getString("cached_device_id", null)
         if (!cached.isNullOrBlank()) {
-            return@lazy cached!!
+            return@lazy cached
         } else {
             val androidUUID = Settings.Secure.getString(this.contentResolver, Settings.Secure.ANDROID_ID)
             if (!androidUUID.isNullOrBlank()) {

@@ -1,13 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleObserver
-import android.arch.lifecycle.OnLifecycleEvent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.util.AttributeSet
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.ui.IActivityLifeCycle
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.AInputView

@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.utils
 
 import android.app.Dialog
 import android.content.Context
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
 import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.R
 

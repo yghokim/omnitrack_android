@@ -3,15 +3,6 @@ package com.danielstone.materialaboutlibrary.items;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.IntDef;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.StringRes;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.widget.AppCompatImageView;
 import android.text.Html;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -25,6 +16,16 @@ import com.danielstone.materialaboutlibrary.util.ViewTypeManager;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.IntDef;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.StringRes;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 
 import static android.view.View.GONE;
 
@@ -330,9 +331,9 @@ public class MaterialAboutActionItem extends MaterialAboutItem {
         MaterialAboutActionItemViewHolder(View view) {
             super(view);
             this.view = view;
-            icon = (AppCompatImageView) view.findViewById(R.id.mal_item_image);
-            text = (TextView) view.findViewById(R.id.mal_item_text);
-            subText = (TextView) view.findViewById(R.id.mal_action_item_subtext);
+            icon = view.findViewById(R.id.mal_item_image);
+            text = view.findViewById(R.id.mal_item_text);
+            subText = view.findViewById(R.id.mal_action_item_subtext);
 
             view.setOnClickListener(this);
             onClickListener = null;

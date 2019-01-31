@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
-import android.app.Activity
 import android.content.Context
+import androidx.fragment.app.FragmentActivity
 import io.reactivex.Completable
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.BuildConfig
@@ -73,7 +73,7 @@ class MisfitService(context: Context) : OTExternalService(context, "MisfitServic
             }
         }
 
-        override fun tryResolve(activity: Activity): Single<Boolean> {
+        override fun tryResolve(activity: FragmentActivity): Single<Boolean> {
             return parentService.api.authorize(activity).doOnSuccess {
                 token ->
                 parentService.externalServiceManager.get().preferences.edit().putString(MisfitService.PREFERENCE_ACCESS_TOKEN, token).apply()

@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
 import android.app.Application
 import android.os.Bundle
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.R

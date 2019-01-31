@@ -1,10 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.ui.activities
 
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleObserver
-import android.arch.lifecycle.OnLifecycleEvent
 import android.content.Context
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
 import dagger.Lazy
@@ -12,7 +12,6 @@ import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
-import org.jetbrains.anko.support.v4.act
 import javax.inject.Inject
 
 /**
@@ -111,7 +110,7 @@ open class OTFragment : Fragment(), LifecycleObserver {
             println("end ${this.javaClass.name} session - ${elapsed.toFloat() / 1000} seconds")
             if (elapsed > 100) {
                 eventLogger.get().logSession(this.javaClass.name, IEventLogger.SUB_SESSION_TYPE_FRAGMENT, elapsed, now, null) { content ->
-                    content["parent"] = act.localClassName
+                    content["parent"] = requireActivity().localClassName
                     onSessionLogContent(content)
                 }
             }

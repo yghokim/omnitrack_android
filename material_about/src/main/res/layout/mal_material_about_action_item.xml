@@ -6,7 +6,7 @@
     android:paddingBottom="@dimen/mal_baseline_half"
     android:paddingTop="@dimen/mal_baseline_half">
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/mal_item_image"
         android:layout_width="@dimen/mal_action_item_image_width"
         android:layout_height="@dimen/mal_action_action_item_image_height"

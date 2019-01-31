@@ -5,7 +5,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
 
-    tools:parentTag="android.support.constraint.ConstraintLayout">
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <!--
         <EditText
@@ -22,7 +22,7 @@
             android:textSize="15sp"
             android:textStyle="bold" />
     -->
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_minus"
         style="@style/roundButtonStyle"
         android:tint="@color/buttonIconColorDark"
@@ -45,7 +45,7 @@
         android:textSize="20sp"
         app:layout_constraintLeft_toRightOf="@id/ui_button_minus" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_plus"
         style="@style/roundButtonStyle"
         android:tint="@color/buttonIconColorDark"

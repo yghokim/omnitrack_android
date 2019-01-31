@@ -1,8 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.dependency
 
-import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.fragment.app.FragmentActivity
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
@@ -23,7 +23,7 @@ class OAuth2LoginDependencyResolver(val authClient: OAuth2Client, val identifier
         }
     }
 
-    override fun tryResolve(activity: Activity): Single<Boolean> {
+    override fun tryResolve(activity: FragmentActivity): Single<Boolean> {
         return authClient.authorize(activity, serviceName)
                 .doOnSuccess { credential ->
                     credential.store(containerPreferences, identifier)

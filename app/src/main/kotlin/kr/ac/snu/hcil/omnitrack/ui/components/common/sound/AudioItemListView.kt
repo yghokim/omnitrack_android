@@ -2,11 +2,11 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.sound
 
 import android.content.Context
 import android.net.Uri
-import android.support.constraint.ConstraintLayout
-import android.support.v7.widget.AppCompatImageView
 import android.util.AttributeSet
 import android.view.View
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.github.ybq.android.spinkit.SpinKitView
 import dagger.Lazy
 import io.reactivex.android.schedulers.AndroidSchedulers

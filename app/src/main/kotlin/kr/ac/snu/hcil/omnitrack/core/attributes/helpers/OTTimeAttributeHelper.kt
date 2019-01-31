@@ -2,12 +2,12 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.content.Context
 import android.graphics.Typeface
-import android.support.v4.content.ContextCompat
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
+import androidx.core.content.ContextCompat
 import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.R

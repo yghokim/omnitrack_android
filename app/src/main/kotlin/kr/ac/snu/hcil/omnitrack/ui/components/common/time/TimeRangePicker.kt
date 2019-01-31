@@ -2,10 +2,10 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.time
 
 import android.app.Dialog
 import android.content.Context
-import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import android.view.View
 import android.view.View.OnClickListener
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.afollestad.materialdialogs.MaterialDialog
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import kotlinx.android.synthetic.main.component_time_range_picker.view.*
@@ -233,7 +233,7 @@ class TimeRangePicker : ConstraintLayout, View.OnClickListener {
                             timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
                         }
                     }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
-                            .show(activity.fragmentManager, "DatePickerDialog")
+                            .show(activity.supportFragmentManager, "DatePickerDialog")
 
                 } else {
                     dateTimeDialogPicker.value = cal.timeInMillis

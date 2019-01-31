@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.content.Context
-import android.support.v4.content.ContextCompat
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.format.DateUtils
@@ -14,6 +13,7 @@ import android.view.View
 import android.widget.Chronometer
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper

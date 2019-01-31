@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.database.configured.models
 
 import android.content.Context
 import android.content.Intent
-import android.support.v4.content.LocalBroadcastManager
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.github.salomonbrys.kotson.toJson
 import com.google.gson.JsonObject
 import io.reactivex.Completable

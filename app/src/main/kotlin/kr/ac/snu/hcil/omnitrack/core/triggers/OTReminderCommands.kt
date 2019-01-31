@@ -9,9 +9,9 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
-import android.support.v4.app.AlarmManagerCompat
-import android.support.v4.app.NotificationCompat
-import android.support.v4.content.ContextCompat
+import androidx.core.app.AlarmManagerCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import dagger.internal.Factory

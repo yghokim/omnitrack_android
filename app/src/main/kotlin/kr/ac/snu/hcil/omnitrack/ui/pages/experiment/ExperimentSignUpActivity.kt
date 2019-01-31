@@ -1,18 +1,17 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.experiment
 
 import android.app.Activity
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.ViewModelProviders
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_experiment_signup.*
 import kr.ac.snu.hcil.omnitrack.R
-import org.jetbrains.anko.support.v4.act
 
 class ExperimentSignUpActivity : AppCompatActivity() {
     enum class ESlide {

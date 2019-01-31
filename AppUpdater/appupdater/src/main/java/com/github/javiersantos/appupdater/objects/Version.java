@@ -1,12 +1,13 @@
 package com.github.javiersantos.appupdater.objects;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import androidx.annotation.NonNull;
 
 public class Version implements Comparable<Version> {
 

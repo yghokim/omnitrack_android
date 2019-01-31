@@ -11,7 +11,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
-import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -20,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import androidx.core.content.res.ResourcesCompat;
 
 import static android.os.Build.VERSION.SDK_INT;
 

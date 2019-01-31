@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.net
 
-import android.support.annotation.Keep
-import android.support.v7.util.DiffUtil
+import androidx.annotation.Keep
+import androidx.recyclerview.widget.DiffUtil
 import io.reactivex.Completable
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo

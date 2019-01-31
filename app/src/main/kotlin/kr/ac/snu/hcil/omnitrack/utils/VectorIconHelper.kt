@@ -5,10 +5,10 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.os.Build
-import android.support.annotation.DrawableRes
-import android.support.v4.graphics.drawable.DrawableCompat
-import android.support.v7.content.res.AppCompatResources
 import android.util.LruCache
+import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.drawable.DrawableCompat
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.annotations.RealmModule

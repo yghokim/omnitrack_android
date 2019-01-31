@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.visualization.models
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort

@@ -2,10 +2,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.services
 
 import android.graphics.PorterDuff
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.AppCompatButton
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +10,10 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
 import io.reactivex.Completable
@@ -26,8 +26,6 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.MeasureFactoryAdapter
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import org.jetbrains.anko.support.v4.act
-import org.jetbrains.anko.support.v4.dip
 import javax.inject.Inject
 
 /**

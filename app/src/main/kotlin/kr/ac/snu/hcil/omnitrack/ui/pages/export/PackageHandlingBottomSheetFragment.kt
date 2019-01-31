@@ -1,20 +1,19 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.export
 
 import android.app.Dialog
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.FragmentManager
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.bottomsheet_handle_extracted_package.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
-import org.jetbrains.anko.support.v4.act
 import java.text.SimpleDateFormat
 import java.util.*
 

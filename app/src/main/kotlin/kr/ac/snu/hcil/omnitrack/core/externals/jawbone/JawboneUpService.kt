@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.jawbone
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.fragment.app.FragmentActivity
 import com.jawbone.upplatformsdk.api.ApiManager
 import com.jawbone.upplatformsdk.api.response.OauthAccessTokenResponse
 import com.jawbone.upplatformsdk.oauth.OauthUtils
@@ -122,7 +123,7 @@ class JawboneUpService(context: Context) : OTExternalService(context, "JawboneUp
             }
         }
 
-        override fun tryResolve(activity: Activity): Single<Boolean> {
+        override fun tryResolve(activity: FragmentActivity): Single<Boolean> {
             return Single.defer {
                 val builder = OauthUtils.setOauthParameters(BuildConfig.JAWBONE_CLIENT_ID, BuildConfig.JAWBONE_REDIRECT_URI, parentService.SCOPES)
 

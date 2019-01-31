@@ -1,15 +1,15 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
-import android.arch.lifecycle.LifecycleObserver
 import android.content.Intent
-import android.support.v7.widget.AppCompatImageButton
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.text.InputType
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
+import androidx.appcompat.widget.AppCompatImageButton
+import androidx.lifecycle.LifecycleObserver
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.firebase.jobdispatcher.Job

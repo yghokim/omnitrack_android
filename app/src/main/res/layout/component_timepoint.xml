@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:parentTag="android.support.constraint.ConstraintLayout">
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <mehdi.sakout.fancybuttons.FancyButton
         android:id="@+id/ui_button_date"
@@ -38,7 +38,7 @@
         app:layout_constraintRight_toLeftOf="@+id/ui_separator_1"
         app:layout_constraintTop_toBottomOf="@+id/ui_button_date" />
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ui_separator_1"
         android:layout_width="18dp"
         android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
 
         app:layout_constraintTop_toTopOf="@+id/ui_left_picker" />
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ui_separator_2"
         android:layout_width="18dp"
         android:layout_height="wrap_content"

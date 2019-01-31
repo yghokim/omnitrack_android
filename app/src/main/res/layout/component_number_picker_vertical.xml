@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:parentTag="android.support.constraint.ConstraintLayout">
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_plus"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height_small"
@@ -48,7 +48,7 @@
         app:layout_constraintTop_toBottomOf="@id/ui_button_plus"
         tools:text="40" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_minus"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height_small"

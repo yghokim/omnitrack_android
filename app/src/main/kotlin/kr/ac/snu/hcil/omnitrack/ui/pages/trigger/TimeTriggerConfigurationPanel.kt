@@ -2,8 +2,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.app.DatePickerDialog
 import android.content.Context
-import android.support.constraint.ConstraintLayout
-import android.support.transition.*
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +9,8 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.DatePicker
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.transition.*
 import butterknife.bindView
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject

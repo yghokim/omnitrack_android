@@ -1,8 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
-import android.support.v7.widget.AppCompatButton
 import android.util.AttributeSet
+import androidx.appcompat.widget.AppCompatButton
 
 /**
  * Created by younghokim on 2017. 1. 13..

@@ -2,8 +2,8 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback

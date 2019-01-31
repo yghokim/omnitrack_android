@@ -6,9 +6,9 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.support.v4.graphics.ColorUtils
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import androidx.core.graphics.ColorUtils
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R

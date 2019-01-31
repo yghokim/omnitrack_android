@@ -3,11 +3,11 @@ package kr.ac.snu.hcil.omnitrack.ui.components.dialogs
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
-import android.support.v4.app.FragmentManager
-import android.support.v7.widget.AppCompatButton
 import android.view.Gravity
 import android.widget.*
+import androidx.appcompat.widget.AppCompatButton
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.*
 import java.util.*

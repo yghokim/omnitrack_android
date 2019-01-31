@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.synchronization
 
-import android.support.annotation.Keep
+import androidx.annotation.Keep
 
 /**
  * Created by younghokim on 2017. 9. 28..

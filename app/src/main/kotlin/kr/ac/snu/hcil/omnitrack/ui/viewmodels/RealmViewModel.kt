@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.viewmodels
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
+import androidx.lifecycle.AndroidViewModel
 import dagger.Lazy
 import dagger.internal.Factory
 import io.reactivex.disposables.CompositeDisposable

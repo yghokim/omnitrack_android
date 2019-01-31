@@ -10,14 +10,14 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.transition.TransitionManager
-import android.support.v7.util.ListUpdateCallback
 import android.util.AttributeSet
 import android.util.SparseArray
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import androidx.recyclerview.widget.ListUpdateCallback
+import androidx.transition.TransitionManager
 import com.jmedeisis.draglinearlayout.DragLinearLayout
 import kotlinx.android.synthetic.main.attribute_list_element.view.*
 import kr.ac.snu.hcil.omnitrack.R

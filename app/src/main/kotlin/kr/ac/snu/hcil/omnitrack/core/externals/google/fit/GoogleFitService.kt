@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.google.fit
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.Api
 import com.google.android.gms.common.api.GoogleApiClient
@@ -156,7 +157,7 @@ class GoogleFitService(context: Context) : OTExternalService(context, "GoogleFit
             }.onErrorReturn { err -> DependencyCheckResult(DependencyState.FatalFailed, TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_failed, parentService.nameResourceId), context.getString(R.string.msg_sign_in)) }
         }
 
-        override fun tryResolve(activity: Activity): Single<Boolean> {
+        override fun tryResolve(activity: FragmentActivity): Single<Boolean> {
             return parentService.getConnectedClientOrResolve(activity).map { true }.onErrorReturn { err ->
                 err.printStackTrace()
                 false

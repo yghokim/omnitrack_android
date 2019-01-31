@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.database.configured.models.research
 
-import android.support.annotation.Keep
-import android.support.v7.util.DiffUtil
+import androidx.annotation.Keep
+import androidx.recyclerview.widget.DiffUtil
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.Required

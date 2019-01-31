@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.net
 
-import android.support.annotation.Keep
+import androidx.annotation.Keep
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter

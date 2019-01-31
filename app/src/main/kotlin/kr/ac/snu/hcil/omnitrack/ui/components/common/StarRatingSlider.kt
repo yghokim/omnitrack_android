@@ -2,10 +2,10 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
+import androidx.core.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
 import kr.ac.snu.hcil.omnitrack.utils.applyTint

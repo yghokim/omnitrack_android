@@ -6,7 +6,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.v7.widget.AppCompatImageButton
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/ui_appbar_button_left"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -38,7 +38,7 @@
                 android:layout_alignParentEnd="true"
                 android:orientation="horizontal">
 
-                <android.support.v7.widget.AppCompatImageButton
+                <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/ui_appbar_button_right_sub"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
@@ -48,7 +48,7 @@
                     android:visibility="gone"
                     app:srcCompat="@drawable/more" />
 
-                <android.support.v7.widget.AppCompatImageButton
+                <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/ui_appbar_button_right"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
@@ -57,7 +57,7 @@
                     android:tint="#FFF"
                     app:srcCompat="@drawable/done" />
 
-                <android.support.v7.widget.AppCompatButton
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/ui_appbar_text_button_right"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"

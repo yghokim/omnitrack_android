@@ -4,11 +4,11 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.annotation.PluralsRes
-import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import androidx.annotation.PluralsRes
+import androidx.constraintlayout.widget.ConstraintLayout
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent

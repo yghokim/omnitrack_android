@@ -8,8 +8,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
-import android.support.v4.content.LocalBroadcastManager
 import android.util.AttributeSet
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import dagger.Lazy
 import gun0912.tedbottompicker.TedBottomPicker
 import io.reactivex.android.schedulers.AndroidSchedulers

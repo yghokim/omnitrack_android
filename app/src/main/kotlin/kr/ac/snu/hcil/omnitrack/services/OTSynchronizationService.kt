@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.services
 
 import android.content.Intent
-import android.support.v4.content.LocalBroadcastManager
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.firebase.jobdispatcher.JobParameters
 import com.firebase.jobdispatcher.JobService
 import com.github.salomonbrys.kotson.jsonObject

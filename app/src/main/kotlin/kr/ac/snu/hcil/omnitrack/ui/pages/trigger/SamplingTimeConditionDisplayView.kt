@@ -1,10 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.content.Context
-import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.android.synthetic.main.trigger_display_time_ema.view.*
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R

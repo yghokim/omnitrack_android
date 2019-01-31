@@ -1,17 +1,17 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.app.Activity
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_multibutton_single_recyclerview.*
 import kotlinx.android.synthetic.main.sortable_list_element.view.*
 import kr.ac.snu.hcil.omnitrack.R

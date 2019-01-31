@@ -1,11 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.database.configured.models
 
-import android.app.Activity
-import android.support.annotation.ColorInt
+import androidx.annotation.ColorInt
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
-import com.tbruyelle.rxpermissions2.RxPermissions
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.realm.*
 import io.realm.annotations.Ignore
@@ -131,15 +128,6 @@ open class OTTrackerDAO : RealmObject() {
         }
 
         return list.toTypedArray()
-    }
-
-    fun makePermissionAssertObservable(activity: Activity, configuredContext: ConfiguredContext): Observable<Boolean> {
-        val requiredPermissions = this.getRequiredPermissions(configuredContext)
-        return if (requiredPermissions.isNotEmpty()) {
-            RxPermissions(activity).request(*requiredPermissions)
-        } else {
-            Observable.just(true)
-        }
     }
 
     fun getSimpleInfo(populateReminders: Boolean = false): SimpleTrackerInfo {

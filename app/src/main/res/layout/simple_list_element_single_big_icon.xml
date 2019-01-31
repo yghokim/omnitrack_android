@@ -6,7 +6,7 @@
     android:paddingBottom="2dp"
     android:paddingTop="2dp">
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/textView"
         android:layout_width="@dimen/button_height_small"
         android:layout_height="@dimen/button_height_small"

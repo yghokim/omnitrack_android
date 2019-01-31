@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
 import android.content.Context
-import android.support.annotation.StringRes
 import android.text.Html
 import android.text.Spanned
+import androidx.annotation.StringRes
 import java.util.*
 
 /**

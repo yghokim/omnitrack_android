@@ -1,7 +1,7 @@
 import android.content.Context
 import android.graphics.Rect
-import android.support.v7.widget.RecyclerView
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import org.jetbrains.anko.dip
 
 class ItemSpacingDecoration(private val horizontal: Int, private val vertical: Int) : RecyclerView.ItemDecoration() {

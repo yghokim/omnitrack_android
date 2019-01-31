@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,14 +11,14 @@
 
     tools:context=".ui.pages.tracker.TrackerDetailActivity">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/appbar_padding_top"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,11 +27,11 @@
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <android.support.constraint.Guideline
+                <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guideline_appbar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
                     app:layout_constraintGuide_begin="@dimen/action_bar_height"
                     app:layout_constraintGuide_end="@dimen/action_bar_height" />
 
-                <android.support.v7.widget.AppCompatImageButton
+                <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/ui_appbar_button_left"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
@@ -70,7 +70,7 @@
                     tools:text="Activity title" />
 
 
-                <android.support.v7.widget.AppCompatImageButton
+                <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/ui_appbar_button_right_sub"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
@@ -83,7 +83,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/more" />
 
-                <android.support.v7.widget.AppCompatImageButton
+                <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/ui_appbar_button_right"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
@@ -95,7 +95,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/done" />
 
-                <android.support.v7.widget.AppCompatButton
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/ui_appbar_text_button_right"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
@@ -130,15 +130,15 @@
                     style="@style/HorizontalSeparator.NoVerticalMargin"
                     android:background="@color/textColorLightLight"
                     app:layout_constraintBottom_toBottomOf="parent" />
-            </android.support.constraint.ConstraintLayout>
-        </android.support.v7.widget.Toolbar>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.appcompat.widget.Toolbar>
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/frontalBackground">
 
-            <android.support.v7.widget.AppCompatImageButton
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/ui_navigate_left"
                 android:layout_width="@dimen/button_height_normal"
                 android:layout_height="@dimen/button_height_normal"
@@ -183,7 +183,7 @@
                 app:layout_constraintTop_toBottomOf="@id/ui_current_year"
                 app:layout_constraintVertical_chainStyle="packed" />
 
-            <android.support.v7.widget.AppCompatImageButton
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/ui_navigate_right"
                 android:layout_width="@dimen/button_height_normal"
                 android:layout_height="@dimen/button_height_normal"
@@ -195,13 +195,13 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/ui_navigate_left"
                 app:srcCompat="@drawable/right_dark" />
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ui_recyclerview_with_fallback"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

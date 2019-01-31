@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:parentTag="android.support.constraint.ConstraintLayout">
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <ImageView
         android:id="@+id/ui_image_view"
@@ -19,7 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:src="@drawable/service_thumb_fitbit" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_cancel"
         android:layout_width="@dimen/button_height_small"
         android:layout_height="@dimen/button_height_small"
@@ -32,7 +32,7 @@
         app:srcCompat="@drawable/ex" />
 
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_camera"
         style="@style/whitePlusButtonStyle"
         android:layout_width="@dimen/button_height_tall"
@@ -49,7 +49,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/camera" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_gallery"
         style="@style/whitePlusButtonStyle"
         android:layout_width="@dimen/button_height_tall"

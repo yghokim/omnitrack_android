@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.container
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 
 /**
  * Created by Young-Ho Kim on 2016-12-06.

@@ -1,15 +1,15 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.research
 
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.annotation.LayoutRes
-import android.support.design.widget.CoordinatorLayout
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.LayoutRes
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.experiment_invitation_list_element.view.*
 import kotlinx.android.synthetic.main.fragment_recyclerview_and_fab.view.*
 import kr.ac.snu.hcil.omnitrack.R
@@ -17,7 +17,6 @@ import kr.ac.snu.hcil.omnitrack.core.net.ExperimentInvitation
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
-import org.jetbrains.anko.support.v4.act
 import org.jetbrains.anko.verticalMargin
 
 /**

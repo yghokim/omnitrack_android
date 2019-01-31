@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
 import android.graphics.*
-import android.support.v4.content.ContextCompat
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
@@ -10,6 +9,7 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
 import kr.ac.snu.hcil.omnitrack.utils.dipSize

@@ -1,16 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.content.Context
-import android.support.annotation.DrawableRes
-import android.support.annotation.StringRes
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.AppCompatImageView
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 

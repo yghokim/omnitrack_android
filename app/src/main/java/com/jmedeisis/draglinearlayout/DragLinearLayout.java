@@ -13,8 +13,6 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
@@ -26,6 +24,8 @@ import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import kr.ac.snu.hcil.omnitrack.R;
 
 /**

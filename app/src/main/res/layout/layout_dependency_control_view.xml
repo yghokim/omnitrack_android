@@ -80,7 +80,7 @@
             app:SpinKit_Color="@color/colorPointed"
             app:SpinKit_Style="Circle" />
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ui_checked"
             android:layout_width="30dp"
             android:layout_height="30dp"

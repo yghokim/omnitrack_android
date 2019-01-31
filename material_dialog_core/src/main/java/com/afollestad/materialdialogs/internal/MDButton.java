@@ -3,13 +3,14 @@ package com.afollestad.materialdialogs.internal;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
 import android.view.Gravity;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.R;
 import com.afollestad.materialdialogs.util.DialogUtils;
+
+import androidx.appcompat.widget.AppCompatTextView;
 
 /**
  * @author Kevin Barry (teslacoil) 4/02/2015

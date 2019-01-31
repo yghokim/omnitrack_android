@@ -3,14 +3,14 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.AppCompatButton
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import com.github.ybq.android.spinkit.SpinKitView
 import com.github.ybq.android.spinkit.style.Circle
 import kr.ac.snu.hcil.omnitrack.R

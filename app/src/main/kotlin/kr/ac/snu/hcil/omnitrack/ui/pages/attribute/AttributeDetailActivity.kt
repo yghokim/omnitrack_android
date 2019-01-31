@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.attribute
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +10,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.lifecycle.ViewModelProviders
 import com.github.salomonbrys.kotson.set
 import com.jaredrummler.materialspinner.MaterialSpinner
 import dagger.Lazy

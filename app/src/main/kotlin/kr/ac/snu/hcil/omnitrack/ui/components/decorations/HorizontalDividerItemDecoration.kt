@@ -3,8 +3,8 @@ package kr.ac.snu.hcil.omnitrack.ui.components.decorations
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
-import android.support.v7.widget.RecyclerView
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 
 /**
  * Created by Young-Ho Kim on 2016-07-25.

@@ -3,12 +3,12 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
-import android.support.annotation.StringRes
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.annotation.StringRes
 import com.github.ybq.android.spinkit.SpinKitView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent

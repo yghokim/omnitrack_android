@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
-import android.support.v7.util.DiffUtil
+import androidx.recyclerview.widget.DiffUtil
 
 /**
  * Created by younghokim on 2017. 10. 20..

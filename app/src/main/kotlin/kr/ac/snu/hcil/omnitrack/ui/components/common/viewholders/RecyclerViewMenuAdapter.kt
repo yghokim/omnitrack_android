@@ -1,8 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders
 
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
@@ -16,7 +16,7 @@ abstract class RecyclerViewMenuAdapter : RecyclerView.Adapter<RecyclerViewMenuAd
         holder.bind(getMenuItemAt(position))
     }
 
-    open protected fun getLayout(viewType: Int): Int {
+    protected open fun getLayout(viewType: Int): Int {
         return R.layout.simple_menu_element_with_icon_title_description
     }
 

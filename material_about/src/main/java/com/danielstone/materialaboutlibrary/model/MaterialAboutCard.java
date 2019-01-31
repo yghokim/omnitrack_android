@@ -1,12 +1,12 @@
 package com.danielstone.materialaboutlibrary.model;
 
 
-import android.support.annotation.StringRes;
-
 import com.danielstone.materialaboutlibrary.items.MaterialAboutItem;
 
 import java.util.ArrayList;
 import java.util.Collections;
+
+import androidx.annotation.StringRes;
 
 public class MaterialAboutCard {
 
@@ -14,7 +14,6 @@ public class MaterialAboutCard {
     private int titleRes = 0;
 
     private ArrayList<MaterialAboutItem> mItems = new ArrayList<>();
-    ;
 
     private MaterialAboutCard(Builder builder) {
         this.title = builder.title;

@@ -4,9 +4,9 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.os.PowerManager
 import android.os.Vibrator
-import android.support.annotation.DrawableRes
-import android.support.annotation.StringRes
 import android.util.Log
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader

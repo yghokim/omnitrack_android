@@ -2,13 +2,12 @@ package kr.ac.snu.hcil.omnitrack.ui.components.dialogs
 
 import android.app.Dialog
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.AppCompatImageButton
 import android.view.View
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatImageButton
+import androidx.fragment.app.DialogFragment
 import kr.ac.snu.hcil.omnitrack.R
-import org.jetbrains.anko.support.v4.act
 import us.feras.mdv.MarkdownView
 
 /**

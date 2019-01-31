@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.wizard
 
 import android.content.Context
-import android.support.v4.view.PagerAdapter
 import android.view.View
 import android.view.ViewGroup
+import androidx.viewpager.widget.PagerAdapter
 
 /**
  * Created by Young-Ho Kim on 2016-08-30.

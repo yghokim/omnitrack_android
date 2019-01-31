@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="27dp"
         android:layout_height="27dp"
         android:layout_gravity="center_vertical"

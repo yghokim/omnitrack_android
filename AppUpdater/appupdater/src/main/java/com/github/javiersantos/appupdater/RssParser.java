@@ -1,6 +1,5 @@
 package com.github.javiersantos.appupdater;
 
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.github.javiersantos.appupdater.objects.Update;
@@ -19,6 +18,8 @@ import java.net.UnknownHostException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import androidx.annotation.Nullable;
 
 class RssParser {
     private URL rssUrl;

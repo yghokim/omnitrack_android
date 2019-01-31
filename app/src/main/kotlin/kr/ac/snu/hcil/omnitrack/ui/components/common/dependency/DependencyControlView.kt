@@ -2,12 +2,12 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.dependency
 
 import android.content.Context
 import android.graphics.PorterDuff
-import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.R

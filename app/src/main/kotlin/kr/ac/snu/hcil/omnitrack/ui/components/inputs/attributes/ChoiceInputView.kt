@@ -1,10 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 
 import android.content.Context
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.AppCompatImageButton
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.text.InputType
 import android.util.AttributeSet
 import android.util.SparseIntArray
@@ -16,6 +12,10 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatImageButton
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import dagger.internal.Factory
 import io.realm.Realm

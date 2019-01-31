@@ -3,11 +3,6 @@ package com.danielstone.materialaboutlibrary;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +11,12 @@ import com.danielstone.materialaboutlibrary.adapters.MaterialAboutListAdapter;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList;
 import com.danielstone.materialaboutlibrary.util.DefaultViewTypeManager;
 import com.danielstone.materialaboutlibrary.util.ViewTypeManager;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public abstract class MaterialAboutFragment extends Fragment {
 
@@ -41,7 +42,7 @@ public abstract class MaterialAboutFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.mal_material_about_fragment, container, false);
 
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.mal_recyclerview);
+        recyclerView = rootView.findViewById(R.id.mal_recyclerview);
         adapter = new MaterialAboutListAdapter(list, getViewTypeManager());
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);

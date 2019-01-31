@@ -16,7 +16,7 @@
 #   public *;
 #}
 
--keepattributes Signature, *Annotation*
+-keepattributes Signature, *Annotation*, InnerClasses, EnclosingMethod
 
 -keepclassmembers class * extends java.lang.Enum {
     <fields>;
@@ -60,18 +60,30 @@
 -dontnote org.apache.http.**
 
 
-# Platform calls Class.forName on types which do not exist on Android to determine platform.
--dontnote retrofit2.Platform
-# Platform used when running on RoboVM on iOS. Will not be used at runtime.
--dontnote retrofit2.Platform$IOS$MainThreadExecutor
-# Platform used when running on Java 8 VMs. Will not be used at runtime.
--dontwarn retrofit2.Platform$Java8
+#Retrofit2#################################################################
+# Retain service method parameters when optimizing.
+-keepclassmembers,allowshrinking,allowobfuscation interface * {
+    @retrofit2.http.* <methods>;
+}
 
--dontwarn retrofit.**
-# Retain generic type information for use by reflection by converters and adapters.
--keepattributes Signature
-# Retain declared checked exceptions for use by a Proxy instance.
--keepattributes Exceptions
+# Ignore annotation used for build tooling.
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+
+# Ignore JSR 305 annotations for embedding nullability information.
+-dontwarn javax.annotation.**
+
+# Guarded by a NoClassDefFoundError try/catch and only used when on the classpath.
+-dontwarn kotlin.Unit
+
+# Top-level functions that can only be used by Kotlin.
+-dontwarn retrofit2.-KotlinExtensions
+
+# With R8 full mode, it sees no subtypes of Retrofit interfaces since they are created with a Proxy
+# and replaces all potential values with null. Explicitly keeping the interfaces prevents this.
+-if interface * { @retrofit2.http.* <methods>; }
+-keep,allowobfuscation interface <1>
+
+#end Retrofit2#################################################################
 
 #For CameraKit >= 0.13.0
 -dontwarn com.google.android.gms.**
@@ -87,8 +99,6 @@
 -dontwarn io.reactivex.functions.Function
 -dontwarn rx.internal.util.**
 -dontwarn sun.misc.Unsafe
-
--dontwarn androidx.work.impl.background.systemjob.SystemJobService
 
 # for DexGuard only
 #-keepresourcexmlelements manifest/application/meta-data@value=GlideModule

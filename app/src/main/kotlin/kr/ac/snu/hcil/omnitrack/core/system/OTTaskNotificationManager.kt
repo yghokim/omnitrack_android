@@ -2,8 +2,8 @@ package kr.ac.snu.hcil.omnitrack.core.system
 
 import android.app.PendingIntent
 import android.content.Context
-import android.support.v4.app.NotificationCompat
-import android.support.v4.content.ContextCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import org.jetbrains.anko.notificationManager

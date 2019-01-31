@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bottom_separator_light"
-    tools:parentTag="android.support.constraint.ConstraintLayout">
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
         android:id="@+id/ui_time_trigger_type"
@@ -22,7 +22,7 @@
 
         />
 
-    <android.support.constraint.Group
+    <androidx.constraintlayout.widget.Group
         android:id="@+id/ui_group_interval"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
         style="@style/HorizontalSeparator.OfConstraintLayout.Light"
         app:layout_constraintTop_toBottomOf="@id/ui_trigger_interval_timespan_picker_wrapper" />
 
-    <android.support.constraint.Group
+    <androidx.constraintlayout.widget.Group
         android:id="@+id/ui_group_alarm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -118,7 +118,7 @@
         app:layout_constraintTop_toBottomOf="@id/ui_alarm_group_config_header" />
 
 
-    <android.support.constraint.Group
+    <androidx.constraintlayout.widget.Group
         android:id="@+id/ui_ema_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -197,7 +197,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ui_ema_group_config_bottom_separator" />
 
-    <android.support.constraint.Group
+    <androidx.constraintlayout.widget.Group
         android:id="@+id/ui_group_repitition_config"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

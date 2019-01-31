@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.time
 
 import android.content.Context
-import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.android.synthetic.main.component_hour_range_picker.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.INumericUpDown

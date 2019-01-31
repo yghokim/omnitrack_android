@@ -3,11 +3,11 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.text
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
-import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kotlin.properties.Delegates

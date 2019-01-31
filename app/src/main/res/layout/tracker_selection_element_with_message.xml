@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/colored_circle"
             android:layout_width="20dp"
             android:layout_height="20dp"

@@ -33,9 +33,9 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
-    implementation "com.android.support:appcompat-v7:$rootProject.ext.android_support_version"
-    implementation "com.android.support:design:$rootProject.ext.android_support_version"
-    implementation "com.android.support:support-annotations:$rootProject.ext.android_support_version"
+    implementation "androidx.appcompat:appcompat:$rootProject.ext.androidx_appcompat_version"
+    implementation "com.google.android.material:material:$rootProject.ext.android_support_version"
+    implementation "androidx.annotation:annotation:$rootProject.ext.android_support_version"
     implementation "com.squareup.picasso:picasso:$rootProject.ext.picasso_version"
 }
 

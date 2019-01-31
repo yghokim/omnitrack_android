@@ -5,13 +5,13 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.AppCompatButton
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
+import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper

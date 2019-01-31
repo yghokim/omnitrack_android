@@ -8,8 +8,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.support.v4.app.NotificationCompat
-import android.support.v4.content.ContextCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.R
 import org.jetbrains.anko.notificationManager
 import org.jetbrains.anko.powerManager

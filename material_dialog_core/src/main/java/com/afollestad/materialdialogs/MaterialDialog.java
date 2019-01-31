@@ -9,22 +9,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
-import android.support.annotation.ArrayRes;
-import android.support.annotation.AttrRes;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DimenRes;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.IntRange;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.annotation.UiThread;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
@@ -57,6 +41,23 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+
+import androidx.annotation.ArrayRes;
+import androidx.annotation.AttrRes;
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
+import androidx.annotation.DimenRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.IntRange;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.annotation.UiThread;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -180,7 +181,7 @@ public class MaterialDialog extends DialogBase implements
         } else {
             // Default adapter, choice mode
             if (listType == ListType.MULTI) {
-                final CheckBox cb = (CheckBox) view.findViewById(R.id.md_control);
+                final CheckBox cb = view.findViewById(R.id.md_control);
                 if (!cb.isEnabled()) return false;
                 final boolean shouldBeChecked = !selectedIndicesList.contains(position);
                 if (shouldBeChecked) {
@@ -206,7 +207,7 @@ public class MaterialDialog extends DialogBase implements
                         sendMultichoiceCallback();
                 }
             } else if (listType == ListType.SINGLE) {
-                final RadioButton radio = (RadioButton) view.findViewById(R.id.md_control);
+                final RadioButton radio = view.findViewById(R.id.md_control);
                 if (!radio.isEnabled()) return false;
                 boolean allowSelection = true;
                 final int oldSelected = mBuilder.selectedIndex;
@@ -1809,7 +1810,7 @@ public class MaterialDialog extends DialogBase implements
         }
 
         /**
-         * Sets a custom {@link android.support.v7.widget.RecyclerView.Adapter} for the dialog's list
+         * Sets a custom {@link androidx.recyclerview.widget.RecyclerView.Adapter} for the dialog's list
          *
          * @param adapter       The adapter to set to the list.
          * @param layoutManager The layout manager to use in the RecyclerView. Pass null to use the default linear manager.

@@ -12,7 +12,7 @@
         android:layout_alignParentEnd="true"
         android:background="@color/colorPointed" />
 
-    <android.support.v7.widget.AppCompatCheckBox
+    <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/ui_checkbox"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height_normal"

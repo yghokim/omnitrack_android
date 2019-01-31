@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
-import android.support.annotation.Keep
+import androidx.annotation.Keep
 
 @Keep
 open class ValueWithTimestamp<T>(open var value: T?, open var timestamp: Long?)

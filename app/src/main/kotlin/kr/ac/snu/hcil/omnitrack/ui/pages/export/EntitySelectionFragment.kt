@@ -1,19 +1,18 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.export
 
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.simple_layout_with_recycler_view.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
-import org.jetbrains.anko.support.v4.act
 
 abstract class EntitySelectionFragment<EntityType : IReadonlyObjectId, ChildType : IReadonlyObjectId> : OTFragment() {
 

@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.content.Context
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
 import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO

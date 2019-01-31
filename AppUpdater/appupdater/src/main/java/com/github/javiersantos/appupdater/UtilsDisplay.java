@@ -7,14 +7,15 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.media.RingtoneManager;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.AlertDialog;
 import android.view.View;
 
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.net.URL;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.NotificationCompat;
 
 class UtilsDisplay {
 

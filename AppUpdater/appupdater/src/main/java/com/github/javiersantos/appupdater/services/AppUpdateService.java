@@ -11,10 +11,6 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -27,6 +23,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
 
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;

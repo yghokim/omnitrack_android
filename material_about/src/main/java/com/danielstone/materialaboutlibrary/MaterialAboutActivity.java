@@ -4,20 +4,21 @@ package com.danielstone.materialaboutlibrary;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
-import android.support.v4.app.NavUtils;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 
 import com.danielstone.materialaboutlibrary.adapters.MaterialAboutListAdapter;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList;
 import com.danielstone.materialaboutlibrary.util.DefaultViewTypeManager;
 import com.danielstone.materialaboutlibrary.util.ViewTypeManager;
+import com.google.android.material.appbar.AppBarLayout;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NavUtils;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public abstract class MaterialAboutActivity extends AppCompatActivity {
 
@@ -52,8 +53,8 @@ public abstract class MaterialAboutActivity extends AppCompatActivity {
     }
 
     private void assignViews() {
-        toolbar = (Toolbar) findViewById(R.id.mal_toolbar);
-        recyclerView = (RecyclerView) findViewById(R.id.mal_recyclerview);
+        toolbar = findViewById(R.id.mal_toolbar);
+        recyclerView = findViewById(R.id.mal_recyclerview);
         recyclerView.setAlpha(0f);
         recyclerView.setTranslationY(20);
     }

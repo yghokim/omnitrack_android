@@ -15,10 +15,10 @@ import android.net.Uri
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
-import android.support.v4.app.NotificationCompat
-import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import android.widget.RemoteViews
+import androidx.core.app.NotificationCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager

@@ -4,16 +4,16 @@ import android.app.Activity
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.support.design.widget.AppBarLayout
-import android.support.v4.content.ContextCompat
-import android.support.v4.graphics.ColorUtils
-import android.support.v7.widget.AppCompatButton
-import android.support.v7.widget.AppCompatImageButton
-import android.support.v7.widget.Toolbar
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import butterknife.bindView
+import com.google.android.material.appbar.AppBarLayout
 import kr.ac.snu.hcil.omnitrack.R
 
 /**
@@ -123,9 +123,9 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
     }
 
 
-    abstract protected fun onToolbarLeftButtonClicked()
+    protected abstract fun onToolbarLeftButtonClicked()
 
-    abstract protected fun onToolbarRightButtonClicked()
+    protected abstract fun onToolbarRightButtonClicked()
 
     protected open fun onToolbarRightSubButtonClicked() {
 

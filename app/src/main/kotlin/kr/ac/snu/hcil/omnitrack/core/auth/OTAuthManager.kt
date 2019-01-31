@@ -3,10 +3,10 @@ package kr.ac.snu.hcil.omnitrack.core.auth
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.support.annotation.StringRes
-import android.support.v4.content.LocalBroadcastManager
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

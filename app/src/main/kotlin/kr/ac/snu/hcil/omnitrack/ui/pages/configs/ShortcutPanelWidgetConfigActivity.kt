@@ -3,9 +3,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.configs
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.AppCompatCheckBox
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +10,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatCheckBox
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import butterknife.bindView
 import dagger.internal.Factory
 import io.realm.Realm

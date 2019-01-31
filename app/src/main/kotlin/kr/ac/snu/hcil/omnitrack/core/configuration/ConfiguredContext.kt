@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.configuration
 
 import android.content.Context
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
 import kr.ac.snu.hcil.omnitrack.core.di.configured.*
 import kr.ac.snu.hcil.omnitrack.core.di.global.ApplicationComponent
 

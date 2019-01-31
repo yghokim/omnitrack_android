@@ -59,7 +59,7 @@
         </TableRow>
     </TableLayout>
 
-    <android.support.v7.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/ui_store_button"
         style="@style/PointedColoredButtonStyle"
         android:layout_width="wrap_content"

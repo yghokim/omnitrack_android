@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.dependency
 
-import android.app.Activity
 import android.content.Context
+import androidx.fragment.app.FragmentActivity
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
@@ -55,7 +55,7 @@ class DependencyControlViewModel(val dependencyResolver: OTSystemDependencyResol
         )
     }
 
-    fun resolveDependency(activity: Activity): Boolean {
+    fun resolveDependency(activity: FragmentActivity): Boolean {
         if (onStatusChanged.value != State.SATISFIED) {
             onStatusChanged.onNext(State.RESOLVING)
             subscriptions.add(dependencyResolver.tryResolve(activity)

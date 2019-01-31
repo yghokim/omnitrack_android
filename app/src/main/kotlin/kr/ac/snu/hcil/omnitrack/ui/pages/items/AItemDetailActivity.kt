@@ -1,16 +1,21 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import android.app.Activity
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.*
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.TooltipCompat
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.salomonbrys.kotson.*
@@ -55,7 +60,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
     protected lateinit var viewModel: ViewModelType
 
-    private val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+    private val layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
     private val loadingIndicatorBar: LoadingIndicatorBar by bindView(R.id.ui_loading_indicator)
 

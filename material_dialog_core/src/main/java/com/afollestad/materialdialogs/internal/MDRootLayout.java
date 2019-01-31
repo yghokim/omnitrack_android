@@ -8,8 +8,6 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Build;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +20,9 @@ import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.R;
 import com.afollestad.materialdialogs.StackingBehavior;
 import com.afollestad.materialdialogs.util.DialogUtils;
+
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * @author Kevin Barry (teslacoil) 4/02/2015

@@ -4,13 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import butterknife.bindView
 import com.github.ybq.android.spinkit.SpinKitView
 import kr.ac.snu.hcil.omnitrack.BuildConfig

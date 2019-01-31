@@ -11,7 +11,7 @@
     android:id="@+id/ui_indicator_view"
     android:paddingRight="12dp">
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ui_connection_link_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
         android:text="Step Count | Google Fit"
         android:textColor="@color/colorPointed" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_invalid_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

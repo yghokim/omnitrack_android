@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:parentTag="android.support.constraint.ConstraintLayout">
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_prev_date"
         style="@style/Base.Widget.AppCompat.Button.Borderless"
         android:layout_width="0dp"
@@ -31,7 +31,7 @@
         app:layout_constraintRight_toLeftOf="@+id/ui_button_next_date"
         app:layout_constraintTop_toTopOf="@+id/ui_button_prev_date">
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/ui_date_semantic_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
             app:textAllCaps="true"
             tools:text="Today" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/ui_date_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
             tools:text="Sunday, 2017" />
     </LinearLayout>
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_next_date"
         style="@style/Base.Widget.AppCompat.Button.Borderless"
         android:layout_width="0dp"
@@ -117,7 +117,7 @@
         android:background="@drawable/gradient_accent_mild"
         app:layout_constraintTop_toBottomOf="@+id/ui_picker_hour">
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/ui_relative_from_now_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -127,7 +127,7 @@
             android:textSize="14sp"
             tools:text="30 minutes later" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/ui_button_ok"
             style="@style/Base.Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"

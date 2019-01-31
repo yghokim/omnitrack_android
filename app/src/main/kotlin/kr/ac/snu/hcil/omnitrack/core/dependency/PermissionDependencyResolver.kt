@@ -1,9 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.core.dependency
 
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Single
 
@@ -28,9 +29,16 @@ class PermissionDependencyResolver(vararg permissions: String) : OTSystemDepende
         )
     }
 
-    override fun tryResolve(activity: Activity): Single<Boolean> {
-        return RxPermissions(activity)
-                .request(*(this.permissionNames.toTypedArray()))
+    override fun tryResolve(activity: FragmentActivity): Single<Boolean> {
+        return tryResolveImpl(RxPermissions(activity))
+    }
+
+    override fun tryResolve(fragment: Fragment): Single<Boolean> {
+        return tryResolveImpl(RxPermissions(fragment))
+    }
+
+    private fun tryResolveImpl(perm: RxPermissions): Single<Boolean> {
+        return perm.request(*(this.permissionNames.toTypedArray()))
                 .toList()
                 .map { list -> list.none { it == false } }
     }

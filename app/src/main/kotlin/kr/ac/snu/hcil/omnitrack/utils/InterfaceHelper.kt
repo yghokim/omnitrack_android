@@ -6,11 +6,11 @@ import android.graphics.ColorFilter
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
-import android.support.v4.content.ContextCompat
-import android.support.v4.graphics.ColorUtils
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import kr.ac.snu.hcil.omnitrack.R
 
 /**
@@ -24,7 +24,7 @@ object InterfaceHelper {
 
     fun removeButtonTextDecoration(button: Button) {
         button.transformationMethod = null
-        button.setAllCaps(false)
+        button.isAllCaps = false
     }
 
     @Suppress("DEPRECATION")

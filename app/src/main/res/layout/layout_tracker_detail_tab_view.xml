@@ -9,7 +9,7 @@
     tools:background="@drawable/main_gradient"
     tools:layout_height="@dimen/action_bar_height">
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/icon"
         android:layout_width="20dp"
         android:layout_height="20dp"
