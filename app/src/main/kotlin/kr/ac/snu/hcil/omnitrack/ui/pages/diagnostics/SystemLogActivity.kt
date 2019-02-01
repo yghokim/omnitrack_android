@@ -26,7 +26,7 @@ class SystemLogActivity : MultiButtonActionBarActivity(R.layout.activity_system_
         setActionBarButtonMode(Mode.Back)
 
         systemLogListView = findViewById(R.id.ui_system_log_list)
-        systemLogListView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true)
+        systemLogListView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, true)
 
         adapter = SystemLogAdapter()
 

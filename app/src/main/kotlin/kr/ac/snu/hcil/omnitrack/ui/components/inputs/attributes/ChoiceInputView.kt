@@ -90,7 +90,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
         adapter = Adapter()
 
-        listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        listView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         listView.adapter = adapter
         listView.itemAnimator?.changeDuration = 200
         listView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light), dip(0.8f), resources.getDimensionPixelSize(R.dimen.choice_indicator_size) + resources.getDimensionPixelSize(R.dimen.choice_indicator_spacing)))

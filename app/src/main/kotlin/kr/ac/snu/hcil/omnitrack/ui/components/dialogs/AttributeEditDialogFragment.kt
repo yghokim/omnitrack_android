@@ -169,7 +169,7 @@ class AttributeEditDialogFragment : DialogFragment() {
         subscriptions.add(
                 viewModel.onInformationMounted.subscribe {
                     println("item edit dialog: loaded attribute and item")
-                    this.valueView = viewModel.makeItemView(act, this.valueView)
+                    this.valueView = viewModel.makeItemView(requireActivity(), this.valueView)
                     if (valueView != null) {
                         valueView?.onCreate(savedInstanceState)
                         valueView?.onResume()

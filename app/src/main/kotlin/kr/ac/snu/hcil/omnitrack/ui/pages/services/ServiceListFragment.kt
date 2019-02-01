@@ -26,7 +26,9 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.MeasureFactoryAdapter
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 /**
  * Created by Young-Ho on 7/29/2016.
@@ -40,14 +42,14 @@ class ServiceListFragment : OTFragment() {
 
     private lateinit var adapter: Adapter
 
-    private val activateColor: Int by lazy { ContextCompat.getColor(act, R.color.colorPointed) }
+    private val activateColor: Int by lazy { ContextCompat.getColor(requireContext(), R.color.colorPointed) }
 
-    private val deactivateColor: Int by lazy { ContextCompat.getColor(act, R.color.colorRed_Light) }
+    private val deactivateColor: Int by lazy { ContextCompat.getColor(requireContext(), R.color.colorRed_Light) }
 
-    private val onActivatingColor: Int by lazy { ContextCompat.getColor(act, R.color.material_grey_100) }
+    private val onActivatingColor: Int by lazy { ContextCompat.getColor(requireContext(), R.color.material_grey_100) }
 
     private val internetRequiredAlertBuilder: MaterialDialog.Builder by lazy {
-        DialogHelper.makeSimpleAlertBuilder(act, act.getString(R.string.msg_external_service_activation_requires_internet))
+        DialogHelper.makeSimpleAlertBuilder(requireContext(), requireContext().resources.getString(R.string.msg_external_service_activation_requires_internet))
     }
 
     override fun onInject(configuredContext: ConfiguredContext) {
@@ -60,7 +62,7 @@ class ServiceListFragment : OTFragment() {
 
         listView = rootView.findViewById(R.id.ui_recyclerview_with_fallback)
 
-        listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        listView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         //listView.addItemDecoration(HorizontalDividerItemDecoration(0, 20))
 
         adapter = Adapter()
@@ -147,8 +149,8 @@ class ServiceListFragment : OTFragment() {
 
                 measureFactoryListView = view.findViewById(R.id.ui_supported_measure_list)
                 measureFactoryListView.adapter = measureFactoryAdapter
-                measureFactoryListView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-                measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(act, R.color.separator_Light), dip(0.6f)))
+                measureFactoryListView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+                measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(requireContext(), R.color.separator_Light), dipSize(requireContext(), 0.6f).roundToInt()))
 
                 activationButton = view.findViewById(R.id.ui_button_activate)
                 activationButton.background.setColorFilter(activateColor, PorterDuff.Mode.MULTIPLY)
@@ -163,7 +165,7 @@ class ServiceListFragment : OTFragment() {
                                         eventLogger.get().logServiceActivationChangeEvent(service.identifier, false)
                                     }, { err ->
                                         err.printStackTrace()
-                                        Toast.makeText(act, "Deactivation was failed due to an error. Please Try again later.", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(requireContext(), "Deactivation was failed due to an error. Please Try again later.", Toast.LENGTH_LONG).show()
                                     })
                             )
                         }
@@ -185,7 +187,7 @@ class ServiceListFragment : OTFragment() {
                                                         }
                                                     }
                                         }
-                                    }.andThen(service.startActivationActivityAsync(act)).subscribe({ success ->
+                                    }.andThen(service.startActivationActivityAsync(requireActivity())).subscribe({ success ->
                                         if (success) {
                                             eventLogger.get().logServiceActivationChangeEvent(service.identifier, true)
                                         }
@@ -225,8 +227,8 @@ class ServiceListFragment : OTFragment() {
             }
 
             fun bind(service: OTExternalService) {
-                nameView.text = act.resources.getString(service.nameResourceId)
-                descriptionView.text = act.resources.getString(service.descResourceId)
+                nameView.text = requireContext().resources.getString(service.nameResourceId)
+                descriptionView.text = requireContext().resources.getString(service.descResourceId)
                 thumbView.setImageResource(service.thumbResourceId)
 
                 measureFactoryAdapter.service = service

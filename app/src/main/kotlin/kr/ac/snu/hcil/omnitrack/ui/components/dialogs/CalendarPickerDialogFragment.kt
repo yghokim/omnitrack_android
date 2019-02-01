@@ -93,7 +93,7 @@ class CalendarPickerDialogFragment : DialogFragment() {
             val cal = GregorianCalendar(TimeZone.getDefault())
             cal.set(year, month, day)
 
-            val calendarView = CalendarView(act)
+            val calendarView = CalendarView(requireActivity())
             calendarView.setDate(cal.timeInMillis, false, true)
 
             calendarView.setOnDateChangeListener(object : CalendarView.OnDateChangeListener {

@@ -66,7 +66,7 @@ abstract class ACheckableTrackingEntityViewHolder<EntityType, ChildType>(parent:
 
         if (useChildrenList) {
             itemView.ui_group_children.visibility = View.VISIBLE
-            itemView.ui_children_list.layoutManager = LinearLayoutManager(itemView.context, LinearLayoutManager.VERTICAL, false)
+            itemView.ui_children_list.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
         } else {
             itemView.ui_group_children.visibility = View.GONE
         }

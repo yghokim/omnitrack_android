@@ -72,9 +72,9 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
         unSelectedTextColor = ContextCompat.getColor(context, R.color.selection_view_button_unselected_text_color)
 
 
-        layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
 
-        addItemDecoration(BetweenSpacingItemDecoration(LinearLayoutManager.HORIZONTAL, resources.getDimensionPixelOffset(R.dimen.selection_view_button_spacing)))
+        addItemDecoration(BetweenSpacingItemDecoration(RecyclerView.HORIZONTAL, resources.getDimensionPixelOffset(R.dimen.selection_view_button_spacing)))
 
         adapter = Adapter()
 

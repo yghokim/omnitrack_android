@@ -53,7 +53,7 @@ class MarkdownScreenDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val inflater = act.layoutInflater
+        val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.activity_markdown_screen, null)
         initView(view)
 
@@ -88,7 +88,7 @@ class MarkdownScreenDialogFragment : DialogFragment() {
             }
         }
 
-        return AlertDialog.Builder(act)
+        return AlertDialog.Builder(requireActivity())
                 .setView(view)
                 .setCancelable(true)
                 .create()

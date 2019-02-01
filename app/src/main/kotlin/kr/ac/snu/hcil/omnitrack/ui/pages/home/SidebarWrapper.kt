@@ -116,7 +116,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
             popupMenu.show()
         }
 
-        menuList.layoutManager = LinearLayoutManager(parentActivity, LinearLayoutManager.VERTICAL, false)
+        menuList.layoutManager = LinearLayoutManager(parentActivity, RecyclerView.VERTICAL, false)
         menuList.adapter = SidebarMenuAdapter()
     }
 

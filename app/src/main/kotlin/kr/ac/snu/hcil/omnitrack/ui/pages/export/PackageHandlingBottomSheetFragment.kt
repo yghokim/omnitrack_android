@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.bottomsheet_handle_extracted_package.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
@@ -44,7 +45,7 @@ class PackageHandlingBottomSheetFragment : DismissingBottomSheetDialogFragment(R
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(act).get(PackageExportViewModel::class.java)
+        viewModel = ViewModelProviders.of(requireActivity()).get(PackageExportViewModel::class.java)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -54,19 +55,19 @@ class PackageHandlingBottomSheetFragment : DismissingBottomSheetDialogFragment(R
             if (resultCode == AppCompatActivity.RESULT_OK && data != null) {
                 val exportUri = data.data
                 val success = try {
-                    val outputStream = act.contentResolver.openOutputStream(exportUri)
-                    outputStream.write((arguments?.getString(KEY_JSON_CONTENT_STRING)
+                    val outputStream = requireContext().contentResolver.openOutputStream(exportUri)
+                    outputStream?.write((arguments?.getString(KEY_JSON_CONTENT_STRING)
                             ?: "").toByteArray())
-                    outputStream.close()
+                    outputStream?.close()
                     true
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                     false
                 }
                 if (success) {
-                    Toast.makeText(act, "Saved JSON to file.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireActivity(), "Saved JSON to file.", Toast.LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(act, "Failed to save file.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireActivity(), "Failed to save file.", Toast.LENGTH_LONG).show()
                 }
                 dismiss()
             }
@@ -74,7 +75,7 @@ class PackageHandlingBottomSheetFragment : DismissingBottomSheetDialogFragment(R
     }
 
     override fun setupDialogAndContentView(dialog: Dialog, contentView: View) {
-        contentView.ui_list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        contentView.ui_list.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
         val jsonString = arguments?.getString(KEY_JSON_CONTENT_STRING)
 
@@ -102,7 +103,7 @@ class PackageHandlingBottomSheetFragment : DismissingBottomSheetDialogFragment(R
                         "Share the package content to research platform",
                         {
                             if (jsonString != null) {
-                                UploadTemporaryPackageDialogFragment.makeInstance(jsonString).show(act.supportFragmentManager, "InstantSharePackage")
+                                UploadTemporaryPackageDialogFragment.makeInstance(jsonString).show(fragmentManager, "InstantSharePackage")
                                 dismissAllowingStateLoss()
                             }
                         })

@@ -89,7 +89,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
 
         init {
             padding = context.resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             adapter = TrackerListAdapter()
         }
     }

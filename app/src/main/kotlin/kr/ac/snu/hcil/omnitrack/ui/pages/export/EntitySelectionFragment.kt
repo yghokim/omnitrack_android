@@ -27,7 +27,7 @@ abstract class EntitySelectionFragment<EntityType : IReadonlyObjectId, ChildType
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        this.viewModel = ViewModelProviders.of(act).get(PackageExportViewModel::class.java)
+        this.viewModel = ViewModelProviders.of(requireActivity()).get(PackageExportViewModel::class.java)
         creationSubscriptions.add(
                 getEntityListObservable(this.viewModel).subscribe { list ->
                     entityList.clear()
@@ -48,7 +48,7 @@ abstract class EntitySelectionFragment<EntityType : IReadonlyObjectId, ChildType
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.simple_layout_with_recycler_view, container, false)
 
-        rootView.ui_recyclerview_with_fallback.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        rootView.ui_recyclerview_with_fallback.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         rootView.ui_recyclerview_with_fallback.adapter = adapter
 
         return rootView

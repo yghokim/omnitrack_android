@@ -99,7 +99,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
         }
         titleForm.setText(OTShortcutPanelWidgetUpdateService.getTitle(appWidgetId, pref), TextView.BufferType.EDITABLE)
 
-        trackerSelectionList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        trackerSelectionList.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         trackerSelectionList.adapter = trackerSelectionAdapter
     }
 

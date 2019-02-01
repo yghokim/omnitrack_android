@@ -76,7 +76,7 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
 
         entryListView = findViewById(R.id.ui_recyclerview_with_fallback)
 
-        entryListView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        entryListView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
         entryListView.itemAnimator = null
         //entryListView.itemAnimator = SlideInLeftAnimator()

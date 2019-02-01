@@ -51,7 +51,7 @@ class TrackerPickerDialogBuilder(val trackers: List<OTTrackerDAO.SimpleTrackerIn
 
         val listView: RecyclerView = view
         listView.padding = context.resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
-        listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        listView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
 
         listView.adapter = TrackerAdapter(inactiveIds) {

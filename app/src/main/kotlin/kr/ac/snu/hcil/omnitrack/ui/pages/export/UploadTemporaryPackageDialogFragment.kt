@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProviders
@@ -26,7 +27,7 @@ class UploadTemporaryPackageDialogFragment : DialogFragment(), View.OnClickListe
     companion object {
         fun makeInstance(jsonString: String): UploadTemporaryPackageDialogFragment {
             return UploadTemporaryPackageDialogFragment().apply {
-                arguments = bundleOf(arrayOf<Pair<String, Any?>>(PackageHandlingBottomSheetFragment.KEY_JSON_CONTENT_STRING to jsonString))
+                arguments = bundleOf(PackageHandlingBottomSheetFragment.KEY_JSON_CONTENT_STRING to jsonString)
             }
         }
     }
@@ -58,7 +59,7 @@ class UploadTemporaryPackageDialogFragment : DialogFragment(), View.OnClickListe
         this.dialogView.ui_button.text = "Cancel"
         this.dialogView.ui_button.setOnClickListener(this)
 
-        val dialog = AlertDialog.Builder(act)
+        val dialog = AlertDialog.Builder(requireActivity())
                 .setView(this.dialogView)
                 .create()
 

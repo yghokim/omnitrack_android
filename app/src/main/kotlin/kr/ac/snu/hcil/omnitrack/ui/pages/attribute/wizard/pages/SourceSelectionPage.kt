@@ -72,7 +72,7 @@ class SourceSelectionPage(override val parent: ConnectionWizardView, val attribu
         constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
         init {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light),
                     dip(1.5f),
                     resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin),

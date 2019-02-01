@@ -141,7 +141,7 @@ class ExperimentSignUpActivity : AppCompatActivity() {
 
         override fun onAttach(context: Context) {
             super.onAttach(context)
-            viewModel = ViewModelProviders.of(act).get(ExperimentSignUpViewModel::class.java)
+            viewModel = ViewModelProviders.of(requireActivity()).get(ExperimentSignUpViewModel::class.java)
             attachSubscription.add(
                     viewModel.onNextTried.filter { it == slide }.subscribe {
                         onNextTried()

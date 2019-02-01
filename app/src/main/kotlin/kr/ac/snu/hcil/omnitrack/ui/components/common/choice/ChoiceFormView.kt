@@ -72,7 +72,7 @@ class ChoiceFormView : LinearLayout {
         recyclerView.preserveFocusAfterLayout = true
         recyclerView.descendantFocusability = ViewGroup.FOCUS_AFTER_DESCENDANTS
         recyclerView.layoutParams = LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         recyclerView.adapter = adapter
 
         addView(recyclerView)

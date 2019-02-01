@@ -80,7 +80,7 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_service_activation_wizard)
 
-        dependencyListView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        dependencyListView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         dependencyListView.adapter = dependencyAdapter
         dependencyListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(this, R.color.separator_Light),
                 dip(1),

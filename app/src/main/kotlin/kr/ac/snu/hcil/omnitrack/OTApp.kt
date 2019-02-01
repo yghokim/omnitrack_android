@@ -116,7 +116,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
 
     override val deviceId: String by lazy {
         val deviceUUID: UUID
-        val cached: String? = applicationComponent.defaultPreferences().getString("cached_device_id", null)
+        val cached = applicationComponent.defaultPreferences().getString("cached_device_id", null)
         if (!cached.isNullOrBlank()) {
             return@lazy cached
         } else {

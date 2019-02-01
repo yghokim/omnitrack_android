@@ -119,7 +119,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         showRightSubButton()
 
         itemListView.emptyView = emptyListMessageView
-        itemListView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        itemListView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
         val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(context = this)
         itemListView.addItemDecoration(shadowDecoration)
@@ -432,7 +432,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 itemMenu.inflate(R.menu.menu_item_list_element)
                 itemMenu.setOnMenuItemClickListener(this)
 
-                valueListView.layoutManager = LinearLayoutManager(this@ItemBrowserActivity, LinearLayoutManager.VERTICAL, false)
+                valueListView.layoutManager = LinearLayoutManager(this@ItemBrowserActivity, RecyclerView.VERTICAL, false)
 
                 valueListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(this@ItemBrowserActivity, R.color.separator_Light), dip(1)))
 
@@ -847,7 +847,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
             listView = contentView.findViewById(R.id.ui_recyclerview_with_fallback)
 
-            listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            listView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             listView.adapter = menuAdapter
         }
 

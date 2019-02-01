@@ -67,11 +67,11 @@ class ExperimentListFragment : OTFragment() {
         rootView.ui_empty_list_message.setText(R.string.msg_empty_experiments)
         rootView.ui_recyclerview_with_fallback.emptyView = rootView.ui_empty_list_message
 
-        rootView.ui_recyclerview_with_fallback.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        rootView.ui_recyclerview_with_fallback.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
         rootView.ui_recyclerview_with_fallback.adapter = this.adapter
 
-        val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(context = act, heightMultiplier = 0.8f)
+        val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(context = requireContext(), heightMultiplier = 0.8f)
         rootView.ui_recyclerview_with_fallback.addItemDecoration(shadowDecoration)
         (rootView.ui_recyclerview_with_fallback.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
 

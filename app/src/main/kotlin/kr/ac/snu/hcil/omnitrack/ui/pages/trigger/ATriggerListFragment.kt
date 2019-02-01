@@ -157,6 +157,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
     protected open fun makeNewDefaultTrigger(conditionType: Byte): OTTriggerDAO {
         val newDao = OTTriggerDAO()
 
+        @Suppress("SENSELESS_COMPARISON")
         if (BuildConfig.DEFAULT_EXPERIMENT_ID != null) {
             newDao.experimentIdInFlags = BuildConfig.DEFAULT_EXPERIMENT_ID
             newDao.serializedCreationFlags = CreationFlagsHelper.Builder(newDao.serializedCreationFlags)
@@ -178,19 +179,19 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
     override fun onStart() {
         super.onStart()
-        LocalBroadcastManager.getInstance(act).registerReceiver(triggerFireBroadcastReceiver, TriggerFireBroadcastReceiver.makeIntentFilter())
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(triggerFireBroadcastReceiver, TriggerFireBroadcastReceiver.makeIntentFilter())
     }
 
     override fun onStop() {
         super.onStop()
-        LocalBroadcastManager.getInstance(act).unregisterReceiver(triggerFireBroadcastReceiver)
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(triggerFireBroadcastReceiver)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        ui_trigger_list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(context = act)
+        ui_trigger_list.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(context = requireContext())
         ui_trigger_list.addItemDecoration(shadowDecoration)
 
         (ui_trigger_list.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
@@ -199,7 +200,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
         ui_trigger_list.adapter = triggerListAdapter
 
-        setFloatingButtonColor(ContextCompat.getColor(act, R.color.colorPointed))
+        setFloatingButtonColor(ContextCompat.getColor(requireContext(), R.color.colorPointed))
     }
 
     fun setFloatingButtonColor(color: Int) {
@@ -215,7 +216,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         if (requestCode == DETAIL_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
             if (data.hasExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO)) {
                 val resultDao =
-                        (act.application as OTAndroidApp).currentConfiguredContext.daoSerializationComponent.manager().parseTrigger(data.getStringExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO))
+                        (requireActivity().application as OTAndroidApp).currentConfiguredContext.daoSerializationComponent.manager().parseTrigger(data.getStringExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO))
                 viewModel.addNewTrigger(resultDao)
             }
         }
@@ -326,7 +327,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                                     })
                             )
                         }
-                view === itemView.ui_button_remove -> DialogHelper.makeNegativePhrasedYesNoDialogBuilder(act,
+                view === itemView.ui_button_remove -> DialogHelper.makeNegativePhrasedYesNoDialogBuilder(requireActivity(),
                         "OmniTrack",
                         String.format(getString(R.string.msg_format_confirm_remove_trigger), getString(OTTriggerInformationHelper.getActionNameResId(viewModel.defaultTriggerInterfaceOptions.defaultActionType)
                                 ?: 0)),
@@ -414,7 +415,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                     triggerViewModel.triggerCondition.subscribe { condition ->
                         println("condition changed")
                         triggerViewModel.triggerConditionType.value?.let { conditionType ->
-                            val displayView = OTTriggerViewFactory.getConditionViewProvider(conditionType)?.getTriggerDisplayView(currentHeaderView, triggerViewModel.dao, act, configuredContext)
+                            val displayView = OTTriggerViewFactory.getConditionViewProvider(conditionType)?.getTriggerDisplayView(currentHeaderView, triggerViewModel.dao, requireActivity(), configuredContext)
                             if (displayView != null) {
                                 refreshHeaderView(displayView)
                             } else {
