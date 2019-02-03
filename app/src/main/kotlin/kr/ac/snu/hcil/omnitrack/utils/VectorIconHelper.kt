@@ -59,10 +59,18 @@ object VectorIconHelper {
         val memCachedBitmap = memCache.get(cacheKey)
         if (memCachedBitmap == null) {
             val realm = Realm.getInstance(realmConfiguration)
-            val cache = realm.where(VectorIconBitmapCache::class.java).equalTo("resourceId", vectorDrawableRes).equalTo("sizeDp", sizeDp).equalTo("tint", tint).findAll().toTypedArray()
+            val cache = realm.where(VectorIconBitmapCache::class.java)
+                    .equalTo("resourceId", vectorDrawableRes)
+                    .equalTo("sizeDp", sizeDp)
+                    .equalTo("tint", tint)
+                    .findAll().toTypedArray()
 
-            val finalBitmap = if (cache.isNotEmpty()) {
+            val cachedBitmap: Bitmap? = if (cache.isNotEmpty()) {
                 BitmapFactory.decodeFile(cache[0].uri)
+            } else null
+
+            val finalBitmap = if (cachedBitmap != null) {
+                cachedBitmap
             } else {
                 var drawable = AppCompatResources.getDrawable(context, vectorDrawableRes)!!
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
@@ -95,15 +103,21 @@ object VectorIconHelper {
                     outputStream = output.outputStream()
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
 
-                    val newCache = VectorIconBitmapCache()
-                    newCache.resourceId = vectorDrawableRes
-                    newCache.sizeDp = sizeDp
-                    newCache.tint = tint
-                    newCache.uri = output.absolutePath
+                    if (cache.isNotEmpty()) {
+                        //cache information is in DB, but its uri is broken. Update the existing one.
+                        realm.executeTransaction { rlm ->
+                            cache[0].uri = output.absolutePath
+                        }
+                    } else {
+                        val newCache = VectorIconBitmapCache()
+                        newCache.resourceId = vectorDrawableRes
+                        newCache.sizeDp = sizeDp
+                        newCache.tint = tint
+                        newCache.uri = output.absolutePath
 
-                    realm.executeTransaction {
-                        rlm ->
-                        rlm.insert(newCache)
+                        realm.executeTransaction { rlm ->
+                            rlm.insert(newCache)
+                        }
                     }
 
                 } catch(ex: Exception) {
