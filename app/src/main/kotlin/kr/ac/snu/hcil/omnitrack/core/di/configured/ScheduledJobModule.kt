@@ -1,12 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.core.di.configured
 
 import android.os.Bundle
+import androidx.core.os.bundleOf
+import androidx.work.*
 import com.firebase.jobdispatcher.*
 import dagger.Module
 import dagger.Provides
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.services.*
-import org.jetbrains.anko.bundleOf
+import java.util.concurrent.TimeUnit
 import javax.inject.Provider
 import javax.inject.Qualifier
 
@@ -63,21 +65,17 @@ class ScheduledJobModule {
     @Provides
     @Configured
     @BinaryStorageServer
-    fun provideBinaryUploadJob(builder: Job.Builder): Job {
-        return builder.setService(OTBinaryUploadService::class.java)
-                .setTag(OTBinaryUploadService.TAG)
-                .setRecurring(false)
-                .setTag(OTBinaryUploadService.ACTION_UPLOAD)
-                .setLifetime(Lifetime.FOREVER)
-                .setReplaceCurrent(true)
-                .setTrigger(Trigger.executionWindow(0, 30))
-                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
-                .setConstraints(
-                        Constraint.ON_ANY_NETWORK
-                )
+    fun provideBinaryUploadRequest(): OneTimeWorkRequest {
+        val constraints = Constraints.Builder().apply {
+            setRequiredNetworkType(NetworkType.CONNECTED)
+        }.build()
+
+        return OneTimeWorkRequestBuilder<OTBinaryUploadWorker>()
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.SECONDS)
+                .setConstraints(constraints)
+                .addTag(OTBinaryUploadWorker.TAG)
                 .build()
     }
-
 
     @Provides
     @Configured

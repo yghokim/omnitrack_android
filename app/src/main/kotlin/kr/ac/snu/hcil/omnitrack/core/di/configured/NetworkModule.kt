@@ -2,8 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.di.configured
 
 import android.content.Context
 import android.net.Uri
-import com.firebase.jobdispatcher.FirebaseJobDispatcher
-import com.firebase.jobdispatcher.Job
+import androidx.work.OneTimeWorkRequest
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
 import com.github.pwittchen.reactivenetwork.library.rx2.internet.observing.InternetObservingSettings
 import com.github.pwittchen.reactivenetwork.library.rx2.internet.observing.strategy.SocketInternetObservingStrategy
@@ -144,10 +143,9 @@ class NetworkModule {
     @Provides
     @Configured
     fun provideBinaryStorageController(
-            dispatcher: Lazy<FirebaseJobDispatcher>,
-            @BinaryStorageServer jobProvider: Provider<Job>,
+            @BinaryStorageServer workRequest: Provider<OneTimeWorkRequest>,
             core: IBinaryStorageCore): OTBinaryStorageController {
-        return OTBinaryStorageController(dispatcher, jobProvider, core, provideRealm())
+        return OTBinaryStorageController(workRequest, core, provideRealm())
     }
 
     /**

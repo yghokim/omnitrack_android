@@ -1,6 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.services
 
+import android.content.Context
 import android.util.Log
+import androidx.work.RxWorker
+import androidx.work.WorkerParameters
 import com.firebase.jobdispatcher.JobParameters
 import com.firebase.jobdispatcher.JobService
 import dagger.Lazy
@@ -21,6 +24,25 @@ import javax.inject.Inject
 /**
  * Created by younghokim on 2017. 11. 28..
  */
+class OTUsageLogUploadWorker(private val context: Context, workerParams: WorkerParameters) : RxWorker(context, workerParams) {
+
+
+    @field:[Inject UsageLogger]
+    lateinit var realmFactory: Factory<Realm>
+
+    @Inject
+    lateinit var usageLogUploadApi: Lazy<IUsageLogUploadAPI>
+
+    init {
+        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+    }
+
+    override fun createWork(): Single<Result> {
+        return Single.just(Result.success())
+    }
+
+}
+
 class OTUsageLogUploadService : JobService() {
 
 

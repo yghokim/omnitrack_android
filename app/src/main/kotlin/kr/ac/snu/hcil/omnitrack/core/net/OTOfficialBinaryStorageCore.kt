@@ -66,8 +66,7 @@ class OTOfficialBinaryStorageCore(val context: Context, val retrofit: Lazy<Retro
                     return@defer service.uploadItemMediaFile(split[0], split[1], split[2], split[3], fileBody).subscribeOn(Schedulers.io())
                             .doOnError { error ->
                                 error.printStackTrace()
-                            }
-                            .toCompletable()
+                            }.ignoreElement()
                 } else return@defer Completable.error(FileNotFoundException("MimeType extraction was failed"))
             } else return@defer Completable.error(FileNotFoundException("file size zero"))
         }

@@ -212,7 +212,8 @@ interface ConfiguredAppComponent {
 
     fun inject(expression: RealmLazyFunction)
 
-    fun inject(service: OTBinaryUploadService)
+    fun inject(worker: OTBinaryUploadWorker)
+    fun inject(worker: OTUsageLogUploadWorker)
 
     fun inject(service: OTUsageLogUploadService)
 

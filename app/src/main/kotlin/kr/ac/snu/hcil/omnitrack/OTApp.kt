@@ -14,7 +14,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.squareup.leakcanary.LeakCanary
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
@@ -228,13 +227,14 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
 
         val startedAt = SystemClock.elapsedRealtime()
 
+        /*
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
             // You should not init your instance in this process.
             return
         } else {
             LeakCanary.install(this)
-        }
+        }*/
 
         //Use a new async API to improve performance in RxAndroid 2.1.0
         RxAndroidPlugins.initMainThreadScheduler {
