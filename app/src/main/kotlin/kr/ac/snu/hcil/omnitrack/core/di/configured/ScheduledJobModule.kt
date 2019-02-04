@@ -80,15 +80,15 @@ class ScheduledJobModule {
     @Provides
     @Configured
     @UsageLogger
-    fun providesUsageLogUploadJob(builder: Job.Builder): Job {
-        return builder.setService(OTUsageLogUploadService::class.java)
-                .setTag("OTUsageLogUploadService")
-                .setLifetime(Lifetime.FOREVER)
-                .setReplaceCurrent(true)
-                .setRecurring(false)
-                .setTrigger(Trigger.executionWindow(5, 30))
-                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
-                .addConstraint(Constraint.ON_ANY_NETWORK)
+    fun providesUsageLogUploadRequest(): OneTimeWorkRequest {
+        val constraints = Constraints.Builder().apply {
+            setRequiredNetworkType(NetworkType.CONNECTED)
+        }.build()
+
+        return OneTimeWorkRequestBuilder<OTUsageLogUploadWorker>()
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.SECONDS)
+                .setConstraints(constraints)
+                .addTag(OTUsageLogUploadWorker.TAG)
                 .build()
     }
 

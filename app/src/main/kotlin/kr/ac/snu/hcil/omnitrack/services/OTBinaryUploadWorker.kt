@@ -4,7 +4,6 @@ import android.content.Context
 import android.widget.Toast
 import androidx.work.RxWorker
 import androidx.work.WorkerParameters
-import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -88,7 +87,7 @@ class OTBinaryUploadWorker(val context: Context, workerParams: WorkerParameters)
                 return@defer Single.just(Result.success())
             } else {
                 println("continue with ${currentUploadTasks.count()} upload tasks...")
-                Completable.merge(
+                Single.zip(
                         currentUploadTasks.map { dbObject ->
                             core.startNewUploadTaskImpl(dbObject
                             ) { sessionUri ->
@@ -104,10 +103,23 @@ class OTBinaryUploadWorker(val context: Context, workerParams: WorkerParameters)
                             }.doOnError { err ->
                                 println("binary upload error")
                                 err.printStackTrace()
-                            }.onErrorComplete()
-                        }).doOnTerminate {
+                            }.toSingle { true }.onErrorReturn { false }
+                        }) {
+                    if (it.any { it == false }) {
+                        Result.retry()
+                    } else {
+                        Result.success()
+                    }
+                }.doFinally {
                     realm.close()
-                }.andThen(crawlAndUpload(0))
+                }.flatMap {
+                    when (it) {
+                        is Result.Success ->
+                            crawlAndUpload(0)
+                        else ->
+                            Single.just(it)
+                    }
+                }
             }
         }.subscribeOn(realmScheduler)
     }

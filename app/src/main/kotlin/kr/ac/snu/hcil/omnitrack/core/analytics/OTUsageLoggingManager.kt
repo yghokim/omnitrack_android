@@ -1,11 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.core.analytics
 
 import android.os.Looper
-import com.firebase.jobdispatcher.FirebaseJobDispatcher
-import com.firebase.jobdispatcher.Job
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.github.salomonbrys.kotson.*
 import com.google.gson.JsonObject
-import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.BuildConfig
@@ -28,6 +28,7 @@ import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UsageLog
 import kr.ac.snu.hcil.omnitrack.core.di.configured.UsageLogger
+import kr.ac.snu.hcil.omnitrack.services.OTUsageLogUploadWorker
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.versionCode
 import org.jetbrains.anko.getStackTraceString
@@ -42,11 +43,8 @@ class OTUsageLoggingManager(val configuredContext: ConfiguredContext) : IEventLo
     @field:[Inject UsageLogger]
     lateinit var realmFactory: Factory<Realm>
 
-    @Inject
-    lateinit var jobDispatcher: Lazy<FirebaseJobDispatcher>
-
     @field:[Inject UsageLogger]
-    lateinit var uploadJob: Provider<Job>
+    lateinit var uploadRequestProvider: Provider<OneTimeWorkRequest>
 
     init {
         configuredContext.configuredAppComponent.inject(this)
@@ -70,7 +68,7 @@ class OTUsageLoggingManager(val configuredContext: ConfiguredContext) : IEventLo
 
         if (Looper.myLooper() == Looper.getMainLooper()) {
             realm.executeTransactionAsync(transaction, {
-                jobDispatcher.get().mustSchedule(uploadJob.get())
+                WorkManager.getInstance().enqueueUniqueWork(OTUsageLogUploadWorker.TAG, ExistingWorkPolicy.KEEP, uploadRequestProvider.get())
                 realm.close()
             }, { ex ->
                 println("UsageLog save transaction was failed:")
@@ -78,7 +76,7 @@ class OTUsageLoggingManager(val configuredContext: ConfiguredContext) : IEventLo
             })
         } else {
             realm.executeTransaction(transaction)
-            jobDispatcher.get().mustSchedule(uploadJob.get())
+            WorkManager.getInstance().enqueueUniqueWork(OTUsageLogUploadWorker.TAG, ExistingWorkPolicy.KEEP, uploadRequestProvider.get())
             realm.close()
         }
     }

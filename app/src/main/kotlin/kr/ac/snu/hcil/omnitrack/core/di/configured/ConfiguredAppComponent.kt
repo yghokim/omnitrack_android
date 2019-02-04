@@ -215,8 +215,6 @@ interface ConfiguredAppComponent {
     fun inject(worker: OTBinaryUploadWorker)
     fun inject(worker: OTUsageLogUploadWorker)
 
-    fun inject(service: OTUsageLogUploadService)
-
     fun inject(service: OTInformationUploadService)
 
     fun inject(task: OTReminderCommands)
