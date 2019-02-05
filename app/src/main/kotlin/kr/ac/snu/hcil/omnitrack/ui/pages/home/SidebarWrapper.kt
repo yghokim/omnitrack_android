@@ -10,8 +10,11 @@ import androidx.appcompat.widget.AppCompatImageButton
 import androidx.lifecycle.LifecycleObserver
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.afollestad.materialdialogs.MaterialDialog
-import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.firebase.jobdispatcher.Job
 import com.squareup.picasso.Picasso
 import dagger.Lazy
@@ -32,7 +35,7 @@ import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.configured.InformationUpload
 import kr.ac.snu.hcil.omnitrack.core.di.configured.ResearchSync
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
-import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadService
+import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadWorker
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
@@ -61,11 +64,9 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
     @Inject
     lateinit var eventLogger: Lazy<IEventLogger>
 
-    @Inject
-    lateinit var jobDispatcher: FirebaseJobDispatcher
 
     @field:[Inject InformationUpload]
-    lateinit var informationUploadJobProvider: Job.Builder
+    lateinit var informationUploadRequestBuilderFactory: Factory<OneTimeWorkRequest.Builder>
 
     @field:[Inject ResearchSync]
     lateinit var researchSyncJob: Provider<Job>
@@ -164,8 +165,14 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                                         user.nameUpdatedAt = System.currentTimeMillis()
                                         user.nameSynchronizedAt = null
                                     }
-                                    jobDispatcher.mustSchedule(informationUploadJobProvider.setTag(OTInformationUploadService.INFORMATION_USERNAME)
-                                            .build())
+
+                                    WorkManager.getInstance().enqueueUniqueWork(OTInformationUploadWorker.INFORMATION_USERNAME, ExistingWorkPolicy.APPEND,
+                                            informationUploadRequestBuilderFactory.get()
+                                                    .addTag(OTInformationUploadWorker.INFORMATION_USERNAME)
+                                                    .setInputData(Data.Builder().putString(OTInformationUploadWorker.KEY_TYPE, OTInformationUploadWorker.INFORMATION_USERNAME)
+                                                            .build()
+                                                    ).build()
+                                    )
                                 }
                             }
                         }
@@ -211,7 +218,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                     //OTApp.instance.syncManager.performSynchronizationOf(ESyncDataType.ITEM)
                     syncManager.get().queueFullSync(ignoreFlags = false)
                     syncManager.get().reserveSyncServiceNow()
-                    jobDispatcher.mustSchedule(researchSyncJob.get())
+                    //jobDispatcher.mustSchedule(researchSyncJob.get())
                 }, true)
         ).apply {
 

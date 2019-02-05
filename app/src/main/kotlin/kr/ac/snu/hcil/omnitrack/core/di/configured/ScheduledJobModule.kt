@@ -6,6 +6,7 @@ import androidx.work.*
 import com.firebase.jobdispatcher.*
 import dagger.Module
 import dagger.Provides
+import dagger.internal.Factory
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.services.*
 import java.util.concurrent.TimeUnit
@@ -87,6 +88,7 @@ class ScheduledJobModule {
 
         return OneTimeWorkRequestBuilder<OTUsageLogUploadWorker>()
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.SECONDS)
+                .setInitialDelay(5, TimeUnit.SECONDS)
                 .setConstraints(constraints)
                 .addTag(OTUsageLogUploadWorker.TAG)
                 .build()
@@ -95,14 +97,27 @@ class ScheduledJobModule {
     @Provides
     @Configured
     @InformationUpload
-    fun providesInformationUploadJobBuilder(builder: Job.Builder): Job.Builder {
-        return builder.setService(OTInformationUploadService::class.java)
+    fun providesInformationUploadRequestBuilderFactory(): Factory<OneTimeWorkRequest.Builder> {
+        return object : Factory<OneTimeWorkRequest.Builder> {
+            override fun get(): OneTimeWorkRequest.Builder {
+                val constraints = Constraints.Builder().apply {
+                    setRequiredNetworkType(NetworkType.CONNECTED)
+                }.build()
+
+                return OneTimeWorkRequestBuilder<OTInformationUploadWorker>()
+                        .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.SECONDS)
+                        .setConstraints(constraints)
+            }
+        }
+
+
+        /*return builder.setService(OTInformationUploadService::class.java)
                 .setTag("OTInformationUploadService")
                 .setLifetime(Lifetime.FOREVER)
                 .setReplaceCurrent(true)
                 .setTrigger(Trigger.executionWindow(0, 20))
                 .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
-                .addConstraint(Constraint.ON_ANY_NETWORK)
+                .addConstraint(Constraint.ON_ANY_NETWORK)*/
     }
 
     @Provides
