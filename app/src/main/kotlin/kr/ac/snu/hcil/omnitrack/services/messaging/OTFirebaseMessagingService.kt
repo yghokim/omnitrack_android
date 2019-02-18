@@ -4,7 +4,9 @@ import android.app.PendingIntent
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.firebase.jobdispatcher.FirebaseJobDispatcher
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.WorkManager
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -23,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
+import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadWorker
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import org.jetbrains.anko.notificationManager
@@ -48,9 +51,6 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
 
         const val COMMAND_TEST_TRIGGER_PING = "test_trigger_ping"
     }
-
-    @Inject
-    lateinit var dispatcher: FirebaseJobDispatcher
 
     @Inject
     lateinit var configController: OTConfigurationController
@@ -81,8 +81,12 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
                                         println("FirebaseInstanceId token - $token")
                                         val currentUserId = configuredContext.configuredAppComponent.getAuthManager().userId
                                         if (currentUserId != null) {
-                                            val jobBuilder = configuredContext.scheduledJobComponent.getInformationUploadJobBuilderProvider().get()
-                                            dispatcher.mustSchedule(jobBuilder.build())
+                                            val requestBuilder = configuredContext.scheduledJobComponent.getInformationUploadRequestBuilderFactory().get()
+                                            requestBuilder.addTag(OTInformationUploadWorker.INFORMATION_DEVICE)
+                                                    .setInputData(Data.Builder().putString(OTInformationUploadWorker.KEY_TYPE, OTInformationUploadWorker.INFORMATION_DEVICE)
+                                                            .build()
+                                                    ).build()
+                                            WorkManager.getInstance().enqueueUniqueWork(OTInformationUploadWorker.INFORMATION_DEVICE, ExistingWorkPolicy.REPLACE, requestBuilder.build())
                                         }
                                     }
                                 } catch (ex: IOException) {

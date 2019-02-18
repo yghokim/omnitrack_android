@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.configuration
 
 import android.content.Context
 import androidx.annotation.StringRes
+import androidx.work.WorkManager
 import kr.ac.snu.hcil.omnitrack.core.di.configured.*
 import kr.ac.snu.hcil.omnitrack.core.di.global.ApplicationComponent
 
@@ -128,7 +129,8 @@ class ConfiguredContext(val configuration: OTConfiguration, val applicationCompo
     fun activateOnSystem() {
         //triggerSystemComponent.getTriggerAlarmController().activateOnSystem()
 
-        applicationComponent.jobDispatcher().mustSchedule(scheduledJobComponent.getFullSyncPeriodicJob().get())
+        WorkManager.getInstance().enqueue(scheduledJobComponent.getFullSyncPeriodicRequestProvider().get())
+        //applicationComponent.jobDispatcher().mustSchedule(scheduledJobComponent.getFullSyncPeriodicJob().get())
     }
 
     fun deactivateOnSystem() {

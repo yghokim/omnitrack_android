@@ -1,7 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.di.configured
 
-import com.firebase.jobdispatcher.Job
+import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequest
 import dagger.Subcomponent
+import dagger.internal.Factory
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
 import kr.ac.snu.hcil.omnitrack.receivers.PackageReceiver
@@ -21,10 +23,11 @@ interface ScheduledJobComponent {
         fun build(): ScheduledJobComponent
     }
 
-    fun getInformationUploadJobBuilderProvider(): Provider<Job.Builder>
+    @InformationUpload
+    fun getInformationUploadRequestBuilderFactory(): Factory<OneTimeWorkRequest.Builder>
 
-    @ServerSync
-    fun getFullSyncPeriodicJob(): Provider<Job>
+    @ServerFullSync
+    fun getFullSyncPeriodicRequestProvider(): Provider<PeriodicWorkRequest>
 
     fun inject(receiver: PackageReceiver)
     fun inject(controller: OTBinaryStorageController)

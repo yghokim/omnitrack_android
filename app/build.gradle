@@ -18,7 +18,17 @@ def buildConfigJson = project.buildConfigJson
 
 android {
 
-    if (buildConfigJson.signing != null) {
+    if (
+            buildConfigJson.signing != null &&
+            buildConfigJson.signing.releaseKeystoreLocation != null &&
+            buildConfigJson.signing.releaseKeystoreLocation.length() > 0 &&
+            buildConfigJson.signing.releaseAlias != null &&
+            buildConfigJson.signing.releaseAlias.length() > 0 &&
+            buildConfigJson.signing.releaseKeyPassword != null &&
+            buildConfigJson.signing.releaseKeyPassword.length() > 0 &&
+            buildConfigJson.signing.releaseStorePassword != null &&
+            buildConfigJson.signing.releaseStorePassword.length() > 0
+    ) {
         signingConfigs {
             sign_release {
                 storeFile file(buildConfigJson.signing.releaseKeystoreLocation)
@@ -62,13 +72,13 @@ android {
 
     flavorDimensions "minApi"
 
-    productFlavors{
-        minApi19{
+    productFlavors {
+        minApi19 {
             dimension "minApi"
             minSdkVersion 19
         }
 
-        minApi21{
+        minApi21 {
             dimension "minApi"
             minSdkVersion 21
         }
@@ -97,7 +107,12 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.sign_release
+
+            if (signingConfigs.hasProperty("sign_release")) {
+                signingConfig signingConfigs.sign_release
+            } else {
+                println("The omnitrackBuildConfig.json file does not define an Android signing Keystore.")
+            }
 
             manifestPlaceholders.appNameSuffix = ""
         }
@@ -112,16 +127,16 @@ android {
     //preliminary check for google-services.json validaty.
     def matchClient
 
-    buildTypes.each{
-        buildType->
-        def finalApplicationId = buildType.applicationIdSuffix == null ? defaultConfig.applicationId : defaultConfig.applicationId + buildType.applicationIdSuffix
-        matchClient = googleServices.client.find {
-            println("Find matching service client with package name - ${finalApplicationId}")
-            return it.client_info.android_client_info.package_name == finalApplicationId
-        }
+    buildTypes.each {
+        buildType ->
+            def finalApplicationId = buildType.applicationIdSuffix == null ? defaultConfig.applicationId : defaultConfig.applicationId + buildType.applicationIdSuffix
+            matchClient = googleServices.client.find {
+                println("Find matching service client with package name - ${finalApplicationId}")
+                return it.client_info.android_client_info.package_name == finalApplicationId
+            }
     }
 
-    if(matchClient==null){
+    if (matchClient == null) {
         throw new IllegalStateException("google-services.json file does not contain a matching client information.")
     }
 
@@ -151,8 +166,8 @@ android {
                 return it.client_info.android_client_info.package_name == finalApplicationId
             }
 
-            if(googleServiceClient!=null) {
-                def googleAuthClientId = googleServiceClient.oauth_client.find{c-> c.client_type == 3 }.client_id
+            if (googleServiceClient != null) {
+                def googleAuthClientId = googleServiceClient.oauth_client.find { c -> c.client_type == 3 }.client_id
                 def firebaseApiKey = googleServiceClient.api_key[0].current_key
                 def mobileSdkAppId = googleServiceClient.client_info.mobilesdk_app_id
 
@@ -204,7 +219,7 @@ configurations.all {
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
         def requested = details.requested
         if (requested.group == 'androidx.legacy') {
-                details.useVersion rootProject.ext.android_support_version
+            details.useVersion rootProject.ext.android_support_version
         } else if (requested.group == "org.jetbrains.kotlin") {
             details.useVersion rootProject.ext.kotlin_version
         }
@@ -327,7 +342,7 @@ apply plugin: 'realm-android'
 
 ext.refreshVersion = {
     increase ->
-        println(buildConfigJson.disableVersionAutoIncrement == true? "Use version properties without auto-increment." : "auto-increment version name.")
+        println(buildConfigJson.disableVersionAutoIncrement == true ? "Use version properties without auto-increment." : "auto-increment version name.")
         def versionPropsFile = rootProject.file("version.properties")
         Properties versionProperties = new Properties()
         versionProperties.load(new FileInputStream(versionPropsFile))
@@ -347,7 +362,7 @@ ext.refreshVersion = {
         versionProperties.setProperty("versionName", versionName)
         versionProperties.setProperty("versionCode", versionCode.toString())
 
-        if(buildConfigJson.disableVersionAutoIncrement != true) {
+        if (buildConfigJson.disableVersionAutoIncrement != true) {
             versionProperties.store(versionPropsFile.newWriter(), "auto-incremented version information.")
         }
 
@@ -355,7 +370,7 @@ ext.refreshVersion = {
         android.defaultConfig.versionCode = versionCode
         android.applicationVariants.all {
             variant ->
-                variant.outputs.each{
+                variant.outputs.each {
                     output ->
                         output.versionCodeOverride = versionCode
                         output.versionNameOverride = versionName

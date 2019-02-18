@@ -181,7 +181,6 @@ interface ConfiguredAppComponent {
 
 
     fun inject(viewModel: HomeScreenViewModel)
-    fun inject(service: OTSynchronizationService)
     fun inject(sidebar: SidebarWrapper)
     fun inject(viewModel: OrderedTrackerListViewModel)
     fun inject(viewModel: TrackerDetailViewModel)
@@ -215,6 +214,7 @@ interface ConfiguredAppComponent {
     fun inject(worker: OTBinaryUploadWorker)
     fun inject(worker: OTUsageLogUploadWorker)
     fun inject(worker: OTInformationUploadWorker)
+    fun inject(worker: OTSynchronizationWorker)
 
     fun inject(task: OTReminderCommands)
 

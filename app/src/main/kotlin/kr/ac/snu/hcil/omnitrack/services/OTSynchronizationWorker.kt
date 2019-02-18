@@ -1,13 +1,15 @@
 package kr.ac.snu.hcil.omnitrack.services
 
+import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.firebase.jobdispatcher.JobParameters
-import com.firebase.jobdispatcher.JobService
+import androidx.work.RxWorker
+import androidx.work.WorkerParameters
 import com.github.salomonbrys.kotson.jsonObject
 import dagger.Lazy
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
@@ -22,6 +24,96 @@ import javax.inject.Inject
 /**
  * Created by younghokim on 2017. 9. 26..
  */
+class OTSynchronizationWorker(private val context: Context, private val workerParams: WorkerParameters) : RxWorker(context, workerParams) {
+
+    companion object {
+        val TAG = "OTSynchronizationWorker"
+        const val EXTRA_KEY_ONESHOT = "isOneShot"
+        const val EXTRA_KEY_FULLSYNC = "fullSync"
+        const val BROADCAST_ACTION_SYNCHRONIZATION_FINISHED = "${BuildConfig.APPLICATION_ID}:synchronization_finished"
+        const val BROADCAST_EXTRA_ENTITY_TYPES = "entityTypes"
+    }
+
+    @Inject
+    lateinit var syncManager: Lazy<OTSyncManager>
+
+    @Inject
+    lateinit var authManager: Lazy<OTAuthManager>
+
+    @Inject
+    lateinit var shortcutPanelManager: Lazy<OTShortcutPanelManager>
+
+    @Inject
+    lateinit var syncQueueDbHelper: Lazy<SyncQueueDbHelper>
+
+    @Inject
+    lateinit var eventLogger: Lazy<IEventLogger>
+
+    init {
+        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+    }
+
+    override fun createWork(): Single<Result> {
+        return Single.defer {
+
+            if (workerParams.inputData.getBoolean(EXTRA_KEY_FULLSYNC, false)) {
+                syncManager.get().queueFullSync(ignoreFlags = false)
+                this.eventLogger.get().logEvent(OTSynchronizationWorker.TAG, "synchronization_try_fullsync")
+            }
+
+            val pendingQueue = syncQueueDbHelper.get().getAggregatedData()
+            if (pendingQueue != null) {
+                syncManager.get().makeSynchronizationTask(pendingQueue)
+                        .toSingle { Result.success() }
+                        .doOnError { err ->
+                            err.printStackTrace()
+                            println("synchronization failed")
+                            this.eventLogger.get().logEvent(TAG, "synchronization_failed", jsonObject("error" to err.message, "stacktrace" to err.getStackTraceString()))
+                        }
+                        .onErrorReturn { Result.retry() }
+                        .doAfterSuccess {
+                            Log.d(TAG, "doAfterSuccess: purge entries")
+                            syncQueueDbHelper.get().purgeEntries(pendingQueue.ids)
+                        }.observeOn(AndroidSchedulers.mainThread())
+                        .doOnSubscribe {
+                            Log.d(TAG, "doOnSubscribe: start synchronization")
+                            context.runOnUiThread {
+                                eventLogger.get().logEvent(TAG, "synchronization_started")
+                                if (authManager.get().isUserSignedIn()) {
+                                    shortcutPanelManager.get().registerShortcutRefreshSubscription(authManager.get().userId
+                                            ?: "", TAG)
+                                }
+                            }
+                        }.doAfterSuccess {
+                            Log.d(TAG, "doAfterSuccess: broadcast the sync finish")
+                            broadcastFinished(pendingQueue)
+                        }.doFinally {
+
+                            Log.d(TAG, "doFinally")
+                            shortcutPanelManager.get().unregisterShortcutRefreshSubscription(TAG)
+
+                            println("synchronization process finished successfully.")
+                            this.eventLogger.get().logEvent(TAG, "synchronization_finished")
+                        }
+            } else {
+                Single.just(Result.success()).doAfterSuccess { broadcastFinished(null) }
+            }
+        }
+
+    }
+
+    private fun broadcastFinished(pendingQueue: SyncQueueDbHelper.AggregatedSyncQueue?) {
+        println(pendingQueue)
+        LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(
+                BROADCAST_ACTION_SYNCHRONIZATION_FINISHED
+        ).apply {
+            putExtra(BROADCAST_EXTRA_ENTITY_TYPES, pendingQueue?.data?.map { it.first.ordinal }?.toIntArray()
+                    ?: intArrayOf())
+        })
+    }
+
+}
+/*
 class OTSynchronizationService : JobService() {
     companion object {
         val TAG = OTSynchronizationService::class.java.simpleName
@@ -133,4 +225,4 @@ class OTSynchronizationService : JobService() {
             shortcutPanelManager.get().unregisterShortcutRefreshSubscription(TAG)
         }
     }
-}
+}*/

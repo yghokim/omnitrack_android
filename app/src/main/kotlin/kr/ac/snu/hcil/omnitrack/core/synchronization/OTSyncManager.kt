@@ -1,7 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.synchronization
 
-import com.firebase.jobdispatcher.FirebaseJobDispatcher
-import com.firebase.jobdispatcher.Job
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import dagger.Lazy
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -10,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.di.configured.ServerSyncOneShot
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
+import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationWorker
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -22,8 +24,7 @@ class OTSyncManager @Inject constructor(
         private val syncClient: Lazy<ISynchronizationClientSideAPI>,
         private val syncServer: Lazy<ISynchronizationServerSideAPI>,
         private val eventLogger: Lazy<IEventLogger>,
-        @ServerSyncOneShot private val oneShotJobProvider: Provider<Job>,
-        private val dispatcher: Lazy<FirebaseJobDispatcher>) {
+        @ServerSyncOneShot private val oneShotRequestProvider: Provider<OneTimeWorkRequest>) {
 
     fun registerSyncQueue(type: ESyncDataType, direction: SyncDirection, reserveService: Boolean = true, ignoreDirtyFlags: Boolean = false) {
         syncQueueDbHelper.insertNewEntry(type, direction, System.currentTimeMillis(), ignoreDirtyFlags)
@@ -40,7 +41,7 @@ class OTSyncManager @Inject constructor(
 
     fun reserveSyncServiceNow() {
         println("reserve data synchronization from server.")
-        dispatcher.get().mustSchedule(oneShotJobProvider.get())
+        WorkManager.getInstance().enqueueUniqueWork(OTSynchronizationWorker.TAG, ExistingWorkPolicy.APPEND, oneShotRequestProvider.get())
     }
 
 

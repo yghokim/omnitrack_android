@@ -1,7 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.di.configured
 
-import android.os.Bundle
-import androidx.core.os.bundleOf
 import androidx.work.*
 import com.firebase.jobdispatcher.*
 import dagger.Module
@@ -10,7 +8,6 @@ import dagger.internal.Factory
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.services.*
 import java.util.concurrent.TimeUnit
-import javax.inject.Provider
 import javax.inject.Qualifier
 
 /**
@@ -19,16 +16,33 @@ import javax.inject.Qualifier
 @Module(includes = [ConfiguredModule::class])
 class ScheduledJobModule {
 
-    @Provides
-    @Configured
-    @ServerSyncOneShot
-    fun makeOneShotBundle(): Bundle {
-        return bundleOf(OTSynchronizationService.EXTRA_KEY_ONESHOT to true)
+    private val networkConstraints: Constraints by lazy {
+        Constraints.Builder().apply {
+            setRequiredNetworkType(NetworkType.CONNECTED)
+        }.build()
     }
 
     @Provides
     @Configured
-    @ServerSync
+    @ServerFullSync
+    fun providesServerSyncRequest(): PeriodicWorkRequest {
+        return PeriodicWorkRequest.Builder(OTSynchronizationWorker::class.java, 3, TimeUnit.HOURS)
+                .setConstraints(
+                        Constraints.Builder()
+                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .setRequiresCharging(true)
+                                .build()
+                ).setBackoffCriteria(BackoffPolicy.LINEAR, 20, TimeUnit.SECONDS)
+                .setInputData(Data.Builder().putBoolean(OTSynchronizationWorker.EXTRA_KEY_FULLSYNC, true).build())
+                .addTag(OTSynchronizationWorker.TAG)
+                .addTag(OTSynchronizationWorker.EXTRA_KEY_FULLSYNC)
+                .build()
+    }
+
+    /*
+    @Provides
+    @Configured
+    @ServerFullSync
     fun providesServerSyncJob(builder: Job.Builder): Job
     {
         return builder
@@ -43,37 +57,59 @@ class ScheduledJobModule {
                         Constraint.ON_ANY_NETWORK
                 )
                 .setExtras(bundleOf(OTSynchronizationService.EXTRA_KEY_FULLSYNC to true)).build()
-    }
+    }*/
 
     @Provides
     @Configured
     @ServerSyncOneShot
-    fun providesImmediateServerSyncJob(builder: Job.Builder, @ServerSyncOneShot oneShotBundle: Provider<Bundle>): Job {
+    fun providesImmediateServerSyncRequest(): OneTimeWorkRequest {
+        return OneTimeWorkRequestBuilder<OTSynchronizationWorker>()
+                .setConstraints(networkConstraints)
+                .setInitialDelay(1, TimeUnit.SECONDS)
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.SECONDS)
+                .setInputData(Data.Builder().putBoolean(OTSynchronizationWorker.EXTRA_KEY_ONESHOT, true).build())
+                .addTag(OTSynchronizationWorker.EXTRA_KEY_ONESHOT)
+                .build()
+        /*
         return builder
                 .setTag("${OTSynchronizationService.TAG};${OTSynchronizationService.EXTRA_KEY_ONESHOT}")
                 .setRecurring(false)
                 .setService(OTSynchronizationService::class.java)
                 .setLifetime(Lifetime.FOREVER)
-                .setExtras(oneShotBundle.get())
+                //.setExtras(oneShotBundle.get())
+                .setReplaceCurrent(true)
+                .setTrigger(Trigger.executionWindow(0, 0))
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .setConstraints(
+                        Constraint.ON_ANY_NETWORK
+                ).build()*/
+    }
+/*
+    @Provides
+    @Configured
+    @ServerSyncOneShot
+    fun providesImmediateServerSyncJob(builder: Job.Builder, @ServerSyncOneShot oneShotBundle: Provider<Data>): Job {
+        return builder
+                .setTag("${OTSynchronizationService.TAG};${OTSynchronizationService.EXTRA_KEY_ONESHOT}")
+                .setRecurring(false)
+                .setService(OTSynchronizationService::class.java)
+                .setLifetime(Lifetime.FOREVER)
+                //.setExtras(oneShotBundle.get())
                 .setReplaceCurrent(true)
                 .setTrigger(Trigger.executionWindow(0, 0))
                 .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
                 .setConstraints(
                         Constraint.ON_ANY_NETWORK
                 ).build()
-    }
+    }*/
 
     @Provides
     @Configured
     @BinaryStorageServer
     fun provideBinaryUploadRequest(): OneTimeWorkRequest {
-        val constraints = Constraints.Builder().apply {
-            setRequiredNetworkType(NetworkType.CONNECTED)
-        }.build()
-
         return OneTimeWorkRequestBuilder<OTBinaryUploadWorker>()
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.SECONDS)
-                .setConstraints(constraints)
+                .setConstraints(networkConstraints)
                 .addTag(OTBinaryUploadWorker.TAG)
                 .build()
     }
@@ -82,14 +118,11 @@ class ScheduledJobModule {
     @Configured
     @UsageLogger
     fun providesUsageLogUploadRequest(): OneTimeWorkRequest {
-        val constraints = Constraints.Builder().apply {
-            setRequiredNetworkType(NetworkType.CONNECTED)
-        }.build()
 
         return OneTimeWorkRequestBuilder<OTUsageLogUploadWorker>()
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.SECONDS)
                 .setInitialDelay(5, TimeUnit.SECONDS)
-                .setConstraints(constraints)
+                .setConstraints(networkConstraints)
                 .addTag(OTUsageLogUploadWorker.TAG)
                 .build()
     }
@@ -100,13 +133,10 @@ class ScheduledJobModule {
     fun providesInformationUploadRequestBuilderFactory(): Factory<OneTimeWorkRequest.Builder> {
         return object : Factory<OneTimeWorkRequest.Builder> {
             override fun get(): OneTimeWorkRequest.Builder {
-                val constraints = Constraints.Builder().apply {
-                    setRequiredNetworkType(NetworkType.CONNECTED)
-                }.build()
 
                 return OneTimeWorkRequestBuilder<OTInformationUploadWorker>()
                         .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.SECONDS)
-                        .setConstraints(constraints)
+                        .setConstraints(networkConstraints)
             }
         }
 
@@ -138,7 +168,8 @@ class ScheduledJobModule {
 }
 
 @Qualifier
-@Retention(AnnotationRetention.RUNTIME) annotation class ServerSync
+@Retention(AnnotationRetention.RUNTIME)
+annotation class ServerFullSync
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class ServerSyncOneShot
