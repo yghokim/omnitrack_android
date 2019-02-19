@@ -173,25 +173,13 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         SystemIdentifierFactoryModule()
     }
 
-    private val jobDispatcherModule: JobDispatcherModule by lazy {
-        JobDispatcherModule()
-    }
-
     override val applicationComponent: ApplicationComponent by lazy {
         DaggerApplicationComponent.builder()
                 .applicationModule(appModule)
                 .designModule(designModule)
                 .externalServiceModule(externalServiceModule)
-                .jobDispatcherModule(jobDispatcherModule)
                 .serializationModule(serializationModule)
                 .systemIdentifierFactoryModule(systemIdentifierFactoryModule)
-                .build()
-    }
-
-    override val jobDispatcherComponent: JobDispatcherComponent by lazy {
-        DaggerJobDispatcherComponent.builder()
-                .jobDispatcherModule(jobDispatcherModule)
-                .applicationModule(appModule)
                 .build()
     }
 

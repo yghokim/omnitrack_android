@@ -101,7 +101,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
                             .show(supportFragmentManager, "VersionCheck")
 
                     systemPreferences.edit()
-                            .putString(OTVersionCheckService.PREF_LAST_NOTIFIED_VERSION, versionName)
+                            .putString(OTVersionCheckWorker.PREF_LAST_NOTIFIED_VERSION, versionName)
                             .apply()
                 }
             }

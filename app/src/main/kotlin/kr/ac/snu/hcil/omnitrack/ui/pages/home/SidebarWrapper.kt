@@ -15,7 +15,6 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.afollestad.materialdialogs.MaterialDialog
-import com.firebase.jobdispatcher.Job
 import com.squareup.picasso.Picasso
 import dagger.Lazy
 import dagger.internal.Factory
@@ -36,6 +35,7 @@ import kr.ac.snu.hcil.omnitrack.core.di.configured.InformationUpload
 import kr.ac.snu.hcil.omnitrack.core.di.configured.ResearchSync
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadWorker
+import kr.ac.snu.hcil.omnitrack.services.OTResearchSynchronizationWorker
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
@@ -69,7 +69,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
     lateinit var informationUploadRequestBuilderFactory: Factory<OneTimeWorkRequest.Builder>
 
     @field:[Inject ResearchSync]
-    lateinit var researchSyncJob: Provider<Job>
+    lateinit var researchSyncRequest: Provider<OneTimeWorkRequest>
 
     private lateinit var backendRealm: Realm
 
@@ -218,7 +218,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                     //OTApp.instance.syncManager.performSynchronizationOf(ESyncDataType.ITEM)
                     syncManager.get().queueFullSync(ignoreFlags = false)
                     syncManager.get().reserveSyncServiceNow()
-                    //jobDispatcher.mustSchedule(researchSyncJob.get())
+                    WorkManager.getInstance().enqueueUniqueWork(OTResearchSynchronizationWorker.TAG, ExistingWorkPolicy.REPLACE, researchSyncRequest.get())
                 }, true)
         ).apply {
 

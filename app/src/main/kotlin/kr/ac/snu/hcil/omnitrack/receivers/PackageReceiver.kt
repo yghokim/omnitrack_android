@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
-import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
+import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckWorker
 import javax.inject.Inject
 
 /**
@@ -13,11 +13,12 @@ import javax.inject.Inject
  */
 class PackageReceiver : BroadcastReceiver() {
 
-    @Inject lateinit var versionCheckServiceController: OTVersionCheckService.Controller
+    @Inject
+    lateinit var versionCheckController: OTVersionCheckWorker.Controller
 
     override fun onReceive(context: Context, intent: Intent) {
         val app = (context.applicationContext as OTAndroidApp)
-        app.jobDispatcherComponent.inject(this)
+        app.currentConfiguredContext.scheduledJobComponent.inject(this)
 
         println("package broadcast receiver - ${intent.action}")
 
@@ -43,18 +44,18 @@ class PackageReceiver : BroadcastReceiver() {
                     context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
                 }, {})*/
 
-                if (versionCheckServiceController.versionCheckSwitchTurnedOn)
+                if (versionCheckController.versionCheckSwitchTurnedOn)
                 {
-                    versionCheckServiceController.turnOnService()
-                }else versionCheckServiceController.turnOffService()
+                    versionCheckController.checkVersionOneTime()
+                } else versionCheckController.cancelVersionCheckingWork()
             }
 
             Intent.ACTION_MY_PACKAGE_REPLACED -> {
                 println("OmniTrack application was updated.")
-                if (versionCheckServiceController.versionCheckSwitchTurnedOn)
+                if (versionCheckController.versionCheckSwitchTurnedOn)
                 {
-                    versionCheckServiceController.turnOnService()
-                }else versionCheckServiceController.turnOffService()
+                    versionCheckController.checkVersionOneTime()
+                } else versionCheckController.cancelVersionCheckingWork()
 
                 //dispatcher.mustSchedule(informationUploadJobProvider.setTag(OTInformationUploadService.INFORMATION_DEVICE).build())
 
@@ -68,7 +69,7 @@ class PackageReceiver : BroadcastReceiver() {
                     }
                 }, {})
                 */
-                //OTVersionCheckService.setupServiceAlarm(context)
+                //OTVersionCheckWorker.setupServiceAlarm(context)
             }
 
             Intent.ACTION_PACKAGE_ADDED -> {

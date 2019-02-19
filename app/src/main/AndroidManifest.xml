@@ -163,14 +163,6 @@
             android:exported="false" />
 
         <service
-            android:name=".services.OTVersionCheckService"
-            android:exported="false" >
-            <intent-filter>
-                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
-            </intent-filter>
-        </service>
-
-        <service
             android:name=".services.OTTableExportService"
             android:exported="false" />
 
@@ -191,20 +183,11 @@
         <service android:name=".services.OTAudioRecordService"/>
 
         <service
-            android:name=".services.OTSynchronizationService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
-            </intent-filter>
-        </service>
-
-        <service
             android:name=".services.OTItemLoggingService"
             android:exported="false" />
         <service android:name=".services.OTReminderService" />
         <service android:name=".services.OTBinaryLocalCacheService" />
-        <service android:name=".services.OTInformationUploadService" />
-        <service android:name=".services.OTResearchSynchronizationService" />
+
         <service android:name="com.github.javiersantos.appupdater.services.AppUpdateService" />
         <service android:name=".services.OTDeviceStatusService" />
 

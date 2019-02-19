@@ -29,7 +29,7 @@ import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
-import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
+import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckWorker
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
@@ -98,7 +98,7 @@ class SettingsActivity : AppCompatActivity() {
         protected lateinit var realmProvider: Factory<Realm>
 
         @Inject
-        protected lateinit var versionCheckServiceController: Lazy<OTVersionCheckService.Controller>
+        protected lateinit var versionCheckController: Lazy<OTVersionCheckWorker.Controller>
 
         @Inject
         protected lateinit var shortcutPanelManager: OTShortcutPanelManager
@@ -280,9 +280,9 @@ class SettingsActivity : AppCompatActivity() {
 
                 AppUpdater.PREF_CHECK_UPDATES -> {
                     if (sharedPreferences.getBoolean(key, false)) {
-                        versionCheckServiceController.get().turnOnService()
+                        versionCheckController.get().checkVersionOneTime()
                     } else {
-                        versionCheckServiceController.get().turnOffService()
+                        versionCheckController.get().cancelVersionCheckingWork()
                     }
                 }
 

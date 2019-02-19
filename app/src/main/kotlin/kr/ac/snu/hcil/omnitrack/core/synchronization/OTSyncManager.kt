@@ -41,7 +41,7 @@ class OTSyncManager @Inject constructor(
 
     fun reserveSyncServiceNow() {
         println("reserve data synchronization from server.")
-        WorkManager.getInstance().enqueueUniqueWork(OTSynchronizationWorker.TAG, ExistingWorkPolicy.APPEND, oneShotRequestProvider.get())
+        WorkManager.getInstance().enqueueUniqueWork(OTSynchronizationWorker.TAG, ExistingWorkPolicy.REPLACE, oneShotRequestProvider.get())
     }
 
 

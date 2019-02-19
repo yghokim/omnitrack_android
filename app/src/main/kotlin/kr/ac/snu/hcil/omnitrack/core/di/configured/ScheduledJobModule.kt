@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.di.configured
 
 import androidx.work.*
-import com.firebase.jobdispatcher.*
 import dagger.Module
 import dagger.Provides
 import dagger.internal.Factory
@@ -66,7 +65,7 @@ class ScheduledJobModule {
         return OneTimeWorkRequestBuilder<OTSynchronizationWorker>()
                 .setConstraints(networkConstraints)
                 .setInitialDelay(1, TimeUnit.SECONDS)
-                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.SECONDS)
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
                 .setInputData(Data.Builder().putBoolean(OTSynchronizationWorker.EXTRA_KEY_ONESHOT, true).build())
                 .addTag(OTSynchronizationWorker.EXTRA_KEY_ONESHOT)
                 .build()
@@ -108,7 +107,7 @@ class ScheduledJobModule {
     @BinaryStorageServer
     fun provideBinaryUploadRequest(): OneTimeWorkRequest {
         return OneTimeWorkRequestBuilder<OTBinaryUploadWorker>()
-                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.SECONDS)
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
                 .setConstraints(networkConstraints)
                 .addTag(OTBinaryUploadWorker.TAG)
                 .build()
@@ -120,7 +119,7 @@ class ScheduledJobModule {
     fun providesUsageLogUploadRequest(): OneTimeWorkRequest {
 
         return OneTimeWorkRequestBuilder<OTUsageLogUploadWorker>()
-                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.SECONDS)
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
                 .setInitialDelay(5, TimeUnit.SECONDS)
                 .setConstraints(networkConstraints)
                 .addTag(OTUsageLogUploadWorker.TAG)
@@ -135,7 +134,7 @@ class ScheduledJobModule {
             override fun get(): OneTimeWorkRequest.Builder {
 
                 return OneTimeWorkRequestBuilder<OTInformationUploadWorker>()
-                        .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.SECONDS)
+                        .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
                         .setConstraints(networkConstraints)
             }
         }
@@ -152,20 +151,50 @@ class ScheduledJobModule {
 
     @Provides
     @Configured
+    @VersionCheck
+    fun providesVersionCheckRequest(): OneTimeWorkRequest {
+        return OneTimeWorkRequestBuilder<OTVersionCheckWorker>()
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
+                .setConstraints(networkConstraints)
+                .build()
+        /*
+        return builder.setRecurring(true)
+                .setService(OTVersionCheckWorker::class.java)
+                .setTag(OTVersionCheckWorker.TAG)
+                .setLifetime(Lifetime.FOREVER)
+                .setReplaceCurrent(true)
+                .setTrigger(Trigger.executionWindow(3600 * 6, 3600 * 7))
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .setConstraints(
+                        Constraint.ON_ANY_NETWORK
+                ).build()*/
+    }
+
+    @Provides
+    @Configured
     @ResearchSync
-    fun provideResearchSyncJob(builder: Job.Builder): Job {
+    fun provideResearchSyncRequest(): OneTimeWorkRequest {
+        return OneTimeWorkRequestBuilder<OTResearchSynchronizationWorker>()
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
+                .setConstraints(networkConstraints)
+                .build()
+        /*
         return builder
-                .setTag("OTResearchSynchronizationService")
-                .setService(OTResearchSynchronizationService::class.java)
+                .setTag("OTResearchSynchronizationWorker")
+                .setService(OTResearchSynchronizationWorker::class.java)
                 .setRecurring(false)
                 .setLifetime(Lifetime.FOREVER)
                 .setReplaceCurrent(true)
                 .setTrigger(Trigger.executionWindow(0, 10))
                 .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
                 .addConstraint(Constraint.ON_ANY_NETWORK)
-                .build()
+                .build()*/
     }
 }
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class VersionCheck
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)

@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.app.Application
-import com.firebase.jobdispatcher.FirebaseJobDispatcher
-import com.firebase.jobdispatcher.Job
-import dagger.Lazy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncQueueDbHelper
+import kr.ac.snu.hcil.omnitrack.services.OTResearchSynchronizationWorker
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import javax.inject.Inject
@@ -33,11 +34,9 @@ class HomeScreenViewModel(app: Application):UserAttachedViewModel(app) {
     @Inject
     protected lateinit var syncManager: OTSyncManager
 
-    @Inject
-    protected lateinit var dispatcher: Lazy<FirebaseJobDispatcher>
 
     @field:[Inject ResearchSync]
-    protected lateinit var researchSyncJob: Provider<Job>
+    protected lateinit var researchSyncRequest: Provider<OneTimeWorkRequest>
 
     val syncStateObservable: Observable<Int> get() = _syncStateSubject
 
@@ -75,7 +74,7 @@ class HomeScreenViewModel(app: Application):UserAttachedViewModel(app) {
     }
 
     fun syncResearch(): Boolean {
-        dispatcher.get().mustSchedule(researchSyncJob.get())
+        WorkManager.getInstance().enqueueUniqueWork(OTResearchSynchronizationWorker.TAG, ExistingWorkPolicy.REPLACE, researchSyncRequest.get())
         return true
     }
 }

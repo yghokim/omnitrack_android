@@ -1,79 +1,77 @@
 package kr.ac.snu.hcil.omnitrack.services
 
+import android.content.Context
 import android.content.SharedPreferences
-import com.firebase.jobdispatcher.FirebaseJobDispatcher
-import com.firebase.jobdispatcher.Job
-import com.firebase.jobdispatcher.JobParameters
-import com.firebase.jobdispatcher.JobService
+import androidx.work.*
 import com.github.javiersantos.appupdater.AppUpdaterUtils
 import com.github.javiersantos.appupdater.enums.AppUpdaterError
 import com.github.javiersantos.appupdater.objects.Update
 import dagger.Lazy
+import io.reactivex.Single
+import io.reactivex.disposables.Disposables
+import io.reactivex.schedulers.Schedulers
+import kr.ac.snu.hcil.omnitrack.core.di.Configured
+import kr.ac.snu.hcil.omnitrack.core.di.configured.VersionCheck
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
-import kr.ac.snu.hcil.omnitrack.core.di.global.VersionCheck
 import kr.ac.snu.hcil.omnitrack.core.system.OTAppVersionCheckManager
 import javax.inject.Inject
-import javax.inject.Singleton
+import javax.inject.Provider
 
 /**
  * Created by younghokim on 2017. 4. 15..
  */
-class OTVersionCheckService : JobService() {
-
+class OTVersionCheckWorker(private val context: Context, workerParams: WorkerParameters) : RxWorker(context, workerParams) {
 
     companion object {
-        const val TAG = "VersionCheckService"
+        const val TAG = "VersionCheck"
         const val REQUEST_CODE = 20
         const val PREF_CHECK_UPDATES = "pref_check_updates"
         const val PREF_LAST_NOTIFIED_VERSION = "last_notified_version"
     }
 
-    @Singleton
-    class Controller @Inject constructor(@Default val pref: Lazy<SharedPreferences>, val dispatcher: Lazy<FirebaseJobDispatcher>, @VersionCheck val job: Lazy<Job>) {
+    @Configured
+    class Controller @Inject constructor(@Default val pref: Lazy<SharedPreferences>, @VersionCheck val requestBuilder: Provider<OneTimeWorkRequest>) {
 
         val versionCheckSwitchTurnedOn: Boolean
             get() = pref.get().getBoolean(PREF_CHECK_UPDATES, false)
 
-        fun turnOnService(){
-            dispatcher.get().schedule(job.get())
+        fun checkVersionOneTime() {
+            WorkManager.getInstance().enqueueUniqueWork(OTVersionCheckWorker.TAG, ExistingWorkPolicy.REPLACE, requestBuilder.get())
         }
 
-        fun turnOffService(){
-            dispatcher.get().cancel(TAG)
+        fun cancelVersionCheckingWork() {
+            WorkManager.getInstance().cancelUniqueWork(OTVersionCheckWorker.TAG)
         }
     }
 
-    private lateinit var updaterUtils: AppUpdaterUtils
+    override fun createWork(): Single<Result> {
+        return Single.create<Result> {
+            val updaterUtils = OTAppVersionCheckManager.makeAppUpdaterUtils(context)
+            updaterUtils.withListener(object : AppUpdaterUtils.UpdateListener {
+                override fun onSuccess(update: Update, isUpdateAvailable: Boolean) {
+                    it.onSuccess(Result.success())
+                    updaterUtils.stop()
+                    println("app version check was successfully done.")
+                }
 
-    override fun onCreate() {
-        super.onCreate()
-        updaterUtils = OTAppVersionCheckManager.makeAppUpdaterUtils(this)
-    }
+                override fun onFailed(error: AppUpdaterError) {
+                    it.onSuccess(Result.retry())
+                    updaterUtils.stop()
+                    println("app version check failed. - ${error.name}")
+                }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        updaterUtils.stop()
-    }
+            })
+            updaterUtils.start()
+            println("check app version...")
 
-    override fun onStartJob(job: JobParameters): Boolean {
-        updaterUtils.withListener(object : AppUpdaterUtils.UpdateListener {
-            override fun onSuccess(update: Update, isUpdateAvailable: Boolean) {
+            it.setDisposable(Disposables.fromAction {
+                updaterUtils.stop()
+            })
 
-                this@OTVersionCheckService.jobFinished(job, false)
+            it.setCancellable {
+                updaterUtils.stop()
             }
-
-            override fun onFailed(error: AppUpdaterError) {
-                this@OTVersionCheckService.jobFinished(job, true)
-            }
-
-        })
-        updaterUtils.start()
-        return true
-    }
-
-    override fun onStopJob(job: JobParameters): Boolean {
-        updaterUtils.stop()
-        return true
+        }.subscribeOn(Schedulers.io())
     }
 
 /*
