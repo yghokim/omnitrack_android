@@ -751,7 +751,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             outState.putString(OTTableExportService.EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE, exportConfigTableFileType.toString())
         }
 
-        override fun onDismiss(dialog: DialogInterface?) {
+        override fun onDismiss(dialog: DialogInterface) {
             super.onDismiss(dialog)
 
             dialogSubscriptions.clear()

@@ -194,10 +194,10 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
         viewModel.startDependencyCheck(this)
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        outState?.putString(INTENT_EXTRA_SERVICE_IDENTIFIER, serviceIdentifier)
+        outState.putString(INTENT_EXTRA_SERVICE_IDENTIFIER, serviceIdentifier)
     }
 
     inner class DependencyAdapter : RecyclerView.Adapter<DependencyAdapter.DependencyAdapterViewHolder>() {

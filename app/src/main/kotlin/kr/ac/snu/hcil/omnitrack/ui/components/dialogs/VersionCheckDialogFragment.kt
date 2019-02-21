@@ -80,7 +80,7 @@ class VersionCheckDialogFragment : DialogFragment() {
                 .create()
     }
 
-    override fun onDismiss(dialog: DialogInterface?) {
+    override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
 
         dialogSubscriptions.clear()

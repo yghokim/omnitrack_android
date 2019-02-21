@@ -83,11 +83,11 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState?.putBoolean(KEY_IS_ANONYMOUS, isAnonymous)
-        outState?.putString(KEY_TYPE, selectedReportType)
-        outState?.putString(KEY_CONTENT, reportContent)
+        outState.putBoolean(KEY_IS_ANONYMOUS, isAnonymous)
+        outState.putString(KEY_TYPE, selectedReportType)
+        outState.putString(KEY_CONTENT, reportContent)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {

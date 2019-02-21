@@ -40,5 +40,5 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttp_version"
     implementation "com.squareup.okhttp3:okhttp-urlconnection:$rootProject.ext.okhttp_version"
     implementation "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofit_version"
-    implementation 'com.squareup.okio:okio:1.14.0'
+    implementation 'com.squareup.okio:okio:1.15.0'
 }

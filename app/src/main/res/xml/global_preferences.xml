@@ -1,23 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
+        app:iconSpaceReserved="false"
         android:key="pref_key_category_general"
         android:title="@string/msg_pref_category_general">
         <SwitchPreference
+            app:iconSpaceReserved="false"
             android:defaultValue="true"
             android:key="pref_show_shortcut_panel"
             android:summary="@string/msg_pref_summary_show_shortcut_panel"
             android:title="@string/msg_pref_title_show_shortcut_panel" />
         <SwitchPreference
+            app:iconSpaceReserved="false"
             android:defaultValue="true"
             android:key="pref_check_updates"
             android:summary="@string/msg_pref_summary_notify_new_update"
             android:title="@string/msg_pref_title_notify_new_update" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Notification">
-        <RingtonePreference
+    <PreferenceCategory
+        android:title="Notification"
+        app:iconSpaceReserved="false">
+        <Preference
+            app:iconSpaceReserved="false"
             android:defaultValue="content://settings/system/notification_sound"
             android:key="pref_reminder_noti_ringtone"
             android:ringtoneType="notification"
@@ -26,14 +33,18 @@
             android:title="@string/msg_pref_reminder_noti_rington_title" />
 
         <kr.ac.snu.hcil.omnitrack.ui.components.common.preference.ColorPreference
+            app:iconSpaceReserved="false"
             android:defaultValue="@color/colorPrimary"
             android:key="pref_reminder_light_color"
             android:title="@string/msg_pref_reminder_light_color" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/msg_pref_category_language">
+    <PreferenceCategory
+        android:title="@string/msg_pref_category_language"
+        app:iconSpaceReserved="false">
 
         <SwitchPreference
+            app:iconSpaceReserved="false"
             android:defaultValue="true"
             android:disableDependentsState="true"
             android:key="pref_language_follow_device_setting"
@@ -41,6 +52,7 @@
             android:title="@string/msg_pref_follow_device_language" />
 
         <ListPreference
+            app:iconSpaceReserved="false"
             android:defaultValue="en"
             android:dependency="pref_language_follow_device_setting"
             android:entries="@array/supported_language_names"

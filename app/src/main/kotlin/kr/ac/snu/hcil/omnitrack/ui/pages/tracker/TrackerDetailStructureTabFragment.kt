@@ -328,7 +328,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         newAttributeButton = rootView.findViewById(R.id.ui_button_new_attribute)
 
         newAttributeButton.setOnClickListener {
-            newAttributePanel.show(this.fragmentManager, newAttributePanel.tag)
+            newAttributePanel.show(requireFragmentManager(), newAttributePanel.tag)
         }
 
         return rootView

@@ -9,10 +9,12 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.preference.*
+import android.provider.Settings.System.DEFAULT_NOTIFICATION_URI
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
+import androidx.preference.*
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.javiersantos.appupdater.AppUpdater
 import dagger.Lazy
@@ -30,11 +32,11 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckWorker
-import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
+import kr.ac.snu.hcil.omnitrack.ui.components.common.preference.ColorPreference
+import kr.ac.snu.hcil.omnitrack.ui.components.common.preference.ColorPreferenceDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
-import org.jetbrains.anko.act
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -52,6 +54,8 @@ class SettingsActivity : AppCompatActivity() {
         const val FLAG_CONFIGURATION_CHANGED = "flag_configuration_changed"
 
         const val REQUEST_CODE = 3423
+
+        const val REQUEST_CODE_RINGTONE = 3452
     }
 
     private var fragment: SettingsFragment? = null
@@ -68,8 +72,9 @@ class SettingsActivity : AppCompatActivity() {
         ui_appbar_button_left.setOnClickListener { finish() }
         ui_appbar_button_right.visibility = View.GONE
 
-        fragment = fragmentManager.findFragmentById(R.id.ui_content_replace) as? SettingsFragment ?: SettingsFragment().apply {
-            this@SettingsActivity.fragmentManager.beginTransaction()
+        fragment = supportFragmentManager.findFragmentById(R.id.ui_content_replace) as? SettingsFragment
+                ?: SettingsFragment().apply {
+                    this@SettingsActivity.supportFragmentManager.beginTransaction()
                     .replace(R.id.ui_content_replace, this)
                     .commit()
         }
@@ -86,10 +91,13 @@ class SettingsActivity : AppCompatActivity() {
         super.onBackPressed()
     }
 
-    class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceChangeListener {
+    class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceChangeListener {
 
         @Inject
         protected lateinit var currentSignedInLevel: Provider<OTAuthManager.SignedInLevel>
+
+        @Inject
+        protected lateinit var authManager: Provider<OTAuthManager>
 
         @Inject
         protected lateinit var dbManager: Lazy<BackendDbManager>
@@ -125,26 +133,31 @@ class SettingsActivity : AppCompatActivity() {
             retainInstance = true
         }
 
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            setPreferencesFromResource(R.xml.global_preferences, rootKey)
+        }
+
+
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
 
-            addPreferencesFromResource(R.xml.global_preferences)
-
-            settingsPrompter = OTExternalSettingsPrompter(this.activity)
+            settingsPrompter = OTExternalSettingsPrompter(this.requireActivity())
 
             if (Build.VERSION.SDK_INT >= 23) {
-                this.ignoreBatteryOptimizationPreference = SwitchPreference(context)
-                this.ignoreBatteryOptimizationPreference.key = OTExternalSettingsPrompter.KEY_IGNORE_BATTERY_OPTIMIZATION
-                this.ignoreBatteryOptimizationPreference.setTitle(R.string.msg_pref_title_ignore_battery_optimization)
-                this.ignoreBatteryOptimizationPreference.setSummary(R.string.msg_pref_summary_ignore_battery_optimization)
-                this.ignoreBatteryOptimizationPreference.isChecked = settingsPrompter.isBatteryOptimizationWhiteListed()
+                this.ignoreBatteryOptimizationPreference = SwitchPreference(context).apply {
+                    this.key = OTExternalSettingsPrompter.KEY_IGNORE_BATTERY_OPTIMIZATION
+                    this.isIconSpaceReserved = false
+                    this.setTitle(R.string.msg_pref_title_ignore_battery_optimization)
+                    this.setSummary(R.string.msg_pref_summary_ignore_battery_optimization)
+                    this.isChecked = settingsPrompter.isBatteryOptimizationWhiteListed()
+                }
 
                 this.ignoreBatteryOptimizationPreference.setOnPreferenceClickListener {
                     if (settingsPrompter.isBatteryOptimizationWhiteListed()) {
                         //off
                         if (turnOnIgnoreBatteryOptimizationForwardingDialog == null) {
                             turnOnIgnoreBatteryOptimizationForwardingDialog = DialogHelper
-                                    .makeSimpleAlertBuilder(activity,
+                                    .makeSimpleAlertBuilder(requireActivity(),
                                             TextHelper.fromHtml(
                                                     String.format(getString(R.string.msg_pref_dialog_content_ignore_battery_optimization_off), BuildConfig.APP_NAME)
                                             ),
@@ -165,29 +178,41 @@ class SettingsActivity : AppCompatActivity() {
                 generalCategory.addPreference(this.ignoreBatteryOptimizationPreference)
             }
 
-            findPreference(PREF_REMINDER_NOTI_RINGTONE)?.run {
+            findPreference<Preference>(PREF_REMINDER_NOTI_RINGTONE)?.run {
                 summary = getCurrentReminderNotificationRingtoneName()
                 onPreferenceChangeListener = this@SettingsFragment
             }
 
-            findPreference(LocaleHelper.PREF_KEY_SELECTED_LANGUAGE)?.run {
-                (this as? ListPreference)?.let { pref ->
+            findPreference<ListPreference>(LocaleHelper.PREF_KEY_SELECTED_LANGUAGE)?.run {
+                this.let { pref ->
                     summary = pref.entry
                 }
                 onPreferenceChangeListener = this@SettingsFragment
             }
         }
 
+
         override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
             super.onActivityResult(requestCode, resultCode, data)
-            val result = settingsPrompter.handleActivityResult(requestCode, resultCode, data)
-            if (result?.first == OTExternalSettingsPrompter.KEY_IGNORE_BATTERY_OPTIMIZATION) {
-                if (Build.VERSION.SDK_INT >= 23) {
-                    this.ignoreBatteryOptimizationPreference.isChecked = settingsPrompter.isBatteryOptimizationWhiteListed()
-                }
+            if (requestCode == REQUEST_CODE_RINGTONE) {
+                if (data != null) {
+                    val ringtone: Uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+                    preferenceManager.sharedPreferences.edit {
+                        putString(PREF_REMINDER_NOTI_RINGTONE, ringtone.toString())
+                    }
+                    findPreference<Preference>(PREF_REMINDER_NOTI_RINGTONE).summary = RingtoneManager.getRingtone(requireContext(), ringtone).getTitle(requireContext())
 
-                if (settingsPrompter.isBatteryOptimizationWhiteListed()) {
-                    act.startService(Intent(act, OTDeviceStatusService::class.java))
+                }
+            } else {
+                val result = settingsPrompter.handleActivityResult(requestCode, resultCode, data)
+                if (result?.first == OTExternalSettingsPrompter.KEY_IGNORE_BATTERY_OPTIMIZATION) {
+                    if (Build.VERSION.SDK_INT >= 23) {
+                        this.ignoreBatteryOptimizationPreference.isChecked = settingsPrompter.isBatteryOptimizationWhiteListed()
+                    }
+
+                    if (settingsPrompter.isBatteryOptimizationWhiteListed()) {
+                        requireActivity().startService(Intent(requireContext(), OTDeviceStatusService::class.java))
+                    }
                 }
             }
         }
@@ -195,14 +220,14 @@ class SettingsActivity : AppCompatActivity() {
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
 
-            (act.application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
-            languageOnCreation = LocaleHelper.getLanguageCode(activity)
+            (requireActivity().application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+            languageOnCreation = LocaleHelper.getLanguageCode(requireContext())
         }
 
         override fun onDestroy() {
             super.onDestroy()
-            findPreference(PREF_REMINDER_NOTI_RINGTONE).onPreferenceChangeListener = null
-            findPreference(LocaleHelper.PREF_KEY_SELECTED_LANGUAGE).onPreferenceChangeListener = null
+            findPreference<Preference>(PREF_REMINDER_NOTI_RINGTONE).onPreferenceChangeListener = null
+            findPreference<ListPreference>(LocaleHelper.PREF_KEY_SELECTED_LANGUAGE).onPreferenceChangeListener = null
             creationSubscriptions.clear()
         }
 
@@ -231,15 +256,36 @@ class SettingsActivity : AppCompatActivity() {
             this.resultData = data
         }
 
+        override fun onPreferenceTreeClick(preference: Preference): Boolean {
+            if (preference.key == PREF_REMINDER_NOTI_RINGTONE) {
+                val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION)
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, DEFAULT_NOTIFICATION_URI)
+
+                val ringtoneUri = Uri.parse(preferenceManager.sharedPreferences.getString(PREF_REMINDER_NOTI_RINGTONE, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.toString()))
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, ringtoneUri)
+
+                startActivityForResult(intent, REQUEST_CODE_RINGTONE)
+
+                return true
+            } else return super.onPreferenceTreeClick(preference)
+        }
+
+        override fun onDisplayPreferenceDialog(preference: Preference?) {
+            if (preference is ColorPreference) {
+                val colorDialogFragment = ColorPreferenceDialogFragment.makeInstance(preference.key)
+                colorDialogFragment.setTargetFragment(this, 0)
+                colorDialogFragment.show(requireFragmentManager(), "ColorPreferenceDialog")
+
+            } else super.onDisplayPreferenceDialog(preference)
+
+        }
+
         override fun onPreferenceChange(preference: Preference, newValue: Any?): Boolean {
             println("preference changed - ${preference.key}, $newValue")
-            if (preference.key == PREF_REMINDER_NOTI_RINGTONE) {
-                if (newValue is String) {
-                    val ringtone = RingtoneManager.getRingtone(activity, Uri.parse(newValue))
-                    preference.summary = ringtone.getTitle(activity)
-                    return true
-                }
-            } else if (preference.key == LocaleHelper.PREF_KEY_SELECTED_LANGUAGE && preference is ListPreference) {
+            if (preference.key == LocaleHelper.PREF_KEY_SELECTED_LANGUAGE && preference is ListPreference) {
                 if (newValue is String) {
                     try {
                         preference.summary = preference.entries[preference.findIndexOfValue(newValue)]
@@ -258,18 +304,14 @@ class SettingsActivity : AppCompatActivity() {
                     if (sharedPreferences.getBoolean(key, true)) {
                         //show if logged in
                         if (currentSignedInLevel.get() > OTAuthManager.SignedInLevel.NONE) {
-                            val activity = activity
-                            if (activity is OTActivity) {
-                                val realm = realmProvider.get()
 
+                            authManager.get().userId?.let { userId ->
+                                val realm = realmProvider.get()
                                 creationSubscriptions.add(
-                                        activity.signedInUserObservable.concatMap { userId ->
-                                            dbManager.get().makeShortcutPanelRefreshObservable(userId, realm).toObservable()
-                                        }
+                                        dbManager.get().makeShortcutPanelRefreshObservable(userId, realm).toObservable()
                                                 .firstElement().subscribe { realm.close() })
-                            } else {
-                                shortcutPanelManager.disposeShortcutPanel()
                             }
+
                         } else {
                             shortcutPanelManager.disposeShortcutPanel()
                         }
@@ -288,11 +330,11 @@ class SettingsActivity : AppCompatActivity() {
 
                 PREF_REMINDER_NOTI_RINGTONE -> {
                     println("ringtone was changed to ${sharedPreferences.getString(PREF_REMINDER_NOTI_RINGTONE, "")}")
-                    findPreference(key).summary = getCurrentReminderNotificationRingtoneName()
+                    findPreference<Preference>(key).summary = getCurrentReminderNotificationRingtoneName()
                 }
 
                 LocaleHelper.PREF_USE_DEVICE_DEFAULT, LocaleHelper.PREF_KEY_SELECTED_LANGUAGE -> {
-                    (act.application as OTAndroidApp).refreshConfiguration(activity)
+                    (requireActivity().application as OTAndroidApp).refreshConfiguration(requireActivity())
                     Toast.makeText(activity, R.string.msg_language_change_applied_after_exit_this_screen, Toast.LENGTH_LONG).show()
                     setResult(Activity.RESULT_OK, Intent().apply { putExtra(FLAG_CONFIGURATION_CHANGED, true) })
                     println("activity: $activity")

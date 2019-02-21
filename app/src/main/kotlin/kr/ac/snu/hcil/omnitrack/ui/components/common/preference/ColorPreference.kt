@@ -1,11 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.preference
 
+import android.app.Dialog
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.Color
-import android.preference.DialogPreference
+import android.os.Bundle
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.os.bundleOf
+import androidx.preference.DialogPreference
+import androidx.preference.PreferenceDialogFragmentCompat
+import androidx.preference.PreferenceViewHolder
 import com.larswerkman.lobsterpicker.LobsterPicker
 import com.larswerkman.lobsterpicker.adapters.BitmapColorAdapter
 import com.larswerkman.lobsterpicker.sliders.LobsterShadeSlider
@@ -17,7 +22,7 @@ import mehdi.sakout.fancybuttons.FancyButton
  */
 class ColorPreference : DialogPreference {
 
-    private var currentColor: Int = Color.WHITE
+    internal var currentColor: Int = Color.WHITE
         set(value) {
             if (field != value) {
                 field = value
@@ -25,10 +30,13 @@ class ColorPreference : DialogPreference {
             }
         }
 
-    private var colorButton: FancyButton? = null
 
-    private var colorPicker: LobsterPicker? = null
-    private var colorSlider: LobsterShadeSlider? = null
+    internal fun setColor(color: Int) {
+        currentColor = color
+        persistInt(color)
+    }
+
+    private var colorButton: FancyButton? = null
 
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -42,8 +50,47 @@ class ColorPreference : DialogPreference {
         setNegativeButtonText(android.R.string.cancel)
     }
 
-    override fun onBindDialogView(view: View) {
+    override fun onGetDefaultValue(a: TypedArray, index: Int): Any {
+        return a.getInteger(index, Color.WHITE)
+    }
 
+
+    override fun onSetInitialValue(defaultValue: Any?) {
+        if (defaultValue != null) {
+            currentColor = defaultValue as Int
+            persistInt(currentColor)
+        } else {
+            currentColor = getPersistedInt(Color.WHITE)
+        }
+    }
+
+    override fun onBindViewHolder(holder: PreferenceViewHolder) {
+        super.onBindViewHolder(holder)
+
+        colorButton = holder.findViewById(R.id.ui_button) as FancyButton
+        colorButton?.setBackgroundColor(currentColor)
+        colorButton?.setOnClickListener {
+            onClick()
+        }
+    }
+}
+
+class ColorPreferenceDialogFragment : PreferenceDialogFragmentCompat() {
+
+    companion object {
+        const val KEY_PICKER_CURRENT_COLOR = "currentColor"
+
+        fun makeInstance(key: String): ColorPreferenceDialogFragment =
+                ColorPreferenceDialogFragment().apply {
+                    arguments = bundleOf(ARG_KEY to key)
+                }
+    }
+
+    private var colorPicker: LobsterPicker? = null
+    private var colorSlider: LobsterShadeSlider? = null
+
+    override fun onBindDialogView(view: View) {
+        super.onBindDialogView(view)
         colorPicker = view.findViewById(R.id.ui_color_picker)
         colorPicker?.colorAdapter = BitmapColorAdapter(context, R.drawable.lights_pallete)
         colorSlider = view.findViewById(R.id.ui_color_slider)
@@ -52,44 +99,35 @@ class ColorPreference : DialogPreference {
             colorPicker?.addDecorator(colorSlider!!)
         }
 
-        colorPicker?.color = currentColor
-        colorPicker?.history = currentColor
+        (preference as? ColorPreference)?.let {
+            colorPicker?.color = it.currentColor
+            colorPicker?.history = it.currentColor
+        }
+    }
 
-        super.onBindDialogView(view)
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(KEY_PICKER_CURRENT_COLOR)) {
+            colorPicker?.color = savedInstanceState.getInt(KEY_PICKER_CURRENT_COLOR)
+        }
+
+        return dialog
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        colorPicker?.let {
+            outState.putInt(KEY_PICKER_CURRENT_COLOR, it.color)
+        }
     }
 
     override fun onDialogClosed(positiveResult: Boolean) {
-
         if (positiveResult) {
             colorPicker?.let {
-                currentColor = it.color
-                persistInt(currentColor)
+                (preference as? ColorPreference)?.setColor(it.color)
             }
         }
-
-        super.onDialogClosed(positiveResult)
     }
 
-    override fun onGetDefaultValue(a: TypedArray, index: Int): Any {
-        return a.getInteger(index, Color.WHITE)
-    }
-
-    override fun onBindView(view: View) {
-        super.onBindView(view)
-
-        colorButton = view.findViewById(R.id.ui_button)
-        colorButton?.setBackgroundColor(currentColor)
-        colorButton?.setOnClickListener {
-            onClick()
-        }
-    }
-
-    override fun onSetInitialValue(restorePersistedValue: Boolean, defaultValue: Any?) {
-        if (restorePersistedValue) {
-            currentColor = getPersistedInt(Color.WHITE)
-        } else {
-            currentColor = defaultValue as Int
-            persistInt(currentColor)
-        }
-    }
 }

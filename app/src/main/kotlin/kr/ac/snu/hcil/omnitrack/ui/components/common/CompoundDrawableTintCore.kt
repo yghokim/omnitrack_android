@@ -35,12 +35,12 @@ class CompoundDrawableTintCore {
 
         try {
 
-            val drawableStart = getDrawableCompat(R.styleable.DrawableTint_drawableStartCompat, a, context)
+            val drawableStart = getDrawableCompat(R.styleable.DrawableTint_tintDrawableStartCompat, a, context)
             if (drawableStart != null) {
                 compoundDrawables[LEFT] = drawableStart
             }
 
-            val drawableEnd = getDrawableCompat(R.styleable.DrawableTint_drawableEndCompat, a, context)
+            val drawableEnd = getDrawableCompat(R.styleable.DrawableTint_tintDrawableEndCompat, a, context)
             if (drawableEnd != null) {
                 compoundDrawables[RIGHT] = drawableEnd
             }

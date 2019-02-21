@@ -103,7 +103,7 @@ class PackageHandlingBottomSheetFragment : DismissingBottomSheetDialogFragment(R
                         "Share the package content to research platform",
                         {
                             if (jsonString != null) {
-                                UploadTemporaryPackageDialogFragment.makeInstance(jsonString).show(fragmentManager, "InstantSharePackage")
+                                UploadTemporaryPackageDialogFragment.makeInstance(jsonString).show(requireFragmentManager(), "InstantSharePackage")
                                 dismissAllowingStateLoss()
                             }
                         })
