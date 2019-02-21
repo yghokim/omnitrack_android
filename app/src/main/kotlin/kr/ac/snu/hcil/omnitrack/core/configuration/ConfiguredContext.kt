@@ -5,11 +5,14 @@ import androidx.annotation.StringRes
 import androidx.work.WorkManager
 import kr.ac.snu.hcil.omnitrack.core.di.configured.*
 import kr.ac.snu.hcil.omnitrack.core.di.global.ApplicationComponent
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017. 12. 17..
  */
-class ConfiguredContext(val applicationComponent: ApplicationComponent) {
+@Singleton
+class ConfiguredContext @Inject constructor(val applicationComponent: ApplicationComponent) {
 
     val applicationContext: Context
         get() {

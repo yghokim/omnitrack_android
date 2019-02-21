@@ -14,7 +14,6 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
-import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfigurationController
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
@@ -27,7 +26,7 @@ import javax.inject.Inject
 class OTShortcutPanelWidgetService : RemoteViewsService() {
 
     @Inject
-    lateinit var configController: OTConfigurationController
+    lateinit var configuredContext: ConfiguredContext
 
     override fun onCreate() {
         super.onCreate()
@@ -35,7 +34,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
     }
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        return PanelWidgetElementFactory(this.applicationContext, configController.currentConfiguredContext, intent)
+        return PanelWidgetElementFactory(this.applicationContext, configuredContext, intent)
     }
 
     class PanelWidgetElementFactory(val context: Context, val configuredContext: ConfiguredContext, intent: Intent) : RemoteViewsFactory {

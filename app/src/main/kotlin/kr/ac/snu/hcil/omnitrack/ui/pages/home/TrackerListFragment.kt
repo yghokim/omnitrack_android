@@ -304,7 +304,6 @@ class TrackerListFragment : OTFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         for (viewHolder in trackerListAdapter.viewHolders) {
-            println("viewHolder viewmodel subscriptions clear: ${viewHolder.subscriptions.size() > 0}, ${viewHolder.subscriptions.isDisposed}")
             viewHolder.subscriptions.clear()
         }
         trackerListAdapter.viewHolders.clear()
@@ -367,7 +366,6 @@ class TrackerListFragment : OTFragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            println("Bind tracker viewmodel: ${currentTrackerViewModelList[position]}")
             holder.bindViewModel(currentTrackerViewModelList[position])
         }
 
@@ -531,7 +529,6 @@ class TrackerListFragment : OTFragment() {
             }
 
             private fun setLastLoggingTime(timestamp: Long?) {
-                println("Last logging time: $timestamp")
                 if (timestamp != null) {
                     InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle)
                     val dateText = TimeHelper.getDateText(timestamp, requireContext()).toUpperCase()

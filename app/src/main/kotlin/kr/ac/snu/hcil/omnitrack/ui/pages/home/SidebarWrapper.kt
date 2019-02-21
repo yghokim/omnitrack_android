@@ -94,7 +94,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
 
     init {
 
-        (parentActivity.application as OTAndroidApp).applicationComponent.configurationController().currentConfiguredContext
+        (parentActivity.application as OTAndroidApp).applicationComponent.configuredContext()
                 .configuredAppComponent.inject(this)
 
         /*

@@ -191,7 +191,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
 
     override val currentConfiguredContext: ConfiguredContext
         get() {
-            return this.applicationComponent.configurationController().currentConfiguredContext
+            return this.applicationComponent.configuredContext()
         }
 
     override fun attachBaseContext(base: Context) {
@@ -236,8 +236,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         val systemDefaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             try {
-                applicationComponent.configurationController()
-                        .currentConfiguredContext.configuredAppComponent.getEventLogger()
+                applicationComponent.configuredContext().configuredAppComponent.getEventLogger()
                         .logExceptionEvent("Uncaught", throwable, thread)
                 println("logged the uncaught exception.")
             } finally {
@@ -255,7 +254,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         //TODO start service in job controller
         //startService(this.binaryUploadServiceController.makeResumeUploadIntent())
 
-        applicationComponent.configurationController().currentConfiguredContext.activateOnSystem()
+        applicationComponent.configuredContext().activateOnSystem()
 
         if (OTExternalSettingsPrompter.isBatteryOptimizationWhiteListed(this) || ProcessLifecycleOwner.get().lifecycle.currentState >= Lifecycle.State.STARTED) {
             startService(Intent(this, OTDeviceStatusService::class.java))
@@ -290,7 +289,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
             val duration = finishedAt - foregroundTime.getAndSet(Long.MIN_VALUE)
             if (duration > 100) {
                 println("App Screen Session duration : ${duration.toFloat() / 1000} seconds")
-                applicationComponent.configurationController().currentConfiguredContext.configuredAppComponent.getEventLogger()
+                applicationComponent.configuredContext().configuredAppComponent.getEventLogger()
                         .logSession("engagement_foreground", "application", duration, finishedAt, null)
             }
         }

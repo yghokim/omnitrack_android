@@ -20,7 +20,6 @@ import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
-import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfigurationController
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -53,7 +52,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     @Inject
-    lateinit var configController: OTConfigurationController
+    lateinit var configuredContext: ConfiguredContext
 
     private val subscriptions = CompositeDisposable()
 
@@ -71,7 +70,6 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
         super.onNewToken(newToken)
         subscriptions.add(
                 Completable.defer {
-                                val configuredContext = configController.currentConfiguredContext
                                 try {
                                     val fbInstanceId = configuredContext.firebaseComponent.getFirebaseInstanceId()
                                     val token = fbInstanceId.getToken(BuildConfig.FIREBASE_CLOUD_MESSAGING_SENDER_ID, "FCM")
@@ -109,7 +107,6 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
         if (senderId != null) {
             subscriptions.add(
                     Completable.defer {
-                        val configuredContext = configController.currentConfiguredContext
                         val data = remoteMessage.data
                         if (data != null && data.isNotEmpty()) {
 

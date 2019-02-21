@@ -86,7 +86,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
     }
 
     init {
-        (context.applicationContext as OTAndroidApp).applicationComponent.configurationController().currentConfiguredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.configuredContext().configuredAppComponent.inject(this)
 
         adapter = Adapter()
 
@@ -163,7 +163,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
             this.realmProvider.get().use { realm ->
                 val attribute = realm.where(OTAttributeDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, boundAttributeObjectId).findFirst()
                 if (attribute != null) {
-                    val configuredContext = (context.applicationContext as OTApp).applicationComponent.configurationController().currentConfiguredContext
+                    val configuredContext = (context.applicationContext as OTApp).applicationComponent.configuredContext()
                     val helper = attribute.getHelper(configuredContext) as OTChoiceAttributeHelper
                     val originalEntryList = helper.getChoiceEntries(attribute)
                     if (originalEntryList != null) {

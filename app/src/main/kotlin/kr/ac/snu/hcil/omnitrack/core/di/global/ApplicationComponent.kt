@@ -6,7 +6,7 @@ import android.content.res.Resources
 import com.google.gson.Gson
 import dagger.Component
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
-import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfigurationController
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.di.configured.*
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.services.messaging.OTFirebaseMessagingService
@@ -27,7 +27,7 @@ import javax.inject.Singleton
 @Component(modules = [ApplicationModule::class, SerializationModule::class, DesignModule::class, ExternalServiceModule::class, SystemIdentifierFactoryModule::class])
 interface ApplicationComponent {
 
-    fun configurationController(): OTConfigurationController
+    fun configuredContext(): ConfiguredContext
 
     @Default
     fun defaultPreferences(): SharedPreferences

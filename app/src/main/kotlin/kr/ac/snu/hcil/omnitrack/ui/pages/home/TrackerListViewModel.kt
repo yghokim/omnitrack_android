@@ -88,7 +88,6 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
     override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet) {
         if (snapshot.isLoaded && snapshot.isValid) {
             if (changeSet.state == OrderedCollectionChangeSet.State.INITIAL) {
-                println("Viewmodel first time emit")
                 //first time emit
                 clearTrackerViewModelList()
                 val viewModels = snapshot.map { TrackerInformationViewModel(it, realm, researchRealm, dbManager.get(), configuredContext) }

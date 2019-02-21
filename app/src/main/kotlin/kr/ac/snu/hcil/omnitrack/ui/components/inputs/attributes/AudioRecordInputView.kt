@@ -99,7 +99,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     private val subscriptions = CompositeDisposable()
 
     init {
-        (context.applicationContext as OTAndroidApp).applicationComponent.configurationController().currentConfiguredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.configuredContext().configuredAppComponent.inject(this)
 
         valueView.audioFileUriChanged += { _, uri ->
             println("picker uri changed to $uri")

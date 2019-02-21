@@ -16,7 +16,7 @@ import androidx.core.app.TaskStackBuilder
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfigurationController
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
@@ -184,7 +184,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
     }
 
     @Inject
-    lateinit var configController: OTConfigurationController
+    lateinit var configuredContext: ConfiguredContext
 
     override fun onCreate() {
         super.onCreate()
@@ -194,7 +194,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
 
         println("Widget update service action: ${intent.action}")
-        val currentSignedInLevel = configController.currentConfiguredContext.configuredAppComponent.getAuthManager().currentSignedInLevel
+        val currentSignedInLevel = configuredContext.configuredAppComponent.getAuthManager().currentSignedInLevel
             val appWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS) ?: intArrayOf()
             if (appWidgetIds.isNotEmpty()) {
                 println("widget ids: ${appWidgetIds.joinToString(", ")}")
