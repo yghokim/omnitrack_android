@@ -3,8 +3,8 @@ package kr.ac.snu.hcil.omnitrack.core.di.configured
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import dagger.Module
 import dagger.Provides
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfiguration
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import javax.inject.Qualifier
 
@@ -22,11 +22,11 @@ class AuthModule {
     @Provides
     @Configured
     @ForGeneralAuth
-    fun getGoogleSignInOptions(config: OTConfiguration): GoogleSignInOptions {
+    fun getGoogleSignInOptions(): GoogleSignInOptions {
         return GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestProfile()
                 .requestEmail()
-                .requestIdToken(config.googleAuthClientId)
+                .requestIdToken(BuildConfig.FIREBASE_AUTH_CLIENT_ID)
                 .build()
     }
 }

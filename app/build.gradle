@@ -7,6 +7,7 @@ apply plugin: 'com.cookpad.android.licensetools'
 apply plugin: 'com.getkeepsafe.dexcount'
 
 import java.util.regex.Pattern
+import org.apache.http.client.utils.URIBuilder
 
 def keystoreProperties = project.keystoreProperties
 
@@ -15,6 +16,20 @@ def gcmSenderId = googleServices.project_info.project_number
 def firebaseProjectId = googleServices.project_info.project_id
 
 def buildConfigJson = project.buildConfigJson
+
+static def fallbackUrl(String url){
+    try{
+        URI parsedUri = new URI(url)
+        println("scheme: " + parsedUri.scheme)
+        if(parsedUri.scheme == 'https' || parsedUri.scheme == 'http')
+        {
+            return url
+        }else throw new Exception("The URI does not have an HTTP or HTTPS scheme.")
+    }catch(Exception ex) {
+        println(ex.getMessage())
+        return new URIBuilder().setPath(url).setScheme("http").build().toString()
+    }
+}
 
 android {
 
@@ -144,8 +159,8 @@ android {
         buildType ->
             def finalApplicationId = buildType.applicationIdSuffix == null ? defaultConfig.applicationId : defaultConfig.applicationId + buildType.applicationIdSuffix
 
-            buildType.buildConfigField 'String', 'OMNITRACK_SYNCHRONIZATION_SERVER_URL', "\"$buildConfigJson.synchronizationServerUrl\""
-            buildType.buildConfigField 'String', 'OMNITRACK_MEDIA_STORAGE_SERVER_URL', "\"$buildConfigJson.mediaStorageUrl\""
+            buildType.buildConfigField 'String', 'OMNITRACK_SYNCHRONIZATION_SERVER_URL', "\"${fallbackUrl(buildConfigJson.synchronizationServerUrl)}\""
+            buildType.buildConfigField 'String', 'OMNITRACK_MEDIA_STORAGE_SERVER_URL', "\"${fallbackUrl(buildConfigJson.mediaStorageUrl)}\""
 
             keystoreProperties.keySet().forEach {
                 buildType.buildConfigField 'String', it.toString(), keystoreProperties.getProperty(it)

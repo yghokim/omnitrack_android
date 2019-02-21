@@ -19,7 +19,6 @@ import io.realm.RealmConfiguration
 import io.realm.annotations.RealmModule
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfiguration
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.LocalMediaCacheEntry
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UploadTaskInfo
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
@@ -104,10 +103,10 @@ class NetworkModule {
     @Provides
     @Configured
     @SynchronizationServer
-    fun provideSynchronizationRetrofit(config: OTConfiguration, @Authorized client: OkHttpClient, @ForGeneric gson: Lazy<Gson>): Retrofit {
+    fun provideSynchronizationRetrofit(@Authorized client: OkHttpClient, @ForGeneric gson: Lazy<Gson>): Retrofit {
         return Retrofit.Builder()
                 .client(client)
-                .baseUrl(config.synchronizationServerUrl)
+                .baseUrl(BuildConfig.OMNITRACK_SYNCHRONIZATION_SERVER_URL)
                 .addCallAdapterFactory(rxJava2CallAdapterFactory)
                 .addConverterFactory(scalarsConverterFactory)
                 .addConverterFactory(GsonConverterFactory.create(
@@ -125,10 +124,10 @@ class NetworkModule {
     @Provides
     @Configured
     @BinaryStorageServer
-    fun provideBinaryStorageRetrofit(config: OTConfiguration, @Authorized client: OkHttpClient): Retrofit {
+    fun provideBinaryStorageRetrofit(@Authorized client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
                 .client(client)
-                .baseUrl(config.mediaStorageServerUrl)
+                .baseUrl(BuildConfig.OMNITRACK_MEDIA_STORAGE_SERVER_URL)
                 .addCallAdapterFactory(rxJava2CallAdapterFactory)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
@@ -197,8 +196,8 @@ class NetworkModule {
     @Provides
     @Configured
     @ServerResponsive
-    fun provideServerConnection(configuration: OTConfiguration): Completable {
-        val serverUri = Uri.parse(configuration.synchronizationServerUrl)
+    fun provideServerConnection(): Completable {
+        val serverUri = Uri.parse(BuildConfig.OMNITRACK_SYNCHRONIZATION_SERVER_URL)
 
         return ReactiveNetwork.checkInternetConnectivity(
                 InternetObservingSettings

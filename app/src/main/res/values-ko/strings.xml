@@ -32,7 +32,7 @@
 
     <string name="msg_format_confirm_apply_change">%1$s에 대한 변경사항을 저장하시겠습니까?</string>
 
-    <string name="msg_format_confirm_save_creation">새 $1%s를 저장하시겠습니까?</string>
+    <string name="msg_format_confirm_save_creation">새 %1$s를 저장하시겠습니까?</string>
 
     <string name="msg_confirm_empty_tracker_log">이 트래커에는 필드가 없습니다. 현재 시각만을 기록하시겠습니까?</string>
 

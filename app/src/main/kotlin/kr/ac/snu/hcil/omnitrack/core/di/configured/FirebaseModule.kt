@@ -10,7 +10,6 @@ import dagger.Provides
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfiguration
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import javax.inject.Qualifier
 
@@ -21,17 +20,17 @@ import javax.inject.Qualifier
 class FirebaseModule {
     @Provides
     @Configured
-    fun provideFirebaseApp(context: Context, configuration: OTConfiguration): FirebaseApp {
+    fun provideFirebaseApp(context: Context): FirebaseApp {
 
         return try {
             FirebaseApp.getInstance()!!
         } catch (ex: Exception) {
             FirebaseApp.initializeApp(context, FirebaseOptions
                     .Builder()
-                    .setApiKey(configuration.firebaseGoogleApiKey)
+                    .setApiKey(BuildConfig.FIREBASE_API_KEY)
                     .setApplicationId(BuildConfig.FIREBASE_CLIENT_ID)
-                    .setGcmSenderId(configuration.firebaseCloudMessagingSenderId)
-                    .setProjectId(configuration.firebaseProjectId)
+                    .setGcmSenderId(BuildConfig.FIREBASE_CLOUD_MESSAGING_SENDER_ID)
+                    .setProjectId(BuildConfig.FIREBASE_PROJECT_ID)
                     .build())
         }
     }
@@ -51,9 +50,9 @@ class FirebaseModule {
     @Provides
     @Configured
     @FirebaseInstanceIdToken
-    fun provideFirebaseInstanceIdToken(configuration: OTConfiguration, fbInstanceId: FirebaseInstanceId): Single<String> {
+    fun provideFirebaseInstanceIdToken(fbInstanceId: FirebaseInstanceId): Single<String> {
         return Single.defer {
-            return@defer Single.just(fbInstanceId.getToken(configuration.firebaseCloudMessagingSenderId, "FCM"))
+            return@defer Single.just(fbInstanceId.getToken(BuildConfig.FIREBASE_CLOUD_MESSAGING_SENDER_ID, "FCM"))
         }.subscribeOn(Schedulers.io())
     }
 }

@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.di.global.ApplicationComponent
 /**
  * Created by younghokim on 2017. 12. 17..
  */
-class ConfiguredContext(val configuration: OTConfiguration, val applicationComponent: ApplicationComponent) {
+class ConfiguredContext(val applicationComponent: ApplicationComponent) {
 
     val applicationContext: Context
         get() {
@@ -17,7 +17,7 @@ class ConfiguredContext(val configuration: OTConfiguration, val applicationCompo
         }
 
     private val configuredModule: ConfiguredModule by lazy {
-        ConfiguredModule(configuration, this)
+        ConfiguredModule(this)
     }
 
     private val authModule: AuthModule by lazy {

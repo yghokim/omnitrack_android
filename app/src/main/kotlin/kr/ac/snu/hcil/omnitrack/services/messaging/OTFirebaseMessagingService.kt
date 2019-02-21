@@ -70,13 +70,11 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(newToken: String) {
         super.onNewToken(newToken)
         subscriptions.add(
-                Completable.merge(
-                        configController.map { config ->
-                            Completable.defer {
+                Completable.defer {
                                 val configuredContext = configController.currentConfiguredContext
                                 try {
                                     val fbInstanceId = configuredContext.firebaseComponent.getFirebaseInstanceId()
-                                    val token = fbInstanceId.getToken(config.firebaseCloudMessagingSenderId, "FCM")
+                                    val token = fbInstanceId.getToken(BuildConfig.FIREBASE_CLOUD_MESSAGING_SENDER_ID, "FCM")
                                     if (token != null) {
                                         println("FirebaseInstanceId token - $token")
                                         val currentUserId = configuredContext.configuredAppComponent.getAuthManager().userId
@@ -93,9 +91,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
                                     ex.printStackTrace()
                                 }
                                 return@defer Completable.complete()
-                            }
-                        }
-                ).subscribeOn(Schedulers.io())
+                }.subscribeOn(Schedulers.io())
                         .subscribe({
                             println("Firebase Instance Id Token was refreshed: onTokenRefresh")
                         }, { ex ->

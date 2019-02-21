@@ -11,14 +11,7 @@ import javax.inject.Singleton
 class OTConfigurationController @Inject constructor(
         val applicationComponent: ApplicationComponent
 ) {
-
-    private val currentConfiguration: OTConfiguration = OTConfiguration()
-
     val currentConfiguredContext: ConfiguredContext by lazy {
-        ConfiguredContext(currentConfiguration, applicationComponent)
-    }
-
-    fun <T> map(func: ((OTConfiguration) -> T)): List<T> {
-        return listOf(currentConfiguration).map(func)
+        ConfiguredContext(applicationComponent)
     }
 }

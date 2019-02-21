@@ -4,13 +4,13 @@ import android.content.*
 import android.graphics.PointF
 import android.graphics.Rect
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.preference.PreferenceManager
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.Display
 import com.github.salomonbrys.kotson.set
