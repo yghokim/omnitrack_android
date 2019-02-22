@@ -9,7 +9,6 @@ import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UploadTaskInfo
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
-import kr.ac.snu.hcil.omnitrack.core.di.configured.BinaryStorageServer
 import kr.ac.snu.hcil.omnitrack.services.OTBinaryUploadWorker
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import java.util.*
@@ -19,7 +18,7 @@ import javax.inject.Provider
  * Created by younghokim on 2017. 11. 15..
  */
 class OTBinaryStorageController(
-        @BinaryStorageServer val uploadRequest: Provider<OneTimeWorkRequest>,
+        val uploadRequest: Provider<OneTimeWorkRequest>,
         val core: IBinaryStorageCore, val realmProvider: Factory<Realm>) {
 
 

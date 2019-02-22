@@ -11,7 +11,6 @@ import dagger.Provides
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.di.configured.ConfiguredAppComponent
-import kr.ac.snu.hcil.omnitrack.core.di.configured.FirebaseComponent
 import kr.ac.snu.hcil.omnitrack.core.di.configured.ResearchComponent
 import kr.ac.snu.hcil.omnitrack.core.di.configured.TriggerSystemComponent
 import java.io.ByteArrayInputStream
@@ -30,7 +29,6 @@ import javax.inject.Singleton
  */
 @Module(subcomponents = [
     ConfiguredAppComponent::class,
-    FirebaseComponent::class,
     TriggerSystemComponent::class,
     ResearchComponent::class
 ])

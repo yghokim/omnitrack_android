@@ -6,7 +6,7 @@ import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
-import kr.ac.snu.hcil.omnitrack.core.di.configured.FirebaseComponent
+import kr.ac.snu.hcil.omnitrack.core.di.global.FirebaseComponent
 import kr.ac.snu.hcil.omnitrack.utils.versionName
 
 /**

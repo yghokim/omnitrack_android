@@ -59,7 +59,7 @@ class OTInformationUploadWorker(private val context: Context, private val worker
                 val uid = authManager.userId!!
                 when (informationType) {
                     INFORMATION_DEVICE ->
-                        OTDeviceInfo.makeDeviceInfo(context, configuredContext.firebaseComponent).flatMap { deviceInfo ->
+                        OTDeviceInfo.makeDeviceInfo(context, configuredContext.applicationComponent.application().firebaseComponent).flatMap { deviceInfo ->
                             syncServerController
                                     .putDeviceInfo(deviceInfo)
                         }.map { Result.success() }

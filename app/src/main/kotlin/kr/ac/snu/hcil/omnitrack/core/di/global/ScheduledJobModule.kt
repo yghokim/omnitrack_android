@@ -1,18 +1,18 @@
-package kr.ac.snu.hcil.omnitrack.core.di.configured
+package kr.ac.snu.hcil.omnitrack.core.di.global
 
 import androidx.work.*
 import dagger.Module
 import dagger.Provides
 import dagger.internal.Factory
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.services.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017. 12. 18..
  */
-@Module(includes = [ConfiguredModule::class])
+@Module()
 class ScheduledJobModule {
 
     private val networkConstraints: Constraints by lazy {
@@ -22,7 +22,7 @@ class ScheduledJobModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     @ServerFullSync
     fun providesServerSyncRequest(): PeriodicWorkRequest {
         return PeriodicWorkRequest.Builder(OTSynchronizationWorker::class.java, 3, TimeUnit.HOURS)
@@ -38,28 +38,8 @@ class ScheduledJobModule {
                 .build()
     }
 
-    /*
     @Provides
-    @Configured
-    @ServerFullSync
-    fun providesServerSyncJob(builder: Job.Builder): Job
-    {
-        return builder
-                .setTag("${OTSynchronizationService.TAG};${OTSynchronizationService.EXTRA_KEY_FULLSYNC}")
-                .setRecurring(true)
-                .setService(OTSynchronizationService::class.java)
-                .setLifetime(Lifetime.FOREVER)
-                .setReplaceCurrent(true)
-                .setTrigger(Trigger.executionWindow(4800, 3600 * 2))
-                .setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
-                .setConstraints(
-                        Constraint.ON_ANY_NETWORK
-                )
-                .setExtras(bundleOf(OTSynchronizationService.EXTRA_KEY_FULLSYNC to true)).build()
-    }*/
-
-    @Provides
-    @Configured
+    @Singleton
     @ServerSyncOneShot
     fun providesImmediateServerSyncRequest(): OneTimeWorkRequest {
         return OneTimeWorkRequestBuilder<OTSynchronizationWorker>()
@@ -83,28 +63,10 @@ class ScheduledJobModule {
                         Constraint.ON_ANY_NETWORK
                 ).build()*/
     }
-/*
-    @Provides
-    @Configured
-    @ServerSyncOneShot
-    fun providesImmediateServerSyncJob(builder: Job.Builder, @ServerSyncOneShot oneShotBundle: Provider<Data>): Job {
-        return builder
-                .setTag("${OTSynchronizationService.TAG};${OTSynchronizationService.EXTRA_KEY_ONESHOT}")
-                .setRecurring(false)
-                .setService(OTSynchronizationService::class.java)
-                .setLifetime(Lifetime.FOREVER)
-                //.setExtras(oneShotBundle.get())
-                .setReplaceCurrent(true)
-                .setTrigger(Trigger.executionWindow(0, 0))
-                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
-                .setConstraints(
-                        Constraint.ON_ANY_NETWORK
-                ).build()
-    }*/
 
     @Provides
-    @Configured
-    @BinaryStorageServer
+    @Singleton
+    @BinaryUpload
     fun provideBinaryUploadRequest(): OneTimeWorkRequest {
         return OneTimeWorkRequestBuilder<OTBinaryUploadWorker>()
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
@@ -114,7 +76,7 @@ class ScheduledJobModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     @UsageLogger
     fun providesUsageLogUploadRequest(): OneTimeWorkRequest {
 
@@ -127,7 +89,7 @@ class ScheduledJobModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     @InformationUpload
     fun providesInformationUploadRequestBuilderFactory(): Factory<OneTimeWorkRequest.Builder> {
         return object : Factory<OneTimeWorkRequest.Builder> {
@@ -150,7 +112,7 @@ class ScheduledJobModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     @VersionCheck
     fun providesVersionCheckRequest(): OneTimeWorkRequest {
         return OneTimeWorkRequestBuilder<OTVersionCheckWorker>()
@@ -171,7 +133,7 @@ class ScheduledJobModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     @ResearchSync
     fun provideResearchSyncRequest(): OneTimeWorkRequest {
         return OneTimeWorkRequestBuilder<OTResearchSynchronizationWorker>()
@@ -209,4 +171,9 @@ annotation class ServerFullSync
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ResearchSync
+
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class BinaryUpload
 

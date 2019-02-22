@@ -27,20 +27,8 @@ class ConfiguredContext @Inject constructor(val applicationComponent: Applicatio
         AuthModule()
     }
 
-    private val firebaseModule: FirebaseModule by lazy {
-        FirebaseModule()
-    }
-
-    private val loggingModule: UsageLoggingModule by lazy {
-        UsageLoggingModule()
-    }
-
     private val backendDatabaseModule: BackendDatabaseModule by lazy {
         BackendDatabaseModule()
-    }
-
-    private val scheduledJobModule: ScheduledJobModule by lazy {
-        ScheduledJobModule()
     }
 
     private val networkModule: NetworkModule by lazy {
@@ -67,24 +55,14 @@ class ConfiguredContext @Inject constructor(val applicationComponent: Applicatio
     val configuredAppComponent: ConfiguredAppComponent by lazy {
         applicationComponent.configuredAppComponentBuilder()
                 .plus(configuredModule)
-                .plus(firebaseModule)
                 .plus(authModule)
                 .plus(networkModule)
                 .plus(backendDatabaseModule)
                 .plus(triggerSystemModule)
-                .plus(scheduledJobModule)
                 .plus(synchronizationModule)
-                .plus(loggingModule)
                 .plus(researchModule)
                 .plus(ScriptingModule())
                 .plus(InformationHelpersModule())
-                .build()
-    }
-
-    val firebaseComponent: FirebaseComponent by lazy {
-        applicationComponent.firebaseComponentBuilder()
-                .plus(firebaseModule)
-                .plus(configuredModule)
                 .build()
     }
 
@@ -94,13 +72,6 @@ class ConfiguredContext @Inject constructor(val applicationComponent: Applicatio
                 .plus(backendDatabaseModule)
                 .plus(authModule)
                 .plus(configuredModule)
-                .build()
-    }
-
-    val scheduledJobComponent: ScheduledJobComponent by lazy {
-        applicationComponent.scheduledJobComponentBuilder()
-                .plus(configuredModule)
-                .plus(scheduledJobModule)
                 .build()
     }
 
@@ -120,8 +91,6 @@ class ConfiguredContext @Inject constructor(val applicationComponent: Applicatio
                 .plus(researchModule)
                 .plus(networkModule)
                 .plus(authModule)
-                .plus(firebaseModule)
-                .plus(loggingModule)
                 .build()
     }
 
@@ -132,7 +101,7 @@ class ConfiguredContext @Inject constructor(val applicationComponent: Applicatio
     fun activateOnSystem() {
         //triggerSystemComponent.getTriggerAlarmController().activateOnSystem()
 
-        WorkManager.getInstance().enqueue(scheduledJobComponent.getFullSyncPeriodicRequestProvider().get())
+        WorkManager.getInstance().enqueue(applicationComponent.application().scheduledJobComponent.getFullSyncPeriodicRequestProvider().get())
         //applicationComponent.jobDispatcher().mustSchedule(scheduledJobComponent.getFullSyncPeriodicJob().get())
     }
 

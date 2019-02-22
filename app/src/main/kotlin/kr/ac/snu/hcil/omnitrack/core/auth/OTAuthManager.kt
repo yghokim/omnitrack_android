@@ -217,7 +217,7 @@ class OTAuthManager @Inject constructor(
 
                             .flatMap { authResult ->
                                 println("Signed in through Google account. try to push device info to server...")
-                                OTDeviceInfo.makeDeviceInfo(configuredContext.applicationContext, configuredContext.firebaseComponent)
+                                OTDeviceInfo.makeDeviceInfo(configuredContext.applicationContext, configuredContext.applicationComponent.application().firebaseComponent)
                             }
                             .flatMap { deviceInfo ->
                                 if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {

@@ -18,7 +18,7 @@ class PackageReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val app = (context.applicationContext as OTAndroidApp)
-        app.currentConfiguredContext.scheduledJobComponent.inject(this)
+        app.scheduledJobComponent.inject(this)
 
         println("package broadcast receiver - ${intent.action}")
 

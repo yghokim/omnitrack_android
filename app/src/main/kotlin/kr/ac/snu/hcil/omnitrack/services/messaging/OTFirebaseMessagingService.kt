@@ -6,13 +6,16 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.github.salomonbrys.kotson.jsonObject
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -21,6 +24,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.di.global.InformationUpload
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
@@ -54,6 +58,13 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
     @Inject
     lateinit var configuredContext: ConfiguredContext
 
+    @Inject
+    lateinit var firebaseInstanceId: FirebaseInstanceId
+
+
+    @field:[Inject InformationUpload]
+    lateinit var informationUploadRequestBuilderFactory: Factory<OneTimeWorkRequest.Builder>
+
     private val subscriptions = CompositeDisposable()
 
     override fun onCreate() {
@@ -71,13 +82,13 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
         subscriptions.add(
                 Completable.defer {
                                 try {
-                                    val fbInstanceId = configuredContext.firebaseComponent.getFirebaseInstanceId()
-                                    val token = fbInstanceId.getToken(BuildConfig.FIREBASE_CLOUD_MESSAGING_SENDER_ID, "FCM")
+
+                                    val token = firebaseInstanceId.getToken(BuildConfig.FIREBASE_CLOUD_MESSAGING_SENDER_ID, "FCM")
                                     if (token != null) {
                                         println("FirebaseInstanceId token - $token")
                                         val currentUserId = configuredContext.configuredAppComponent.getAuthManager().userId
                                         if (currentUserId != null) {
-                                            val requestBuilder = configuredContext.scheduledJobComponent.getInformationUploadRequestBuilderFactory().get()
+                                            val requestBuilder = informationUploadRequestBuilderFactory.get()
                                             requestBuilder.addTag(OTInformationUploadWorker.INFORMATION_DEVICE)
                                                     .setInputData(Data.Builder().putString(OTInformationUploadWorker.KEY_TYPE, OTInformationUploadWorker.INFORMATION_DEVICE)
                                                             .build()

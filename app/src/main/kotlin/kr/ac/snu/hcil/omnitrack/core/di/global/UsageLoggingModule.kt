@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.di.configured
+package kr.ac.snu.hcil.omnitrack.core.di.global
 
 import dagger.Module
 import dagger.Provides
@@ -11,8 +11,8 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.analytics.OTUsageLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UsageLog
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017. 11. 28..
@@ -20,7 +20,7 @@ import javax.inject.Qualifier
 @Module()
 class UsageLoggingModule {
     @Provides
-    @Configured
+    @Singleton
     @UsageLogger
     fun usageLogDatabaseConfiguration(): RealmConfiguration {
         return RealmConfiguration.Builder()
@@ -35,14 +35,14 @@ class UsageLoggingModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     @UsageLogger
     fun makeUsageLogDbRealm(@UsageLogger configuration: RealmConfiguration): Realm {
         return Realm.getInstance(configuration)
     }
 
     @Provides
-    @Configured
+    @Singleton
     @UsageLogger
     fun makeUsageLogDbRealmFactory(@UsageLogger configuration: RealmConfiguration): Factory<Realm> {
         return object : Factory<Realm> {
@@ -53,7 +53,7 @@ class UsageLoggingModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     fun getLoggingManager(configuredContext: ConfiguredContext): IEventLogger {
         return OTUsageLoggingManager(configuredContext)
     }

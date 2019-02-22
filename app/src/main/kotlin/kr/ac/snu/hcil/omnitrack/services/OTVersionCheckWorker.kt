@@ -10,12 +10,12 @@ import dagger.Lazy
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
 import io.reactivex.schedulers.Schedulers
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
-import kr.ac.snu.hcil.omnitrack.core.di.configured.VersionCheck
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
+import kr.ac.snu.hcil.omnitrack.core.di.global.VersionCheck
 import kr.ac.snu.hcil.omnitrack.core.system.OTAppVersionCheckManager
 import javax.inject.Inject
 import javax.inject.Provider
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017. 4. 15..
@@ -29,7 +29,7 @@ class OTVersionCheckWorker(private val context: Context, workerParams: WorkerPar
         const val PREF_LAST_NOTIFIED_VERSION = "last_notified_version"
     }
 
-    @Configured
+    @Singleton
     class Controller @Inject constructor(@Default val pref: Lazy<SharedPreferences>, @VersionCheck val requestBuilder: Provider<OneTimeWorkRequest>) {
 
         val versionCheckSwitchTurnedOn: Boolean

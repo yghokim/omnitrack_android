@@ -31,8 +31,8 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTUserDAO
 import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
-import kr.ac.snu.hcil.omnitrack.core.di.configured.InformationUpload
-import kr.ac.snu.hcil.omnitrack.core.di.configured.ResearchSync
+import kr.ac.snu.hcil.omnitrack.core.di.global.InformationUpload
+import kr.ac.snu.hcil.omnitrack.core.di.global.ResearchSync
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadWorker
 import kr.ac.snu.hcil.omnitrack.services.OTResearchSynchronizationWorker

@@ -169,6 +169,22 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         SerializationModule()
     }
 
+    private val usageLoggingModule: UsageLoggingModule by lazy {
+        UsageLoggingModule()
+    }
+
+    private val uiHelperModule: UIHelperModule by lazy {
+        UIHelperModule()
+    }
+
+    private val firebaseModule: FirebaseModule by lazy {
+        FirebaseModule()
+    }
+
+    private val scheduledJobModule: ScheduledJobModule by lazy {
+        ScheduledJobModule()
+    }
+
     private val systemIdentifierFactoryModule: SystemIdentifierFactoryModule by lazy {
         SystemIdentifierFactoryModule()
     }
@@ -176,10 +192,21 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
     override val applicationComponent: ApplicationComponent by lazy {
         DaggerApplicationComponent.builder()
                 .applicationModule(appModule)
+                .firebaseModule(firebaseModule)
+                .usageLoggingModule(usageLoggingModule)
+                .uIHelperModule(uiHelperModule)
+                .scheduledJobModule(scheduledJobModule)
                 .designModule(designModule)
                 .externalServiceModule(externalServiceModule)
                 .serializationModule(serializationModule)
                 .systemIdentifierFactoryModule(systemIdentifierFactoryModule)
+                .build()
+    }
+
+    override val firebaseComponent: FirebaseComponent by lazy {
+        DaggerFirebaseComponent.builder()
+                .applicationModule(appModule)
+                .firebaseModule(firebaseModule)
                 .build()
     }
 
@@ -188,6 +215,14 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
                 .serializationModule(serializationModule)
                 .build()
     }
+
+    override val scheduledJobComponent: ScheduledJobComponent by lazy {
+        DaggerScheduledJobComponent.builder()
+                .applicationModule(appModule)
+                .scheduledJobModule(scheduledJobModule)
+                .build()
+    }
+
 
     override val currentConfiguredContext: ConfiguredContext
         get() {

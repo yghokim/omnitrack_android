@@ -69,12 +69,9 @@ import java.util.*
     NetworkModule::class,
     InformationHelpersModule::class,
     DaoSerializationModule::class,
-    ScheduledJobModule::class,
     SynchronizationModule::class,
     TriggerSystemModule::class,
     ScriptingModule::class,
-    UsageLoggingModule::class,
-    UIHelperModule::class,
     ResearchModule::class
 ])
 interface ConfiguredAppComponent {
@@ -83,17 +80,14 @@ interface ConfiguredAppComponent {
     interface Builder {
 
         fun plus(module: ConfiguredModule): Builder
-        fun plus(module: FirebaseModule): Builder
         fun plus(module: AuthModule): Builder
         fun plus(module: BackendDatabaseModule): Builder
         fun plus(module: NetworkModule): Builder
         fun plus(module: InformationHelpersModule): Builder
         fun plus(module: DaoSerializationModule): Builder
-        fun plus(module: ScheduledJobModule): Builder
         fun plus(module: SynchronizationModule): Builder
         fun plus(module: TriggerSystemModule): Builder
         fun plus(module: ScriptingModule): Builder
-        fun plus(module: UsageLoggingModule): Builder
         fun plus(module: ResearchModule): Builder
 
         fun build(): ConfiguredAppComponent

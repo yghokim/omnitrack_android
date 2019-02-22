@@ -22,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.LocalMediaCacheEntry
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UploadTaskInfo
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
+import kr.ac.snu.hcil.omnitrack.core.di.global.BinaryUpload
 import kr.ac.snu.hcil.omnitrack.core.di.global.DeviceId
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.di.global.Sha1FingerPrint
@@ -142,7 +143,7 @@ class NetworkModule {
     @Provides
     @Configured
     fun provideBinaryStorageController(
-            @BinaryStorageServer workRequest: Provider<OneTimeWorkRequest>,
+            @BinaryUpload workRequest: Provider<OneTimeWorkRequest>,
             core: IBinaryStorageCore): OTBinaryStorageController {
         return OTBinaryStorageController(workRequest, core, provideRealm())
     }

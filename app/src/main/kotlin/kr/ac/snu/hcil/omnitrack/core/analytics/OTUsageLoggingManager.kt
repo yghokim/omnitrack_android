@@ -27,7 +27,7 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.TRIGGER_FI
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UsageLog
-import kr.ac.snu.hcil.omnitrack.core.di.configured.UsageLogger
+import kr.ac.snu.hcil.omnitrack.core.di.global.UsageLogger
 import kr.ac.snu.hcil.omnitrack.services.OTUsageLogUploadWorker
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.versionCode

@@ -7,7 +7,10 @@ import com.google.gson.Gson
 import dagger.Component
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
-import kr.ac.snu.hcil.omnitrack.core.di.configured.*
+import kr.ac.snu.hcil.omnitrack.core.di.configured.ConfiguredAppComponent
+import kr.ac.snu.hcil.omnitrack.core.di.configured.DaoSerializationComponent
+import kr.ac.snu.hcil.omnitrack.core.di.configured.ResearchComponent
+import kr.ac.snu.hcil.omnitrack.core.di.configured.TriggerSystemComponent
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.services.messaging.OTFirebaseMessagingService
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ColorPaletteView
@@ -24,7 +27,7 @@ import javax.inject.Singleton
  * Created by younghokim on 2017. 12. 15..
  */
 @Singleton
-@Component(modules = [ApplicationModule::class, SerializationModule::class, DesignModule::class, ExternalServiceModule::class, SystemIdentifierFactoryModule::class])
+@Component(modules = [ApplicationModule::class, FirebaseModule::class, UsageLoggingModule::class, ScheduledJobModule::class, UIHelperModule::class, SerializationModule::class, DesignModule::class, ExternalServiceModule::class, SystemIdentifierFactoryModule::class])
 interface ApplicationComponent {
 
     fun configuredContext(): ConfiguredContext
@@ -42,9 +45,7 @@ interface ApplicationComponent {
     fun genericGson(): Gson
 
     fun configuredAppComponentBuilder(): ConfiguredAppComponent.Builder
-    fun scheduledJobComponentBuilder(): ScheduledJobComponent.Builder
     fun triggerSystemComponentBuilder(): TriggerSystemComponent.Builder
-    fun firebaseComponentBuilder(): FirebaseComponent.Builder
     fun daoSerializationComponentBuilder(): DaoSerializationComponent.Builder
     fun researchComponentBuilder(): ResearchComponent.Builder
 

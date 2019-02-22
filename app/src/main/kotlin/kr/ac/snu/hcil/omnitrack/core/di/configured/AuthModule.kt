@@ -11,7 +11,7 @@ import javax.inject.Qualifier
 /**
  * Created by Young-Ho on 11/3/2017.
  */
-@Module(includes = [FirebaseModule::class, NetworkModule::class, ConfiguredModule::class])
+@Module(includes = [NetworkModule::class, ConfiguredModule::class])
 class AuthModule {
 
     @Provides

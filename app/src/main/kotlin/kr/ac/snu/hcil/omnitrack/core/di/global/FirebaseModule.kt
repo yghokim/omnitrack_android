@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.di.configured
+package kr.ac.snu.hcil.omnitrack.core.di.global
 
 import android.content.Context
 import com.google.firebase.FirebaseApp
@@ -10,16 +10,16 @@ import dagger.Provides
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017. 12. 10..
  */
-@Module(includes = [ConfiguredModule::class])
+@Module(includes = [ApplicationModule::class])
 class FirebaseModule {
     @Provides
-    @Configured
+    @Singleton
     fun provideFirebaseApp(context: Context): FirebaseApp {
 
         return try {
@@ -36,19 +36,19 @@ class FirebaseModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     fun provideFirebaseAuth(fbApp: FirebaseApp): FirebaseAuth {
         return FirebaseAuth.getInstance(fbApp)
     }
 
     @Provides
-    @Configured
+    @Singleton
     fun provideFirebaseInstanceId(fbApp: FirebaseApp): FirebaseInstanceId {
         return FirebaseInstanceId.getInstance(fbApp)
     }
 
     @Provides
-    @Configured
+    @Singleton
     @FirebaseInstanceIdToken
     fun provideFirebaseInstanceIdToken(fbInstanceId: FirebaseInstanceId): Single<String> {
         return Single.defer {

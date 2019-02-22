@@ -15,7 +15,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 /**
  * Created by younghokim on 2017. 11. 9..
  */
-@Module(includes = [ScheduledJobModule::class])
+@Module()
 class TriggerSystemModule {
     @Provides
     @Configured
