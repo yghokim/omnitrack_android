@@ -20,13 +20,11 @@ def buildConfigJson = project.buildConfigJson
 static def fallbackUrl(String url){
     try{
         URI parsedUri = new URI(url)
-        println("scheme: " + parsedUri.scheme)
         if(parsedUri.scheme == 'https' || parsedUri.scheme == 'http')
         {
             return url
         }else throw new Exception("The URI does not have an HTTP or HTTPS scheme.")
     }catch(Exception ex) {
-        println(ex.getMessage())
         return new URIBuilder().setPath(url).setScheme("http").build().toString()
     }
 }
