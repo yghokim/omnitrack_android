@@ -23,7 +23,7 @@ class DemographicQuestionnaireSlideFragment : ExperimentSignUpActivity.SlideFrag
 
         fun getInstance(schema: String): DemographicQuestionnaireSlideFragment {
             return DemographicQuestionnaireSlideFragment().apply {
-                arguments = bundleOf(arrayOf<Pair<String, Any?>>("questionnaireSchema" to schema))
+                arguments = bundleOf("questionnaireSchema" to schema)
             }
         }
     }
