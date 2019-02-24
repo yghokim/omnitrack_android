@@ -25,7 +25,7 @@ class ManagedReminderListViewModel(app: Application) : AManagedTriggerListViewMo
     private lateinit var currentDefaultTriggerInterfaceOptions: TriggerInterfaceOptions
 
     init {
-        getApplication<OTApp>().currentConfiguredContext.configuredAppComponent.inject(this)
+        getApplication<OTApp>().applicationComponent.inject(this)
     }
 
     fun init(trackerId: String) {

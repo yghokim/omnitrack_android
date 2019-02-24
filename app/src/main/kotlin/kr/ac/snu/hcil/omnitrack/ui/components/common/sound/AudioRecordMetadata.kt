@@ -70,7 +70,7 @@ data class AudioRecordMetadata(var durationMillis: Int, var fileSizeBytes: Long,
                 val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                 val dateString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
 
-                val localTimeFormats = (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.getLocalTimeFormats()
+                val localTimeFormats = (context.applicationContext as OTAndroidApp).applicationComponent.getLocalTimeFormats()
 
                 val parsedDateString = try {
                     localTimeFormats.FORMAT_DATETIME.format(Date(parseDefaultFormat(dateString)))

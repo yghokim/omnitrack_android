@@ -29,12 +29,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.attribute_list_element.view.*
 import kotlinx.android.synthetic.main.fragment_tracker_detail_structure.*
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.AdapterLinearLayout
@@ -114,8 +114,8 @@ class TrackerDetailStructureTabFragment : OTFragment() {
     @Inject
     lateinit var tutorialManager: TutorialManager
 
-    override fun onInject(configuredContext: ConfiguredContext) {
-        configuredContext.configuredAppComponent.inject(this)
+    override fun onInject(app: OTAndroidApp) {
+        app.applicationComponent.inject(this)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -370,7 +370,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     fun openAttributeDetailActivity(position: Int) {
         val attrViewModel = currentAttributeViewModelList[position]
-        startActivityForResult(AttributeDetailActivity.makeIntent(requireContext(), configuredContext, attrViewModel.makeFrontalChangesToDao()), REQUEST_CODE_ATTRIBUTE_DETAIL)
+        startActivityForResult(AttributeDetailActivity.makeIntent(requireContext(), attrViewModel.makeFrontalChangesToDao()), REQUEST_CODE_ATTRIBUTE_DETAIL)
     }
 
     fun scrollToBottom() {

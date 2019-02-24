@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core
 
+import android.content.Context
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.ISingleNumberAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.DailyCountChartModel
@@ -17,7 +17,7 @@ import java.util.*
  */
 object TrackerHelper {
 
-    fun makeRecommendedChartModels(trackerDao: OTTrackerDAO, realm: Realm, configuredContext: ConfiguredContext): Array<ChartModel<*>> {
+    fun makeRecommendedChartModels(trackerDao: OTTrackerDAO, realm: Realm, context: Context): Array<ChartModel<*>> {
 
         val list = ArrayList<ChartModel<*>>()
 
@@ -25,17 +25,17 @@ object TrackerHelper {
 
         val timeSpanAttributes = trackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan && it.type == OTAttributeManager.TYPE_TIMESPAN }
 
-        val singleNumberAttributes = trackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan && it.getHelper(configuredContext) is ISingleNumberAttributeHelper }
+        val singleNumberAttributes = trackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan && it.getHelper(context) is ISingleNumberAttributeHelper }
 
         //generate tracker-level charts
 
-        list += DailyCountChartModel(trackerDao, realm, configuredContext, timePointAttributes.firstOrNull())
-        list += LoggingHeatMapModel(trackerDao, realm, configuredContext, timePointAttributes.firstOrNull())
+        list += DailyCountChartModel(trackerDao, realm, context, timePointAttributes.firstOrNull())
+        list += LoggingHeatMapModel(trackerDao, realm, context, timePointAttributes.firstOrNull())
 
         //durationTimeline
         for (timeSpanAttr in timeSpanAttributes) {
             for (numAttr in singleNumberAttributes) {
-                list.add(DurationHeatMapModel(trackerDao, timeSpanAttr, numAttr, realm, configuredContext))
+                list.add(DurationHeatMapModel(trackerDao, timeSpanAttr, numAttr, realm, context))
             }
         }
 
@@ -49,12 +49,12 @@ object TrackerHelper {
         //add time-value scatterplots
         for (timeAttr in timePointAttributes) {
             for (numAttr in singleNumberAttributes) {
-                list.add(TimeSeriesPlotModel(trackerDao, timeAttr, numAttr, realm, configuredContext))
+                list.add(TimeSeriesPlotModel(trackerDao, timeAttr, numAttr, realm, context))
             }
         }
 
         for (attribute in trackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan }) {
-            list.addAll(attribute.getHelper(configuredContext).makeRecommendedChartModels(attribute, realm))
+            list.addAll(attribute.getHelper(context).makeRecommendedChartModels(attribute, realm))
         }
 
         return list.toTypedArray()

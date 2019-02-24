@@ -3,12 +3,12 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.home
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -59,7 +59,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
     override fun onInject(app: OTAndroidApp) {
         super.onInject(app)
-        app.currentConfiguredContext.configuredAppComponent.inject(this)
+        app.applicationComponent.inject(this)
     }
 
     init {
@@ -173,10 +173,10 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
     override fun onToolbarLeftButtonClicked() {
         //       slidingMenu.toggle(true)
-        if (drawerLayout.isDrawerOpen(Gravity.START)) {
-            drawerLayout.closeDrawer(Gravity.START)
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START)
         } else {
-            drawerLayout.openDrawer(Gravity.START)
+            drawerLayout.openDrawer(GravityCompat.START)
         }
     }
 

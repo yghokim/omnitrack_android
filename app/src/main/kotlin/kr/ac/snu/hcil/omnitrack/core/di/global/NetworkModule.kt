@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.di.configured
+package kr.ac.snu.hcil.omnitrack.core.di.global
 
 import android.content.Context
 import android.net.Uri
@@ -21,11 +21,6 @@ import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.LocalMediaCacheEntry
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UploadTaskInfo
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
-import kr.ac.snu.hcil.omnitrack.core.di.global.BinaryUpload
-import kr.ac.snu.hcil.omnitrack.core.di.global.DeviceId
-import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
-import kr.ac.snu.hcil.omnitrack.core.di.global.Sha1FingerPrint
 import kr.ac.snu.hcil.omnitrack.core.net.*
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkNotConnectedException
@@ -38,11 +33,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Provider
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017-11-01.
  */
-@Module(includes = [ConfiguredModule::class])
+@Module(includes = [ApplicationModule::class, ScheduledJobModule::class])
 class NetworkModule {
     private val rxJava2CallAdapterFactory: RxJava2CallAdapterFactory by lazy {
         RxJava2CallAdapterFactory.create()
@@ -53,14 +49,14 @@ class NetworkModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     fun provideHttpCache(context: Context): Cache {
         val cacheSize = 10 * 1024 * 1024
         return Cache(context.cacheDir, cacheSize.toLong())
     }
 
     @Provides
-    @Configured
+    @Singleton
     @Authorized
     fun provideOkHttpClient(context: Context, authManager: Lazy<OTAuthManager>, @DeviceId deviceId: Lazy<String>, @Sha1FingerPrint fingerPrint: String, cache: Cache): OkHttpClient {
         return OkHttpClient.Builder()
@@ -86,14 +82,14 @@ class NetworkModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     @OkHttpMediaType(MediaTypeValue.IMAGE)
     fun provideImageMediaType(): MediaType {
         return MediaType.parse("image/*")!!
     }
 
     @Provides
-    @Configured
+    @Singleton
     @OkHttpMediaType(MediaTypeValue.PLAINTEXT)
     fun providePlainTextMediaType(): MediaType {
         return MediaType.parse("text/plain")!!
@@ -102,7 +98,7 @@ class NetworkModule {
 
 
     @Provides
-    @Configured
+    @Singleton
     @SynchronizationServer
     fun provideSynchronizationRetrofit(@Authorized client: OkHttpClient, @ForGeneric gson: Lazy<Gson>): Retrofit {
         return Retrofit.Builder()
@@ -123,7 +119,7 @@ class NetworkModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     @BinaryStorageServer
     fun provideBinaryStorageRetrofit(@Authorized client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
@@ -135,15 +131,15 @@ class NetworkModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     fun provideOfficialServerController(@SynchronizationServer retrofit: Retrofit): OTOfficialServerApiController {
         return OTOfficialServerApiController(retrofit)
     }
 
     @Provides
-    @Configured
+    @Singleton
     fun provideBinaryStorageController(
-            @BinaryUpload workRequest: Provider<OneTimeWorkRequest>,
+            @BinaryStorageServer workRequest: Provider<OneTimeWorkRequest>,
             core: IBinaryStorageCore): OTBinaryStorageController {
         return OTBinaryStorageController(workRequest, core, provideRealm())
     }
@@ -152,32 +148,32 @@ class NetworkModule {
      * Change this to replace binary storage
      */
     @Provides
-    @Configured
+    @Singleton
     fun provideBinaryStorageCore(context: Context, @BinaryStorageServer retrofit: Lazy<Retrofit>): IBinaryStorageCore {
         //return OTFirebaseStorageCore()
         return OTOfficialBinaryStorageCore(context, retrofit)
     }
 
     @Provides
-    @Configured
+    @Singleton
     fun provideSynchronizationServerController(controller: OTOfficialServerApiController): ISynchronizationServerSideAPI {
         return controller
     }
 
     @Provides
-    @Configured
+    @Singleton
     fun provideLocalMediaCacheManager(context: Context, authManager: Lazy<OTAuthManager>, storageController: Lazy<OTBinaryStorageController>): OTLocalMediaCacheManager {
         return OTLocalMediaCacheManager(context, authManager, storageController)
     }
 
     @Provides
-    @Configured
+    @Singleton
     fun provideUserReportServerController(controller: OTOfficialServerApiController): IUserReportServerAPI {
         return controller
     }
 
     @Provides
-    @Configured
+    @Singleton
     fun provideUsageLogUploadController(controller: OTOfficialServerApiController): IUsageLogUploadAPI {
         return controller
     }
@@ -195,7 +191,7 @@ class NetworkModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     @ServerResponsive
     fun provideServerConnection(): Completable {
         val serverUri = Uri.parse(BuildConfig.OMNITRACK_SYNCHRONIZATION_SERVER_URL)

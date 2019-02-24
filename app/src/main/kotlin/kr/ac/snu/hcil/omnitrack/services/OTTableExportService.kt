@@ -22,10 +22,9 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
 import kr.ac.snu.hcil.omnitrack.utils.io.StringTableSheet
@@ -67,12 +66,12 @@ class OTTableExportService : WakefulService(TAG) {
                     .putExtra(EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE, tableFileType.toString())
         }
 
-        fun makeConfigurationDialog(context: Context, configuredContext: ConfiguredContext, tracker: OTTrackerDAO, onConfigured: (includeFiles: Boolean, tableFileType: TableFileType) -> Unit): MaterialDialog.Builder {
+        fun makeConfigurationDialog(context: Context, tracker: OTTrackerDAO, onConfigured: (includeFiles: Boolean, tableFileType: TableFileType) -> Unit): MaterialDialog.Builder {
 
             val view = LayoutInflater.from(context).inflate(R.layout.dialog_export_configuration, null, false)
 
             val includeFilesCheckbox = view.findViewById<AppCompatCheckBox>(R.id.ui_include_external_files)
-            if (tracker.isExternalFilesInvolved(configuredContext)) {
+            if (tracker.isExternalFilesInvolved(context)) {
                 includeFilesCheckbox.isEnabled = true
                 includeFilesCheckbox.isChecked = true
             } else {
@@ -124,7 +123,7 @@ class OTTableExportService : WakefulService(TAG) {
 
     override fun onCreate() {
         super.onCreate()
-        (application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (application as OTAndroidApp).applicationComponent.inject(this)
         realm = realmProvider.get()
     }
 
@@ -200,7 +199,6 @@ class OTTableExportService : WakefulService(TAG) {
 
             subscriptions.add(
                     Single.defer<Boolean> {
-                        val configuredContext = (application as OTAndroidApp).currentConfiguredContext
                         val tracker = dbManager.get().getUnManagedTrackerDao(trackerId, realm)
                         val attributes = tracker?.attributes?.filter { it.isHidden == false && it.isInTrashcan == false }
                                 ?: emptyList()
@@ -223,7 +221,7 @@ class OTTableExportService : WakefulService(TAG) {
                             table.columns.add("source")
 
                             attributes.forEach {
-                                it.getHelper(configuredContext).onAddColumnToTable(it, table.columns)
+                                it.getHelper(this).onAddColumnToTable(it, table.columns)
                             }
 
 
@@ -235,7 +233,7 @@ class OTTableExportService : WakefulService(TAG) {
                                 row.add(item.timestamp.toString())
                                 row.add(item.loggingSource.name)
                                 attributes.forEach { attribute ->
-                                    attribute.getHelper(configuredContext).onAddValueToTable(attribute, item.getValueOf(attribute.localId), row, itemWithIndex.index.toString())
+                                    attribute.getHelper(this).onAddValueToTable(attribute, item.getValueOf(attribute.localId), row, itemWithIndex.index.toString())
                                 }
                                 table.rows.add(row)
                             }
@@ -260,8 +258,8 @@ class OTTableExportService : WakefulService(TAG) {
                                 }
 
                                 val storeObservables = ArrayList<Single<Uri>>()
-                                attributes.filter { it.getHelper(configuredContext).isExternalFile(it) && it.getHelper(configuredContext) is OTFileInvolvedAttributeHelper }.forEach { attr ->
-                                    val helper = attr.getHelper(configuredContext) as OTFileInvolvedAttributeHelper
+                                attributes.filter { it.getHelper(this).isExternalFile(it) && it.getHelper(this) is OTFileInvolvedAttributeHelper }.forEach { attr ->
+                                    val helper = attr.getHelper(this) as OTFileInvolvedAttributeHelper
                                     items.withIndex().forEach { itemWithIndex ->
                                         val itemValue = itemWithIndex.value.getValueOf(attr.localId)
                                         if (itemValue != null && helper.isValueContainingFileInfo(attr, itemValue)) {

@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.analytics
 
+import android.content.Context
 import android.os.Looper
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
@@ -9,6 +10,7 @@ import com.google.gson.JsonObject
 import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.BuildConfig
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_CHANGE_ATTRIBUTE
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_CHANGE_ITEM
@@ -24,7 +26,6 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.SUB_ADD
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.SUB_EDIT
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.SUB_REMOVE
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.TRIGGER_FIRED
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UsageLog
 import kr.ac.snu.hcil.omnitrack.core.di.global.UsageLogger
@@ -38,7 +39,7 @@ import javax.inject.Provider
 /**
  * Created by younghokim on 2017. 11. 28..
  */
-class OTUsageLoggingManager(val configuredContext: ConfiguredContext) : IEventLogger {
+class OTUsageLoggingManager(val app: OTAndroidApp, val context: Context) : IEventLogger {
 
     @field:[Inject UsageLogger]
     lateinit var realmFactory: Factory<Realm>
@@ -47,7 +48,7 @@ class OTUsageLoggingManager(val configuredContext: ConfiguredContext) : IEventLo
     lateinit var uploadRequestProvider: Provider<OneTimeWorkRequest>
 
     init {
-        configuredContext.configuredAppComponent.inject(this)
+        app.applicationComponent.inject(this)
     }
 
     private var logIdGenerator = ConcurrentUniqueLongGenerator()
@@ -60,8 +61,8 @@ class OTUsageLoggingManager(val configuredContext: ConfiguredContext) : IEventLo
             val newLog = realm.createObject(UsageLog::class.java, logIdGenerator.getNewUniqueLong())
             newLog.name = name
             newLog.sub = sub
-            newLog.deviceId = configuredContext.applicationComponent.application().deviceId
-            newLog.userId = configuredContext.configuredAppComponent.getAuthManager().userId
+            newLog.deviceId = app.applicationComponent.application().deviceId
+            newLog.userId = app.applicationComponent.getAuthManager().userId
             newLog.timestamp = timestamp
             newLog.contentJson = content?.toString() ?: "null"
         }
@@ -217,9 +218,9 @@ class OTUsageLoggingManager(val configuredContext: ConfiguredContext) : IEventLo
         }
 
         val content: JsonObject = jsonObject(
-                "versionCode" to configuredContext.applicationContext.versionCode(),
+                "versionCode" to context.applicationContext.versionCode(),
                 "experiment" to BuildConfig.DEFAULT_EXPERIMENT_ID,
-                "packageName" to configuredContext.applicationComponent.application().getPackageName(),
+                "packageName" to app.getPackageName(),
                 "message" to throwable.message,
                 "thread" to thread?.name,
                 "stacktrace" to stackTraceStringBuilder.toString()

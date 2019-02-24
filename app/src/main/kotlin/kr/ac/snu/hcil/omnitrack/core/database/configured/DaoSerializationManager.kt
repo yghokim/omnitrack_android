@@ -6,14 +6,14 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.typeadapters.ServerCompatibleTypeAdapter
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
-import kr.ac.snu.hcil.omnitrack.core.di.configured.*
+import kr.ac.snu.hcil.omnitrack.core.di.global.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017-11-02.
  */
-@Configured
+@Singleton
 class DaoSerializationManager @Inject constructor(
         @ForTrigger val triggerTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTTriggerDAO>>,
         @ForAttribute val attributeTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTAttributeDAO>>,

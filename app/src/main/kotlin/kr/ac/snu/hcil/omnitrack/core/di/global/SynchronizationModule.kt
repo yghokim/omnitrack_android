@@ -1,12 +1,12 @@
-package kr.ac.snu.hcil.omnitrack.core.di.configured
+package kr.ac.snu.hcil.omnitrack.core.di.global
 
 import android.content.Context
 import dagger.Module
 import dagger.Provides
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncQueueDbHelper
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017. 11. 4..
@@ -15,14 +15,14 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncQueueDbHelper
 class SynchronizationModule {
 
     @Provides
-    @Configured
+    @Singleton
     fun provideSyncDbHelper(appContext: Context): SyncQueueDbHelper
     {
         return SyncQueueDbHelper(appContext, "db_synchronization_queue.sqlite")
     }
 
     @Provides
-    @Configured
+    @Singleton
     fun provideClientSideApi(backendDatabaseManager: BackendDbManager): ISynchronizationClientSideAPI
     {
         return backendDatabaseManager

@@ -27,7 +27,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
@@ -220,7 +220,7 @@ class SettingsActivity : AppCompatActivity() {
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
 
-            (requireActivity().application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+            (requireActivity().application as OTAndroidApp).applicationComponent.inject(this)
             languageOnCreation = LocaleHelper.getLanguageCode(requireContext())
         }
 

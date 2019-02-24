@@ -10,9 +10,7 @@ import dagger.Module
 import dagger.Provides
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.di.configured.ConfiguredAppComponent
-import kr.ac.snu.hcil.omnitrack.core.di.configured.ResearchComponent
-import kr.ac.snu.hcil.omnitrack.core.di.configured.TriggerSystemComponent
+import kr.ac.snu.hcil.omnitrack.utils.time.LocalTimeFormats
 import java.io.ByteArrayInputStream
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -20,6 +18,7 @@ import java.security.cert.CertificateEncodingException
 import java.security.cert.CertificateException
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
+import java.util.*
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -27,11 +26,7 @@ import javax.inject.Singleton
 /**
  * Created by Young-Ho on 10/31/2017.
  */
-@Module(subcomponents = [
-    ConfiguredAppComponent::class,
-    TriggerSystemComponent::class,
-    ResearchComponent::class
-])
+@Module()
 class ApplicationModule(private val mApp: OTApp) {
 
     @Provides
@@ -116,6 +111,18 @@ class ApplicationModule(private val mApp: OTApp) {
         } catch (ex: Exception) {
             return ""
         }
+    }
+
+    @Provides
+    @Singleton
+    fun providesPreferredTimeZone(): TimeZone {
+        return TimeZone.getDefault()
+    }
+
+    @Provides
+    @Singleton
+    fun providesLocalTimeFormats(context: Context): LocalTimeFormats {
+        return LocalTimeFormats(context)
     }
 
     private fun byte2HexFormatted(arr: ByteArray): String {

@@ -1,11 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.models
 
+import android.content.Context
 import io.reactivex.Single
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.ISingleNumberAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTRatingAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
@@ -17,7 +18,7 @@ import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
 /**
  * Created by younghokim on 2017. 11. 25..
  */
-open class DurationHeatMapModel(tracker: OTTrackerDAO, timeSpanAttribute: OTAttributeDAO, val numericAttribute: OTAttributeDAO, realm: Realm, val configuredContext: ConfiguredContext) : TrackerChartModel<DurationHeatMapModel.DataPoint>(tracker, realm), IWebBasedChartModel {
+open class DurationHeatMapModel(tracker: OTTrackerDAO, timeSpanAttribute: OTAttributeDAO, val numericAttribute: OTAttributeDAO, realm: Realm, val context: Context) : TrackerChartModel<DurationHeatMapModel.DataPoint>(tracker, realm), IWebBasedChartModel {
 
     data class DataPoint(val dateIndex: Int, val fromDateRatio: Float, val toDateRatio: Float, val value: Double, val cutOnLeft: Boolean, val cutOnRight: Boolean) {
         fun toJsonString(): String {
@@ -36,12 +37,12 @@ open class DurationHeatMapModel(tracker: OTTrackerDAO, timeSpanAttribute: OTAttr
     init {
         resolveIntrinsicRanges(numericAttribute)
 
-        configuredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
     protected fun resolveIntrinsicRanges(attr: OTAttributeDAO) {
         if (attr.type == OTAttributeManager.TYPE_RATING) {
-            val ratingOptions = (attr.getHelper(configuredContext) as OTRatingAttributeHelper).getRatingOptions(attr)
+            val ratingOptions = (attr.getHelper(context) as OTRatingAttributeHelper).getRatingOptions(attr)
             this.intrinsicValueLevels = when (ratingOptions.type) {
                 RatingOptions.DisplayType.Likert -> (ratingOptions.rightMost - ratingOptions.leftMost)
                 RatingOptions.DisplayType.Star -> ratingOptions.stars
@@ -69,7 +70,7 @@ open class DurationHeatMapModel(tracker: OTTrackerDAO, timeSpanAttribute: OTAttr
 
             val data = ArrayList<DataPoint>()
 
-            val xScale = QuantizedTimeScale(configuredContext.applicationContext)
+            val xScale = QuantizedTimeScale(context)
             xScale.setDomain(getTimeScope().from, getTimeScope().to)
             xScale.quantize(currentGranularity)
             cachedDates = xScale.binPointsOnDomain.toList()
@@ -81,7 +82,7 @@ open class DurationHeatMapModel(tracker: OTTrackerDAO, timeSpanAttribute: OTAttr
                     continue
                 }
 
-                val helper = numericAttribute.getHelper(configuredContext)
+                val helper = numericAttribute.getHelper(context)
                 val value: Double = if (helper is ISingleNumberAttributeHelper) {
                     helper.convertValueToSingleNumber(item.getValueOf(numericAttributeLocalId)!!, numericAttribute)
                 } else {

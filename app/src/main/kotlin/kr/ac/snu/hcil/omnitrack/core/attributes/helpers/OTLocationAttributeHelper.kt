@@ -13,7 +13,6 @@ import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LiteMapView
@@ -25,7 +24,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTLocationAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeHelper(configuredContext) {
+class OTLocationAttributeHelper(context: Context) : OTAttributeHelper(context) {
 
     class CurrentLocationFallbackResolver(context: Context) : FallbackPolicyResolver(context, R.string.msg_intrinsic_location, isValueVolatile = true) {
         override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
@@ -60,7 +59,7 @@ class OTLocationAttributeHelper(configuredContext: ConfiguredContext) : OTAttrib
 
     override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver> by lazy {
         val original = super.supportedFallbackPolicies
-        original[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = CurrentLocationFallbackResolver(configuredContext.applicationContext)
+        original[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = CurrentLocationFallbackResolver(context)
         original.remove(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL)
         return@lazy original
     }

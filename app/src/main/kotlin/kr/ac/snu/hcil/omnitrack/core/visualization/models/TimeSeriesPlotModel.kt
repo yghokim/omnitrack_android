@@ -1,11 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.models
 
+import android.content.Context
 import io.reactivex.Single
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.ISingleNumberAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
@@ -16,7 +17,7 @@ import javax.inject.Inject
 /**
  * Created by younghokim on 2017. 11. 24..
  */
-class TimeSeriesPlotModel(tracker: OTTrackerDAO, protected val timeAttribute: OTAttributeDAO, protected val yAttribute: OTAttributeDAO, realm: Realm, val configuredContext: ConfiguredContext) : TrackerChartModel<Pair<Long, Double>>(tracker, realm), IWebBasedChartModel {
+class TimeSeriesPlotModel(tracker: OTTrackerDAO, protected val timeAttribute: OTAttributeDAO, protected val yAttribute: OTAttributeDAO, realm: Realm, val context: Context) : TrackerChartModel<Pair<Long, Double>>(tracker, realm), IWebBasedChartModel {
 
     private val timeAttributeLocalId = timeAttribute.localId
     private val yValueAttributeLocalId = yAttribute.localId
@@ -26,14 +27,14 @@ class TimeSeriesPlotModel(tracker: OTTrackerDAO, protected val timeAttribute: OT
 
     override val name: String
         get() {
-            return String.format(configuredContext.applicationContext.getString(R.string.msg_vis_format_time_number_plot_title), yAttributeName, timeAttributeName)
+            return String.format(context.getString(R.string.msg_vis_format_time_number_plot_title), yAttributeName, timeAttributeName)
         }
 
     @Inject
     protected lateinit var attributeManager: OTAttributeManager
 
     init {
-        configuredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun reloadData(): Single<List<Pair<Long, Double>>> {

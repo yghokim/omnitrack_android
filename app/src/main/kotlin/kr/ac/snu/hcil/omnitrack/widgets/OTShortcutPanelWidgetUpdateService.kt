@@ -16,12 +16,10 @@ import androidx.core.app.TaskStackBuilder
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
-import javax.inject.Inject
 
 /**
  * Created by Young-Ho Kim on 2017-04-04.
@@ -183,9 +181,6 @@ class OTShortcutPanelWidgetUpdateService : Service() {
         return null
     }
 
-    @Inject
-    lateinit var configuredContext: ConfiguredContext
-
     override fun onCreate() {
         super.onCreate()
         (application as OTAndroidApp).applicationComponent.inject(this)
@@ -194,7 +189,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
 
         println("Widget update service action: ${intent.action}")
-        val currentSignedInLevel = configuredContext.configuredAppComponent.getAuthManager().currentSignedInLevel
+        val currentSignedInLevel = (application as OTAndroidApp).applicationComponent.getAuthManager().currentSignedInLevel
             val appWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS) ?: intArrayOf()
             if (appWidgetIds.isNotEmpty()) {
                 println("widget ids: ${appWidgetIds.joinToString(", ")}")

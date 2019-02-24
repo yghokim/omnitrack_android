@@ -264,7 +264,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
         }
 
         override fun getItemViewType(position: Int): Int {
-            return getItem(position).attributeDAO.getInputViewType(configuredContext, false)
+            return getItem(position).attributeDAO.getInputViewType(this@AItemDetailActivity, false)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -379,7 +379,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
                 internalSubscriptions.clear()
 
-                attributeViewModel.attributeDAO.getHelper(configuredContext).refreshInputViewUI(inputView, attributeViewModel.attributeDAO)
+                attributeViewModel.attributeDAO.getHelper(this@AItemDetailActivity).refreshInputViewUI(inputView, attributeViewModel.attributeDAO)
                 internalSubscriptions.add(
                         attributeViewModel.columnNameObservable.subscribe { name ->
                             columnNameView.text = name
@@ -411,12 +411,12 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
                 internalSubscriptions.add(
                         attributeViewModel.onAttributeChanged.subscribe {
-                            attributeViewModel.attributeDAO.getHelper(configuredContext).refreshInputViewUI(inputView, attributeViewModel.attributeDAO)
+                            attributeViewModel.attributeDAO.getHelper(this@AItemDetailActivity).refreshInputViewUI(inputView, attributeViewModel.attributeDAO)
                         }
                 )
 
 
-                connectionIndicatorStubProxy.onBind(attributeViewModel.attributeDAO.getParsedConnection(configuredContext))
+                connectionIndicatorStubProxy.onBind(attributeViewModel.attributeDAO.getParsedConnection(this@AItemDetailActivity))
 
                 internalSubscriptions.add(
                         attributeViewModel.stateObservable.observeOn(AndroidSchedulers.mainThread()).subscribe { state ->
@@ -449,7 +449,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
                                 inputView.valueChanged.suspend = false
                             }
 
-                            TooltipCompat.setTooltipText(timestampIndicator, valueNullable.datum?.timestamp?.let { (applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.getLocalTimeFormats().FORMAT_DATETIME.format(Date(it)) })
+                            TooltipCompat.setTooltipText(timestampIndicator, valueNullable.datum?.timestamp?.let { (applicationContext as OTAndroidApp).applicationComponent.getLocalTimeFormats().FORMAT_DATETIME.format(Date(it)) })
                             setTimestampIndicatorText(valueNullable.datum?.timestamp)
                         }
                 )

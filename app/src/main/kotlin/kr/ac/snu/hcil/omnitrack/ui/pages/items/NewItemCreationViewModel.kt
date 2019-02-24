@@ -5,10 +5,10 @@ import android.os.Bundle
 import com.google.gson.JsonObject
 import io.reactivex.Maybe
 import io.reactivex.subjects.BehaviorSubject
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTItemBuilderFieldValueEntry
 import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
@@ -45,8 +45,8 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         return this.reservedNewItemId!!
     }
 
-    override fun onInject(configuredContext: ConfiguredContext) {
-        configuredContext.configuredAppComponent.inject(this)
+    override fun onInject(app: OTAndroidApp) {
+        getApplication<OTApp>().applicationComponent.inject(this)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -100,7 +100,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
                 this.itemBuilderDao = realm.copyFromRealm(storedBuilderDao)
             }
 
-            this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao, configuredContext)
+            this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao, getApplication())
 
             for (key in this.builderWrapper.keys) {
                 val value = this.builderWrapper.getValueInformationOf(key)

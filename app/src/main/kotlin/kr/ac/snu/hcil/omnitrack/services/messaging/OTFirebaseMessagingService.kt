@@ -22,7 +22,6 @@ import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.di.global.InformationUpload
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
@@ -56,9 +55,6 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     @Inject
-    lateinit var configuredContext: ConfiguredContext
-
-    @Inject
     lateinit var firebaseInstanceId: FirebaseInstanceId
 
 
@@ -86,7 +82,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
                                     val token = firebaseInstanceId.getToken(BuildConfig.FIREBASE_CLOUD_MESSAGING_SENDER_ID, "FCM")
                                     if (token != null) {
                                         println("FirebaseInstanceId token - $token")
-                                        val currentUserId = configuredContext.configuredAppComponent.getAuthManager().userId
+                                        val currentUserId = (application as OTAndroidApp).applicationComponent.getAuthManager().userId
                                         if (currentUserId != null) {
                                             val requestBuilder = informationUploadRequestBuilderFactory.get()
                                             requestBuilder.addTag(OTInformationUploadWorker.INFORMATION_DEVICE)
@@ -121,15 +117,15 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
                         val data = remoteMessage.data
                         if (data != null && data.isNotEmpty()) {
 
-                            configuredContext.configuredAppComponent.getEventLogger().logEvent(TAG, "received_gcm_command", jsonObject("command" to data.get("command")))
+                            (application as OTAndroidApp).applicationComponent.getEventLogger().logEvent(TAG, "received_gcm_command", jsonObject("command" to data.get("command")))
                             try {
                                 when (data.get("command")) {
-                                    COMMAND_SYNC -> handleSyncCommand(data, configuredContext)
-                                    COMMAND_SIGNOUT -> handleSignOutCommand(data, configuredContext)
-                                    COMMAND_DUMP_DB -> handleDumpCommand(data, configuredContext)
-                                    COMMAND_EXPERIMENT_DROPPED -> handleExperimentDropout(data, configuredContext)
-                                    COMMAND_TEXT_MESSAGE -> handleMessageCommand(data, configuredContext)
-                                    COMMAND_TEST_TRIGGER_PING -> handleTestTriggerPing(data, configuredContext)
+                                    COMMAND_SYNC -> handleSyncCommand(data)
+                                    COMMAND_SIGNOUT -> handleSignOutCommand(data)
+                                    COMMAND_DUMP_DB -> handleDumpCommand(data)
+                                    COMMAND_EXPERIMENT_DROPPED -> handleExperimentDropout(data)
+                                    COMMAND_TEXT_MESSAGE -> handleMessageCommand(data)
+                                    COMMAND_TEST_TRIGGER_PING -> handleTestTriggerPing(data)
                                 }
                             } catch (ex: Exception) {
                                 ex.printStackTrace()
@@ -143,45 +139,47 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
-    private fun handleSyncCommand(data: Map<String, String>, configuredContext: ConfiguredContext) {
+    private fun handleSyncCommand(data: Map<String, String>) {
         println("received Firebase Cloud message - sync")
         val syncInfoArray = Gson().fromJson<JsonArray>(data.get("syncInfoArray"), JsonArray::class.java)
         var registeredCount = 0
         syncInfoArray.forEach { syncInfo ->
             val typeString = (syncInfo as JsonObject).get("type")?.asString
             if (typeString != null) {
-                configuredContext.configuredAppComponent.getSyncManager().registerSyncQueue(ESyncDataType.valueOf(typeString), SyncDirection.DOWNLOAD, false, false)
+                (application as OTAndroidApp).applicationComponent.getSyncManager().registerSyncQueue(ESyncDataType.valueOf(typeString), SyncDirection.DOWNLOAD, false, false)
                 registeredCount++
             }
         }
 
         if (registeredCount > 0) {
-            configuredContext.configuredAppComponent.getSyncManager().reserveSyncServiceNow()
+            (application as OTAndroidApp).applicationComponent.getSyncManager().reserveSyncServiceNow()
         }
     }
 
-    private fun handleDumpCommand(data: Map<String, String>, configuredContext: ConfiguredContext) {
-        configuredContext.configuredAppComponent.getSyncManager().queueFullSync(SyncDirection.UPLOAD, true)
-        configuredContext.configuredAppComponent.getSyncManager().reserveSyncServiceNow()
+    private fun handleDumpCommand(data: Map<String, String>) {
+        (application as OTAndroidApp).applicationComponent.getSyncManager().apply {
+            queueFullSync(SyncDirection.UPLOAD, true)
+            reserveSyncServiceNow()
+        }
     }
 
-    private fun handleSignOutCommand(data: Map<String, String>, configuredContext: ConfiguredContext) {
-        configuredContext.configuredAppComponent.getAuthManager().signOut()
+    private fun handleSignOutCommand(data: Map<String, String>) {
+        (application as OTAndroidApp).applicationComponent.getAuthManager().signOut()
     }
 
-    private fun handleExperimentDropout(data: Map<String, String>, configuredContext: ConfiguredContext) {
+    private fun handleExperimentDropout(data: Map<String, String>) {
         println("experiment dropout message received")
         if (data.containsKey("experimentId")) {
             val experimentId = data["experimentId"]!!
             if (BuildConfig.DEFAULT_EXPERIMENT_ID == experimentId) {
-                configuredContext.configuredAppComponent.getAuthManager().signOut()
+                (application as OTAndroidApp).applicationComponent.getAuthManager().signOut()
             }
         } else {
             println("experiment dropout message does not contain the experiment ID.")
         }
     }
 
-    private fun handleMessageCommand(data: Map<String, String>, configuredContext: ConfiguredContext) {
+    private fun handleMessageCommand(data: Map<String, String>) {
         val title = data.get("messageTitle")
         val content = data.get("messageContent")
         val contentHtml = TextHelper.fromHtml(content ?: "")
@@ -198,14 +196,14 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
         notificationManager.notify(TAG, System.currentTimeMillis().toInt(), notificationBuilder.build())
     }
 
-    private fun handleTestTriggerPing(data: Map<String, String>, configuredContext: ConfiguredContext) {
+    private fun handleTestTriggerPing(data: Map<String, String>) {
         val triggerId = data.get("triggerId")
-        val userId = configuredContext.configuredAppComponent.getAuthManager().userId
+        val userId = (application as OTAndroidApp).applicationComponent.getAuthManager().userId
         println("received a test trigger ping - ${triggerId}")
         if (triggerId != null && triggerId.isNotBlank() && userId != null) {
-            configuredContext.configuredAppComponent.backendRealmFactory().get().use { realm ->
-                val trigger = configuredContext.configuredAppComponent.getBackendDbManager().getTriggerQueryWithId(triggerId, realm).equalTo(BackendDbManager.FIELD_USER_ID, userId).findFirst()
-                trigger?.getPerformFireCompletable(System.currentTimeMillis(), jsonObject("source" to "ping_test"), configuredContext)?.blockingAwait()
+            (application as OTAndroidApp).applicationComponent.backendRealmFactory().get().use { realm ->
+                val trigger = (application as OTAndroidApp).applicationComponent.getBackendDbManager().getTriggerQueryWithId(triggerId, realm).equalTo(BackendDbManager.FIELD_USER_ID, userId).findFirst()
+                trigger?.getPerformFireCompletable(System.currentTimeMillis(), jsonObject("source" to "ping_test"), this.applicationContext)?.blockingAwait()
             }
 
         }

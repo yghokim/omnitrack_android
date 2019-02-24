@@ -91,7 +91,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             println("trigger type selected - $type")
             //viewModel.saveTrigger(makeNewDefaultTrigger(type))
             val defaultTrigger = makeNewDefaultTrigger(type)
-            startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(context!!, configuredContext, defaultTrigger, viewModel.defaultTriggerInterfaceOptions), DETAIL_REQUEST_CODE)
+            startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(context!!, defaultTrigger, viewModel.defaultTriggerInterfaceOptions), DETAIL_REQUEST_CODE)
             triggerTypeDialog.dismiss()
         }.create()
     }
@@ -143,7 +143,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             val conditionTypes = viewModel.defaultTriggerInterfaceOptions.supportedConditionTypes
             if (conditionTypes?.size == 1) {
                 //immediately create a trigger.
-                startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(context!!, configuredContext, makeNewDefaultTrigger(conditionTypes.first()), viewModel.defaultTriggerInterfaceOptions), DETAIL_REQUEST_CODE)
+                startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(context!!, makeNewDefaultTrigger(conditionTypes.first()), viewModel.defaultTriggerInterfaceOptions), DETAIL_REQUEST_CODE)
             } else {
                 //show dialog
                 triggerTypeDialog.show()
@@ -216,7 +216,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         if (requestCode == DETAIL_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
             if (data.hasExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO)) {
                 val resultDao =
-                        (requireActivity().application as OTAndroidApp).currentConfiguredContext.daoSerializationComponent.manager().parseTrigger(data.getStringExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO))
+                        (requireActivity().application as OTAndroidApp).daoSerializationComponent.manager().parseTrigger(data.getStringExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO))
                 viewModel.addNewTrigger(resultDao)
             }
         }
@@ -293,7 +293,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                     val intent = if (viewModel is AManagedTriggerListViewModel) {
                         TriggerDetailActivity.makeEditTriggerIntent(context!!, attachedViewModel!!.objectId!!, viewModel.defaultTriggerInterfaceOptions)
                     } else if (viewModel is OfflineTriggerListViewModel) {
-                        TriggerDetailActivity.makeEditTriggerIntent(context!!, configuredContext, attachedViewModel!!.dao, viewModel.defaultTriggerInterfaceOptions)
+                        TriggerDetailActivity.makeEditTriggerIntent(context!!, attachedViewModel!!.dao, viewModel.defaultTriggerInterfaceOptions)
                     } else throw UnsupportedOperationException()
 
                     startActivityForResult(intent, DETAIL_REQUEST_CODE)
@@ -415,7 +415,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                     triggerViewModel.triggerCondition.subscribe { condition ->
                         println("condition changed")
                         triggerViewModel.triggerConditionType.value?.let { conditionType ->
-                            val displayView = OTTriggerViewFactory.getConditionViewProvider(conditionType)?.getTriggerDisplayView(currentHeaderView, triggerViewModel.dao, requireActivity(), configuredContext)
+                            val displayView = OTTriggerViewFactory.getConditionViewProvider(conditionType)?.getTriggerDisplayView(currentHeaderView, triggerViewModel.dao, requireActivity())
                             if (displayView != null) {
                                 refreshHeaderView(displayView)
                             } else {

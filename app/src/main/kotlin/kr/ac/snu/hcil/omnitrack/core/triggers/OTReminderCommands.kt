@@ -26,7 +26,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerReminderEntry
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.di.global.ReminderNotification
@@ -84,7 +84,7 @@ class OTReminderCommands(val context: Context) {
     protected lateinit var dbManager: BackendDbManager
 
     init {
-        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
     fun isReminderPromptingToTracker(trackerId: String): Boolean {

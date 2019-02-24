@@ -115,7 +115,7 @@ class OTDeviceStatusService : Service() {
 
             when (intent.action) {
                 Intent.ACTION_BATTERY_LOW, Intent.ACTION_BATTERY_OKAY, Intent.ACTION_POWER_CONNECTED, Intent.ACTION_POWER_DISCONNECTED -> {
-                    val eventLogger = (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.getEventLogger()
+                    val eventLogger = (context.applicationContext as OTAndroidApp).applicationComponent.getEventLogger()
                     val batteryStatus = getBatteryStatus(context)
 
                     val batteryPercentage = getBatteryPercentage(batteryStatus)
@@ -137,7 +137,7 @@ class OTDeviceStatusService : Service() {
         private fun onDeviceActive(context: Context) {
             //Do Samsung-specific optimization tweaking
             if (Build.MANUFACTURER == "samsung") {
-                val triggerSystemManager = (context.applicationContext as OTAndroidApp).currentConfiguredContext.triggerSystemComponent.getTriggerSystemManager()
+                val triggerSystemManager = (context.applicationContext as OTAndroidApp).triggerSystemComponent.getTriggerSystemManager()
                 triggerSystemManager.get().refreshReservedAlarms()
             }
         }

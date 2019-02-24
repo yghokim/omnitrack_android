@@ -5,7 +5,6 @@ import android.content.Context
 import android.view.View
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
@@ -17,7 +16,7 @@ import java.util.*
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTAudioRecordAttributeHelper(configuredContext: ConfiguredContext) : OTFileInvolvedAttributeHelper(configuredContext) {
+class OTAudioRecordAttributeHelper(context: Context) : OTFileInvolvedAttributeHelper(context) {
 
     private val permissions = arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 

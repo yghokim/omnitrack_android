@@ -11,7 +11,6 @@ import dagger.Lazy
 import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import javax.inject.Inject
 
 /**
@@ -26,18 +25,15 @@ open class OTFragment : Fragment(), LifecycleObserver {
     @Inject
     protected lateinit var eventLogger: Lazy<IEventLogger>
 
-    @Inject
-    protected lateinit var configuredContext: ConfiguredContext
-
     private var shownAt: Long? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        onInject((context.applicationContext as OTAndroidApp).currentConfiguredContext)
+        onInject((context.applicationContext as OTAndroidApp))
     }
 
-    protected open fun onInject(configuredContext: ConfiguredContext) {
-        configuredContext.configuredAppComponent.inject(this)
+    protected open fun onInject(app: OTAndroidApp) {
+        app.applicationComponent.inject(this)
     }
 
     override fun onDestroy() {

@@ -7,7 +7,8 @@ import io.realm.OrderedCollectionChangeSet
 import io.realm.OrderedRealmCollectionChangeListener
 import io.realm.RealmResults
 import io.realm.Sort
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
@@ -45,8 +46,8 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
             } else return false
         }
 
-    override fun onInject(configuredContext: ConfiguredContext) {
-        configuredContext.configuredAppComponent.inject(this)
+    override fun onInject(app: OTAndroidApp) {
+        getApplication<OTApp>().applicationComponent.inject(this)
     }
 
     override fun onUserAttached(newUserId: String) {

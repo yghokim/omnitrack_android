@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
+import android.content.Context
 import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.R
@@ -8,7 +9,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.NumericSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -22,7 +22,7 @@ import java.math.BigDecimal
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTNumberAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeHelper(configuredContext), ISingleNumberAttributeHelper {
+class OTNumberAttributeHelper(context: Context) : OTAttributeHelper(context), ISingleNumberAttributeHelper {
 
     companion object {
         const val NUMBERSTYLE = "style"
@@ -31,7 +31,7 @@ class OTNumberAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
 
     override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
         get() = super.supportedFallbackPolicies.apply{
-            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(configuredContext.applicationContext, R.string.msg_intrinsic_number, false) {
+            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(context.applicationContext, R.string.msg_intrinsic_number, false) {
                 override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
                     return Single.just(Nullable(0))
                 }
@@ -72,7 +72,7 @@ class OTNumberAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
     override fun getPropertyTitle(propertyKey: String): String {
         return when (propertyKey) {
             NUMBERSTYLE -> ""
-            BUTTON_UNIT -> configuredContext.getString(R.string.msg_number_button_unit)
+            BUTTON_UNIT -> context.getString(R.string.msg_number_button_unit)
             else -> ""
         }
     }

@@ -23,7 +23,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
@@ -90,7 +90,7 @@ class AttributeEditDialogFragment : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //retainInstance = true
-        (activity?.application as? OTAndroidApp)?.currentConfiguredContext?.configuredAppComponent?.inject(this)
+        (requireActivity().application as OTAndroidApp).applicationComponent.inject(this)
         realm = realmFactory.get()
 
         viewModel = ViewModelProviders.of(this).get(ViewModel::class.java)
@@ -267,7 +267,7 @@ class AttributeEditDialogFragment : DialogFragment() {
         val attributeName = BehaviorSubject.create<String>()
 
         fun makeItemView(context: Context, originalView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
-            val view = attribute.getHelper(configuredContext).getInputView(context, false, attribute, originalView)
+            val view = attribute.getHelper(getApplication()).getInputView(context, false, attribute, originalView)
             view.boundAttributeObjectId = attribute.objectId
             return view
         }

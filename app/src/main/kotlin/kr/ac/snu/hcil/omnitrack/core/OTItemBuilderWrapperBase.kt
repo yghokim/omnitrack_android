@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core
 
+import android.content.Context
 import android.util.Log
 import com.google.gson.JsonObject
 import io.reactivex.Flowable
@@ -7,8 +8,8 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTItemBuilderDAO
@@ -20,7 +21,7 @@ import javax.inject.Provider
 /**
  * Created by Young-Ho Kim on 16. 7. 25
  */
-class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext: ConfiguredContext) {
+class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val context: Context) {
 
     enum class EAttributeValueState {
         Processing, GettingExternalValue, Idle
@@ -44,10 +45,11 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext:
     fun saveToItem(itemDao: OTItemDAO?, loggingSource: ItemLoggingSource?, metadata: JsonObject?): OTItemDAO {
         val itemDaoToSave = itemDao ?: OTItemDAO()
         if (itemDao == null) {
-            itemDaoToSave.deviceId = (configuredContext.applicationComponent.application()).deviceId
+            val app = (context.applicationContext as OTAndroidApp)
+            itemDaoToSave.deviceId = app.deviceId
             itemDaoToSave.loggingSource = loggingSource ?: ItemLoggingSource.Unspecified
             itemDaoToSave.trackerId = dao.tracker?.objectId
-            itemDaoToSave.timezone = configuredContext.configuredAppComponent.getPreferredTimeZone().id
+            itemDaoToSave.timezone = app.applicationComponent.getPreferredTimeZone().id
             println("item timezone: ${itemDaoToSave.timezone}")
         } else {
             itemDaoToSave.userUpdatedAt = System.currentTimeMillis()
@@ -75,13 +77,13 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext:
                 val realm = realmProvider.get()
                 Observable.merge(attributes.mapIndexed { i, attr: OTAttributeDAO ->
                     val attrLocalId = attr.localId
-                    val connection = attr.getParsedConnection(configuredContext)
+                    val connection = attr.getParsedConnection(context)
                     if (connection != null && connection.isAvailableToRequestValue()) {
                         //Connection
                         connection.getRequestedValue(this).flatMap { data ->
                             if (data.datum == null) {
                                 println("ValueConnection result was null. send fallback value")
-                                return@flatMap attr.getFallbackValue(configuredContext, realm).toFlowable()
+                                return@flatMap attr.getFallbackValue(context, realm).toFlowable()
                             } else {
                                 println("Received valueConnection result - ${data.datum}")
                                 return@flatMap Flowable.just(data)
@@ -89,7 +91,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext:
                         }.onErrorResumeNext { err: Throwable ->
                             err.printStackTrace()
                             OTApp.logger.writeSystemLog(Log.getStackTraceString(err), "OTItemBuilderWrapperBase")
-                            attr.getFallbackValue(configuredContext, realm).toFlowable()
+                            attr.getFallbackValue(context, realm).toFlowable()
                         }.map { nullable: Nullable<out Any> -> Pair(attrLocalId, AnyValueWithTimestamp(nullable)) }
                                 .subscribeOn(Schedulers.io())
                                 .doOnSubscribe {
@@ -98,7 +100,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext:
                     } else {
 
                         println("No connection. use fallback value: $attrLocalId")
-                        return@mapIndexed attr.getFallbackValue(configuredContext, realm).map { nullable ->
+                        return@mapIndexed attr.getFallbackValue(context, realm).map { nullable ->
                             println("No connection. received fallback value: $attrLocalId, ${nullable.datum}")
                             Pair(attrLocalId, AnyValueWithTimestamp(nullable))
                         }.doOnSubscribe {

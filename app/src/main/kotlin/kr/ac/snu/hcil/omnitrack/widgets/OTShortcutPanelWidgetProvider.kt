@@ -10,13 +10,11 @@ import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemActivity
-import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017. 3. 30..
@@ -38,9 +36,6 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
         }
     }
 
-    @Inject
-    lateinit var configuredContext: ConfiguredContext
-
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
         super.onDeleted(context, appWidgetIds)
         val editor = OTShortcutPanelWidgetUpdateService.getPreferences(context).edit()
@@ -52,7 +47,8 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
+        val app = context.applicationContext as OTAndroidApp
+        app.applicationComponent.inject(this)
         if (intent.action == OTApp.BROADCAST_ACTION_USER_SIGNED_IN || intent.action == OTApp.BROADCAST_ACTION_USER_SIGNED_OUT) {
             val updateIntent = Intent(context, OTShortcutPanelWidgetUpdateService::class.java)
 
@@ -69,7 +65,7 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
         } else if (intent.action == ACTION_TRACKER_CLICK_EVENT) {
 
             val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
-            val realm = configuredContext.configuredAppComponent.backendRealmFactory().get()
+            val realm = app.applicationComponent.backendRealmFactory().get()
             val trackerDao = realm.where(OTTrackerDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, trackerId).findFirst()
             if (trackerDao?.isIndependentInputLocked() == true) {
                 val reminderCommands = OTReminderCommands(context)

@@ -47,7 +47,7 @@ class FieldPresetSelectionBottomSheetFragment : DismissingBottomSheetDialogFragm
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        (requireActivity().application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (requireActivity().application as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -4,6 +4,7 @@ import android.content.Context
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
@@ -11,7 +12,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimeSpanIntervalSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimeSpanPivotalSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemValueEntryDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
@@ -30,7 +30,7 @@ import java.util.*
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTTimeSpanAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeHelper(configuredContext) {
+class OTTimeSpanAttributeHelper(context: Context) : OTAttributeHelper(context) {
 
     companion object {
         const val PROPERTY_GRANULARITY = "granularity"
@@ -43,9 +43,11 @@ class OTTimeSpanAttributeHelper(configuredContext: ConfiguredContext) : OTAttrib
     }
 
     val formats = mapOf(
-            Pair(OTTimeAttributeHelper.GRANULARITY_DAY, SimpleDateFormat(configuredContext.applicationContext.getString(R.string.property_time_format_granularity_day))),
-            Pair(OTTimeAttributeHelper.GRANULARITY_MINUTE, SimpleDateFormat(configuredContext.applicationContext.getString(R.string.property_time_format_granularity_minute)))
+            Pair(OTTimeAttributeHelper.GRANULARITY_DAY, SimpleDateFormat(context.getString(R.string.property_time_format_granularity_day))),
+            Pair(OTTimeAttributeHelper.GRANULARITY_MINUTE, SimpleDateFormat(context.getString(R.string.property_time_format_granularity_minute)))
     )
+
+    private val app = context.applicationContext as OTAndroidApp
 
     override fun getValueNumericCharacteristics(attribute: OTAttributeDAO): NumericCharacteristics = NumericCharacteristics(true, false)
 
@@ -94,7 +96,7 @@ class OTTimeSpanAttributeHelper(configuredContext: ConfiguredContext) : OTAttrib
 
     override fun getPropertyTitle(propertyKey: String): String {
         return when (propertyKey) {
-            PROPERTY_GRANULARITY -> configuredContext.applicationContext.getString(R.string.property_time_granularity)
+            PROPERTY_GRANULARITY -> context.applicationContext.getString(R.string.property_time_granularity)
             else -> ""
         }
     }
@@ -123,13 +125,13 @@ class OTTimeSpanAttributeHelper(configuredContext: ConfiguredContext) : OTAttrib
 
     override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
         get() = super.supportedFallbackPolicies.apply {
-            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(configuredContext.applicationContext, R.string.msg_intrinsic_time, isValueVolatile = true) {
+            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(context.applicationContext, R.string.msg_intrinsic_time, isValueVolatile = true) {
                 override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
-                    return Single.just(Nullable(TimeSpan().apply { this.timeZone = configuredContext.configuredAppComponent.getPreferredTimeZone() }))
+                    return Single.just(Nullable(TimeSpan().apply { this.timeZone = app.applicationComponent.getPreferredTimeZone() }))
                 }
             }
 
-            this[FALLBACK_POLICY_ID_TIMESPAN_CONNECT_PREVIOUS] = object : FallbackPolicyResolver(configuredContext.applicationContext, R.string.msg_attribute_fallback_policy_timespan_connect_previous, isValueVolatile = true) {
+            this[FALLBACK_POLICY_ID_TIMESPAN_CONNECT_PREVIOUS] = object : FallbackPolicyResolver(context.applicationContext, R.string.msg_attribute_fallback_policy_timespan_connect_previous, isValueVolatile = true) {
                 override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
                     return Single.defer {
                         val previousNotNullEntry = try {

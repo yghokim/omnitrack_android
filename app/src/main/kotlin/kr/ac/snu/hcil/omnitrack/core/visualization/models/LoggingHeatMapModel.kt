@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.models
 
+import android.content.Context
 import android.graphics.Canvas
 import android.text.format.DateUtils
 import androidx.core.content.ContextCompat
@@ -7,8 +8,8 @@ import androidx.core.graphics.ColorUtils
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
@@ -33,7 +34,7 @@ import java.util.*
  */
 
 
-class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, val configuredContext: ConfiguredContext, timeAttribute: OTAttributeDAO? = null) : TrackerChartModel<ITimeBinnedHeatMap.CounterVector>(tracker, realm), ITimeBinnedHeatMap, INativeChartModel {
+class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, val context: Context, timeAttribute: OTAttributeDAO? = null) : TrackerChartModel<ITimeBinnedHeatMap.CounterVector>(tracker, realm), ITimeBinnedHeatMap, INativeChartModel {
 
     val hoursInYBin = 2
 
@@ -41,7 +42,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, val configuredCon
     val timeAttributeName: String? = timeAttribute?.name
 
     init {
-        configuredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
     private fun getTimestampOfItem(item: OTItemDAO): Long? {
@@ -52,7 +53,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, val configuredCon
 
     override fun reloadData(): Single<List<ITimeBinnedHeatMap.CounterVector>> {
         val data = ArrayList<ITimeBinnedHeatMap.CounterVector>()
-        val xScale = QuantizedTimeScale(configuredContext.applicationContext)
+        val xScale = QuantizedTimeScale(context)
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
@@ -154,15 +155,15 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, val configuredCon
     override val name: String
         get() {
             return if (timeAttributeLocalId != null) {
-                String.format(configuredContext.applicationContext.getString(R.string.msg_vis_logging_heatmap_title_format_with_time_attr), tracker.name, timeAttributeName)
-            } else String.format(configuredContext.applicationContext.resources.getString(R.string.msg_vis_logging_heatmap_title_format), tracker.name)
+                String.format(context.getString(R.string.msg_vis_logging_heatmap_title_format_with_time_attr), tracker.name, timeAttributeName)
+            } else String.format(context.resources.getString(R.string.msg_vis_logging_heatmap_title_format), tracker.name)
         }
 
     override fun getChartDrawer(): AChartDrawer {
         return HeatMapDrawer()
     }
 
-    inner class HeatMapDrawer : ATimelineChartDrawer(configuredContext.applicationContext) {
+    inner class HeatMapDrawer : ATimelineChartDrawer(context) {
         override val aspectRatio: Float = 1.7f
 
         val verticalAxis = Axis(context, Axis.Pivot.LEFT)
@@ -173,8 +174,8 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, val configuredCon
 
         init {
 
-            horizontalAxis.gridLinePaint.color = ContextCompat.getColor(configuredContext.applicationContext, R.color.frontalBackground)
-            verticalAxis.gridLinePaint.color = ContextCompat.getColor(configuredContext.applicationContext, R.color.frontalBackground)
+            horizontalAxis.gridLinePaint.color = ContextCompat.getColor(context, R.color.frontalBackground)
+            verticalAxis.gridLinePaint.color = ContextCompat.getColor(context, R.color.frontalBackground)
 
             verticalAxis.style = Axis.TickLabelStyle.Small
 
@@ -256,7 +257,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, val configuredCon
 
                     cellGroup.appendEnterSelection { count ->
                         val newCell = RectElement<Float>()
-                        newCell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(configuredContext.applicationContext, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
+                        newCell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(context, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
                         mapCellRectToSpace(newCell, datum.value.time, count.index)
                         newCell
                     }
@@ -269,14 +270,14 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, val configuredCon
                     rectList.setData(datum.value.distribution.toList())
                     rectList.appendEnterSelection { count ->
                         val newCell = RectElement<Float>()
-                        newCell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(configuredContext.applicationContext, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
+                        newCell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(context, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
                         mapCellRectToSpace(newCell, datum.value.time, count.index)
                         newCell
                     }
 
                     rectList.updateElement { count, cell ->
                         mapCellRectToSpace(cell as RectElement<Float>, datum.value.time, count.index)
-                        cell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(configuredContext.applicationContext, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
+                        cell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(context, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
                     }
 
                     rectList.removeElements(rectList.getExitElements())
@@ -288,7 +289,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, val configuredCon
         }
 
         override fun onDraw(canvas: Canvas) {
-            fillRect(plotAreaRect, ContextCompat.getColor(configuredContext.applicationContext, R.color.editTextFormBackground), canvas)
+            fillRect(plotAreaRect, ContextCompat.getColor(context, R.color.editTextFormBackground), canvas)
 
             super.onDraw(canvas)
         }

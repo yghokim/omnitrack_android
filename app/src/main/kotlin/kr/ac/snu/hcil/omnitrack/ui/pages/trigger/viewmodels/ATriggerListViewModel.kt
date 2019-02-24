@@ -5,9 +5,9 @@ import android.os.Bundle
 import androidx.annotation.StringRes
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import java.util.*
@@ -30,8 +30,8 @@ abstract class ATriggerListViewModel(app: Application) : RealmViewModel(app) {
 
     open val defaultTriggerInterfaceOptions: TriggerInterfaceOptions = TriggerInterfaceOptions()
 
-    override fun onInject(configuredContext: ConfiguredContext) {
-        configuredContext.configuredAppComponent.inject(this)
+    override fun onInject(app: OTAndroidApp) {
+        app.applicationComponent.inject(this)
     }
 
     protected open fun beforeAddNewTrigger(daoToAdd: OTTriggerDAO) {

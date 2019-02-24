@@ -21,7 +21,7 @@ class OTResearchSynchronizationWorker(context: Context, workerParams: WorkerPara
     lateinit var researchManager: ResearchManager
 
     init {
-        (context.applicationContext as OTAndroidApp).currentConfiguredContext.researchComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).researchComponent.inject(this)
     }
 
     override fun createWork(): Single<Result> {

@@ -10,7 +10,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ChoiceSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.ChoiceCategoricalBarChartModel
@@ -25,7 +24,7 @@ import java.util.*
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTChoiceAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeHelper(configuredContext) {
+class OTChoiceAttributeHelper(context: Context) : OTAttributeHelper(context) {
 
     companion object {
         const val PROPERTY_MULTISELECTION = "multiSelection"
@@ -80,9 +79,9 @@ class OTChoiceAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
 
     override fun getPropertyTitle(propertyKey: String): String {
         return when (propertyKey) {
-            PROPERTY_MULTISELECTION -> configuredContext.applicationContext.getString(R.string.property_choice_allow_multiple_selections)
-            PROPERTY_ALLOW_APPENDING_FROM_VIEW -> configuredContext.applicationContext.getString(R.string.msg_allow_appending_from_view)
-            PROPERTY_ENTRIES -> configuredContext.applicationContext.getString(R.string.property_choice_entries)
+            PROPERTY_MULTISELECTION -> context.applicationContext.getString(R.string.property_choice_allow_multiple_selections)
+            PROPERTY_ALLOW_APPENDING_FROM_VIEW -> context.applicationContext.getString(R.string.msg_allow_appending_from_view)
+            PROPERTY_ENTRIES -> context.applicationContext.getString(R.string.property_choice_entries)
             else -> ""
         }
     }
@@ -157,7 +156,7 @@ class OTChoiceAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
     }
 
     override fun makeRecommendedChartModels(attribute: OTAttributeDAO, realm: Realm): Array<ChartModel<*>> {
-        return arrayOf(ChoiceCategoricalBarChartModel(attribute, realm, configuredContext))
+        return arrayOf(ChoiceCategoricalBarChartModel(attribute, realm, context))
     }
 
     private fun getChoiceTexts(attribute: OTAttributeDAO, value: IntArray): List<String> {

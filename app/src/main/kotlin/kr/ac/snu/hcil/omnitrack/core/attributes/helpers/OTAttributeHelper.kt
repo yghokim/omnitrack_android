@@ -7,17 +7,16 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
 import io.realm.Sort
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -33,19 +32,18 @@ import kotlin.collections.set
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-@Configured
-abstract class OTAttributeHelper(protected val configuredContext: ConfiguredContext) {
+abstract class OTAttributeHelper(protected val context: Context) {
 
     protected val propertyManager: OTPropertyManager
-        get() = configuredContext.configuredAppComponent.getPropertyManager()
+        get() = (context.applicationContext as OTAndroidApp).applicationComponent.getPropertyManager()
 
-    val FALLBACK_POLICY_RESOLVER_EMPTY_VALUE = object : FallbackPolicyResolver(configuredContext.applicationContext, R.string.msg_empty_value) {
+    val FALLBACK_POLICY_RESOLVER_EMPTY_VALUE = object : FallbackPolicyResolver(context.applicationContext, R.string.msg_empty_value) {
         override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
             return Single.just<Nullable<out Any>>(Nullable(null)).observeOn(AndroidSchedulers.mainThread())
         }
     }
 
-    val FALLBACK_POLICY_RESOLVER_PREVIOUS_VALUE = object : FallbackPolicyResolver(configuredContext.applicationContext, R.string.msg_attribute_fallback_policy_last, isValueVolatile = true) {
+    val FALLBACK_POLICY_RESOLVER_PREVIOUS_VALUE = object : FallbackPolicyResolver(context.applicationContext, R.string.msg_attribute_fallback_policy_last, isValueVolatile = true) {
         override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
 
             return Single.defer {
@@ -155,8 +153,6 @@ abstract class OTAttributeHelper(protected val configuredContext: ConfiguredCont
         if (initialValue != null)
             view.value = initialValue
         return view
-
-        return view
     }
 
     open fun makePropertyViews(context: Context): Collection<Pair<String, View>> {
@@ -170,7 +166,7 @@ abstract class OTAttributeHelper(protected val configuredContext: ConfiguredCont
     //Input Values=======================================================================================================
 
     open fun isAttributeValueVolatile(attribute: OTAttributeDAO): Boolean {
-        return attribute.serializedConnection?.let { configuredContext.configuredAppComponent.getConnectionTypeAdapter().fromJson(it) }?.source != null
+        return attribute.serializedConnection?.let { (context.applicationContext as OTAndroidApp).applicationComponent.getConnectionTypeAdapter().fromJson(it) }?.source != null
                 || supportedFallbackPolicies[attribute.fallbackValuePolicy]?.isValueVolatile == true
     }
 

@@ -19,7 +19,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerReminderEntry
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
@@ -59,7 +59,7 @@ class NewItemActivity : AItemDetailActivity<NewItemCreationViewModel>(NewItemCre
 
 
     override fun onInject(app: OTAndroidApp) {
-        app.currentConfiguredContext.configuredAppComponent.inject(this)
+        app.applicationComponent.inject(this)
     }
 
     override fun initViewModel(viewModel: NewItemCreationViewModel, savedInstanceState: Bundle?) {
@@ -169,7 +169,7 @@ class NewItemActivity : AItemDetailActivity<NewItemCreationViewModel>(NewItemCre
         val needToStoreBuilder = if (viewModel.isValid) {
             if (viewModel.isViewModelsDirty()) {
                 true
-            } else currentAttributeViewModelList.any { it.attributeDAO.getHelper(configuredContext).isAttributeValueVolatile(it.attributeDAO) }
+            } else currentAttributeViewModelList.any { it.attributeDAO.getHelper(this@NewItemActivity).isAttributeValueVolatile(it.attributeDAO) }
         } else {
             false
         }

@@ -9,16 +9,16 @@ import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.OTExperimentDAO
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Research
+import kr.ac.snu.hcil.omnitrack.core.di.global.Research
 import kr.ac.snu.hcil.omnitrack.core.net.ExperimentInvitation
 import kr.ac.snu.hcil.omnitrack.core.net.IResearchServerAPI
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2018. 1. 4..
  */
-@Configured
+@Singleton
 class ResearchManager @Inject constructor(val serverApiController: IResearchServerAPI, @Research val researchRealmFactory: Factory<Realm>) {
 
     fun dropoutFromExperiment(experimentId: String, reason: String?): Completable {

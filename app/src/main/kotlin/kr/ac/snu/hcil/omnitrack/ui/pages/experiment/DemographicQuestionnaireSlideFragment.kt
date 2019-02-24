@@ -9,13 +9,12 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.slide_demographic.view.*
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.getStringCompat
-import org.jetbrains.anko.bundleOf
-import org.jetbrains.anko.support.v4.act
 
 class DemographicQuestionnaireSlideFragment : ExperimentSignUpActivity.SlideFragment(ExperimentSignUpActivity.ESlide.DEMOGRAPHIC_QUESTIONNAIRE) {
 
@@ -24,7 +23,7 @@ class DemographicQuestionnaireSlideFragment : ExperimentSignUpActivity.SlideFrag
 
         fun getInstance(schema: String): DemographicQuestionnaireSlideFragment {
             return DemographicQuestionnaireSlideFragment().apply {
-                arguments = bundleOf("questionnaireSchema" to schema)
+                arguments = bundleOf(arrayOf<Pair<String, Any?>>("questionnaireSchema" to schema))
             }
         }
     }
@@ -64,12 +63,12 @@ class DemographicQuestionnaireSlideFragment : ExperimentSignUpActivity.SlideFrag
         println("serializedError: $serializedError")
         println("serializedValues: $serializedValues")
         if (serializedError != null) {
-            val errorObj = (act.applicationContext as OTAndroidApp).serializationComponent.genericGson().fromJson(serializedError, JsonObject::class.java)
+            val errorObj = (requireContext().applicationContext as OTAndroidApp).serializationComponent.genericGson().fromJson(serializedError, JsonObject::class.java)
             if (errorObj.getStringCompat("error") == "RequiredFields") {
-                Toast.makeText(act, "Fill up all the required questions.", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Fill up all the required questions.", Toast.LENGTH_LONG).show()
             }
         } else {
-            val valueObj = (act.applicationContext as OTAndroidApp).serializationComponent.genericGson().fromJson(serializedValues, JsonObject::class.java)
+            val valueObj = (requireContext().applicationContext as OTAndroidApp).serializationComponent.genericGson().fromJson(serializedValues, JsonObject::class.java)
             viewModel.demographicAnswers = valueObj
             viewModel.goNext(slide)
         }

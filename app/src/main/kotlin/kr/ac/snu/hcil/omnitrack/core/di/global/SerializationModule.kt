@@ -3,14 +3,13 @@ package kr.ac.snu.hcil.omnitrack.core.di.global
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
-import kr.ac.snu.hcil.omnitrack.core.di.configured.DaoSerializationComponent
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017. 12. 19..
  */
-@Module(includes = [DesignModule::class], subcomponents = [DaoSerializationComponent::class])
+@Module(includes = [DesignModule::class])
 class SerializationModule {
     @Provides
     @Singleton

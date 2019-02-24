@@ -5,7 +5,6 @@ import android.util.SparseArray
 import android.view.View
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerConditionViewModel
@@ -16,20 +15,20 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TimeConditionViewMod
  */
 object OTTriggerViewFactory {
     interface ITriggerConditionViewProvider {
-        fun getTriggerConditionViewModel(trigger: OTTriggerDAO, configuredContext: ConfiguredContext): ATriggerConditionViewModel
-        fun getTriggerDisplayView(original: View?, trigger: OTTriggerDAO, uiContext: Context, configuredContext: ConfiguredContext): View
-        fun getTriggerConfigurationPanel(original: View?, uiContext: Context, configuredContext: ConfiguredContext): IConditionConfigurationView
+        fun getTriggerConditionViewModel(trigger: OTTriggerDAO, context: Context): ATriggerConditionViewModel
+        fun getTriggerDisplayView(original: View?, trigger: OTTriggerDAO, uiContext: Context): View
+        fun getTriggerConfigurationPanel(original: View?, uiContext: Context): IConditionConfigurationView
         fun connectViewModelToDisplayView(viewModel: ATriggerConditionViewModel, displayView: View, outSubscription: CompositeDisposable)
     }
 
     private val providerDict: SparseArray<ITriggerConditionViewProvider> by lazy {
         SparseArray<ITriggerConditionViewProvider>().apply {
             this.append(OTTriggerDAO.CONDITION_TYPE_TIME.toInt(), object : ITriggerConditionViewProvider {
-                override fun getTriggerConditionViewModel(trigger: OTTriggerDAO, configuredContext: ConfiguredContext): ATriggerConditionViewModel {
-                    return TimeConditionViewModel(trigger, configuredContext)
+                override fun getTriggerConditionViewModel(trigger: OTTriggerDAO, context: Context): ATriggerConditionViewModel {
+                    return TimeConditionViewModel(trigger, context)
                 }
 
-                override fun getTriggerDisplayView(original: View?, trigger: OTTriggerDAO, uiContext: Context, configuredContext: ConfiguredContext): View {
+                override fun getTriggerDisplayView(original: View?, trigger: OTTriggerDAO, uiContext: Context): View {
                     val condition = trigger.condition as OTTimeTriggerCondition
 
                     when (condition.timeConditionType) {
@@ -65,7 +64,7 @@ object OTTriggerViewFactory {
                     }
                 }
 
-                override fun getTriggerConfigurationPanel(original: View?, uiContext: Context, configuredContext: ConfiguredContext): IConditionConfigurationView {
+                override fun getTriggerConfigurationPanel(original: View?, uiContext: Context): IConditionConfigurationView {
                     return if (original is TimeTriggerConfigurationPanel) {
                         original
                     } else TimeTriggerConfigurationPanel(uiContext)

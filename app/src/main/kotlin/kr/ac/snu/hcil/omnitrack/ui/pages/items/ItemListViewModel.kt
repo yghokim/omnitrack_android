@@ -8,10 +8,10 @@ import io.realm.OrderedCollectionChangeSet
 import io.realm.OrderedRealmCollectionChangeListener
 import io.realm.RealmResults
 import io.realm.Sort
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimestampSorter
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
@@ -78,8 +78,8 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
 
     val onItemContentChanged = PublishSubject.create<Array<OrderedCollectionChangeSet.Range>>()
 
-    override fun onInject(configuredContext: ConfiguredContext) {
-        configuredContext.configuredAppComponent.inject(this)
+    override fun onInject(app: OTAndroidApp) {
+        app.applicationComponent.inject(this)
     }
 
     fun init(trackerId: String) {
@@ -107,7 +107,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
         currentSorterSet.clear()
         currentSorterSet.add(TimestampSorter(getApplication()))
         attributes.forEach {
-            currentSorterSet += it.getHelper(configuredContext).getSupportedSorters(it)
+            currentSorterSet += it.getHelper(getApplication()).getSupportedSorters(it)
         }
 
         sorterSetObservable.onNext(currentSorterSet)

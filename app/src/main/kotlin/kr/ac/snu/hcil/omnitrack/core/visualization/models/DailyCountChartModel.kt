@@ -1,13 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.models
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.core.content.ContextCompat
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
@@ -28,13 +29,13 @@ import kr.ac.snu.hcil.omnitrack.utils.dipSize
 /**
  * Created by younghokim on 2017. 5. 8..
  */
-class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, val configuredContext: ConfiguredContext, timeAttribute: OTAttributeDAO? = null) : TrackerChartModel<Pair<Long, Int>>(tracker, realm), INativeChartModel {
+class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, val context: Context, timeAttribute: OTAttributeDAO? = null) : TrackerChartModel<Pair<Long, Int>>(tracker, realm), INativeChartModel {
 
     override val name: String
         get() {
             return if (timeAttributeLocalId != null) {
-                String.format(configuredContext.applicationContext.resources.getString(R.string.msg_vis_daily_count_title_format_with_time_attr), tracker.name, timeAttributeName)
-            } else String.format(configuredContext.applicationContext.resources.getString(R.string.msg_vis_daily_count_title_format), tracker.name)
+                String.format(context.resources.getString(R.string.msg_vis_daily_count_title_format_with_time_attr), tracker.name, timeAttributeName)
+            } else String.format(context.resources.getString(R.string.msg_vis_daily_count_title_format), tracker.name)
         }
 
     val timeAttributeLocalId: String? = timeAttribute?.localId
@@ -47,13 +48,13 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, val configuredCo
     }
 
     init{
-        configuredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun reloadData(): Single<List<Pair<Long, Int>>> {
         println("reload chart data. Scope:  ${getTimeScope()}")
 
-        val xScale = QuantizedTimeScale(configuredContext.applicationContext)
+        val xScale = QuantizedTimeScale(context)
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
@@ -80,7 +81,7 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, val configuredCo
         return DailyCountChartDrawer()
     }
 
-    inner class DailyCountChartDrawer : ATimelineChartDrawer(configuredContext.applicationContext) {
+    inner class DailyCountChartDrawer : ATimelineChartDrawer(context) {
         override val aspectRatio: Float = 2f
 
         private val yAxis = Axis(context, Axis.Pivot.LEFT)
@@ -88,12 +89,12 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, val configuredCo
 
         private val textPadding: Float
 
-        private val normalRectColor = ContextCompat.getColor(configuredContext.applicationContext, R.color.colorPointed)
-        private val todayRectColor = ContextCompat.getColor(configuredContext.applicationContext, R.color.colorAccent)
-        private val normalTextColor = ContextCompat.getColor(configuredContext.applicationContext, R.color.textColorMid)
-        private val todayTextColor = ContextCompat.getColor(configuredContext.applicationContext, R.color.colorAccent)
+        private val normalRectColor = ContextCompat.getColor(context, R.color.colorPointed)
+        private val todayRectColor = ContextCompat.getColor(context, R.color.colorAccent)
+        private val normalTextColor = ContextCompat.getColor(context, R.color.textColorMid)
+        private val todayTextColor = ContextCompat.getColor(context, R.color.colorAccent)
 
-        private val todayBackgroundColor = ContextCompat.getColor(configuredContext.applicationContext, R.color.editTextFormBackground)
+        private val todayBackgroundColor = ContextCompat.getColor(context, R.color.editTextFormBackground)
 
         private val counterBarGroups = DataEncodedDrawingList<Pair<Long, Int>, Void?>()
 

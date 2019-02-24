@@ -1,8 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
+import android.content.Context
 import android.net.Uri
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
@@ -16,7 +17,7 @@ import javax.inject.Inject
 /**
  * Created by younghokim on 2017. 10. 13..
  */
-abstract class OTFileInvolvedAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeHelper(configuredContext) {
+abstract class OTFileInvolvedAttributeHelper(context: Context) : OTAttributeHelper(context) {
 
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_SERVERFILE
@@ -25,7 +26,7 @@ abstract class OTFileInvolvedAttributeHelper(configuredContext: ConfiguredContex
     protected lateinit var localCacheManager: OTLocalMediaCacheManager
 
     init {
-        configuredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun isExternalFile(attribute: OTAttributeDAO): Boolean {

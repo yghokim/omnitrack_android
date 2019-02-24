@@ -11,9 +11,9 @@ import android.widget.TextView
 import androidx.lifecycle.ViewModelProviders
 import kotlinx.android.synthetic.main.activity_trigger_detail.*
 import kotlinx.android.synthetic.main.layout_tracker_assign_panel.view.*
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
@@ -33,8 +33,8 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         const val INTENT_EXTRA_INTERFACE_OPTIONS = "trigger_interface_options"
         const val INTENT_EXTRA_TRIGGER_DAO = "trigger_dao"
 
-        fun makeNewTriggerIntent(context: Context, configuredContext: ConfiguredContext, baseDao: OTTriggerDAO, options: TriggerInterfaceOptions): Intent {
-            val serialized = configuredContext.daoSerializationComponent.manager().serializeTrigger(baseDao)
+        fun makeNewTriggerIntent(context: Context, baseDao: OTTriggerDAO, options: TriggerInterfaceOptions): Intent {
+            val serialized = (context.applicationContext as OTAndroidApp).daoSerializationComponent.manager().serializeTrigger(baseDao)
             println(serialized)
             return Intent(context, TriggerDetailActivity::class.java)
                     .setAction(MODE_NEW)
@@ -49,10 +49,10 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                     .putExtra(INTENT_EXTRA_INTERFACE_OPTIONS, options)
         }
 
-        fun makeEditTriggerIntent(context: Context, configuredContext: ConfiguredContext, baseDao: OTTriggerDAO, options: TriggerInterfaceOptions): Intent {
+        fun makeEditTriggerIntent(context: Context, baseDao: OTTriggerDAO, options: TriggerInterfaceOptions): Intent {
             return Intent(context, TriggerDetailActivity::class.java)
                     .setAction(MODE_EDIT)
-                    .putExtra(INTENT_EXTRA_TRIGGER_DAO, configuredContext.daoSerializationComponent.manager().serializeTrigger(baseDao))
+                    .putExtra(INTENT_EXTRA_TRIGGER_DAO, (context.applicationContext as OTAndroidApp).daoSerializationComponent.manager().serializeTrigger(baseDao))
                     .putExtra(INTENT_EXTRA_INTERFACE_OPTIONS, options)
         }
     }
@@ -83,12 +83,12 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                     val mode = intent.action
                     when (mode) {
                         MODE_NEW -> {
-                            val baseDao = configuredContext.daoSerializationComponent.manager().parseTrigger(intent.getStringExtra(INTENT_EXTRA_TRIGGER_DAO))
+                            val baseDao = (application as OTAndroidApp).daoSerializationComponent.manager().parseTrigger(intent.getStringExtra(INTENT_EXTRA_TRIGGER_DAO))
                             viewModel.initNew(baseDao, savedInstanceState)
                         }
                         MODE_EDIT -> {
                             if (intent.hasExtra(INTENT_EXTRA_TRIGGER_DAO)) {
-                                val baseDao = configuredContext.daoSerializationComponent.manager().parseTrigger(intent.getStringExtra(INTENT_EXTRA_TRIGGER_DAO))
+                                val baseDao = (application as OTAndroidApp).daoSerializationComponent.manager().parseTrigger(intent.getStringExtra(INTENT_EXTRA_TRIGGER_DAO))
                                 viewModel.initEdit(baseDao, savedInstanceState)
                             } else if (intent.hasExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER)) {
                                 viewModel.initEdit(intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER), userId, savedInstanceState)
@@ -168,7 +168,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                 viewModel.conditionType.subscribe { conditionType ->
                     val viewProvider = OTTriggerViewFactory.getConditionViewProvider(conditionType)
                     if (viewProvider != null) {
-                        val configView = viewProvider.getTriggerConfigurationPanel(conditionConfigurationView as? View, this, configuredContext)
+                        val configView = viewProvider.getTriggerConfigurationPanel(conditionConfigurationView as? View, this)
                         this.conditionConfigurationView = configView
                         ui_condition_control_panel_container.removeAllViewsInLayout()
                         ui_condition_control_panel_container.addView(configView as View, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))

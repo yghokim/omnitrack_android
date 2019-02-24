@@ -7,7 +7,6 @@ import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditActivity
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
@@ -19,7 +18,7 @@ object OTTrackingNotificationFactory {
 
     private val TAG = "TrackingReminder"
 
-    fun makeLoggingSuccessNotificationBuilder(context: Context, configuredContext: ConfiguredContext, trackerId: String, trackerName: String, itemId: String, loggedTime: Long, table: List<Pair<String, CharSequence?>>?, notificationId: Int, tag: String): NotificationCompat.Builder {
+    fun makeLoggingSuccessNotificationBuilder(context: Context, trackerId: String, trackerName: String, itemId: String, loggedTime: Long, table: List<Pair<String, CharSequence?>>?, notificationId: Int, tag: String): NotificationCompat.Builder {
         val stackBuilder = TaskStackBuilder.create(context)
         // Adds the back stack for the Intent (but not the Intent itself)
         stackBuilder.addParentStack(ItemEditActivity::class.java)

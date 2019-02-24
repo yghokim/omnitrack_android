@@ -119,7 +119,7 @@ class QuantizedTimeScale(val context: Context) : IAxisScale<Long> {
     }
 
     init {
-        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
     fun inset(inset: Boolean): QuantizedTimeScale {

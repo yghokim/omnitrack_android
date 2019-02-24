@@ -22,15 +22,15 @@ class PackageReceiver : BroadcastReceiver() {
 
         println("package broadcast receiver - ${intent.action}")
 
-        val authManager = app.currentConfiguredContext.configuredAppComponent.getAuthManager()
+        val authManager = app.applicationComponent.getAuthManager()
         if (authManager.isUserSignedIn()) {
 
             val reminderCommands = OTReminderCommands(context)
-            val realm = app.currentConfiguredContext.configuredAppComponent.backendRealmFactory().get()
+            val realm = app.applicationComponent.backendRealmFactory().get()
             reminderCommands.restoreReminderNotifications(realm).blockingAwait()
             realm.close()
 
-            val triggerSystemManager = app.currentConfiguredContext.triggerSystemComponent.getTriggerSystemManager().get()
+            val triggerSystemManager = app.triggerSystemComponent.getTriggerSystemManager().get()
             triggerSystemManager.checkInAllToSystem(authManager.userId!!)
         }
 

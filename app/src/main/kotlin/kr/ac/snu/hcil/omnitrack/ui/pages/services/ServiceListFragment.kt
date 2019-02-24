@@ -18,8 +18,8 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
 import io.reactivex.Completable
 import io.reactivex.disposables.SerialDisposable
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
@@ -52,9 +52,8 @@ class ServiceListFragment : OTFragment() {
         DialogHelper.makeSimpleAlertBuilder(requireContext(), requireContext().resources.getString(R.string.msg_external_service_activation_requires_internet))
     }
 
-    override fun onInject(configuredContext: ConfiguredContext) {
-        super.onInject(configuredContext)
-        configuredContext.configuredAppComponent.inject(this)
+    override fun onInject(app: OTAndroidApp) {
+        app.applicationComponent.inject(this)
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {

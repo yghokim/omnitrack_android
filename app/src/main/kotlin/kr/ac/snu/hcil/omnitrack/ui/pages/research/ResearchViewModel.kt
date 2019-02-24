@@ -12,7 +12,7 @@ import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.OTExperimentDAO
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Research
+import kr.ac.snu.hcil.omnitrack.core.di.global.Research
 import kr.ac.snu.hcil.omnitrack.core.net.ExperimentInvitation
 import kr.ac.snu.hcil.omnitrack.core.research.ResearchManager
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
@@ -43,7 +43,7 @@ class ResearchViewModel(application: Application) : AndroidViewModel(application
     private val subscriptions = CompositeDisposable()
 
     init {
-        getApplication<OTApp>().currentConfiguredContext.researchComponent.inject(this)
+        getApplication<OTApp>().researchComponent.inject(this)
         realm = realmFactory.get()
     }
 

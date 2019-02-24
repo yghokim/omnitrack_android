@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.di.global
 
+import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.internal.Factory
@@ -7,9 +8,9 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.annotations.RealmModule
 import kr.ac.snu.hcil.omnitrack.BuildConfig
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.analytics.OTUsageLoggingManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UsageLog
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -17,7 +18,7 @@ import javax.inject.Singleton
 /**
  * Created by younghokim on 2017. 11. 28..
  */
-@Module()
+@Module(includes = [ApplicationModule::class])
 class UsageLoggingModule {
     @Provides
     @Singleton
@@ -54,8 +55,8 @@ class UsageLoggingModule {
 
     @Provides
     @Singleton
-    fun getLoggingManager(configuredContext: ConfiguredContext): IEventLogger {
-        return OTUsageLoggingManager(configuredContext)
+    fun getLoggingManager(app: OTAndroidApp, context: Context): IEventLogger {
+        return OTUsageLoggingManager(app, context)
     }
 
 }

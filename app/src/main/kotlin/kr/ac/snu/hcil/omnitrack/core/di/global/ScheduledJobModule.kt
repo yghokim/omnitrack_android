@@ -66,7 +66,7 @@ class ScheduledJobModule {
 
     @Provides
     @Singleton
-    @BinaryUpload
+    @BinaryStorageServer
     fun provideBinaryUploadRequest(): OneTimeWorkRequest {
         return OneTimeWorkRequestBuilder<OTBinaryUploadWorker>()
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)

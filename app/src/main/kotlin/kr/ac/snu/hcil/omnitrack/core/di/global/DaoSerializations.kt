@@ -1,10 +1,10 @@
-package kr.ac.snu.hcil.omnitrack.core.di.configured
+package kr.ac.snu.hcil.omnitrack.core.di.global
 
 import com.google.gson.Gson
+import dagger.Component
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
-import dagger.Subcomponent
 import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
@@ -14,40 +14,38 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.typeadapters.*
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
-import kr.ac.snu.hcil.omnitrack.core.di.global.ColorPalette
-import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017-11-02.
  */
-@Module()
+@Module(includes = [SerializationModule::class])
 class DaoSerializationModule {
 
     @Provides
-    @Configured
+    @Singleton
     @ForAttribute
     fun provideAttributeAdapter(@ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTAttributeDAO> = AttributeTypeAdapter(false, gson)
 
     @Provides
-    @Configured
+    @Singleton
     @ForServerAttribute
     fun provideServerAttributeAdapter(@ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTAttributeDAO> = AttributeTypeAdapter(true, gson)
 
     @Provides
-    @Configured
+    @Singleton
     @ForTrigger
     fun provideTriggerAdapter(@ForGeneric gson: Lazy<Gson>, @Backend realmProvider: Factory<Realm>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(false, gson, realmProvider)
 
     @Provides
-    @Configured
+    @Singleton
     @ForServerTrigger
     fun provideServerTriggerAdapter(@ForGeneric gson: Lazy<Gson>, @Backend realmProvider: Factory<Realm>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(true, gson, realmProvider)
 
     @Provides
-    @Configured
+    @Singleton
     @ForTracker
     fun provideTrackerAdapter(@ForAttribute attributeTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTAttributeDAO>>,
                               @ForGeneric gson: Lazy<Gson>,
@@ -55,48 +53,34 @@ class DaoSerializationModule {
 
 
     @Provides
-    @Configured
+    @Singleton
     @ForServerTracker
     fun provideServerTrackerAdapter(@ForServerAttribute attributeTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTAttributeDAO>>,
                                     @ForGeneric gson: Lazy<Gson>,
                                     @ColorPalette colorPalette: IntArray): ServerCompatibleTypeAdapter<OTTrackerDAO> = TrackerTypeAdapter(true, attributeTypeAdapter, gson, colorPalette)
 
-
-
     @Provides
-    @Configured
+    @Singleton
     @ForItem
     fun provideItemAdapter(@ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTItemDAO> = ItemTypeAdapter(false, gson)
 
 
     @Provides
-    @Configured
+    @Singleton
     @ForServerItem
     fun provideServerItemAdapter(@ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTItemDAO> = ItemTypeAdapter(true, gson)
 
     @Provides
-    @Configured
+    @Singleton
     fun provideConnectionTypeAdapter(serviceManager: OTExternalServiceManager): OTConnection.ConnectionTypeAdapter {
         return OTConnection.ConnectionTypeAdapter(serviceManager)
     }
 
 }
 
-@Configured
-@Subcomponent(modules = [DaoSerializationModule::class, BackendDatabaseModule::class])
+@Singleton
+@Component(modules = [DaoSerializationModule::class, BackendDatabaseModule::class])
 interface DaoSerializationComponent {
-
-    @Subcomponent.Builder
-    interface Builder {
-
-        fun plus(module: DaoSerializationModule): Builder
-        fun plus(module: BackendDatabaseModule): Builder
-        fun plus(module: AuthModule): Builder
-        fun plus(module: ConfiguredModule): Builder
-
-
-        fun build(): DaoSerializationComponent
-    }
 
     fun manager(): DaoSerializationManager
 }

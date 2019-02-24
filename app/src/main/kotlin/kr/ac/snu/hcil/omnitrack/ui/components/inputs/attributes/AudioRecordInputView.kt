@@ -17,7 +17,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
@@ -99,7 +99,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     private val subscriptions = CompositeDisposable()
 
     init {
-        (context.applicationContext as OTAndroidApp).applicationComponent.configuredContext().configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
 
         valueView.audioFileUriChanged += { _, uri ->
             println("picker uri changed to $uri")

@@ -1,11 +1,7 @@
 package kr.ac.snu.hcil.omnitrack
 
 import android.content.Context
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
-import kr.ac.snu.hcil.omnitrack.core.di.global.ApplicationComponent
-import kr.ac.snu.hcil.omnitrack.core.di.global.FirebaseComponent
-import kr.ac.snu.hcil.omnitrack.core.di.global.ScheduledJobComponent
-import kr.ac.snu.hcil.omnitrack.core.di.global.SerializationComponent
+import kr.ac.snu.hcil.omnitrack.core.di.global.*
 
 interface OTAndroidApp {
     val deviceId: String
@@ -13,7 +9,10 @@ interface OTAndroidApp {
     val scheduledJobComponent: ScheduledJobComponent
     val serializationComponent: SerializationComponent
     val firebaseComponent: FirebaseComponent
-    val currentConfiguredContext: ConfiguredContext
+    val triggerSystemComponent: TriggerSystemComponent
+    val researchComponent: ResearchComponent
+    val daoSerializationComponent: DaoSerializationComponent
+
     fun getPackageName(): String
     fun refreshConfiguration(context: Context)
 }

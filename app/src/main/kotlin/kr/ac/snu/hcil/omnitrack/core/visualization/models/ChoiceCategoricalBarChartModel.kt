@@ -1,13 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.models
 
+import android.content.Context
 import android.util.SparseIntArray
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTChoiceAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.IWebBasedChartModel
@@ -18,19 +19,19 @@ import javax.inject.Inject
 /**
  * Created by younghokim on 16. 9. 7..
  */
-class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm, val configuredContext: ConfiguredContext) : AttributeChartModel<ICategoricalBarChart.Point>(attribute, realm), ICategoricalBarChart, IWebBasedChartModel {
+class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm, val context: Context) : AttributeChartModel<ICategoricalBarChart.Point>(attribute, realm), ICategoricalBarChart, IWebBasedChartModel {
 
     private val counterDictCache = SparseIntArray() // entry id : count
     private val categoriesCache = HashSet<Int>()
 
     override val name: String
-        get() = String.format(configuredContext.applicationContext.resources.getString(R.string.msg_vis_categorical_distribution_title_format), super.name)
+        get() = String.format(context.resources.getString(R.string.msg_vis_categorical_distribution_title_format), super.name)
 
     @Inject
     protected lateinit var attributeManager: OTAttributeManager
 
     init{
-        configuredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun recycle() {

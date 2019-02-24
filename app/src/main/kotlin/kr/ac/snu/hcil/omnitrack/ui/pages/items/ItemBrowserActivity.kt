@@ -31,7 +31,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
@@ -102,7 +101,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
     private val startSubscriptions = CompositeDisposable()
 
     override fun onInject(app: OTAndroidApp) {
-        app.currentConfiguredContext.configuredAppComponent.inject(this)
+        app.applicationComponent.inject(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -525,7 +524,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                 override fun getItemViewType(position: Int): Int {
                     if (this@ItemElementViewHolder.adapterPosition != -1 && getParent().getItemValueOf(viewModel.attributes[position].localId) != null)
-                        return viewModel.attributes[position].getHelper(configuredContext).getViewForItemListContainerType()
+                        return viewModel.attributes[position].getHelper(this@ItemBrowserActivity).getViewForItemListContainerType()
                     else return 5
                 }
 
@@ -603,14 +602,14 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                         val itemValue = getParent().getItemValueOf(attribute.localId)
                         if (itemValue != null) {
-                            val newValueView = attribute.getHelper(configuredContext).getViewForItemList(attribute, this@ItemBrowserActivity, valueView)
+                            val newValueView = attribute.getHelper(this@ItemBrowserActivity).getViewForItemList(attribute, this@ItemBrowserActivity, valueView)
                             if (newValueView is IActivityLifeCycle && newValueView !== valueView) {
                                 newValueView.onCreate(null)
                             }
                             newValueView.setOnClickListener(this)
                             changeNewValueView(newValueView)
 
-                            valueApplySubscription.set(attribute.getHelper(configuredContext).applyValueToViewForItemList(attribute, itemValue, valueView).subscribe({
+                            valueApplySubscription.set(attribute.getHelper(this@ItemBrowserActivity).applyValueToViewForItemList(attribute, itemValue, valueView).subscribe({
 
                             }, {
                             }))
@@ -685,9 +684,6 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         @Inject
         lateinit var attributeManager: OTAttributeManager
 
-        @Inject
-        lateinit var configuredContext: ConfiguredContext
-
         private lateinit var viewModel: ItemListViewModel
 
         private var listView: RecyclerView by Delegates.notNull()
@@ -707,7 +703,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
-            (requireActivity().application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+            (requireActivity().application as OTAndroidApp).applicationComponent.inject(this)
             viewModel = ViewModelProviders.of(activity!!).get(ItemListViewModel::class.java)
 
             dialogSubscriptions.add(
@@ -797,7 +793,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                 viewModel.trackerDao.let {
 
-                    val configDialog = OTTableExportService.makeConfigurationDialog(requireActivity(), configuredContext, it) { includeFile, tableFileType ->
+                    val configDialog = OTTableExportService.makeConfigurationDialog(requireActivity(), it) { includeFile, tableFileType ->
                         exportConfigIncludeFile = includeFile
                         exportConfigTableFileType = tableFileType
 

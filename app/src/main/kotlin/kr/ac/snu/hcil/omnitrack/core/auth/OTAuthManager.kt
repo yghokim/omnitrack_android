@@ -29,30 +29,33 @@ import io.reactivex.disposables.Disposables
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.BuildConfig
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTUserDAO
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
-import kr.ac.snu.hcil.omnitrack.core.di.configured.ForGeneralAuth
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneralAuth
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
+import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignUpActivity
 import org.jetbrains.anko.runOnUiThread
 import rx_activity_result2.RxActivityResult
 import java.util.concurrent.CancellationException
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Created by Young-Ho Kim on 2017-02-03.
  */
-@Configured
+@Singleton
 class OTAuthManager @Inject constructor(
         private val context: Context,
-        private val configuredContext: ConfiguredContext,
         private val firebaseAuth: FirebaseAuth,
+        private val triggerSystemManager: Lazy<OTTriggerSystemManager>,
+        private val shortcutPanelManager: OTShortcutPanelManager,
         private val eventLogger: Lazy<IEventLogger>,
         @ForGeneric private val gson: Gson,
         @Backend private val realmFactory: Factory<Realm>,
@@ -217,7 +220,7 @@ class OTAuthManager @Inject constructor(
 
                             .flatMap { authResult ->
                                 println("Signed in through Google account. try to push device info to server...")
-                                OTDeviceInfo.makeDeviceInfo(configuredContext.applicationContext, configuredContext.applicationComponent.application().firebaseComponent)
+                                OTDeviceInfo.makeDeviceInfo(context, (context.applicationContext as OTAndroidApp).firebaseComponent)
                             }
                             .flatMap { deviceInfo ->
                                 if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
@@ -260,7 +263,7 @@ class OTAuthManager @Inject constructor(
                             .doOnSuccess { success ->
                                 if (success) {
                                     activity.applicationContext.runOnUiThread { notifySignedIn() }
-                                    configuredContext.triggerSystemComponent.getTriggerSystemManager().get().checkInAllToSystem(userId!!)
+                                    triggerSystemManager.get().checkInAllToSystem(userId!!)
                                 }
                             }.doOnError { ex ->
                                 ex.printStackTrace()
@@ -335,8 +338,8 @@ class OTAuthManager @Inject constructor(
             firebaseAuth.signOut()
             Auth.GoogleSignInApi.signOut(mGoogleApiClient)
 
-            configuredContext.triggerSystemComponent.getTriggerSystemManager().get().checkOutAllFromSystem(lastUserId)
-            configuredContext.configuredAppComponent.shortcutPanelManager().disposeShortcutPanel()
+            triggerSystemManager.get().checkOutAllFromSystem(lastUserId)
+            shortcutPanelManager.disposeShortcutPanel()
 
             notifySignedOut()
         }

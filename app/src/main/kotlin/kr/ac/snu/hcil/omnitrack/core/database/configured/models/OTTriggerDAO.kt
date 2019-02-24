@@ -12,10 +12,10 @@ import io.realm.RealmQuery
 import io.realm.annotations.Ignore
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.ExpressionEvaluator
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTBackgroundLoggingTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
@@ -226,13 +226,13 @@ open class OTTriggerDAO : RealmObject() {
         }
     }
 
-    fun validateScriptIfExist(configuredContext: ConfiguredContext): Boolean {
+    fun validateScriptIfExist(context: Context): Boolean {
         if (checkScript) {
             if (additionalScript == null || additionalScript?.contentEquals("TRUE") == true) {
                 return true
             } else {
                 //evaluate
-                val evaluator = ExpressionEvaluator(additionalScript!!, *configuredContext.configuredAppComponent.getSupportedScriptFunctions())
+                val evaluator = ExpressionEvaluator(additionalScript!!, *(context.applicationContext as OTAndroidApp).applicationComponent.getSupportedScriptFunctions())
                 return evaluator.evalBoolean()
             }
         } else {
@@ -263,18 +263,18 @@ open class OTTriggerDAO : RealmObject() {
         }
     }
 
-    fun getPerformFireCompletable(triggerTime: Long, metadata: JsonObject, configuredContext: ConfiguredContext): Completable {
+    fun getPerformFireCompletable(triggerTime: Long, metadata: JsonObject, context: Context): Completable {
         val triggerId = objectId!!
         val unManagedDAO = this.realm.copyFromRealm(this)
-        return (action?.performAction(this, triggerTime, metadata, configuredContext)
+        return (action?.performAction(this, triggerTime, metadata, context)
                 ?: Completable.error(IllegalStateException("Not proper action instance is generated.")))
                 .doOnComplete {
-                    configuredContext.applicationContext.runOnUiThread {
-                        LocalBroadcastManager.getInstance(configuredContext.applicationContext).sendBroadcastSync(Intent(OTApp.BROADCAST_ACTION_TRIGGER_FIRED)
+                    context.runOnUiThread {
+                        LocalBroadcastManager.getInstance(context.applicationContext).sendBroadcastSync(Intent(OTApp.BROADCAST_ACTION_TRIGGER_FIRED)
                                 .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER, triggerId)
                                 .putExtra(OTApp.INTENT_EXTRA_TRIGGER_TIME, triggerTime)
                         )
-                        configuredContext.configuredAppComponent.getEventLogger()
+                        (context.applicationContext as OTAndroidApp).applicationComponent.getEventLogger()
                                 .logTriggerFireEvent(triggerId, System.currentTimeMillis(), unManagedDAO) { content -> content.add("idealTime", triggerTime.toJson()) }
 
                     }

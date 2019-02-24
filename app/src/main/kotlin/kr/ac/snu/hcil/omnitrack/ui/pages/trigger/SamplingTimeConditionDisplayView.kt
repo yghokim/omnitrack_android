@@ -32,7 +32,7 @@ class SamplingTimeConditionDisplayView : ConstraintLayout {
                 ui_text_next_time_info.visibility = GONE
             } else {
                 ui_text_next_time_info.visibility = View.VISIBLE
-                ui_text_next_time_info.text = String.format(resources.getString(R.string.msg_trigger_ema_display_next_alert_format), (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.getLocalTimeFormats().FORMAT_DAY_WITHOUT_YEAR.format(Date(value)))
+                ui_text_next_time_info.text = String.format(resources.getString(R.string.msg_trigger_ema_display_next_alert_format), (context.applicationContext as OTAndroidApp).applicationComponent.getLocalTimeFormats().FORMAT_DAY_WITHOUT_YEAR.format(Date(value)))
             }
         }
 

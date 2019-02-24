@@ -43,7 +43,7 @@ class OTBinaryUploadWorker(val context: Context, workerParams: WorkerParameters)
     private val realmScheduler = Schedulers.from(Executors.newSingleThreadExecutor())
 
     init {
-        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun createWork(): Single<Result> {

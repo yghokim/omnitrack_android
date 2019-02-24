@@ -1,10 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.models
 
+import android.content.Context
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
@@ -22,20 +23,20 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-08.
  */
-class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent: OTTrackerDAO, realm: Realm, val configuredContext: ConfiguredContext)
+class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent: OTTrackerDAO, realm: Realm, val context: Context)
     : CompoundAttributeChartModel<ILineChartOnTime.TimeSeriesTrendData>(attributes, parent, realm), ILineChartOnTime, INativeChartModel {
 
-    override val name: String = configuredContext.applicationContext.resources.getString(R.string.msg_vis_numeric_line_timeline_title)
+    override val name: String = context.resources.getString(R.string.msg_vis_numeric_line_timeline_title)
 
     init{
-        configuredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun reloadData(): Single<List<ILineChartOnTime.TimeSeriesTrendData>> {
         val data = ArrayList<ILineChartOnTime.TimeSeriesTrendData>()
         val values = ArrayList<BigDecimal>()
 
-        val xScale = QuantizedTimeScale(configuredContext.applicationContext)
+        val xScale = QuantizedTimeScale(context)
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
@@ -109,12 +110,12 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
     }
 
     override fun getChartDrawer(): AChartDrawer {
-        val drawer = MultiLineChartDrawer(configuredContext.applicationContext)
+        val drawer = MultiLineChartDrawer(context)
 
 
 
         drawer.verticalAxis.labelPaint.isFakeBoldText = true
-        drawer.verticalAxis.labelPaint.textSize = configuredContext.applicationContext.resources.getDimension(R.dimen.vis_axis_label_numeric_size)
+        drawer.verticalAxis.labelPaint.textSize = context.resources.getDimension(R.dimen.vis_axis_label_numeric_size)
         return drawer
     }
 }

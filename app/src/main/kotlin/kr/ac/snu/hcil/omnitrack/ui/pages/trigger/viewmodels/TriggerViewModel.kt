@@ -1,9 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
+import android.content.Context
 import io.reactivex.Completable
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.*
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
@@ -23,7 +24,7 @@ import javax.inject.Inject
 /**
  * Created by younghokim on 2017. 10. 24..
  */
-open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: OTTriggerDAO, val realm: Realm) : IReadonlyObjectId, RealmChangeListener<OTTriggerDAO>, OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
+open class TriggerViewModel(val context: Context, val dao: OTTriggerDAO, val realm: Realm) : IReadonlyObjectId, RealmChangeListener<OTTriggerDAO>, OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
 
     @Inject
     protected lateinit var syncManager: OTSyncManager
@@ -67,7 +68,7 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
         }
 
     init {
-        configuredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
 
         applyDaoToFront()
         println("trigger user id: ${dao.userId}")
@@ -92,7 +93,7 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
         triggerActionType.onNext(dao.actionType)
         dao.action?.let { triggerAction.onNext(it) }
         if (currentConditionViewModel?.conditionType != dao.conditionType) {
-            currentConditionViewModel = OTTriggerViewFactory.getConditionViewProvider(dao.conditionType)?.getTriggerConditionViewModel(dao, configuredContext)
+            currentConditionViewModel = OTTriggerViewFactory.getConditionViewProvider(dao.conditionType)?.getTriggerConditionViewModel(dao, context)
         }
         currentConditionViewModel?.refreshDaoToFront(dao)
 
@@ -101,7 +102,7 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
 
         configIconResId.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigIconResId(dao))
         configDescResId.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigDescResId(dao))
-        configSummary.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigSummaryText(dao, configuredContext.applicationContext))
+        configSummary.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigSummaryText(dao, context))
         scriptUsed.onNextIfDifferAndNotNull(dao.checkScript && dao.additionalScript?.isNotBlank() == true)
         triggerSwitch.onNextIfDifferAndNotNull(dao.isOn)
 
@@ -174,7 +175,7 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
                     Completable.complete()
                 } else {
                     if (dao.isManaged) {
-                        val validationError = dao.isValidToTurnOn(configuredContext.applicationContext)
+                        val validationError = dao.isValidToTurnOn(context)
                         if (validationError == null) {
                             val id = dao.objectId
                             realm.executeTransactionAsObservable { realm ->
@@ -193,7 +194,7 @@ open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: O
                     } else {
                         //offline mode
                         println("offline mode trigger switch on")
-                        val validationError = dao.isValidToTurnOn(configuredContext.applicationContext)
+                        val validationError = dao.isValidToTurnOn(context)
                         if (validationError == null ||
                                 (validationError.causes.size == 1 &&
                                         validationError.causes.contains(OTTriggerDAO.TriggerValidationComponent.TRACKER_ATTACHED))) {

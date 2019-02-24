@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardViewPagerAdapter
@@ -37,18 +37,16 @@ class ServiceWizardView: WizardView {
 
     private var attributeDAO: OTAttributeDAO? = null
 
-    constructor(context: Context?, measureFactory: OTMeasureFactory) : super(context) {
-        val component = (context?.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent
-        component.inject(this)
+    constructor(context: Context, measureFactory: OTMeasureFactory) : super(context) {
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
         currentMeasureFactory = measureFactory
         connection.source = measureFactory.makeMeasure()
         Log.i("Omnitrack", measureFactory.javaClass.name)
         setAdapter(Adapter(context))
     }
 
-    constructor(context: Context?, measureFactory: OTMeasureFactory, attrs: AttributeSet?) : super(context, attrs) {
-        val component = (context?.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent
-        component.inject(this)
+    constructor(context: Context, measureFactory: OTMeasureFactory, attrs: AttributeSet?) : super(context, attrs) {
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
         currentMeasureFactory = measureFactory
         connection.source = measureFactory.makeMeasure()
         setAdapter(Adapter(context))
@@ -64,7 +62,7 @@ class ServiceWizardView: WizardView {
                 (page as QueryRangeSelectionPage).applyConfiguration(connection)
                 val realm = realmProvider.get()
                 realm.executeTransactionIfNotIn {
-                    attributeDAO?.serializedConnection = connection.getSerializedString((context.applicationContext as OTAndroidApp).currentConfiguredContext)
+                    attributeDAO?.serializedConnection = connection.getSerializedString(context)
                 }
                 realm.close()
             }

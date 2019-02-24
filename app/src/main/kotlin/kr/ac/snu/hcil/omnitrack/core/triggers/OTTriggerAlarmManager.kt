@@ -14,14 +14,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.Sort
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerAlarmInstance
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerSchedule
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
 import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
@@ -34,12 +33,13 @@ import org.jetbrains.anko.alarmManager
 import org.jetbrains.anko.powerManager
 import org.jetbrains.anko.runOnUiThread
 import java.util.*
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 16. 8. 29..
  */
-@Configured
-class OTTriggerAlarmManager(val context: Context, val configuredContext: ConfiguredContext, val realmProvider: Factory<Realm>) : ITriggerAlarmController {
+@Singleton
+class OTTriggerAlarmManager(val context: Context, val realmProvider: Factory<Realm>) : ITriggerAlarmController {
     companion object {
 
         const val TAG = "TimeTriggerAlarmManager"
@@ -105,10 +105,10 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                                 }
                             } else {
                                 //sticky alarm
-                                if (it.trigger?.validateScriptIfExist(this.configuredContext) == true) {
+                                if (it.trigger?.validateScriptIfExist(context) == true) {
                                     val metadata = buildMetadata(it, now)
                                     metadata.addProperty("stickyDelayed", true)
-                                    it.trigger?.getPerformFireCompletable(it.intrinsicAlarmTime, metadata, configuredContext)?.blockingAwait()
+                                    it.trigger?.getPerformFireCompletable(it.intrinsicAlarmTime, metadata, context)?.blockingAwait()
                                     OTApp.logger.writeSystemLog("Trigger was missed at ${it.intrinsicAlarmTime.toDatetimeString()}. But its sticky so perform immediately.", TAG)
                                 }
                             }
@@ -189,8 +189,8 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
                                             //simple alarm. fire
 
                                             OTApp.logger.writeSystemLog("Fire time trigger. schedule id: ${schedule.id}", TAG)
-                                            if (trigger.validateScriptIfExist(configuredContext)) {
-                                                trigger.getPerformFireCompletable(triggerTime, buildMetadata(schedule, actualTriggeredTime), configuredContext)
+                                            if (trigger.validateScriptIfExist(context)) {
+                                                trigger.getPerformFireCompletable(triggerTime, buildMetadata(schedule, actualTriggeredTime), context)
                                             } else Completable.complete()
                                         }
                                         else -> {
@@ -213,7 +213,7 @@ class OTTriggerAlarmManager(val context: Context, val configuredContext: Configu
     }
 
     private fun buildMetadata(schedule: OTTriggerSchedule, actualTriggeredTime: Long): JsonObject {
-        val metadata: JsonObject = schedule.serializedMetadata?.let { configuredContext.applicationComponent.genericGson().fromJson(it, JsonObject::class.java) }
+        val metadata: JsonObject = schedule.serializedMetadata?.let { (context.applicationContext as OTAndroidApp).applicationComponent.genericGson().fromJson(it, JsonObject::class.java) }
                 ?: JsonObject()
         metadata.addProperty("reservedAt", schedule.intrinsicAlarmTime)
         metadata.addProperty("actuallyFiredAt", actualTriggeredTime)

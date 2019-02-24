@@ -11,10 +11,9 @@ import io.realm.Realm
 import io.realm.kotlin.where
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTUserDAO
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -40,7 +39,7 @@ class OTInformationUploadWorker(private val context: Context, private val worker
     @Inject
     lateinit var syncServerController: ISynchronizationServerSideAPI
 
-    private val configuredContext: ConfiguredContext = (context.applicationContext as OTAndroidApp).currentConfiguredContext
+    private val app: OTAndroidApp = context.applicationContext as OTAndroidApp
 
 
     private val realmScheduler = Schedulers.from(Executors.newSingleThreadExecutor())
@@ -49,7 +48,7 @@ class OTInformationUploadWorker(private val context: Context, private val worker
     }
 
     init {
-        configuredContext.configuredAppComponent.inject(this)
+        app.applicationComponent.inject(this)
     }
 
     override fun createWork(): Single<Result> {
@@ -59,7 +58,7 @@ class OTInformationUploadWorker(private val context: Context, private val worker
                 val uid = authManager.userId!!
                 when (informationType) {
                     INFORMATION_DEVICE ->
-                        OTDeviceInfo.makeDeviceInfo(context, configuredContext.applicationComponent.application().firebaseComponent).flatMap { deviceInfo ->
+                        OTDeviceInfo.makeDeviceInfo(context, app.firebaseComponent).flatMap { deviceInfo ->
                             syncServerController
                                     .putDeviceInfo(deviceInfo)
                         }.map { Result.success() }

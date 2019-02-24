@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.text.LinedTextView
@@ -15,7 +14,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTLongTextAttributeHelper(configuredContext: ConfiguredContext) : ATextTypeAttributeHelper(configuredContext) {
+class OTLongTextAttributeHelper(context: Context) : ATextTypeAttributeHelper(context) {
 
     override fun getValueNumericCharacteristics(attribute: OTAttributeDAO): NumericCharacteristics {
         return NumericCharacteristics(false, false)

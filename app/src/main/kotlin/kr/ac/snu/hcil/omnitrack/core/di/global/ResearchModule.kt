@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.di.configured
+package kr.ac.snu.hcil.omnitrack.core.di.global
 
 import dagger.Module
 import dagger.Provides
@@ -9,10 +9,10 @@ import io.realm.annotations.RealmModule
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.OTExperimentDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.OTExperimentInvitationDAO
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.net.IResearchServerAPI
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2018. 1. 3..
@@ -21,11 +21,11 @@ import javax.inject.Qualifier
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class Research
 
-@Module(includes = [NetworkModule::class, ConfiguredModule::class])
+@Module(includes = [NetworkModule::class, UsageLoggingModule::class, FirebaseModule::class])
 class ResearchModule {
 
     @Provides
-    @Configured
+    @Singleton
     @Research
     fun researchDatabaseConfiguration(): RealmConfiguration {
         return RealmConfiguration.Builder()
@@ -40,14 +40,14 @@ class ResearchModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     @Research
     fun makeResearchDbRealmProvider(@Research configuration: RealmConfiguration): Factory<Realm> {
         return Factory { Realm.getInstance(configuration) }
     }
 
     @Provides
-    @Configured
+    @Singleton
     fun provideResearchServerController(controller: OTOfficialServerApiController): IResearchServerAPI {
         return controller
     }

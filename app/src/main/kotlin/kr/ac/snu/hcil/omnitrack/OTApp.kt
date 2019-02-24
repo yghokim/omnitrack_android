@@ -14,10 +14,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.work.WorkManager
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.di.global.*
 import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
@@ -189,6 +189,35 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         SystemIdentifierFactoryModule()
     }
 
+    private val authModule: AuthModule by lazy {
+        AuthModule()
+    }
+
+    private val backendDatabaseModule: BackendDatabaseModule by lazy {
+        BackendDatabaseModule()
+    }
+
+    private val networkModule: NetworkModule by lazy {
+        NetworkModule()
+    }
+
+    private val synchronizationModule: SynchronizationModule by lazy {
+        SynchronizationModule()
+    }
+
+    private val triggerSystemModule: TriggerSystemModule by lazy {
+        TriggerSystemModule()
+    }
+
+    private val daoSerializationModule: DaoSerializationModule by lazy {
+        DaoSerializationModule()
+    }
+
+    private val researchModule: ResearchModule by lazy {
+        ResearchModule()
+    }
+
+
     override val applicationComponent: ApplicationComponent by lazy {
         DaggerApplicationComponent.builder()
                 .applicationModule(appModule)
@@ -200,6 +229,13 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
                 .externalServiceModule(externalServiceModule)
                 .serializationModule(serializationModule)
                 .systemIdentifierFactoryModule(systemIdentifierFactoryModule)
+                .backendDatabaseModule(backendDatabaseModule)
+                .daoSerializationModule(daoSerializationModule)
+                .networkModule(networkModule)
+                .informationHelpersModule(InformationHelpersModule())
+                .scriptingModule(ScriptingModule())
+                .synchronizationModule(synchronizationModule)
+                .triggerSystemModule(triggerSystemModule)
                 .build()
     }
 
@@ -223,11 +259,40 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
                 .build()
     }
 
+    override val triggerSystemComponent: TriggerSystemComponent by lazy {
+        DaggerTriggerSystemComponent.builder()
+                .applicationModule(appModule)
+                .triggerSystemModule(triggerSystemModule)
+                .backendDatabaseModule(backendDatabaseModule)
+                .build()
+    }
 
-    override val currentConfiguredContext: ConfiguredContext
-        get() {
-            return this.applicationComponent.configuredContext()
-        }
+    override val daoSerializationComponent: DaoSerializationComponent by lazy {
+        DaggerDaoSerializationComponent.builder()
+                .applicationModule(appModule)
+                .backendDatabaseModule(backendDatabaseModule)
+                .designModule(designModule)
+                .serializationModule(serializationModule)
+                .daoSerializationModule(daoSerializationModule)
+                .build()
+    }
+
+    override val researchComponent: ResearchComponent by lazy {
+        DaggerResearchComponent.builder()
+                .applicationModule(appModule)
+                .authModule(authModule)
+                .backendDatabaseModule(backendDatabaseModule)
+                .firebaseModule(firebaseModule)
+                .networkModule(networkModule)
+                .researchModule(researchModule)
+                .serializationModule(serializationModule)
+                .usageLoggingModule(usageLoggingModule)
+                .daoSerializationModule(daoSerializationModule)
+                .designModule(designModule)
+                .triggerSystemModule(triggerSystemModule)
+                .scheduledJobModule(scheduledJobModule)
+                .build()
+    }
 
     override fun attachBaseContext(base: Context) {
         LocaleHelper.init(base)
@@ -271,7 +336,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         val systemDefaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             try {
-                applicationComponent.configuredContext().configuredAppComponent.getEventLogger()
+                applicationComponent.getEventLogger()
                         .logExceptionEvent("Uncaught", throwable, thread)
                 println("logged the uncaught exception.")
             } finally {
@@ -289,7 +354,8 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         //TODO start service in job controller
         //startService(this.binaryUploadServiceController.makeResumeUploadIntent())
 
-        applicationComponent.configuredContext().activateOnSystem()
+        WorkManager.getInstance().enqueue(scheduledJobComponent.getFullSyncPeriodicRequestProvider().get())
+
 
         if (OTExternalSettingsPrompter.isBatteryOptimizationWhiteListed(this) || ProcessLifecycleOwner.get().lifecycle.currentState >= Lifecycle.State.STARTED) {
             startService(Intent(this, OTDeviceStatusService::class.java))
@@ -324,7 +390,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
             val duration = finishedAt - foregroundTime.getAndSet(Long.MIN_VALUE)
             if (duration > 100) {
                 println("App Screen Session duration : ${duration.toFloat() / 1000} seconds")
-                applicationComponent.configuredContext().configuredAppComponent.getEventLogger()
+                applicationComponent.getEventLogger()
                         .logSession("engagement_foreground", "application", duration, finishedAt, null)
             }
         }

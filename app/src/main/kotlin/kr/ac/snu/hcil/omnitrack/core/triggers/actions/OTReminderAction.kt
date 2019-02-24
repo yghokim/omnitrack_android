@@ -14,7 +14,6 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import io.reactivex.Completable
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.ui.activities.ReminderPopupActivity
@@ -179,12 +178,12 @@ class OTReminderAction : OTTriggerAction() {
         }*/
 
 
-    override fun performAction(trigger: OTTriggerDAO, triggerTime: Long, metadata: JsonObject, configuredContext: ConfiguredContext): Completable {
+    override fun performAction(trigger: OTTriggerDAO, triggerTime: Long, metadata: JsonObject, context: Context): Completable {
         return Completable.defer {
             println("trigger fired - send notification")
 
             if (trigger.liveTrackerCount > 0) {
-                val reminderCommands = OTReminderCommands(configuredContext.applicationContext)
+                val reminderCommands = OTReminderCommands(context.applicationContext)
                 return@defer reminderCommands.remind(trigger.objectId!!, triggerTime, metadata)
             }
             return@defer Completable.complete()

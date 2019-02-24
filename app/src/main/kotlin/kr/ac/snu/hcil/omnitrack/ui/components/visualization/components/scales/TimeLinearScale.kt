@@ -61,7 +61,7 @@ class TimeLinearScale(val context: Context) : IAxisScale<Long> {
                         return if (hourOfDay == 12) {
                             context.resources.getString(R.string.msg_noon)
                         } else if (hourOfDay == 0 || hourOfDay == 23) {
-                            (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.getLocalTimeFormats().FORMAT_DAY.format(Date(value))
+                            (context.applicationContext as OTAndroidApp).applicationComponent.getLocalTimeFormats().FORMAT_DAY.format(Date(value))
                         } else {
                             "haha"
                         }

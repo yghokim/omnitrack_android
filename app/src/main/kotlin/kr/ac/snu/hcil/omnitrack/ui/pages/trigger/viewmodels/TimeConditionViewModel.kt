@@ -1,9 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
+import android.content.Context
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.ITriggerAlarmController
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
@@ -13,7 +14,7 @@ import javax.inject.Inject
 /**
  * Created by younghokim on 2017. 11. 12..
  */
-class TimeConditionViewModel(trigger: OTTriggerDAO, configuredContext: ConfiguredContext) : ATriggerConditionViewModel(trigger, OTTriggerDAO.CONDITION_TYPE_TIME) {
+class TimeConditionViewModel(trigger: OTTriggerDAO, context: Context) : ATriggerConditionViewModel(trigger, OTTriggerDAO.CONDITION_TYPE_TIME) {
 
     private val subscriptions = CompositeDisposable()
 
@@ -24,7 +25,7 @@ class TimeConditionViewModel(trigger: OTTriggerDAO, configuredContext: Configure
     val nextAlarmTime: Observable<Nullable<Long>> get() = nextAlarmTimeSubject
 
     init {
-        configuredContext.triggerSystemComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).triggerSystemComponent.inject(this)
 
         subscriptions.add(
                 triggerAlarmManager.makeNextAlarmTimeObservable(trigger.objectId!!).subscribe { alarmTime ->

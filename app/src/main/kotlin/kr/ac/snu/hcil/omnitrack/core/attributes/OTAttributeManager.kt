@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
+import android.content.Context
 import android.content.pm.PackageManager
 import android.util.SparseArray
 import androidx.core.content.ContextCompat
@@ -10,17 +11,16 @@ import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.*
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-@Configured
-class OTAttributeManager @Inject constructor(val configuredContext: ConfiguredContext, val authManager: Lazy<OTAuthManager>) {
+@Singleton
+class OTAttributeManager @Inject constructor(val context: Context, val authManager: Lazy<OTAuthManager>) {
 
     companion object {
         const val VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE = 0
@@ -45,16 +45,16 @@ class OTAttributeManager @Inject constructor(val configuredContext: ConfiguredCo
         val characteristics = attributeCharacteristicsTable[type]
         if (characteristics == null) {
             val fallback = when (type) {
-                TYPE_NUMBER -> OTNumberAttributeHelper(configuredContext)
-                TYPE_TIME -> OTTimeAttributeHelper(configuredContext)
-                TYPE_TIMESPAN -> OTTimeSpanAttributeHelper(configuredContext)
-                TYPE_SHORT_TEXT -> OTShortTextAttributeHelper(configuredContext)
-                TYPE_LONG_TEXT -> OTLongTextAttributeHelper(configuredContext)
-                TYPE_LOCATION -> OTLocationAttributeHelper(configuredContext)
-                TYPE_CHOICE -> OTChoiceAttributeHelper(configuredContext)
-                TYPE_RATING -> OTRatingAttributeHelper(configuredContext)
-                TYPE_IMAGE -> OTImageAttributeHelper(configuredContext)
-                TYPE_AUDIO -> OTAudioRecordAttributeHelper(configuredContext)
+                TYPE_NUMBER -> OTNumberAttributeHelper(context)
+                TYPE_TIME -> OTTimeAttributeHelper(context)
+                TYPE_TIMESPAN -> OTTimeSpanAttributeHelper(context)
+                TYPE_SHORT_TEXT -> OTShortTextAttributeHelper(context)
+                TYPE_LONG_TEXT -> OTLongTextAttributeHelper(context)
+                TYPE_LOCATION -> OTLocationAttributeHelper(context)
+                TYPE_CHOICE -> OTChoiceAttributeHelper(context)
+                TYPE_RATING -> OTRatingAttributeHelper(context)
+                TYPE_IMAGE -> OTImageAttributeHelper(context)
+                TYPE_AUDIO -> OTAudioRecordAttributeHelper(context)
                 else -> throw Exception("Unsupported type key: $type")
             }
             this.attributeCharacteristicsTable.setValueAt(type, fallback)

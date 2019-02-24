@@ -1,12 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers.actions
 
+import android.content.Context
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import io.reactivex.Completable
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 
@@ -51,12 +51,12 @@ class OTBackgroundLoggingTriggerAction : OTTriggerAction() {
     var notify: Boolean = true
 
     //TODO toss metadata to item creation logic
-    override fun performAction(trigger: OTTriggerDAO, triggerTime: Long, metadata: JsonObject, configuredContext: ConfiguredContext): Completable {
+    override fun performAction(trigger: OTTriggerDAO, triggerTime: Long, metadata: JsonObject, context: Context): Completable {
         return Completable.defer {
             if (trigger.liveTrackerCount > 0) {
-                configuredContext.applicationContext.startService(
+                context.applicationContext.startService(
                         OTItemLoggingService
-                                .makeLoggingIntent(configuredContext.applicationContext,
+                                .makeLoggingIntent(context.applicationContext,
                                         ItemLoggingSource.Trigger,
                                         notify,
                                         *trigger.liveTrackerIds)

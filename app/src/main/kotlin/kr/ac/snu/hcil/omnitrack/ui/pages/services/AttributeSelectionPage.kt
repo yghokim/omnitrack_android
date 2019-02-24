@@ -15,7 +15,6 @@ import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -26,7 +25,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeSpanAttributeHelpe
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
@@ -61,8 +60,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
     var attributeDAO: OTAttributeDAO? = null
 
     init {
-        val component = (parent.context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent
-        component.inject(this)
+        val component = (parent.context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
 
     }
 
@@ -235,14 +233,13 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
     }
 
     fun addNewAttribute(name: String, type: Int, realm: Realm, processor: ((OTAttributeDAO, Realm) -> OTAttributeDAO)? = null) {
-        val configuredContext = (parent.context.applicationContext as OTApp).currentConfiguredContext
         val trackerDao = parent.trackerDao
         val newDao = OTAttributeDAO()
         newDao.objectId = UUID.randomUUID().toString()
         newDao.name = name
         newDao.type = type
         newDao.trackerId = trackerId
-        newDao.initialize(configuredContext)
+        newDao.initialize(parent.context)
         processor?.invoke(newDao, realm)
         newDao.localId = attributeManager.makeNewAttributeLocalId(newDao.userCreatedAt)
         newDao.trackerId = trackerDao.objectId

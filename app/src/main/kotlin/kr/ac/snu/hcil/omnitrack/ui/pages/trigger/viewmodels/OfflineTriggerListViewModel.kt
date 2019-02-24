@@ -3,10 +3,11 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 import android.app.Application
 import android.os.Bundle
 import dagger.Lazy
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.typeadapters.ServerCompatibleTypeAdapter
-import kr.ac.snu.hcil.omnitrack.core.di.configured.ForTrigger
+import kr.ac.snu.hcil.omnitrack.core.di.global.ForTrigger
 import javax.inject.Inject
 
 /**
@@ -18,8 +19,8 @@ open class OfflineTriggerListViewModel(app: Application) : ATriggerListViewModel
     protected lateinit var triggerTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTTriggerDAO>>
 
 
-    override fun onInject(configuredContext: ConfiguredContext) {
-        configuredContext.configuredAppComponent.inject(this)
+    override fun onInject(app: OTAndroidApp) {
+        getApplication<OTApp>().applicationComponent.inject(this)
     }
 
     fun init(savedInstanceState: Bundle?) {
@@ -29,7 +30,7 @@ open class OfflineTriggerListViewModel(app: Application) : ATriggerListViewModel
         if (savedInstanceState != null) {
             val serializedDaos = savedInstanceState.getStringArray("triggerDaos")
             if (serializedDaos != null && serializedDaos.isNotEmpty()) {
-                currentTriggerViewModels.addAll(serializedDaos.map { TriggerViewModel(configuredContext, triggerTypeAdapter.get().fromJson(it), realm) })
+                currentTriggerViewModels.addAll(serializedDaos.map { TriggerViewModel(getApplication(), triggerTypeAdapter.get().fromJson(it), realm) })
                 notifyNewTriggerViewModels()
             }
         }
@@ -49,7 +50,7 @@ open class OfflineTriggerListViewModel(app: Application) : ATriggerListViewModel
             }
         }
 
-        currentTriggerViewModels.add(TriggerViewModel(configuredContext, dao, realm))
+        currentTriggerViewModels.add(TriggerViewModel(getApplication(), dao, realm))
         notifyNewTriggerViewModels()
     }
 

@@ -7,9 +7,10 @@ import com.google.gson.JsonObject
 import dagger.Lazy
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
@@ -83,7 +84,7 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
         }
 
     val isConnectionDirty: Boolean
-        get() = connectionObservable.value?.datum != attributeDAO?.getParsedConnection(configuredContext)
+        get() = connectionObservable.value?.datum != attributeDAO?.getParsedConnection(getApplication())
 
     val isDefaultValuePolicyDirty: Boolean
         get() = defaultValuePolicy != attributeDAO?.fallbackValuePolicy
@@ -116,8 +117,8 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
     @Inject
     lateinit var serializationManager: Lazy<DaoSerializationManager>
 
-    override fun onInject(configuredContext: ConfiguredContext) {
-        configuredContext.configuredAppComponent.inject(this)
+    override fun onInject(app: OTAndroidApp) {
+        app.applicationComponent.inject(this)
     }
 
     fun init(attributeDao: OTAttributeDAO, savedInstanceState: Bundle?) {
@@ -208,7 +209,7 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
         }
 
         if (isConnectionDirty) {
-            changes.add("connection" to connection?.getSerializedString(this.configuredContext))
+            changes.add("connection" to connection?.getSerializedString(getApplication<OTApp>()))
         }
 
         return if (changes.isNotEmpty()) jsonObject(changes) else null
@@ -229,7 +230,7 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
             }
         }
 
-        attributeDAO?.serializedConnection = connection?.getSerializedString(this.configuredContext)
+        attributeDAO?.serializedConnection = connection?.getSerializedString(getApplication<OTApp>())
     }
 
     fun makeFrontalChangesToDao(): OTAttributeDAO? {
@@ -254,7 +255,7 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
                 }
             }
 
-            dao.serializedConnection = connectionObservable.value?.datum?.getSerializedString(configuredContext)
+            dao.serializedConnection = connectionObservable.value?.datum?.getSerializedString(getApplication<OTApp>())
             dao
         }
     }

@@ -28,9 +28,8 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
-import kr.ac.snu.hcil.omnitrack.core.di.configured.ServerResponsive
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
+import kr.ac.snu.hcil.omnitrack.core.di.global.ServerResponsive
 import kr.ac.snu.hcil.omnitrack.core.system.OTAppVersionCheckManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
@@ -54,8 +53,6 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     @Inject
     protected lateinit var authManager: OTAuthManager
-    @Inject
-    protected lateinit var configuredContext: ConfiguredContext
 
     @field:[Inject Default]
     protected lateinit var systemPreferences: SharedPreferences
@@ -115,7 +112,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
                 .observeOn(AndroidSchedulers.mainThread())
 
     protected open fun onInject(app: OTAndroidApp) {
-        app.currentConfiguredContext.configuredAppComponent.inject(this)
+        app.applicationComponent.inject(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

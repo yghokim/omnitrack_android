@@ -10,7 +10,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.NumericSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
@@ -26,13 +25,13 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTRatingAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeHelper(configuredContext), ISingleNumberAttributeHelper {
+class OTRatingAttributeHelper(context: Context) : OTAttributeHelper(context), ISingleNumberAttributeHelper {
 
     companion object {
         const val PROPERTY_OPTIONS = "options"
     }
 
-    inner class MiddleValueFallbackPolicyResolver : FallbackPolicyResolver(configuredContext.applicationContext, R.string.msg_intrinsic_rating, false) {
+    inner class MiddleValueFallbackPolicyResolver : FallbackPolicyResolver(context.applicationContext, R.string.msg_intrinsic_rating, false) {
         override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
             return Single.defer {
                 val ratingOptions = getRatingOptions(attribute)
@@ -69,12 +68,12 @@ class OTRatingAttributeHelper(configuredContext: ConfiguredContext) : OTAttribut
 
     fun getRatingOptions(attribute: OTAttributeDAO): RatingOptions {
         return getDeserializedPropertyValue<RatingOptions>(PROPERTY_OPTIONS, attribute)
-                ?: RatingOptions(configuredContext.applicationContext)
+                ?: RatingOptions(context.applicationContext)
     }
 
     override fun getPropertyInitialValue(propertyKey: String): Any? {
         return when (propertyKey) {
-            PROPERTY_OPTIONS -> RatingOptions(configuredContext.applicationContext)
+            PROPERTY_OPTIONS -> RatingOptions(context.applicationContext)
             else -> null
         }
     }

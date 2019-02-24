@@ -19,7 +19,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.ColorPalette
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import org.jetbrains.anko.padding
@@ -57,9 +57,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
     protected lateinit var authManager: OTAuthManager
 
     init {
-        val component = (parent.context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent
-        component.inject(this)
-
+        (parent.context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun onLeave() {

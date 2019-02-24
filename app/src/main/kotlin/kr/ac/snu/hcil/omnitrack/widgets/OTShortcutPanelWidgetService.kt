@@ -13,7 +13,6 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
@@ -25,19 +24,16 @@ import javax.inject.Inject
  */
 class OTShortcutPanelWidgetService : RemoteViewsService() {
 
-    @Inject
-    lateinit var configuredContext: ConfiguredContext
-
     override fun onCreate() {
         super.onCreate()
         (application as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        return PanelWidgetElementFactory(this.applicationContext, configuredContext, intent)
+        return PanelWidgetElementFactory(this.applicationContext, intent)
     }
 
-    class PanelWidgetElementFactory(val context: Context, val configuredContext: ConfiguredContext, intent: Intent) : RemoteViewsFactory {
+    class PanelWidgetElementFactory(val context: Context, intent: Intent) : RemoteViewsFactory {
 
         @Inject
         protected lateinit var dbManager: BackendDbManager
@@ -52,7 +48,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
 
         init {
             widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
-            configuredContext.configuredAppComponent.inject(this)
+            (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
         }
 
         override fun onCreate() {
@@ -128,7 +124,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
                     rv.setTextViewText(R.id.ui_text_statistics, text)
                 }*/
 
-            val buttonSize = configuredContext.applicationContext.resources.getDimensionPixelSize(R.dimen.app_widget_instant_logging_button_height)
+            val buttonSize = context.resources.getDimensionPixelSize(R.dimen.app_widget_instant_logging_button_height)
             val buttonRadius = buttonSize * .5f
             val paint = Paint(Paint.ANTI_ALIAS_FLAG)
             paint.style = Paint.Style.FILL

@@ -73,7 +73,7 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
 
     override fun onInject(app: OTAndroidApp) {
         super.onInject(app)
-        app.currentConfiguredContext.configuredAppComponent.inject(this)
+        app.applicationComponent.inject(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

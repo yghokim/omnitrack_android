@@ -13,11 +13,12 @@ import io.reactivex.subjects.PublishSubject
 import io.realm.Realm
 import io.realm.RealmChangeListener
 import kr.ac.snu.hcil.omnitrack.BuildConfig
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
@@ -26,9 +27,9 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.OTExperimentDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.typeadapters.ServerCompatibleTypeAdapter
-import kr.ac.snu.hcil.omnitrack.core.di.configured.ForTracker
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Research
 import kr.ac.snu.hcil.omnitrack.core.di.global.ColorPalette
+import kr.ac.snu.hcil.omnitrack.core.di.global.ForTracker
+import kr.ac.snu.hcil.omnitrack.core.di.global.Research
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -188,8 +189,8 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
     }
 
-    override fun onInject(configuredContext: ConfiguredContext) {
-        configuredContext.configuredAppComponent.inject(this)
+    override fun onInject(app: OTAndroidApp) {
+        app.applicationComponent.inject(this)
         colorObservable = BehaviorSubject.createDefault<Int>(colorPalette[0])
         researchRealm = researchRealmFactory.get()
     }
@@ -338,7 +339,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         newDao.name = name
         newDao.type = type
         newDao.trackerId = trackerId
-        newDao.initialize(configuredContext)
+        newDao.initialize(getApplication<OTApp>())
         processor?.invoke(newDao, realm)
 
         if (trackerDao != null) {

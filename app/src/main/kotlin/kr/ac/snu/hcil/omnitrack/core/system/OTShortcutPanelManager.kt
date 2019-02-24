@@ -24,8 +24,7 @@ import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
@@ -38,7 +37,7 @@ import javax.inject.Singleton
 /**
  * Created by Young-Ho Kim on 9/4/2016
  */
-@Configured
+@Singleton
 class OTShortcutPanelManager @Inject constructor(
         @Singleton val context: Context,
         val authManager: Lazy<OTAuthManager>,

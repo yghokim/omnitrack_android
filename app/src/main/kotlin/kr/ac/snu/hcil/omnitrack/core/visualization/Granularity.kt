@@ -246,6 +246,6 @@ enum class Granularity(val nameId: Int) {
     abstract fun getFormattedCurrentScope(time: Long, context: Context): String
 
     protected fun getFormats(context: Context): LocalTimeFormats {
-        return (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.getLocalTimeFormats()
+        return (context.applicationContext as OTAndroidApp).applicationComponent.getLocalTimeFormats()
     }
 }

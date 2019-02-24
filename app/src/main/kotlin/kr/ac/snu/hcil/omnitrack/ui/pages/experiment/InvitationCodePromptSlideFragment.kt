@@ -29,7 +29,7 @@ class InvitationCodePromptSlideFragment : ExperimentSignUpActivity.SlideFragment
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun onNextTried() {

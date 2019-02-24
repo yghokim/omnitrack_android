@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.database.configured.models
 
+import android.content.Context
 import androidx.annotation.ColorInt
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
@@ -9,10 +10,10 @@ import io.realm.annotations.Ignore
 import io.realm.annotations.Index
 import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTStringStringEntryDAO
@@ -102,8 +103,8 @@ open class OTTrackerDAO : RealmObject() {
         return _parsedLockedPropertyInfo!!
     }
 
-    fun isExternalFilesInvolved(configuredContext: ConfiguredContext): Boolean {
-        return getLiveAttributesSync().find { it.getHelper(configuredContext).isExternalFile(it) } != null
+    fun isExternalFilesInvolved(context: Context): Boolean {
+        return getLiveAttributesSync().find { it.getHelper(context).isExternalFile(it) } != null
     }
 
     fun getLiveAttributesSync(): List<OTAttributeDAO> {
@@ -114,11 +115,11 @@ open class OTTrackerDAO : RealmObject() {
         }
     }
 
-    fun getRequiredPermissions(configuredContext: ConfiguredContext): Array<String> {
+    fun getRequiredPermissions(context: Context): Array<String> {
         val list = ArrayList<String>()
         getLiveAttributesSync().forEach {
             try {
-                val perms = it.getHelper(configuredContext).getRequiredPermissions(it)
+                val perms = it.getHelper(context).getRequiredPermissions(it)
                 if (perms != null) {
                     list.addAll(perms)
                 }
@@ -221,9 +222,9 @@ open class OTAttributeDAO : RealmObject() {
     var serializedCreationFlags: String = "{}"
     var serializedLockedPropertyInfo: String = "{}"
 
-    fun getParsedConnection(configuredContext: ConfiguredContext): OTConnection? {
+    fun getParsedConnection(context: Context): OTConnection? {
         return try {
-            serializedConnection?.let { configuredContext.configuredAppComponent.getConnectionTypeAdapter().fromJson(it) }
+            serializedConnection?.let { (context.applicationContext as OTAndroidApp).applicationComponent.getConnectionTypeAdapter().fromJson(it) }
         } catch (ex: JsonSyntaxException) {
             ex.printStackTrace(); null
         }
@@ -255,28 +256,28 @@ open class OTAttributeDAO : RealmObject() {
                 ?: false
     }
 
-    fun getHelper(configuredContext: ConfiguredContext): OTAttributeHelper {
-        return configuredContext.configuredAppComponent.getAttributeManager().getAttributeHelper(type)
+    fun getHelper(context: Context): OTAttributeHelper {
+        return (context.applicationContext as OTAndroidApp).applicationComponent.getAttributeManager().getAttributeHelper(type)
     }
 
-    fun getInputViewType(configuredContext: ConfiguredContext, previewMode: Boolean): Int {
-        return getHelper(configuredContext).getInputViewType(previewMode, this)
+    fun getInputViewType(context: Context, previewMode: Boolean): Int {
+        return getHelper(context).getInputViewType(previewMode, this)
     }
 
-    fun initialize(configuredContext: ConfiguredContext) {
-        initializePropertiesWithDefaults(configuredContext)
-        getHelper(configuredContext).initialize(this)
+    fun initialize(context: Context) {
+        initializePropertiesWithDefaults(context)
+        getHelper(context).initialize(this)
     }
 
-    fun initializePropertiesWithDefaults(configuredContext: ConfiguredContext) {
-        val attributeHelper = getHelper(configuredContext)
+    fun initializePropertiesWithDefaults(context: Context) {
+        val attributeHelper = getHelper(context)
         attributeHelper.propertyKeys.forEach { key ->
             setPropertySerializedValue(key, attributeHelper.getPropertyHelper<Any>(key).getSerializedValue(attributeHelper.getPropertyInitialValue(key)!!))
         }
     }
 
-    fun getFallbackValue(configuredContext: ConfiguredContext, realm: Realm): Single<Nullable<out Any>> {
-        return getHelper(configuredContext).getFallbackValue(this, realm)
+    fun getFallbackValue(context: Context, realm: Realm): Single<Nullable<out Any>> {
+        return getHelper(context).getFallbackValue(this, realm)
     }
 
     fun setPropertySerializedValue(key: String, serializedValue: String): Boolean {

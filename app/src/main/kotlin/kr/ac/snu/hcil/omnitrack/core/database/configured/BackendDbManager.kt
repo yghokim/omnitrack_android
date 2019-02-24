@@ -17,8 +17,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.*
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
@@ -35,7 +34,7 @@ import javax.inject.Singleton
 /**
  * Created by younghokim on 2017. 9. 25..
  */
-@Configured
+@Singleton
 class BackendDbManager @Inject constructor(
         @Singleton private val context: Context,
         @Backend private val config: RealmConfiguration,

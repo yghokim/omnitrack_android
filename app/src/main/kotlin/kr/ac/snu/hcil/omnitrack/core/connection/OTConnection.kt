@@ -7,9 +7,9 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
@@ -117,8 +117,8 @@ class OTConnection {
         } else return false
     }
 
-    fun getSerializedString(configuredContext: ConfiguredContext): String {
-        return configuredContext.configuredAppComponent.getConnectionTypeAdapter().toJson(this)
+    fun getSerializedString(context: Context): String {
+        return (context.applicationContext as OTAndroidApp).applicationComponent.getConnectionTypeAdapter().toJson(this)
     }
 
     fun getSerializedString(adapter: ConnectionTypeAdapter): String {

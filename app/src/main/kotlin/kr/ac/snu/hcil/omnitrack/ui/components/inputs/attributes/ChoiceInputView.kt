@@ -22,13 +22,12 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.input_choice.view.*
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTChoiceAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -86,7 +85,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
     }
 
     init {
-        (context.applicationContext as OTAndroidApp).applicationComponent.configuredContext().configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
 
         adapter = Adapter()
 
@@ -163,8 +162,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
             this.realmProvider.get().use { realm ->
                 val attribute = realm.where(OTAttributeDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, boundAttributeObjectId).findFirst()
                 if (attribute != null) {
-                    val configuredContext = (context.applicationContext as OTApp).applicationComponent.configuredContext()
-                    val helper = attribute.getHelper(configuredContext) as OTChoiceAttributeHelper
+                    val helper = attribute.getHelper(context) as OTChoiceAttributeHelper
                     val originalEntryList = helper.getChoiceEntries(attribute)
                     if (originalEntryList != null) {
                         if (modifyFunc(originalEntryList)) {

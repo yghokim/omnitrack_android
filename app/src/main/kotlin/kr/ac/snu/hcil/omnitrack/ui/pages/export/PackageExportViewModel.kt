@@ -4,17 +4,17 @@ import android.app.Application
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import javax.inject.Inject
 
 class PackageExportViewModel(application: Application) : UserAttachedViewModel(application) {
 
-    @field:[Inject Configured]
+    @Inject
     protected lateinit var serverController: ISynchronizationServerSideAPI
 
     private var selectedTrackerIds = HashSet<String>()
@@ -38,8 +38,8 @@ class PackageExportViewModel(application: Application) : UserAttachedViewModel(a
     val selectedReminderIds: List<String>
         get() = reminderSelectionListSubject.value?.toList() ?: emptyList()
 
-    override fun onInject(configuredContext: ConfiguredContext) {
-        configuredContext.configuredAppComponent.inject(this)
+    override fun onInject(app: OTAndroidApp) {
+        getApplication<OTApp>().applicationComponent.inject(this)
     }
 
     override fun onUserAttached(newUserId: String) {

@@ -1,17 +1,17 @@
-package kr.ac.snu.hcil.omnitrack.core.di.configured
+package kr.ac.snu.hcil.omnitrack.core.di.global
 
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import dagger.Module
 import dagger.Provides
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 /**
  * Created by Young-Ho on 11/3/2017.
  */
-@Module(includes = [NetworkModule::class, ConfiguredModule::class])
+@Module(includes = [ApplicationModule::class, NetworkModule::class])
 class AuthModule {
 
     @Provides
@@ -20,7 +20,7 @@ class AuthModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     @ForGeneralAuth
     fun getGoogleSignInOptions(): GoogleSignInOptions {
         return GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

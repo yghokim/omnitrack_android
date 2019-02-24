@@ -40,7 +40,7 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (application as OTAndroidApp).applicationComponent.inject(this)
 
         rightActionBarTextButton?.visibility = View.VISIBLE
         rightActionBarTextButton?.setText(R.string.msg_send)

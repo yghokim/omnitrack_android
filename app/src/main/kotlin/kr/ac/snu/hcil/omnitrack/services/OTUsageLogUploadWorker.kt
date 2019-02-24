@@ -38,7 +38,7 @@ class OTUsageLogUploadWorker(private val context: Context, workerParams: WorkerP
     private val realmScheduler = Schedulers.from(Executors.newSingleThreadExecutor())
 
     init {
-        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun getBackgroundScheduler(): Scheduler {

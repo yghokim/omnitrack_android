@@ -9,8 +9,8 @@ import io.realm.OrderedCollectionChangeSet
 import io.realm.OrderedRealmCollectionChangeListener
 import io.realm.RealmResults
 import kr.ac.snu.hcil.omnitrack.BuildConfig
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
@@ -68,8 +68,8 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
 
     private var ignoreInitialTrackerList = false
 
-    override fun onInject(configuredContext: ConfiguredContext) {
-        configuredContext.configuredAppComponent.inject(this)
+    override fun onInject(app: OTAndroidApp) {
+        app.applicationComponent.inject(this)
     }
 
     fun initEdit(triggerId: String, userId: String, savedInstanceState: Bundle?) {

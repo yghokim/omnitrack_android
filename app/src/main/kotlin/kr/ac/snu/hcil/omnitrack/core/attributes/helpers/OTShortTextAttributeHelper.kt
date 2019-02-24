@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
+import android.content.Context
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTShortTextAttributeHelper(configuredContext: ConfiguredContext) : ATextTypeAttributeHelper(configuredContext) {
+class OTShortTextAttributeHelper(context: Context) : ATextTypeAttributeHelper(context) {
 
     override fun getValueNumericCharacteristics(attribute: OTAttributeDAO): NumericCharacteristics {
         return NumericCharacteristics(false, false)

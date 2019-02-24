@@ -23,7 +23,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.di.configured.ServerResponsive
+import kr.ac.snu.hcil.omnitrack.core.di.global.ServerResponsive
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
@@ -47,7 +47,7 @@ class SignInActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (application as OTAndroidApp).applicationComponent.inject(this)
 
         setContentView(R.layout.activity_sign_in)
 

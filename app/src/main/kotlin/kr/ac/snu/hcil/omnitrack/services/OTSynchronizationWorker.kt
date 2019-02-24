@@ -50,7 +50,7 @@ class OTSynchronizationWorker(private val context: Context, private val workerPa
     lateinit var eventLogger: Lazy<IEventLogger>
 
     init {
-        (context.applicationContext as OTAndroidApp).currentConfiguredContext.configuredAppComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun createWork(): Single<Result> {

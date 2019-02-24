@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.di.configured
+package kr.ac.snu.hcil.omnitrack.core.di.global
 
 import dagger.Module
 import dagger.Provides
@@ -9,8 +9,8 @@ import io.realm.annotations.RealmModule
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendRealmMigration
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.*
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.*
-import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 /**
  * Created by Young-Ho on 11/3/2017.
@@ -19,11 +19,11 @@ import javax.inject.Qualifier
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class Backend
 
-@Module(includes = [ConfiguredModule::class, AuthModule::class, NetworkModule::class, DaoSerializationModule::class])
+@Module(includes = [AuthModule::class, NetworkModule::class, DaoSerializationModule::class])
 class BackendDatabaseModule {
 
     @Provides
-    @Configured
+    @Singleton
     @Backend
     fun backendDatabaseConfiguration(): RealmConfiguration {
         return RealmConfiguration.Builder()
@@ -35,7 +35,7 @@ class BackendDatabaseModule {
     }
 
     @Provides
-    @Configured
+    @Singleton
     @Backend
     fun makeBackendDbRealmProvider(@Backend configuration: RealmConfiguration): Factory<Realm> {
         return Factory { Realm.getInstance(configuration) }

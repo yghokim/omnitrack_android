@@ -4,7 +4,8 @@ import android.app.Application
 import io.realm.OrderedCollectionChangeSet
 import io.realm.RealmQuery
 import io.realm.RealmResults
-import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
@@ -35,8 +36,8 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
         return originalQuery
     }
 
-    override fun onInject(configuredContext: ConfiguredContext) {
-        configuredContext.configuredAppComponent.inject(this)
+    override fun onInject(app: OTAndroidApp) {
+        getApplication<OTApp>().applicationComponent.inject(this)
     }
 
 
@@ -51,7 +52,7 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
                 //initial set
                 currentTriggerViewModels.clear()
                 currentTriggerViewModels.addAll(
-                        snapshot.map { TriggerViewModel(configuredContext, it, realm) }
+                        snapshot.map { TriggerViewModel(getApplication(), it, realm) }
                 )
             } else {
                 //changes
@@ -62,7 +63,7 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
 
                 //deal with additions
                 changeSet.insertions.forEach { i ->
-                    currentTriggerViewModels.add(i, TriggerViewModel(configuredContext, snapshot[i]!!, realm))
+                    currentTriggerViewModels.add(i, TriggerViewModel(getApplication(), snapshot[i]!!, realm))
                 }
 
                 //deal with refresh
