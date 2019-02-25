@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.services
+package kr.ac.snu.hcil.omnitrack.core.workers
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -36,11 +36,11 @@ class OTVersionCheckWorker(private val context: Context, workerParams: WorkerPar
             get() = pref.get().getBoolean(PREF_CHECK_UPDATES, false)
 
         fun checkVersionOneTime() {
-            WorkManager.getInstance().enqueueUniqueWork(OTVersionCheckWorker.TAG, ExistingWorkPolicy.REPLACE, requestBuilder.get())
+            WorkManager.getInstance().enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, requestBuilder.get())
         }
 
         fun cancelVersionCheckingWork() {
-            WorkManager.getInstance().cancelUniqueWork(OTVersionCheckWorker.TAG)
+            WorkManager.getInstance().cancelUniqueWork(TAG)
         }
     }
 

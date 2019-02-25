@@ -4,7 +4,7 @@ import androidx.work.*
 import dagger.Module
 import dagger.Provides
 import dagger.internal.Factory
-import kr.ac.snu.hcil.omnitrack.services.*
+import kr.ac.snu.hcil.omnitrack.core.workers.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton

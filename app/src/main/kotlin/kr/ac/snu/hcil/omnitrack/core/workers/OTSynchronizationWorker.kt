@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.services
+package kr.ac.snu.hcil.omnitrack.core.workers
 
 import android.content.Context
 import android.content.Intent
@@ -53,12 +53,13 @@ class OTSynchronizationWorker(private val context: Context, private val workerPa
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
+
     override fun createWork(): Single<Result> {
         return Single.defer {
 
             if (workerParams.inputData.getBoolean(EXTRA_KEY_FULLSYNC, false)) {
                 syncManager.get().queueFullSync(ignoreFlags = false)
-                this.eventLogger.get().logEvent(OTSynchronizationWorker.TAG, "synchronization_try_fullsync")
+                this.eventLogger.get().logEvent(TAG, "synchronization_try_fullsync")
             }
 
             val pendingQueue = syncQueueDbHelper.get().getAggregatedData()

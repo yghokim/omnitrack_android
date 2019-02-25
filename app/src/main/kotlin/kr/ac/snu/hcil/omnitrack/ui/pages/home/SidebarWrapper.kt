@@ -34,8 +34,8 @@ import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.InformationUpload
 import kr.ac.snu.hcil.omnitrack.core.di.global.ResearchSync
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
-import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadWorker
-import kr.ac.snu.hcil.omnitrack.services.OTResearchSynchronizationWorker
+import kr.ac.snu.hcil.omnitrack.core.workers.OTInformationUploadWorker
+import kr.ac.snu.hcil.omnitrack.core.workers.OTResearchSynchronizationWorker
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity

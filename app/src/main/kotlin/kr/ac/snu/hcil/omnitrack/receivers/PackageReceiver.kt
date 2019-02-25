@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
-import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckWorker
+import kr.ac.snu.hcil.omnitrack.core.workers.OTVersionCheckWorker
 import javax.inject.Inject
 
 /**

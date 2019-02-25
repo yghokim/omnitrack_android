@@ -30,8 +30,8 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
+import kr.ac.snu.hcil.omnitrack.core.workers.OTVersionCheckWorker
 import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
-import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckWorker
 import kr.ac.snu.hcil.omnitrack.ui.components.common.preference.ColorPreference
 import kr.ac.snu.hcil.omnitrack.ui.components.common.preference.ColorPreferenceDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper

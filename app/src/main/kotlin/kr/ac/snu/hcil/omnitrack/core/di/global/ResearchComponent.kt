@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.di.global
 
 import dagger.Component
-import kr.ac.snu.hcil.omnitrack.services.OTResearchSynchronizationWorker
+import kr.ac.snu.hcil.omnitrack.core.workers.OTResearchSynchronizationWorker
 import kr.ac.snu.hcil.omnitrack.ui.pages.research.ResearchViewModel
 import javax.inject.Singleton
 

@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.services
+package kr.ac.snu.hcil.omnitrack.core.workers
 
 import android.content.Context
 import android.util.Log

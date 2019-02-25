@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.di.global.ServerSyncOneShot
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
-import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationWorker
+import kr.ac.snu.hcil.omnitrack.core.workers.OTSynchronizationWorker
 import javax.inject.Inject
 import javax.inject.Provider
 import javax.inject.Singleton
