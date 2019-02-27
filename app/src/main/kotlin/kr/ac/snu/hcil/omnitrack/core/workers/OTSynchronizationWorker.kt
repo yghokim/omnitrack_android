@@ -28,6 +28,7 @@ class OTSynchronizationWorker(private val context: Context, private val workerPa
 
     companion object {
         val TAG = "OTSynchronizationWorker"
+        const val SYNC_EVENT_NAME = "data_sync"
         const val EXTRA_KEY_ONESHOT = "isOneShot"
         const val EXTRA_KEY_FULLSYNC = "fullSync"
         const val BROADCAST_ACTION_SYNCHRONIZATION_FINISHED = "${BuildConfig.APPLICATION_ID}:synchronization_finished"
@@ -59,7 +60,7 @@ class OTSynchronizationWorker(private val context: Context, private val workerPa
 
             if (workerParams.inputData.getBoolean(EXTRA_KEY_FULLSYNC, false)) {
                 syncManager.get().queueFullSync(ignoreFlags = false)
-                this.eventLogger.get().logEvent(TAG, "synchronization_try_fullsync")
+                this.eventLogger.get().logEvent(SYNC_EVENT_NAME, "synchronization_try_fullsync")
             }
 
             val pendingQueue = syncQueueDbHelper.get().getAggregatedData()
@@ -69,7 +70,7 @@ class OTSynchronizationWorker(private val context: Context, private val workerPa
                         .doOnError { err ->
                             err.printStackTrace()
                             println("synchronization failed")
-                            this.eventLogger.get().logEvent(TAG, "synchronization_failed", jsonObject("error" to err.message, "stacktrace" to err.getStackTraceString()))
+                            this.eventLogger.get().logEvent(SYNC_EVENT_NAME, "synchronization_failed", jsonObject("error" to err.message, "stacktrace" to err.getStackTraceString()))
                         }
                         .onErrorReturn { Result.retry() }
                         .doAfterSuccess {
@@ -79,7 +80,7 @@ class OTSynchronizationWorker(private val context: Context, private val workerPa
                         .doOnSubscribe {
                             Log.d(TAG, "doOnSubscribe: start synchronization")
                             context.runOnUiThread {
-                                eventLogger.get().logEvent(TAG, "synchronization_started")
+                                eventLogger.get().logEvent(SYNC_EVENT_NAME, "synchronization_started")
                                 if (authManager.get().isUserSignedIn()) {
                                     shortcutPanelManager.get().registerShortcutRefreshSubscription(authManager.get().userId
                                             ?: "", TAG)
@@ -94,7 +95,7 @@ class OTSynchronizationWorker(private val context: Context, private val workerPa
                             shortcutPanelManager.get().unregisterShortcutRefreshSubscription(TAG)
 
                             println("synchronization process finished successfully.")
-                            this.eventLogger.get().logEvent(TAG, "synchronization_finished")
+                            this.eventLogger.get().logEvent(SYNC_EVENT_NAME, "synchronization_finished")
                         }
             } else {
                 Single.just(Result.success()).doAfterSuccess { broadcastFinished(null) }
