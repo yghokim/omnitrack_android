@@ -18,7 +18,7 @@ class OTExternalServiceManager @Inject constructor(
         @ExternalService val preferences: SharedPreferences
 ) {
 
-    private val factoryCodeDict = HashMap<String, OTMeasureFactory>()
+    private val factoryCodeDict = HashMap<String, OTServiceMeasureFactory>()
 
     val availableServices: Array<OTExternalService> by lazy {
         val list =
@@ -46,9 +46,9 @@ class OTExternalServiceManager @Inject constructor(
         return availableServices.find { it.identifier == identifier }
     }
 
-    fun getFilteredMeasureFactories(filter: (OTMeasureFactory) -> Boolean): List<OTMeasureFactory> {
+    fun getFilteredMeasureFactories(filter: (OTServiceMeasureFactory) -> Boolean): List<OTServiceMeasureFactory> {
 
-        val list = ArrayList<OTMeasureFactory>()
+        val list = ArrayList<OTServiceMeasureFactory>()
         for (service in availableServices) {
             for (factory in service.measureFactories) {
                 if (filter(factory)) {
@@ -60,7 +60,7 @@ class OTExternalServiceManager @Inject constructor(
         return list
     }
 
-    fun getMeasureFactoryByCode(typeCode: String): OTMeasureFactory? {
+    fun getMeasureFactoryByCode(typeCode: String): OTServiceMeasureFactory? {
         if (availableServices.isNotEmpty())
             return factoryCodeDict[typeCode]
         else return null

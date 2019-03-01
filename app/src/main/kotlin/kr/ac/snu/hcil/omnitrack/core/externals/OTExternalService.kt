@@ -115,9 +115,10 @@ abstract class OTExternalService(val context: Context, val identifier: String, v
             return true
         }
 
-    private val _measureFactories = ArrayList<OTMeasureFactory>()
+    private val _measureFactories = ArrayList<OTServiceMeasureFactory>()
 
-    val measureFactories: List<OTMeasureFactory> get() {
+    val measureFactories: List<OTServiceMeasureFactory>
+        get() {
         return _measureFactories
     }
 
@@ -157,7 +158,7 @@ abstract class OTExternalService(val context: Context, val identifier: String, v
 
     internal abstract fun isSupportedInSystem(): Boolean
 
-    protected abstract fun onRegisterMeasureFactories(): Array<OTMeasureFactory>
+    protected abstract fun onRegisterMeasureFactories(): Array<OTServiceMeasureFactory>
 
     protected open fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
         return emptyArray()

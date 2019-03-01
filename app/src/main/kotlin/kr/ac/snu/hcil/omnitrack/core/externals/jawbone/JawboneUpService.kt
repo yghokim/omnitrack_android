@@ -18,7 +18,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import kr.ac.snu.hcil.omnitrack.utils.getYear
@@ -64,7 +64,7 @@ class JawboneUpService(context: Context) : OTExternalService(context, "JawboneUp
     }
 
 
-    override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
+    override fun onRegisterMeasureFactories(): Array<OTServiceMeasureFactory> {
         return arrayOf(
                 JawboneStepMeasureFactory(context, this),
                 JawboneDistanceMeasureFactory(context, this))

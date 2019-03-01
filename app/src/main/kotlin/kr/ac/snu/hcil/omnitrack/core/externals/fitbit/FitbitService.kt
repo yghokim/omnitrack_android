@@ -6,7 +6,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OAuth2BasedExternalService
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 
 /**
@@ -35,7 +35,7 @@ class FitbitService(context: Context) : OAuth2BasedExternalService(context, "Fit
     override val descResourceId: Int = R.string.service_fitbit_desc
     override val nameResourceId: Int = R.string.service_fitbit_name
 
-    override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
+    override fun onRegisterMeasureFactories(): Array<OTServiceMeasureFactory> {
         return arrayOf(
                 FitbitStepCountMeasureFactory(context, this),
                 FitbitDistanceMeasureFactory(context, this),

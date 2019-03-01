@@ -1,20 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.content.Context
-import android.text.Html
-import com.google.gson.stream.JsonReader
-import io.reactivex.Flowable
-import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
-import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
+import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 
 /**
  * Created by Young-Ho Kim on 16. 7. 28
  */
-abstract class OTMeasureFactory(val context: Context, val parentService: OTExternalService, val factoryTypeName: String) : INameDescriptionResourceProvider {
+abstract class OTServiceMeasureFactory(context: Context, val parentService: OTExternalService, factoryTypeName: String) : OTMeasureFactory(context, factoryTypeName) {
 
     companion object {
         val CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE = intArrayOf(AConditioner.TYPECODE_SINGLE_NUMERIC_COMPARISON)
@@ -83,70 +77,20 @@ abstract class OTMeasureFactory(val context: Context, val parentService: OTExter
 
     }
 
-    interface IExampleAttributeConfigurator {
-        fun configureExampleAttribute(attr: OTAttributeDAO): Boolean
+    override fun getCategoryName(): String {
+        return context.resources.getString(parentService.nameResourceId)
     }
 
-    val typeCode: String by lazy {
+    override val typeCode: String by lazy {
         "${parentService.identifier}_$factoryTypeName"
     }
 
-    open val supportedConditionerTypes: IntArray = intArrayOf()
-
-    open val requiredPermissions: Array<String> = arrayOf()
-
-    abstract fun isAttachableTo(attribute: OTAttributeDAO): Boolean
-
-    abstract fun getAttributeType(): Int
-
-    abstract val isRangedQueryAvailable: Boolean
-    abstract val isDemandingUserInput: Boolean
-    abstract val minimumGranularity: OTTimeRangeQuery.Granularity
-
-    abstract fun makeMeasure(): OTMeasure
-    abstract fun makeMeasure(reader: JsonReader): OTMeasure
-    abstract fun makeMeasure(serialized: String): OTMeasure
-    abstract fun serializeMeasure(measure: OTMeasure): String
-
-    open fun getFormattedName(): CharSequence {
-        val html = "<b>${context.resources.getString(nameResourceId)}</b> | ${context.resources.getString(parentService.nameResourceId)}"
-        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
-        } else {
-            @Suppress("DEPRECATION")
-            Html.fromHtml(html)
-        }
+    fun <T : OTExternalService> getService(): T {
+        @Suppress("UNCHECKED_CAST")
+        return parentService as T
     }
 
-    protected abstract val exampleAttributeType: Int
-    protected abstract fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator
-
-    abstract class OTMeasure(val factory: OTMeasureFactory) {
-
-        /*** Typename in TypeStringSerializer
-         *
-         */
-        abstract val dataTypeName: String
-
-        val factoryCode: String get() = this.factory.typeCode
-
-        abstract fun getValueRequest(builder: OTItemBuilderWrapperBase, query: OTTimeRangeQuery?): Flowable<Nullable<out Any>>
-
-        protected fun <T : OTExternalService> service(): T {
-            @Suppress("UNCHECKED_CAST")
-            return factory.parentService as T
-        }
-
-    }
-
-    abstract class OTRangeQueriedMeasure(factory: OTMeasureFactory) : OTMeasure(factory) {
-
-
-        abstract fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>>
-
-        override fun getValueRequest(builder: OTItemBuilderWrapperBase, query: OTTimeRangeQuery?): Flowable<Nullable<out Any>> {
-            val range = query!!.getRange(builder)
-            return getValueRequest(range.first, range.second)
-        }
+    override fun onMakeFormattedName(): String {
+        return "${super.onMakeFormattedName()} | ${context.resources.getString(parentService.nameResourceId)}"
     }
 }

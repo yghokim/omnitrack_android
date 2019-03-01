@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 
 /**
@@ -29,7 +29,7 @@ class MisfitService(context: Context) : OTExternalService(context, "MisfitServic
         return BuildConfig.MISFIT_APP_KEY != null && BuildConfig.MISFIT_APP_SECRET != null
     }
 
-    override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
+    override fun onRegisterMeasureFactories(): Array<OTServiceMeasureFactory> {
         return arrayOf(MisfitStepMeasureFactory(context, this), MisfitSleepMeasureFactory(context, this))
     }
 

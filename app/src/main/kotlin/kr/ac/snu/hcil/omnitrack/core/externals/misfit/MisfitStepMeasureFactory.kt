@@ -7,7 +7,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
@@ -15,7 +15,7 @@ import java.util.*
 /**
  * Created by Young-Ho on 9/2/2016.
  */
-class MisfitStepMeasureFactory(context: Context, service: MisfitService) : OTMeasureFactory(context, service, "step") {
+class MisfitStepMeasureFactory(context: Context, service: MisfitService) : OTServiceMeasureFactory(context, service, "step") {
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_STEP_ATTRIBUTE
@@ -61,9 +61,10 @@ class MisfitStepMeasureFactory(context: Context, service: MisfitService) : OTMea
 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             return Flowable.defer {
-                val token = service<MisfitService>().getStoredAccessToken()
+                val service = getFactory<MisfitStepMeasureFactory>().getService<MisfitService>()
+                val token = service.getStoredAccessToken()
                 if (token != null) {
-                    return@defer service<MisfitService>().api.getStepsOnDayRequest(token, Date(start), Date(end - 1)).toFlowable() as Flowable<Nullable<out Any>>
+                    return@defer service.api.getStepsOnDayRequest(token, Date(start), Date(end - 1)).toFlowable() as Flowable<Nullable<out Any>>
                 } else {
                     return@defer Flowable.error<Nullable<out Any>>(Exception("no token"))
                 }

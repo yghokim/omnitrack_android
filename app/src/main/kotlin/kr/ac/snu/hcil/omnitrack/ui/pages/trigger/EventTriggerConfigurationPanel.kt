@@ -13,7 +13,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
 import kr.ac.snu.hcil.omnitrack.core.calculation.SingleNumericComparison
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditionerviews.SingleNumericConditionerSettingView
 import javax.inject.Inject
@@ -26,7 +26,7 @@ class EventTriggerConfigurationPanel : FrameLayout {
     @Inject
     lateinit var externalServiceManager: OTExternalServiceManager
 
-    var selectedMeasureFactory: OTMeasureFactory?
+    var selectedMeasureFactory: OTServiceMeasureFactory?
         get() {
             return availableMeasures[measureSelectionView.value]
         }
@@ -48,7 +48,7 @@ class EventTriggerConfigurationPanel : FrameLayout {
         }
 
 
-    val availableMeasures: List<OTMeasureFactory>
+    val availableMeasures: List<OTServiceMeasureFactory>
 
     private val measureSelectionView: ComboBoxPropertyView
 
@@ -76,7 +76,7 @@ class EventTriggerConfigurationPanel : FrameLayout {
 
     }
 
-    inner class MeasureSpinnerAdapter : ArrayAdapter<OTMeasureFactory>(context, R.layout.simple_list_element_category_name, availableMeasures) {
+    inner class MeasureSpinnerAdapter : ArrayAdapter<OTServiceMeasureFactory>(context, R.layout.simple_list_element_category_name, availableMeasures) {
 
         init {
 
@@ -110,8 +110,8 @@ class EventTriggerConfigurationPanel : FrameLayout {
         private val titleView: TextView = view.findViewById(R.id.category)
         private val categoryView: TextView = view.findViewById(R.id.title)
 
-        fun bind(factory: OTMeasureFactory) {
-            categoryView.setText(factory.parentService.nameResourceId)
+        fun bind(factory: OTServiceMeasureFactory) {
+            categoryView.text = factory.getCategoryName()
             titleView.setText(factory.nameResourceId)
         }
     }

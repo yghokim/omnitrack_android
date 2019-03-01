@@ -12,9 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
@@ -82,11 +82,11 @@ class SourceSelectionPage(override val parent: ConnectionWizardView, val attribu
         }
     }
 
-    abstract class SourceInformation(val categoryResId: Int, val titleResId: Int, val descriptionResId: Int) {
+    abstract class SourceInformation(val category: String, val titleResId: Int, val descriptionResId: Int) {
         abstract fun getSource(): OTMeasureFactory.OTMeasure
     }
 
-    class MeasureFactoryInformation(val factory: OTMeasureFactory) : SourceInformation(factory.parentService.nameResourceId, factory.nameResourceId, factory.descResourceId) {
+    class MeasureFactoryInformation(val factory: OTMeasureFactory) : SourceInformation(factory.getCategoryName(), factory.nameResourceId, factory.descResourceId) {
         override fun getSource(): OTMeasureFactory.OTMeasure {
             return factory.makeMeasure()
         }
@@ -140,7 +140,7 @@ class SourceSelectionPage(override val parent: ConnectionWizardView, val attribu
         }
 
         fun bind(information: SourceInformation) {
-            categoryView.setText(information.categoryResId)
+            categoryView.text = information.category
             titleView.setText(information.titleResId)
             descriptionView.setText(information.descriptionResId)
         }

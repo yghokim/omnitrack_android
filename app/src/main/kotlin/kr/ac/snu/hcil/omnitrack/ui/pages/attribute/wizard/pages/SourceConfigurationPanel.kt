@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
+import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.SimpleNameDescriptionViewHolder
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.SimpleTextViewHolder
@@ -40,7 +41,7 @@ class SourceConfigurationPanel : FrameLayout, IEventListener<Int> {
 
     fun initialize(pendingConnection: OTConnection) {
 
-        val filtered = OTTimeRangeQuery.Preset.values().filter { it.granularity.ordinal >= pendingConnection.source?.factory?.minimumGranularity?.ordinal ?: 0 }
+        val filtered = OTTimeRangeQuery.Preset.values().filter { it.granularity.ordinal >= pendingConnection.source?.getFactory<OTMeasureFactory>()?.minimumGranularity?.ordinal ?: 0 }
         println(filtered)
 
         queryPresetAdapter.clear()

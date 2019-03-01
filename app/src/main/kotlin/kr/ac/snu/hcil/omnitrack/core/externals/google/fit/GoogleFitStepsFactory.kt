@@ -76,8 +76,9 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             println("Requested Google Fit Step Measure")
             OTApp.logger.writeSystemLog("Start Google Fit step measure", "GoogleFitStepsFactory")
-            return if (service<GoogleFitService>().state == OTExternalService.ServiceState.ACTIVATED) {
-                service<GoogleFitService>().getConnectedClient().toFlowable().flatMap<Nullable<out Any>> { client ->
+            val service = getFactory<GoogleFitStepsFactory>().getService<GoogleFitService>()
+            return if (service.state == OTExternalService.ServiceState.ACTIVATED) {
+                service.getConnectedClient().toFlowable().flatMap<Nullable<out Any>> { client ->
                     Flowable.defer {
 
                         //make a DataSource to designate to use the same step count as Google Fit app.

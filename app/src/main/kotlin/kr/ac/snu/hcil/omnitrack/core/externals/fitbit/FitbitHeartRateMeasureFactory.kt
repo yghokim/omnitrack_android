@@ -7,7 +7,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
@@ -15,7 +15,7 @@ import org.json.JSONObject
 /**
  * Created by Young-Ho Kim on 2016-10-06.
  */
-class FitbitHeartRateMeasureFactory(context: Context, service: FitbitService) : OTMeasureFactory(context, service, "heart") {
+class FitbitHeartRateMeasureFactory(context: Context, service: FitbitService) : OTServiceMeasureFactory(context, service, "heart") {
 
     override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
         return attribute.type == OTAttributeManager.TYPE_NUMBER
@@ -46,7 +46,7 @@ class FitbitHeartRateMeasureFactory(context: Context, service: FitbitService) : 
     override val exampleAttributeType: Int
         get() = OTAttributeManager.TYPE_NUMBER
 
-    override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator = OTMeasureFactory.CONFIGURATOR_FOR_HEART_RATE_ATTRIBUTE
+    override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator = OTServiceMeasureFactory.CONFIGURATOR_FOR_HEART_RATE_ATTRIBUTE
 
     override val nameResourceId: Int = R.string.measure_fitbit_heart_rate_name
     override val descResourceId: Int = R.string.measure_fitbit_heart_rate_desc
@@ -67,7 +67,7 @@ class FitbitHeartRateMeasureFactory(context: Context, service: FitbitService) : 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             val urls = FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_HEART_RATE, start, end)
             println(urls)
-            return service<FitbitService>().getRequest(converter, *urls).toFlowable() as Flowable<Nullable<out Any>>
+            return getFactory<FitbitHeartRateMeasureFactory>().getService<FitbitService>().getRequest(converter, *urls).toFlowable() as Flowable<Nullable<out Any>>
         }
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT

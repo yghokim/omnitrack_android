@@ -5,7 +5,7 @@ import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OAuth2BasedExternalService
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
@@ -55,7 +55,7 @@ class RescueTimeService(context: Context) : OAuth2BasedExternalService(context, 
     override val descResourceId: Int = R.string.service_rescuetime_desc
 
 
-    override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
+    override fun onRegisterMeasureFactories(): Array<OTServiceMeasureFactory> {
         return arrayOf(
                 RescueTimeProductivityMeasureFactory(context, this),
                 RescueTimeComputerUsageDurationMeasureFactory(context, this)

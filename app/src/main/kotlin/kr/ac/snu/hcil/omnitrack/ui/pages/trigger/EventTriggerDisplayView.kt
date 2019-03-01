@@ -11,7 +11,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.calculation.SingleNumericComparison
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingTop
 import org.jetbrains.anko.dip

@@ -7,13 +7,13 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
  * Created by younghokim on 2017. 1. 25..
  */
-class JawboneDistanceMeasureFactory(context: Context, service: JawboneUpService) : OTMeasureFactory(context, service, "dist") {
+class JawboneDistanceMeasureFactory(context: Context, service: JawboneUpService) : OTServiceMeasureFactory(context, service, "dist") {
     override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
