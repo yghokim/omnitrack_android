@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProviders
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_trigger_detail.*
 import kotlinx.android.synthetic.main.layout_tracker_assign_panel.view.*
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
@@ -222,14 +223,18 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
                     msg, yesLabel = R.string.msg_save, noLabel = R.string.msg_do_not_save, onYes =
             {
-                val errorMessages = viewModel.validateConfiguration(this)
-                if (errorMessages == null) {
-                    viewModel.saveFrontToDao()
-                    setResult(Activity.RESULT_OK, makeResultData())
-                    finish()
-                } else {
-                    DialogHelper.makeSimpleAlertBuilder(this, errorMessages.joinToString("\n")).show()
-                }
+                creationSubscriptions.add(
+                        viewModel.validateConfiguration(this).observeOn(AndroidSchedulers.mainThread()).subscribe { (valid, errorMessages) ->
+                            if (valid) {
+                                viewModel.saveFrontToDao()
+                                setResult(Activity.RESULT_OK, makeResultData())
+                                finish()
+                            } else {
+                                DialogHelper.makeSimpleAlertBuilder(this, errorMessages?.joinToString("\n")
+                                        ?: "Configuration is not valid.").show()
+                            }
+                        }
+                )
             }, onNo = { setResult(Activity.RESULT_CANCELED); finish() })
                     .cancelable(true)
                     .neutralText(R.string.msg_cancel).show()
@@ -244,14 +249,18 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
 
     override fun onToolbarRightButtonClicked() {
         ui_script_form.clearFocus()
-        val errorMessages = viewModel.validateConfiguration(this)
-        if (errorMessages == null) {
-            viewModel.saveFrontToDao()
-            setResult(Activity.RESULT_OK, makeResultData())
-            finish()
-        } else {
-            DialogHelper.makeSimpleAlertBuilder(this, errorMessages.joinToString("\n")).show()
-        }
+        creationSubscriptions.add(
+                viewModel.validateConfiguration(this).subscribe { (valid, errorMessages) ->
+                    if (valid) {
+                        viewModel.saveFrontToDao()
+                        setResult(Activity.RESULT_OK, makeResultData())
+                        finish()
+                    } else {
+                        DialogHelper.makeSimpleAlertBuilder(this, errorMessages?.joinToString("\n")
+                                ?: "Configuration is not valid.").show()
+                    }
+                }
+        )
     }
 
     private fun makeResultData(): Intent {

@@ -175,35 +175,41 @@ open class TriggerViewModel(val context: Context, val dao: OTTriggerDAO, val rea
                     Completable.complete()
                 } else {
                     if (dao.isManaged) {
-                        val validationError = dao.isValidToTurnOn(context)
-                        if (validationError == null) {
-                            val id = dao.objectId
-                            realm.executeTransactionAsObservable { realm ->
-                                realm.where(OTTriggerDAO::class.java).equalTo("objectId", id).findFirst()
-                                        ?.apply {
-                                            isOn = true
-                                            synchronizedAt = null
+                        return@defer dao.isValidToTurnOn(context)
+                                .flatMapCompletable { (validationError) ->
+                                    if (validationError == null) {
+                                        val id = dao.objectId
+                                        realm.executeTransactionAsObservable { realm ->
+                                            realm.where(OTTriggerDAO::class.java).equalTo("objectId", id).findFirst()
+                                                    ?.apply {
+                                                        isOn = true
+                                                        synchronizedAt = null
+                                                    }
+                                        }.doOnComplete {
+                                            triggerSwitch.onNextIfDifferAndNotNull(true)
+                                            triggerSystemManager.handleTriggerOn(dao)
+                                        }.doAfterTerminate {
+                                            syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
                                         }
-                            }.doOnComplete {
-                                triggerSwitch.onNextIfDifferAndNotNull(true)
-                                triggerSystemManager.handleTriggerOn(dao)
-                            }.doAfterTerminate {
-                                syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)
-                            }
-                        } else Completable.error(validationError)
+                                    } else {
+                                        Completable.error(OTTriggerDAO.TriggerConfigInvalidException(*validationError))
+                                    }
+                                }
                     } else {
                         //offline mode
                         println("offline mode trigger switch on")
-                        val validationError = dao.isValidToTurnOn(context)
-                        if (validationError == null ||
-                                (validationError.causes.size == 1 &&
-                                        validationError.causes.contains(OTTriggerDAO.TriggerValidationComponent.TRACKER_ATTACHED))) {
-                            dao.isOn = true
-                            triggerSwitch.onNextIfDifferAndNotNull(true)
-                            Completable.complete()
-                        } else {
-                            Completable.error(validationError)
-                        }
+                        return@defer dao.isValidToTurnOn(context)
+                                .flatMapCompletable { (validationError) ->
+                                    if (validationError == null ||
+                                            (validationError.size == 1 &&
+                                                    validationError.contains(OTTriggerDAO.TriggerInvalidReason.TRACKER_NOT_ATTACHED))) {
+                                        dao.isOn = true
+                                        triggerSwitch.onNextIfDifferAndNotNull(true)
+                                        Completable.complete()
+                                    } else {
+                                        Completable.error(OTTriggerDAO.TriggerConfigInvalidException(*validationError))
+                                    }
+                                }
                     }
                 }
             } else {

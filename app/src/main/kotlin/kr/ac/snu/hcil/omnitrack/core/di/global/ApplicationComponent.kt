@@ -27,10 +27,7 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
-import kr.ac.snu.hcil.omnitrack.core.workers.OTBinaryUploadWorker
-import kr.ac.snu.hcil.omnitrack.core.workers.OTInformationUploadWorker
-import kr.ac.snu.hcil.omnitrack.core.workers.OTSynchronizationWorker
-import kr.ac.snu.hcil.omnitrack.core.workers.OTUsageLogUploadWorker
+import kr.ac.snu.hcil.omnitrack.core.workers.*
 import kr.ac.snu.hcil.omnitrack.receivers.RebootReceiver
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
@@ -251,6 +248,7 @@ interface ApplicationComponent {
     fun inject(worker: OTUsageLogUploadWorker)
     fun inject(worker: OTInformationUploadWorker)
     fun inject(worker: OTSynchronizationWorker)
+    fun inject(worker: OTDataTriggerConditionWorker)
 
     fun inject(task: OTReminderCommands)
 
@@ -261,4 +259,5 @@ interface ApplicationComponent {
     fun inject(fragment: ServiceListFragment)
 
     fun inject(activity: ExternalServiceActivationActivity)
+
 }

@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Bundle
 import dagger.Lazy
+import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.OrderedCollectionChangeSet
 import io.realm.OrderedRealmCollectionChangeListener
@@ -164,11 +165,9 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
         return originalTriggerDao?.let { serializationManager.get().serializeTrigger(it) }
     }
 
-    fun validateConfiguration(context: Context): List<CharSequence>? {
-        val msgs = ArrayList<CharSequence>()
-        if (conditionInstance.value?.isConfigurationValid(context, msgs) != false) {
-            return null
-        } else return msgs
+    fun validateConfiguration(context: Context): Single<Pair<Boolean, List<CharSequence>?>> {
+        return conditionInstance.value?.isConfigurationValid(context)
+                ?: Single.just<Pair<Boolean, List<CharSequence>?>>(Pair(false, listOf("No condition instance.")))
     }
 
     override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet) {

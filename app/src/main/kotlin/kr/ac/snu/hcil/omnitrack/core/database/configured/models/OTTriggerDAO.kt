@@ -6,6 +6,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.github.salomonbrys.kotson.toJson
 import com.google.gson.JsonObject
 import io.reactivex.Completable
+import io.reactivex.Single
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.RealmQuery
@@ -23,6 +24,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -32,9 +34,9 @@ open class OTTriggerDAO : RealmObject() {
 
     data class SimpleTriggerInfo(override val objectId: String, val conditionType: Byte, val condition: ATriggerCondition?, val actionType: Byte, val action: OTTriggerAction?, val trackers: Array<OTTrackerDAO.SimpleTrackerInfo>?) : IReadonlyObjectId
 
-    enum class TriggerValidationComponent { TRACKER_ATTACHED, CONDITION_VALID }
-    class TriggerConfigInvalidException(vararg _causes: TriggerValidationComponent) : Exception() {
-        val causes: Array<out TriggerValidationComponent> = _causes
+    enum class TriggerInvalidReason { TRACKER_NOT_ATTACHED, CONDITION_INVALID }
+    class TriggerConfigInvalidException(vararg _causes: TriggerInvalidReason) : Exception() {
+        val causes: Array<out TriggerInvalidReason> = _causes
 
         override val message: String?
             get() = "trigger validation failed because [${causes.joinToString(", ")}] conditions were not met."
@@ -83,6 +85,7 @@ open class OTTriggerDAO : RealmObject() {
             if (_condition == null) {
                 _condition = when (conditionType) {
                     CONDITION_TYPE_TIME -> serializedCondition?.let { OTTimeTriggerCondition.typeAdapter.fromJson(it) } ?: OTTimeTriggerCondition()
+
                     else -> null
                 }
             }
@@ -243,24 +246,25 @@ open class OTTriggerDAO : RealmObject() {
     /**
      * Check whether the trigger is valid to be turned on the system.
      *
-     * @return if null, is valid. is not, the trigger is invalid due to the returned exception.
+     * @return the trigger is invalid due to the returned exception.
      */
-    fun isValidToTurnOn(context: Context): TriggerConfigInvalidException? {
-        val containsTracker = liveTrackerCount > 0
+    fun isValidToTurnOn(context: Context): Single<Nullable<Array<TriggerInvalidReason>>> {
+        return (condition?.isConfigurationValid(context)?.map { (valid, _) -> valid }
+                ?: Single.just(false))
+                .map { isConditionValid ->
+                    val containsTracker = liveTrackerCount > 0
+                    val invalids = HashSet<TriggerInvalidReason>()
+                    if (!containsTracker) {
+                        invalids.add(TriggerInvalidReason.TRACKER_NOT_ATTACHED)
+                    }
+                    if (!isConditionValid) {
+                        invalids.add(TriggerInvalidReason.CONDITION_INVALID)
+                    }
 
-        val isConditionValid = condition?.isConfigurationValid(context, null) ?: false
-
-        return if (containsTracker && isConditionValid) null else {
-            val invalids = ArrayList<TriggerValidationComponent>()
-            if (!containsTracker) {
-                invalids.add(TriggerValidationComponent.TRACKER_ATTACHED)
-            }
-            if (!isConditionValid) {
-                invalids.add(TriggerValidationComponent.CONDITION_VALID)
-            }
-
-            TriggerConfigInvalidException(*invalids.toTypedArray())
-        }
+                    return@map if (invalids.count() > 0)
+                        Nullable(invalids.toTypedArray())
+                    else Nullable()
+                }
     }
 
     fun getPerformFireCompletable(triggerTime: Long, metadata: JsonObject, context: Context): Completable {
