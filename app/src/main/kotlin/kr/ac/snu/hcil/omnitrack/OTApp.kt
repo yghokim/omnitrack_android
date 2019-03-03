@@ -98,6 +98,9 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
 
         const val PREFERENCE_KEY_FIREBASE_INSTANCE_ID = "$PREFIX_PREF_KEY.firebase_instance_id"
 
+        lateinit var daoSerializationComponent: DaoSerializationComponent
+            private set
+
         init {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         }
@@ -270,6 +273,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
     override val daoSerializationComponent: DaoSerializationComponent by lazy {
         DaggerDaoSerializationComponent.builder()
                 .applicationModule(appModule)
+                .externalServiceModule(externalServiceModule)
                 .backendDatabaseModule(backendDatabaseModule)
                 .designModule(designModule)
                 .serializationModule(serializationModule)
@@ -343,6 +347,8 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
                 systemDefaultUncaughtExceptionHandler.uncaughtException(thread, throwable)
             }
         }
+
+        OTApp.daoSerializationComponent = this.daoSerializationComponent
 
         //initialize modules===============================================
 

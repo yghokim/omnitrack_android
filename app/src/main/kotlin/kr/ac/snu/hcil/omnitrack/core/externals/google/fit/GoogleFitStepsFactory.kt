@@ -31,8 +31,6 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
         return CONFIGURATOR_STEP_ATTRIBUTE
     }
 
-    override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
-
     override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
 
     override val isRangedQueryAvailable: Boolean = true

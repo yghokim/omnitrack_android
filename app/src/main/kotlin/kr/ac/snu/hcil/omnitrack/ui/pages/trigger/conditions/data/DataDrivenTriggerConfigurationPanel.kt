@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
+package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data
 
 import android.content.Context
 import android.util.AttributeSet
@@ -8,20 +8,22 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.TextView
+import io.reactivex.Observable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
-import kr.ac.snu.hcil.omnitrack.core.calculation.SingleNumericComparison
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
+import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditionerviews.SingleNumericConditionerSettingView
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.ConditionConfigurationPanelImpl
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.IConditionConfigurationView
 import javax.inject.Inject
 
 /**
  * Created by younghokim on 16. 9. 5..
  */
-class EventTriggerConfigurationPanel : FrameLayout {
+class DataDrivenTriggerConfigurationPanel : FrameLayout, IConditionConfigurationView {
 
     @Inject
     lateinit var externalServiceManager: OTExternalServiceManager
@@ -31,28 +33,22 @@ class EventTriggerConfigurationPanel : FrameLayout {
             return availableMeasures[measureSelectionView.value]
         }
         set(value) {
-            val pos = if (value != null) availableMeasures.indexOf(value) else -1
+            val pos = if (value != null) availableMeasures.indexOfFirst { it.typeCode == value.typeCode } else -1
             if (pos != -1) {
                 measureSelectionView.value = pos
             }
         }
 
-    var conditioner: AConditioner?
-        get() {
-            return conditionerView.conditioner
-        }
-        set(value) {
-            if (value is SingleNumericComparison) {
-                conditionerView.conditioner = value
-            }
-        }
-
-
     val availableMeasures: List<OTServiceMeasureFactory>
 
     private val measureSelectionView: ComboBoxPropertyView
 
-    private val conditionerView: SingleNumericConditionerSettingView
+    private val comparisonSettingView: DataDrivenComparisonSettingView
+
+    private val impl = ConditionConfigurationPanelImpl(OTDataDrivenTriggerCondition::class.java)
+
+    override val onConditionChanged: Observable<ATriggerCondition>
+        get() = impl.onConditionChanged
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -72,8 +68,37 @@ class EventTriggerConfigurationPanel : FrameLayout {
         measureSelectionView = findViewById(R.id.ui_event_trigger_measure_selection)
         measureSelectionView.adapter = MeasureSpinnerAdapter()
 
-        conditionerView = findViewById(R.id.ui_condition_setting)
+        measureSelectionView.valueChanged += { sender, selectedFactoryIndex ->
+            val factory = availableMeasures[selectedFactoryIndex]
+            impl.currentCondition?.measure = factory.makeMeasure()
+            impl.notifyConditionChanged()
+        }
 
+        comparisonSettingView = findViewById(R.id.ui_condition_setting)
+
+        comparisonSettingView.onComparisonChanged += { sender, newComparison ->
+            impl.currentCondition?.comparison = newComparison
+            impl.notifyConditionChanged()
+        }
+
+        comparisonSettingView.onThresholdChanged += { sender, newThreshold ->
+            impl.currentCondition?.threshold = newThreshold
+            impl.notifyConditionChanged()
+        }
+    }
+
+    override fun applyCondition(condition: ATriggerCondition) {
+        impl.applyConditionAndGetChanged(condition) { newCondition ->
+            if (newCondition.measure == null) {
+                impl.currentCondition?.measure = selectedMeasureFactory?.makeMeasure()
+                impl.notifyConditionChanged()
+            } else {
+                selectedMeasureFactory = newCondition.measure!!.getFactory()
+            }
+
+            comparisonSettingView.comparison = newCondition.comparison
+            comparisonSettingView.threshold = newCondition.threshold
+        }
     }
 
     inner class MeasureSpinnerAdapter : ArrayAdapter<OTServiceMeasureFactory>(context, R.layout.simple_list_element_category_name, availableMeasures) {
@@ -115,31 +140,4 @@ class EventTriggerConfigurationPanel : FrameLayout {
             titleView.setText(factory.nameResourceId)
         }
     }
-    /*
-
-    override fun applyConfigurationToTrigger(trigger: OTTrigger) {
-        if (trigger is OTDataTrigger) {
-            trigger.conditioner = conditioner
-            trigger.measure = selectedMeasureFactory?.makeMeasure()
-        }
-    }
-
-    override fun importTriggerConfiguration(trigger: OTTrigger) {
-        if (trigger is OTDataTrigger) {
-            conditioner = trigger.conditioner
-            selectedMeasureFactory = trigger.measure?.factory
-        }
-    }
-
-    override fun validateConfigurations(errorMessagesOut: MutableList<String>): Boolean {
-        return true
-    }
-
-    override fun writeConfigurationToBundle(out: Bundle) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun readConfigurationFromBundle(bundle: Bundle) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }*/
 }

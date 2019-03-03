@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
+package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatImageView
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
@@ -25,7 +25,7 @@ object NewTriggerConditionTypeSelectionDialogHelper {
 
     init {
         triggerTypeEntryDict[OTTriggerDAO.CONDITION_TYPE_TIME] = TriggerTypeEntry(OTTriggerDAO.CONDITION_TYPE_TIME, R.drawable.alarm_dark, R.string.trigger_name_time, R.string.trigger_desc_time)
-        triggerTypeEntryDict[OTTriggerDAO.CONDITION_TYPE_DATA] = TriggerTypeEntry(OTTriggerDAO.CONDITION_TYPE_DATA, R.drawable.event_dark, R.string.trigger_name_data, R.string.trigger_desc_data, enabled = false)
+        triggerTypeEntryDict[OTTriggerDAO.CONDITION_TYPE_DATA] = TriggerTypeEntry(OTTriggerDAO.CONDITION_TYPE_DATA, R.drawable.event_dark, R.string.trigger_name_data, R.string.trigger_desc_data)
     }
 
     fun builder(context: Context, triggerActionTypeName: Int, supportedConditionTypes: Array<Byte>? = null, listener: (Byte) -> Unit): AlertDialog.Builder {
@@ -33,7 +33,7 @@ object NewTriggerConditionTypeSelectionDialogHelper {
         val view = LayoutInflater.from(context).inflate(R.layout.simple_layout_with_recycler_view, null)
         val listView: RecyclerView = view.findViewById(R.id.ui_recyclerview_with_fallback)
 
-        listView.layoutManager = GridLayoutManager(context, 2)
+        listView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         listView.adapter = Adapter(supportedConditionTypes, listener)
 
         return AlertDialog.Builder(context)
@@ -76,17 +76,17 @@ object NewTriggerConditionTypeSelectionDialogHelper {
                 holder.iconView.alpha = 1f
                 holder.nameView.alpha = 1f
                 holder.descView.alpha = 1f
-                holder.disabledMessageView.visibility = View.GONE
+                //holder.disabledMessageView.visibility = View.GONE
             } else {
                 holder.iconView.alpha = 0.2f
                 holder.nameView.alpha = 0.2f
                 holder.descView.alpha = 0.2f
-                holder.disabledMessageView.visibility = View.VISIBLE
+                //holder.disabledMessageView.visibility = View.VISIBLE
             }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.layout_trigger_type_selection_element, null)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.simple_menu_element_with_icon_title_description, null)
             return ViewHolder(view)
         }
 
@@ -94,10 +94,10 @@ object NewTriggerConditionTypeSelectionDialogHelper {
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
             var item: TriggerTypeEntry? = null
 
-            val iconView: AppCompatImageView = view.findViewById(R.id.ui_icon)
-            val nameView: TextView = view.findViewById(R.id.ui_name)
-            val descView: TextView = view.findViewById(R.id.ui_description)
-            val disabledMessageView: TextView = view.findViewById(R.id.ui_disabled_message)
+            val iconView: AppCompatImageView = view.findViewById(R.id.icon)
+            val nameView: TextView = view.findViewById(R.id.name)
+            val descView: TextView = view.findViewById(R.id.description)
+            //val disabledMessageView: TextView = view.findViewById(R.id.ui_disabled_message)
 
             init {
                 view.setOnClickListener(this)

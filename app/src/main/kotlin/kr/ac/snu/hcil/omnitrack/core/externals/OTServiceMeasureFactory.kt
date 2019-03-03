@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.content.Context
-import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 
@@ -11,8 +10,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 abstract class OTServiceMeasureFactory(context: Context, val parentService: OTExternalService, factoryTypeName: String) : OTMeasureFactory(context, factoryTypeName) {
 
     companion object {
-        val CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE = intArrayOf(AConditioner.TYPECODE_SINGLE_NUMERIC_COMPARISON)
-        val CONDITIONERS_FOR_TIMEPOINT_VALUE = intArrayOf()
 
         val CONFIGURATOR_STEP_ATTRIBUTE = object : IExampleAttributeConfigurator {
             override fun configureExampleAttribute(attr: OTAttributeDAO): Boolean {

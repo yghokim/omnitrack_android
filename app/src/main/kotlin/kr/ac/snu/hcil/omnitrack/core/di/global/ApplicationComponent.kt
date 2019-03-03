@@ -58,9 +58,9 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.services.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.FieldPresetSelectionBottomSheetFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailStructureTabFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailViewModel
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.EventTriggerConfigurationPanel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TrackerAssignPanel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TriggerDetailViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenTriggerConfigurationPanel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.OfflineTriggerListViewModel
@@ -128,7 +128,7 @@ interface ApplicationComponent {
 
     fun inject(externalService: OTExternalService)
 
-    fun inject(panel: EventTriggerConfigurationPanel)
+    fun inject(panel: DataDrivenTriggerConfigurationPanel)
     fun inject(page: SourceSelectionPage)
 
     fun inject(scale: QuantizedTimeScale)

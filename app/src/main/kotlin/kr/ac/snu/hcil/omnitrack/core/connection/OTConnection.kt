@@ -5,6 +5,7 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import dagger.Lazy
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
@@ -21,7 +22,7 @@ import kr.ac.snu.hcil.omnitrack.utils.TextHelper
  */
 class OTConnection {
 
-    class ConnectionTypeAdapter(val externalServiceManager: OTExternalServiceManager) : TypeAdapter<OTConnection>() {
+    class ConnectionTypeAdapter(val externalServiceManager: OTExternalServiceManager, val timeRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>) : TypeAdapter<OTConnection>() {
         override fun read(reader: JsonReader): OTConnection {
             val connection = OTConnection()
             reader.beginObject()
@@ -45,8 +46,7 @@ class OTConnection {
                     }
 
                     "query" -> {
-                        val adapter = OTTimeRangeQuery.TimeRangeQueryTypeAdapter()
-                        connection.rangedQuery = adapter.read(reader)
+                        connection.rangedQuery = timeRangeQueryTypeAdapter.get().read(reader)
                     }
                 }
             }
@@ -69,8 +69,7 @@ class OTConnection {
 
             value.rangedQuery?.let {
                 out.name("query")
-                val adapter = OTTimeRangeQuery.TimeRangeQueryTypeAdapter()
-                adapter.write(out, it)
+                timeRangeQueryTypeAdapter.get().write(out, it)
             }
 
             out.endObject()

@@ -34,7 +34,7 @@ class ManagedReminderListViewModel(app: Application) : AManagedTriggerListViewMo
             currentDefaultTriggerInterfaceOptions = TriggerInterfaceOptions(
                     false,
                     arrayOf(trackerId),
-                    arrayOf(OTTriggerDAO.CONDITION_TYPE_TIME),
+                    arrayOf(OTTriggerDAO.CONDITION_TYPE_TIME, OTTriggerDAO.CONDITION_TYPE_DATA),
                     OTTriggerDAO.ACTION_TYPE_REMIND,
                     !(trackerDao?.isAddNewReminderLocked() ?: false)
             )

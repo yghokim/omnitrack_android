@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
+package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions
 
 import io.reactivex.Observable
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition

@@ -21,8 +21,6 @@ abstract class OTMeasureFactory(val context: Context, val factoryTypeName: Strin
 
     abstract val typeCode: String
 
-    open val supportedConditionerTypes: IntArray = intArrayOf()
-
     open val requiredPermissions: Array<String> = arrayOf()
 
     abstract fun isAttachableTo(attribute: OTAttributeDAO): Boolean

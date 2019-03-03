@@ -19,6 +19,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.IConditionConfigurationView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerInterfaceOptions
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.Nullable

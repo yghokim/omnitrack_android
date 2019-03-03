@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
+package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.time
 
 import android.content.Context
 import android.text.Spannable

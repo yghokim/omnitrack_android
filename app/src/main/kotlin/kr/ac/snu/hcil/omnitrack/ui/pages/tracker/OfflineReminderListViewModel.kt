@@ -10,7 +10,11 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerInterfaceOpti
  * Created by younghokim on 2017. 10. 24..
  */
 class OfflineReminderListViewModel(app: Application) : OfflineTriggerListViewModel(app) {
-    override val defaultTriggerInterfaceOptions: TriggerInterfaceOptions = TriggerInterfaceOptions(false, null, arrayOf(OTTriggerDAO.CONDITION_TYPE_TIME), OTTriggerDAO.ACTION_TYPE_REMIND)
+    override val defaultTriggerInterfaceOptions: TriggerInterfaceOptions = TriggerInterfaceOptions(
+            false,
+            null,
+            arrayOf(OTTriggerDAO.CONDITION_TYPE_TIME, OTTriggerDAO.CONDITION_TYPE_DATA),
+            OTTriggerDAO.ACTION_TYPE_REMIND)
 
 
     fun applyToDb(trackerId: String) {

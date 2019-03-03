@@ -44,6 +44,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.TriggerFireBroadcastReceiver
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.TopBottomHorizontalImageDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.NewTriggerConditionTypeSelectionDialogHelper
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.OfflineTriggerListViewModel

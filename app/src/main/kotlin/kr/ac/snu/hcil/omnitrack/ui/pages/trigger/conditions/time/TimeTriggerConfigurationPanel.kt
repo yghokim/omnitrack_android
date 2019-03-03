@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
+package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.time
 
 import android.app.DatePickerDialog
 import android.content.Context
@@ -13,7 +13,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.transition.*
 import butterknife.bindView
 import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.trigger_time_trigger_config_panel.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
@@ -25,6 +24,8 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourRangePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.ConditionConfigurationPanelImpl
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.IConditionConfigurationView
 import kr.ac.snu.hcil.omnitrack.utils.*
 import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
 import kr.ac.snu.hcil.omnitrack.utils.time.Time
@@ -38,6 +39,9 @@ import java.util.*
  * Created by Young-Ho Kim on 2016-08-24
  */
 class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationView, IEventListener<Int>, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
+
+    private val impl = ConditionConfigurationPanelImpl(OTTimeTriggerCondition::class.java)
+
     private val dateFormat = SimpleDateFormat(resources.getString(R.string.dateformat_ymd))
 
     private val configTypePropertyView: ComboBoxPropertyView by bindView(R.id.ui_time_trigger_type)
@@ -61,14 +65,8 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
 
     private var refreshingViews = false
 
-    private var currentCondition: OTTimeTriggerCondition? = null
-
-    private var suspendConditionChangeEvent = false
-
-
-    private val conditionChanged = PublishSubject.create<ATriggerCondition>()
     override val onConditionChanged: Observable<ATriggerCondition>
-        get() = conditionChanged
+        get() = impl.onConditionChanged
 
     private val modeChangeTransition: Transition by lazy {
         TransitionSet()
@@ -113,8 +111,8 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
         timePicker.setTime(9, 0, Calendar.PM)
 
         timePicker.timeChanged += { sender, time ->
-            currentCondition?.alarmTimeHour = ((timePicker.hour + timePicker.amPm * 12) % 24).toByte()
-            currentCondition?.alarmTimeMinute = timePicker.minute.toByte()
+            impl.currentCondition?.alarmTimeHour = ((timePicker.hour + timePicker.amPm * 12) % 24).toByte()
+            impl.currentCondition?.alarmTimeMinute = timePicker.minute.toByte()
             notifyConditionChanged()
         }
 
@@ -122,7 +120,7 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
         dayOfWeekPicker.allowNoneSelection = false
 
         dayOfWeekPicker.selectionFlagsChanged += { sender, flags ->
-            currentCondition?.dayOfWeekFlags = flags.toByte()
+            impl.currentCondition?.dayOfWeekFlags = flags.toByte()
             notifyConditionChanged()
         }
 
@@ -131,38 +129,38 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
         isRepeatedView.valueChanged += {
             sender, value ->
             applyIsRepeated(value, true)
-            currentCondition?.isRepeated = value
+            impl.currentCondition?.isRepeated = value
             notifyConditionChanged()
         }
 
         durationPicker.onSecondsChanged += { sender, seconds ->
-            if (currentCondition?.intervalSeconds != seconds.toShort()) {
-                currentCondition?.intervalSeconds = seconds.toShort()
+            if (impl.currentCondition?.intervalSeconds != seconds.toShort()) {
+                impl.currentCondition?.intervalSeconds = seconds.toShort()
                 notifyConditionChanged()
             }
         }
 
         timeSpanPicker.onRangeChanged += { sender, range ->
-            if (currentCondition?.intervalHourRangeStart != range.first.toByte()
-                    || currentCondition?.intervalHourRangeEnd != range.second.toByte()) {
-                currentCondition?.intervalHourRangeStart = range.first.toByte()
-                currentCondition?.intervalHourRangeEnd = range.second.toByte()
+            if (impl.currentCondition?.intervalHourRangeStart != range.first.toByte()
+                    || impl.currentCondition?.intervalHourRangeEnd != range.second.toByte()) {
+                impl.currentCondition?.intervalHourRangeStart = range.first.toByte()
+                impl.currentCondition?.intervalHourRangeEnd = range.second.toByte()
                 notifyConditionChanged()
             }
         }
 
         ui_ema_use_sampling_range.setOnCheckedChangeListener(this)
         ui_ema_range_picker.onRangeChanged += { sender, range ->
-            if (currentCondition?.samplingHourStart != range.first.toByte()
-                    || currentCondition?.samplingHourEnd != range.second.toByte()) {
-                currentCondition?.samplingHourStart = range.first.toByte()
-                currentCondition?.samplingHourEnd = range.second.toByte()
+            if (impl.currentCondition?.samplingHourStart != range.first.toByte()
+                    || impl.currentCondition?.samplingHourEnd != range.second.toByte()) {
+                impl.currentCondition?.samplingHourStart = range.first.toByte()
+                impl.currentCondition?.samplingHourEnd = range.second.toByte()
                 notifyConditionChanged()
             }
         }
         ui_ema_count.valueChanged += { sender, count ->
-            if (currentCondition?.samplingCount != count.toShort()) {
-                currentCondition?.samplingCount = count.toShort()
+            if (impl.currentCondition?.samplingCount != count.toShort()) {
+                impl.currentCondition?.samplingCount = count.toShort()
                 notifyConditionChanged()
             }
         }
@@ -172,8 +170,8 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
         ui_ema_minimum_interval_picker.max = (3 * TimeHelper.hoursInMilli / 1000).toInt()
 
         ui_ema_minimum_interval_picker.durationChanged += { sender, duration ->
-            if (currentCondition?.samplingMinIntervalSeconds != duration.toShort()) {
-                currentCondition?.samplingMinIntervalSeconds = duration.toShort()
+            if (impl.currentCondition?.samplingMinIntervalSeconds != duration.toShort()) {
+                impl.currentCondition?.samplingMinIntervalSeconds = duration.toShort()
                 notifyConditionChanged()
             }
         }
@@ -188,15 +186,15 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
         if (animate) TransitionManager.beginDelayedTransition(this, toggleTransition)
         if (isRepeated) {
             repetitionConfigGroup.visibility = View.VISIBLE
-            timeSpanCheckBox.isChecked = currentCondition?.intervalIsHourRangeUsed ?: false
+            timeSpanCheckBox.isChecked = impl.currentCondition?.intervalIsHourRangeUsed ?: false
             timeSpanCheckBox.isEnabled = true
 
         } else {
             repetitionConfigGroup.visibility = View.GONE
-            val rangeOriginallyUsed = currentCondition?.intervalIsHourRangeUsed ?: false
+            val rangeOriginallyUsed = impl.currentCondition?.intervalIsHourRangeUsed ?: false
             timeSpanCheckBox.isChecked = false
             if (rangeOriginallyUsed) {
-                currentCondition?.intervalIsHourRangeUsed = true
+                impl.currentCondition?.intervalIsHourRangeUsed = true
             }
             timeSpanCheckBox.isEnabled = false
         }
@@ -237,8 +235,8 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
                 intervalConfigGroup.visibility = GONE
                 ui_ema_group.visibility = View.VISIBLE
 
-                if (currentCondition?.isRepeated != true) {
-                    currentCondition?.isRepeated = true
+                if (impl.currentCondition?.isRepeated != true) {
+                    impl.currentCondition?.isRepeated = true
                     applyIsRepeated(true, false)
                     notifyConditionChanged()
                 }
@@ -271,8 +269,8 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
 
                 applyConfigMode(conditionType, true)
 
-                if (currentCondition?.timeConditionType != conditionType) {
-                    currentCondition?.timeConditionType = conditionType
+                if (impl.currentCondition?.timeConditionType != conditionType) {
+                    impl.currentCondition?.timeConditionType = conditionType
                     notifyConditionChanged()
                 }
             }
@@ -292,8 +290,8 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
 
         endDateButton.text = dateFormat.format(repeatEndDate.time)
 
-        if (currentCondition?.endAt != repeatEndDate.timeInMillis) {
-            currentCondition?.endAt = repeatEndDate.timeInMillis
+        if (impl.currentCondition?.endAt != repeatEndDate.timeInMillis) {
+            impl.currentCondition?.endAt = repeatEndDate.timeInMillis
             notifyConditionChanged()
         }
     }
@@ -307,8 +305,8 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
     override fun onCheckedChanged(view: CompoundButton, isChecked: Boolean) {
         if (view === timeSpanCheckBox) {
             TransitionManager.beginDelayedTransition(this, toggleTransition)
-            if (currentCondition?.intervalIsHourRangeUsed != timeSpanCheckBox.isChecked) {
-                currentCondition?.intervalIsHourRangeUsed = timeSpanCheckBox.isChecked
+            if (impl.currentCondition?.intervalIsHourRangeUsed != timeSpanCheckBox.isChecked) {
+                impl.currentCondition?.intervalIsHourRangeUsed = timeSpanCheckBox.isChecked
                 notifyConditionChanged()
             }
 
@@ -323,16 +321,16 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
             if (isEndSpecifiedCheckBox.isChecked) {
                 endDateButton.visibility = View.VISIBLE
 
-                if (currentCondition?.endAt != repeatEndDate.timeInMillis) {
-                    currentCondition?.endAt = repeatEndDate.timeInMillis
+                if (impl.currentCondition?.endAt != repeatEndDate.timeInMillis) {
+                    impl.currentCondition?.endAt = repeatEndDate.timeInMillis
                     notifyConditionChanged()
                 }
 
             } else {
                 endDateButton.visibility = View.INVISIBLE
 
-                if (currentCondition?.endAt != null) {
-                    currentCondition?.endAt = null
+                if (impl.currentCondition?.endAt != null) {
+                    impl.currentCondition?.endAt = null
                     notifyConditionChanged()
                 }
             }
@@ -344,28 +342,22 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
                 ui_ema_range_picker.visibility = View.GONE
             }
 
-            if (currentCondition?.samplingRangeUsed != isChecked) {
-                currentCondition?.samplingRangeUsed = isChecked
+            if (impl.currentCondition?.samplingRangeUsed != isChecked) {
+                impl.currentCondition?.samplingRangeUsed = isChecked
                 notifyConditionChanged()
             }
         }
-
-
     }
 
 
     override fun applyCondition(condition: ATriggerCondition) {
-        if (condition is OTTimeTriggerCondition && currentCondition != condition) {
-            currentCondition = condition.clone() as OTTimeTriggerCondition
+        impl.applyConditionAndGetChanged(condition) { newCondition ->
 
-            suspendConditionChangeEvent = true
+            applyIsRepeated(newCondition.isRepeated, false)
+            applyConfigMode(newCondition.timeConditionType, false)
+            dayOfWeekPicker.checkedFlagsInteger = newCondition.dayOfWeekFlags.toInt()
 
-
-            applyIsRepeated(condition.isRepeated, false)
-            applyConfigMode(condition.timeConditionType, false)
-            dayOfWeekPicker.checkedFlagsInteger = condition.dayOfWeekFlags.toInt()
-
-            val endAt = condition.endAt
+            val endAt = newCondition.endAt
             if (endAt != null) {
                 val cal = Calendar.getInstance()
                 cal.timeInMillis = endAt
@@ -376,35 +368,32 @@ class TimeTriggerConfigurationPanel : ConstraintLayout, IConditionConfigurationV
                 applyRepeatEndDateToDayOffset(1)
             }
 
-            val time = Time(condition.alarmTimeHour.toInt(), condition.alarmTimeMinute.toInt(), 0)
+            val time = Time(newCondition.alarmTimeHour.toInt(), newCondition.alarmTimeMinute.toInt(), 0)
             timePicker.setTime(time.hour, time.minute, time.amPm)
 
-            durationPicker.durationSeconds = condition.intervalSeconds.toInt()
+            durationPicker.durationSeconds = newCondition.intervalSeconds.toInt()
 
-            timeSpanCheckBox.isChecked = condition.intervalIsHourRangeUsed
+            timeSpanCheckBox.isChecked = newCondition.intervalIsHourRangeUsed
 
-            if (condition.intervalHourRangeStart == condition.intervalHourRangeEnd) {
+            if (newCondition.intervalHourRangeStart == newCondition.intervalHourRangeEnd) {
                 timeSpanPicker.fromHourOfDay = 9
                 timeSpanPicker.toHourOfDay = 22
             } else {
-                timeSpanPicker.fromHourOfDay = condition.intervalHourRangeStart.toInt()
-                timeSpanPicker.toHourOfDay = condition.intervalHourRangeEnd.toInt()
+                timeSpanPicker.fromHourOfDay = newCondition.intervalHourRangeStart.toInt()
+                timeSpanPicker.toHourOfDay = newCondition.intervalHourRangeEnd.toInt()
             }
 
-            ui_ema_count.value = condition.samplingCount.toInt()
-            ui_ema_use_sampling_range.isChecked = condition.samplingRangeUsed
+            ui_ema_count.value = newCondition.samplingCount.toInt()
+            ui_ema_use_sampling_range.isChecked = newCondition.samplingRangeUsed
 
-            ui_ema_minimum_interval_picker.durationSeconds = condition.samplingMinIntervalSeconds.toInt()
+            ui_ema_minimum_interval_picker.durationSeconds = newCondition.samplingMinIntervalSeconds.toInt()
 
-            ui_ema_range_picker.fromHourOfDay = condition.samplingHourStart.toInt()
-            ui_ema_range_picker.toHourOfDay = condition.samplingHourEnd.toInt()
-
-            suspendConditionChangeEvent = false
+            ui_ema_range_picker.fromHourOfDay = newCondition.samplingHourStart.toInt()
+            ui_ema_range_picker.toHourOfDay = newCondition.samplingHourEnd.toInt()
         }
     }
 
     private fun notifyConditionChanged() {
-        if (!suspendConditionChangeEvent)
-            currentCondition?.let { this.conditionChanged.onNext(it) }
+        impl.notifyConditionChanged()
     }
 }

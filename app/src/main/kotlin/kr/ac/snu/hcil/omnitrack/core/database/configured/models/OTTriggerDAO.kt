@@ -22,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTBackgroundLoggingTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
+import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
@@ -85,7 +86,8 @@ open class OTTriggerDAO : RealmObject() {
             if (_condition == null) {
                 _condition = when (conditionType) {
                     CONDITION_TYPE_TIME -> serializedCondition?.let { OTTimeTriggerCondition.typeAdapter.fromJson(it) } ?: OTTimeTriggerCondition()
-
+                    CONDITION_TYPE_DATA -> serializedCondition?.let { OTApp.daoSerializationComponent.dataDrivenConditionTypeAdapter().fromJson(it) }
+                            ?: OTDataDrivenTriggerCondition()
                     else -> null
                 }
             }
