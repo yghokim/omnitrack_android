@@ -49,14 +49,13 @@ class JawboneDistanceMeasureFactory(context: Context, service: JawboneUpService)
 
     override val descResourceId: Int = R.string.measure_jawbone_distance_desc
     override val nameResourceId: Int = R.string.measure_jawbone_distance_name
+    override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_FLOAT
 
     class JawboneDistanceMeasure(factory: JawboneDistanceMeasureFactory) : AJawboneMoveMeasure(factory) {
 
         override fun extractValueFromItem(item: JsonObject): Float {
             return item.getAsJsonObject("details").get("distance").asFloat
         }
-
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_FLOAT
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

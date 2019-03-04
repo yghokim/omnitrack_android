@@ -17,6 +17,8 @@ import org.json.JSONObject
  */
 class FitbitHeartRateMeasureFactory(context: Context, service: FitbitService) : OTServiceMeasureFactory(context, service, "heart") {
 
+    override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
+
     override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
         return attribute.type == OTAttributeManager.TYPE_NUMBER
     }
@@ -69,8 +71,6 @@ class FitbitHeartRateMeasureFactory(context: Context, service: FitbitService) : 
             println(urls)
             return getFactory<FitbitHeartRateMeasureFactory>().getService<FitbitService>().getRequest(converter, *urls).toFlowable() as Flowable<Nullable<out Any>>
         }
-
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

@@ -17,6 +17,7 @@ import java.util.*
  */
 class MisfitSleepMeasureFactory(context: Context, service: MisfitService) : OTServiceMeasureFactory(context, service, "slp") {
 
+    override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_FOR_TIMESPAN_ATTRIBUTE
     }
@@ -53,8 +54,6 @@ class MisfitSleepMeasureFactory(context: Context, service: MisfitService) : OTSe
     override val descResourceId: Int = R.string.measure_misfit_sleeps_desc
 
     class MisfitSleepMeasure(factory: MisfitSleepMeasureFactory) : OTRangeQueriedMeasure(factory) {
-
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             val service = getFactory<MisfitSleepMeasureFactory>().getService<MisfitService>()

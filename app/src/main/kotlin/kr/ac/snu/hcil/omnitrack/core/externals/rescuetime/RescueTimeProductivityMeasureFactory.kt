@@ -18,6 +18,7 @@ import java.util.*
  */
 class RescueTimeProductivityMeasureFactory(context: Context, service: RescueTimeService) : OTServiceMeasureFactory(context, service, "prd") {
 
+    override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_DOUBLE
 
     val configurator = object : IExampleAttributeConfigurator {
         override fun configureExampleAttribute(attr: OTAttributeDAO): Boolean {
@@ -78,7 +79,6 @@ class RescueTimeProductivityMeasureFactory(context: Context, service: RescueTime
 
     class ProductivityMeasure(factory: RescueTimeProductivityMeasureFactory) : OTRangeQueriedMeasure(factory) {
 
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_DOUBLE
 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             val factory = getFactory<RescueTimeProductivityMeasureFactory>()

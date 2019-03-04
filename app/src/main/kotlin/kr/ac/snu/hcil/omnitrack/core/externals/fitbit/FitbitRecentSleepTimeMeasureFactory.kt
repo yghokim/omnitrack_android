@@ -31,6 +31,7 @@ class FitbitRecentSleepTimeMeasureFactory(context: Context, service: FitbitServi
 
     override fun getAttributeType() = OTAttributeManager.TYPE_TIMESPAN
 
+    override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
     override val isRangedQueryAvailable: Boolean = true
     override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Hour
     override val isDemandingUserInput: Boolean = false
@@ -59,7 +60,6 @@ class FitbitRecentSleepTimeMeasureFactory(context: Context, service: FitbitServi
 
     class FitbitRecentSleepTimeMeasure(factory: FitbitRecentSleepTimeMeasureFactory) : OTRangeQueriedMeasure(factory) {
 
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
 
         val converter = object : OAuth2Client.OAuth2RequestConverter<TimeSpan?> {
             override fun process(requestResultStrings: Array<String>): TimeSpan? {

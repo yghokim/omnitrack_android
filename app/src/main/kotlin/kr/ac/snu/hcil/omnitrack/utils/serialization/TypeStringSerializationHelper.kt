@@ -137,4 +137,12 @@ object TypeStringSerializationHelper {
         }
     }
 
+    fun isNumeric(typeCode: String): Boolean {
+        return typeCode == TYPENAME_LONG ||
+                typeCode == TYPENAME_BIGDECIMAL ||
+                typeCode == TYPENAME_DOUBLE ||
+                typeCode == TYPENAME_FLOAT ||
+                typeCode == TYPENAME_INT
+    }
+
 }

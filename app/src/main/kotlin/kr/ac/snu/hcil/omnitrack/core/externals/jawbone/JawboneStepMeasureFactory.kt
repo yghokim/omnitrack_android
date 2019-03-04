@@ -14,6 +14,8 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
  * Created by younghokim on 2017. 1. 25..
  */
 class JawboneStepMeasureFactory(context: Context, service: JawboneUpService) : OTServiceMeasureFactory(context, service, "step") {
+
+    override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_FLOAT
     override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
@@ -56,7 +58,6 @@ class JawboneStepMeasureFactory(context: Context, service: JawboneUpService) : O
             return item.getAsJsonObject("details").get("steps").asFloat
         }
 
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_FLOAT
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

@@ -36,6 +36,8 @@ class FitbitDistanceMeasureFactory(context: Context, parentService: FitbitServic
     override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Minute
     override val isDemandingUserInput: Boolean = false
 
+    override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_FLOAT
+
     override fun makeMeasure(): OTMeasure {
         return FitbitDistanceMeasure(this)
     }
@@ -58,8 +60,6 @@ class FitbitDistanceMeasureFactory(context: Context, parentService: FitbitServic
 
 
     class FitbitDistanceMeasure(factory: FitbitDistanceMeasureFactory) : OTRangeQueriedMeasure(factory) {
-
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_FLOAT
 
         val dailyConverter = object : OAuth2Client.OAuth2RequestConverter<Float?> {
             override fun process(requestResultStrings: Array<String>): Float? {

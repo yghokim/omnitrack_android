@@ -31,6 +31,11 @@ abstract class OTMeasureFactory(val context: Context, val factoryTypeName: Strin
     abstract val isDemandingUserInput: Boolean
     abstract val minimumGranularity: OTTimeRangeQuery.Granularity
 
+    /*** Typename in TypeStringSerializer
+     *
+     */
+    abstract val dataTypeName: String
+
     abstract fun makeMeasure(): OTMeasure
     abstract fun makeMeasure(reader: JsonReader): OTMeasure
     abstract fun makeMeasure(serialized: String): OTMeasure
@@ -58,11 +63,6 @@ abstract class OTMeasureFactory(val context: Context, val factoryTypeName: Strin
     protected abstract fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator
 
     abstract class OTMeasure(private val factory: OTMeasureFactory) {
-
-        /*** Typename in TypeStringSerializer
-         *
-         */
-        abstract val dataTypeName: String
 
         val factoryCode: String get() = this.factory.typeCode
 

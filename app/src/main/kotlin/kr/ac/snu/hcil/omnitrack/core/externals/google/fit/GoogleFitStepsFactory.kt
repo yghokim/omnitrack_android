@@ -31,6 +31,7 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
         return CONFIGURATOR_STEP_ATTRIBUTE
     }
 
+    override val dataTypeName = TypeStringSerializationHelper.TYPENAME_INT
     override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
 
     override val isRangedQueryAvailable: Boolean = true
@@ -67,9 +68,6 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
     }
 
     class Measure(factory: GoogleFitStepsFactory) : OTRangeQueriedMeasure(factory) {
-
-        override val dataTypeName = TypeStringSerializationHelper.TYPENAME_INT
-
 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             println("Requested Google Fit Step Measure")

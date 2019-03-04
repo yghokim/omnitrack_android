@@ -20,6 +20,8 @@ import java.util.*
  */
 class FitbitStepCountMeasureFactory(context: Context, parentService: FitbitService) : OTServiceMeasureFactory(context, parentService, "step") {
 
+    override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
+
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_STEP_ATTRIBUTE
     }
@@ -57,8 +59,6 @@ class FitbitStepCountMeasureFactory(context: Context, parentService: FitbitServi
 
 
     class FitbitStepMeasure(factory: FitbitStepCountMeasureFactory) : OTRangeQueriedMeasure(factory) {
-
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 
         val dailyConverter = object : OAuth2Client.OAuth2RequestConverter<Int?> {
             override fun process(requestResultStrings: Array<String>): Int? {

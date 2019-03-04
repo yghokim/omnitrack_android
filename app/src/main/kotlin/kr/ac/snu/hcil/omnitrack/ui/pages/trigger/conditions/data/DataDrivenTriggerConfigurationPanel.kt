@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCond
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.ConditionConfigurationPanelImpl
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.IConditionConfigurationView
+import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import javax.inject.Inject
 
 /**
@@ -62,7 +63,7 @@ class DataDrivenTriggerConfigurationPanel : FrameLayout, IConditionConfiguration
 
 
         availableMeasures = externalServiceManager.getFilteredMeasureFactories {
-            it.isDemandingUserInput == false
+            !it.isDemandingUserInput && TypeStringSerializationHelper.isNumeric(it.dataTypeName)
         }
 
         measureSelectionView = findViewById(R.id.ui_event_trigger_measure_selection)
@@ -88,16 +89,22 @@ class DataDrivenTriggerConfigurationPanel : FrameLayout, IConditionConfiguration
     }
 
     override fun applyCondition(condition: ATriggerCondition) {
+        var shouldNotifyChanges = false
         impl.applyConditionAndGetChanged(condition) { newCondition ->
             if (newCondition.measure == null) {
                 impl.currentCondition?.measure = selectedMeasureFactory?.makeMeasure()
-                impl.notifyConditionChanged()
+                (condition as OTDataDrivenTriggerCondition).measure = impl.currentCondition?.measure
+                shouldNotifyChanges = true
             } else {
                 selectedMeasureFactory = newCondition.measure!!.getFactory()
             }
 
             comparisonSettingView.comparison = newCondition.comparison
             comparisonSettingView.threshold = newCondition.threshold
+        }
+
+        if (shouldNotifyChanges) {
+            impl.notifyConditionChanged()
         }
     }
 

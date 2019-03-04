@@ -45,6 +45,7 @@ class RescueTimeComputerUsageDurationMeasureFactory(context: Context, service: R
 
     override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
 
+    override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_DOUBLE
     override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Hour
     override val isRangedQueryAvailable: Boolean = true
     override val isDemandingUserInput: Boolean = false
@@ -78,7 +79,6 @@ class RescueTimeComputerUsageDurationMeasureFactory(context: Context, service: R
     }
 
     class ComputerUsageDurationMeasure(factory: RescueTimeComputerUsageDurationMeasureFactory) : OTRangeQueriedMeasure(factory) {
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_DOUBLE
 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             val factory = getFactory<RescueTimeComputerUsageDurationMeasureFactory>()

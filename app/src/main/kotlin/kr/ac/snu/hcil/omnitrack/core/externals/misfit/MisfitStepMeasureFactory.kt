@@ -17,6 +17,8 @@ import java.util.*
  */
 class MisfitStepMeasureFactory(context: Context, service: MisfitService) : OTServiceMeasureFactory(context, service, "step") {
 
+    override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
+
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_STEP_ATTRIBUTE
     }
@@ -54,8 +56,6 @@ class MisfitStepMeasureFactory(context: Context, service: MisfitService) : OTSer
 
 
     class MisfitStepMeasure(factory: MisfitStepMeasureFactory) : OTRangeQueriedMeasure(factory) {
-
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             return Flowable.defer {
