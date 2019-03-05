@@ -136,7 +136,7 @@ class OTTimeRangeQuery {
         } else return false
     }
 
-    fun getRange(@Suppress("UNUSED_PARAMETER") builder: OTItemBuilderWrapperBase): Pair<Long, Long> {
+    fun getRange(@Suppress("UNUSED_PARAMETER") builder: OTItemBuilderWrapperBase?): Pair<Long, Long> {
         val start: Long
         val end: Long
         if (mode == TYPE_PIVOT_TIMESTAMP) {

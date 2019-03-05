@@ -66,7 +66,7 @@ abstract class OTMeasureFactory(val context: Context, val factoryTypeName: Strin
 
         val factoryCode: String get() = this.factory.typeCode
 
-        abstract fun getValueRequest(builder: OTItemBuilderWrapperBase, query: OTTimeRangeQuery?): Flowable<Nullable<out Any>>
+        abstract fun getValueRequest(builder: OTItemBuilderWrapperBase?, query: OTTimeRangeQuery?): Flowable<Nullable<out Any>>
 
         fun <T : OTMeasureFactory> getFactory(): T {
             @Suppress("UNCHECKED_CAST")
@@ -79,7 +79,7 @@ abstract class OTMeasureFactory(val context: Context, val factoryTypeName: Strin
 
         abstract fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>>
 
-        override fun getValueRequest(builder: OTItemBuilderWrapperBase, query: OTTimeRangeQuery?): Flowable<Nullable<out Any>> {
+        override fun getValueRequest(builder: OTItemBuilderWrapperBase?, query: OTTimeRangeQuery?): Flowable<Nullable<out Any>> {
             val range = query!!.getRange(builder)
             return getValueRequest(range.first, range.second)
         }
