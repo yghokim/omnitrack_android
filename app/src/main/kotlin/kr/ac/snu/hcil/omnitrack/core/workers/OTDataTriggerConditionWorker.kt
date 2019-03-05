@@ -7,6 +7,7 @@ import dagger.internal.Factory
 import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import javax.inject.Inject
 
@@ -24,6 +25,8 @@ class OTDataTriggerConditionWorker(val context: Context, workerParams: WorkerPar
         return Single.defer {
             val realm = realmFactory.get()
             return@defer Single.just(Result.success())
+        }.doOnSubscribe {
+            OTApp.logger.writeSystemLog("start data trigger measure check", "OTDataTriggerConditionWorker")
         }
     }
 

@@ -25,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataDrivenTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
 import kr.ac.snu.hcil.omnitrack.core.workers.*
@@ -260,4 +261,5 @@ interface ApplicationComponent {
 
     fun inject(activity: ExternalServiceActivationActivity)
 
+    fun inject(dataDrivenTriggerManager: OTDataDrivenTriggerManager)
 }

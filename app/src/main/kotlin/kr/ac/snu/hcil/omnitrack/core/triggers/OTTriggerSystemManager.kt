@@ -76,7 +76,7 @@ class OTTriggerSystemManager(
                         }
                     }
                     OTTriggerDAO.CONDITION_TYPE_DATA -> {
-
+                        dataDrivenTriggerManager.get().registerTrigger(managedTrigger)
                     }
                 }
             } else {

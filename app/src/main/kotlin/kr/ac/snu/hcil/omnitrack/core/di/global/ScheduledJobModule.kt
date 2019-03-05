@@ -152,6 +152,16 @@ class ScheduledJobModule {
                 .addConstraint(Constraint.ON_ANY_NETWORK)
                 .build()*/
     }
+
+    @Provides
+    @Singleton
+    @DataDrivenTrigger
+    fun provideDataDrivenMeasureCheckRequest(): PeriodicWorkRequest {
+        return PeriodicWorkRequest.Builder(OTDataTriggerConditionWorker::class.java,
+                3, TimeUnit.MINUTES, 2, TimeUnit.MINUTES)
+                .build()
+    }
+
 }
 
 @Qualifier
@@ -172,8 +182,6 @@ annotation class ServerFullSync
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ResearchSync
 
-
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
-annotation class BinaryUpload
-
+annotation class DataDrivenTrigger
