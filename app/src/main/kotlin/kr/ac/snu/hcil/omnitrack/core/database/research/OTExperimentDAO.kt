@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.database.configured.models.research
+package kr.ac.snu.hcil.omnitrack.core.database.models.research
 
 import androidx.annotation.Keep
 import androidx.recyclerview.widget.DiffUtil

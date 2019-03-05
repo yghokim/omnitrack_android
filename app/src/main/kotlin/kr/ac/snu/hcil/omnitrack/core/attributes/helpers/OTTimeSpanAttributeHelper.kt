@@ -12,8 +12,8 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimeSpanIntervalSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimeSpanPivotalSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemValueEntryDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemValueEntryDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.TimeRangePicker

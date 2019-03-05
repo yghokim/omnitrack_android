@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.analytics.OTUsageLoggingManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UsageLog
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.UsageLog
 import javax.inject.Qualifier
 import javax.inject.Singleton
 

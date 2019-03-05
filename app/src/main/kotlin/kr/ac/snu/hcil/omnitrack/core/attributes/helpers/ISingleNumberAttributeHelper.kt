@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 
 /**
  * Created by younghokim on 2017. 11. 25..

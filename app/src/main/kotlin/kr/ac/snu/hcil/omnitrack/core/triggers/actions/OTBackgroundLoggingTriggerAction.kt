@@ -7,7 +7,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import io.reactivex.Completable
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 
 /**

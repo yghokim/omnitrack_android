@@ -6,8 +6,8 @@ import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import javax.inject.Inject

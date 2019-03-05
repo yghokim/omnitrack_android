@@ -37,8 +37,8 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.TriggerFireBroadcastReceiver

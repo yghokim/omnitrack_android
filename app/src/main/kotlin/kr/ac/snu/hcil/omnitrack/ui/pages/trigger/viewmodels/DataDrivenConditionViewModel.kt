@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
 import android.content.Context
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 
 class DataDrivenConditionViewModel(trigger: OTTriggerDAO, context: Context) : ATriggerConditionViewModel(trigger, OTTriggerDAO.CONDITION_TYPE_DATA) {
 

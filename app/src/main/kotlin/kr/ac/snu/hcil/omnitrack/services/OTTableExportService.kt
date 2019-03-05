@@ -22,8 +22,8 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager

@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 
 /**
  * Created by Young-Ho Kim on 16. 7. 28

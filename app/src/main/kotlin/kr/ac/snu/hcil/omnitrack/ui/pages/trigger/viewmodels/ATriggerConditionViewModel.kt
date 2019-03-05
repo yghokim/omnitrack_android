@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 
 /**

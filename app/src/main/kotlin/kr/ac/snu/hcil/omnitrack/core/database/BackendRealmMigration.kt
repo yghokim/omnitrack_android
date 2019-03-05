@@ -1,12 +1,16 @@
-package kr.ac.snu.hcil.omnitrack.core.database.configured
+package kr.ac.snu.hcil.omnitrack.core.database
 
 import io.realm.DynamicRealm
 import io.realm.FieldAttribute
 import io.realm.RealmMigration
 import io.realm.RealmObjectSchema
 import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerAlarmInstance
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerReminderEntry
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerAlarmInstance
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerMeasureEntry
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerMeasureHistoryEntry
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerReminderEntry
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataDrivenTriggerManager
 
 
 class BackendRealmMigration : RealmMigration {
@@ -91,6 +95,29 @@ class BackendRealmMigration : RealmMigration {
         if (oldVersionPointer == 4L) {
             schema.get("OTUser")
                     ?.removeField("consentApproved")
+
+            oldVersionPointer++
+        }
+
+        if (oldVersionPointer == 5L) {
+
+            schema.create(OTTriggerMeasureHistoryEntry::class.java.simpleName)
+                    .addField("id", Long::class.java, FieldAttribute.PRIMARY_KEY)
+                    .addField(OTDataDrivenTriggerManager.FIELD_MEASURED_VALUE, Double::class.java)
+                    .setNullable(OTDataDrivenTriggerManager.FIELD_MEASURED_VALUE, true)
+                    .addField(BackendDbManager.FIELD_TIMESTAMP_LONG, Long::class.java, FieldAttribute.INDEXED)
+
+            schema.create(OTTriggerMeasureEntry::class.java.simpleName)
+                    .addField("id", Long::class.java, FieldAttribute.PRIMARY_KEY)
+                    .addField(OTDataDrivenTriggerManager.FIELD_FACTORY_CODE, String::class.java, FieldAttribute.REQUIRED, FieldAttribute.INDEXED)
+                    .setNullable(OTDataDrivenTriggerManager.FIELD_FACTORY_CODE, true)
+                    .addField(OTDataDrivenTriggerManager.FIELD_SERIALIZED_MEASURE, String::class.java, FieldAttribute.REQUIRED)
+                    .setNullable(OTDataDrivenTriggerManager.FIELD_SERIALIZED_MEASURE, true)
+                    .addField(OTDataDrivenTriggerManager.FIELD_SERIALIZED_TIME_QUERY, String::class.java, FieldAttribute.REQUIRED)
+                    .setNullable(OTDataDrivenTriggerManager.FIELD_SERIALIZED_TIME_QUERY, true)
+                    .addRealmListField(OTDataDrivenTriggerManager.FIELD_MEASURE_HISTORY, schema.get(OTTriggerMeasureHistoryEntry::class.java.simpleName)!!)
+                    .addRealmListField(OTDataDrivenTriggerManager.FIELD_TRIGGERS, schema.get(OTTriggerDAO::class.java.simpleName)!!)
+
 
             oldVersionPointer++
         }

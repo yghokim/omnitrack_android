@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.di.global
 import android.content.Context
 import dagger.Module
 import dagger.Provides
-import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncQueueDbHelper
 import javax.inject.Singleton

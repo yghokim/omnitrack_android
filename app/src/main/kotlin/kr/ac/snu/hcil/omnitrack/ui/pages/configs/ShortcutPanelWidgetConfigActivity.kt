@@ -18,8 +18,8 @@ import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.ui.activities.AppWidgetConfigurationActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper

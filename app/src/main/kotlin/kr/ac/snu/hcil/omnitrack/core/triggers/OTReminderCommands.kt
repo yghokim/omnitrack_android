@@ -22,10 +22,10 @@ import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerReminderEntry
+import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerReminderEntry
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric

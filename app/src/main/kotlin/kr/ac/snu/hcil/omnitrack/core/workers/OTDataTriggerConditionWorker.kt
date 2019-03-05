@@ -21,7 +21,10 @@ class OTDataTriggerConditionWorker(val context: Context, workerParams: WorkerPar
 
 
     override fun createWork(): Single<Result> {
-        return Single.just(Result.success())
+        return Single.defer {
+            val realm = realmFactory.get()
+            return@defer Single.just(Result.success())
+        }
     }
 
 }

@@ -20,7 +20,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions.RealmLazyFunction
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager

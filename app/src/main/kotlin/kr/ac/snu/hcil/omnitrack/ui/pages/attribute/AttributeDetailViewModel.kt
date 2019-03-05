@@ -12,8 +12,8 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull

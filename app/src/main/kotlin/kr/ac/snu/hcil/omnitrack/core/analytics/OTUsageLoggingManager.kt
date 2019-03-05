@@ -26,8 +26,8 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.SUB_ADD
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.SUB_EDIT
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.SUB_REMOVE
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.TRIGGER_FIRED
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UsageLog
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.UsageLog
 import kr.ac.snu.hcil.omnitrack.core.di.global.UsageLogger
 import kr.ac.snu.hcil.omnitrack.core.workers.OTUsageLogUploadWorker
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator

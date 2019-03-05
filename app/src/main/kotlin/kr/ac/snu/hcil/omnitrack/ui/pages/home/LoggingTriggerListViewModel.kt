@@ -3,8 +3,8 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.home
 import android.app.Application
 import io.realm.RealmQuery
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerInterfaceOptions
 

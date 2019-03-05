@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.database.configured.typeadapters
+package kr.ac.snu.hcil.omnitrack.core.database.typeadapters
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -6,9 +6,9 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
-import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTStringStringEntryDAO
+import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTStringStringEntryDAO
 import kr.ac.snu.hcil.omnitrack.utils.getBooleanCompat
 import kr.ac.snu.hcil.omnitrack.utils.getIntCompat
 import kr.ac.snu.hcil.omnitrack.utils.getStringCompat

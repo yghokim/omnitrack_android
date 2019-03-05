@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.research
 import android.content.Context
 import com.jaredrummler.materialspinner.MaterialSpinnerAdapter
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
+import kr.ac.snu.hcil.omnitrack.core.database.models.research.ExperimentInfo
 
 /**
  * Created by Young-Ho on 2/20/2018.

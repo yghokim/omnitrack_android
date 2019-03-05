@@ -4,7 +4,7 @@ import android.content.Context
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AlphabeticalSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TextLengthSorter
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 
 /**
  * Created by Young-Ho on 10/12/2017.

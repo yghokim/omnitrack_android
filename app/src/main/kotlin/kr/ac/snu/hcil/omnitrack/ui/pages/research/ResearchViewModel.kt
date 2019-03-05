@@ -10,8 +10,8 @@ import io.reactivex.subjects.BehaviorSubject
 import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.OTExperimentDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.research.ExperimentInfo
+import kr.ac.snu.hcil.omnitrack.core.database.models.research.OTExperimentDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Research
 import kr.ac.snu.hcil.omnitrack.core.net.ExperimentInvitation
 import kr.ac.snu.hcil.omnitrack.core.research.ResearchManager

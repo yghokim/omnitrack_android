@@ -21,8 +21,8 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView

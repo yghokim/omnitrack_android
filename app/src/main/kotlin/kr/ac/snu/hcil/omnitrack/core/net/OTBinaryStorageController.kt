@@ -7,7 +7,7 @@ import androidx.work.WorkManager
 import dagger.internal.Factory
 import io.reactivex.Single
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UploadTaskInfo
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.UploadTaskInfo
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.workers.OTBinaryUploadWorker
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn

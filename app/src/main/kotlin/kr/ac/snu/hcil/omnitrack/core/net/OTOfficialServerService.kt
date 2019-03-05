@@ -4,7 +4,7 @@ import com.google.gson.JsonObject
 import io.reactivex.Completable
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
+import kr.ac.snu.hcil.omnitrack.core.database.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp

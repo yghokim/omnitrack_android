@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.database.configured
+package kr.ac.snu.hcil.omnitrack.core.database
 
 import android.content.Context
 import android.content.Intent
@@ -13,7 +13,7 @@ import io.realm.*
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.*
+import kr.ac.snu.hcil.omnitrack.core.database.models.*
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
@@ -80,7 +80,7 @@ class BackendDbManager @Inject constructor(
 
         fun <T> branchCheckDefaultExperimentId(query: RealmQuery<T>): RealmQuery<T> {
             return if (BuildConfig.DISABLE_EXTERNAL_ENTITIES) {
-                query.equalTo(BackendDbManager.FIELD_EXPERIMENT_ID_IN_FLAGS, BuildConfig.DEFAULT_EXPERIMENT_ID)
+                query.equalTo(FIELD_EXPERIMENT_ID_IN_FLAGS, BuildConfig.DEFAULT_EXPERIMENT_ID)
             } else query
         }
 
@@ -88,9 +88,9 @@ class BackendDbManager @Inject constructor(
             return query
                     .not()
                     .beginGroup()
-                    .contains(BackendDbManager.FIELD_LOCKED_PROPERTIES_SERIALIZED, "\"visibleInApp\":true", Case.INSENSITIVE)
+                    .contains(FIELD_LOCKED_PROPERTIES_SERIALIZED, "\"visibleInApp\":true", Case.INSENSITIVE)
                     .or()
-                    .contains(BackendDbManager.FIELD_LOCKED_PROPERTIES_SERIALIZED, "\"visibleInApp\" : true", Case.INSENSITIVE)
+                    .contains(FIELD_LOCKED_PROPERTIES_SERIALIZED, "\"visibleInApp\" : true", Case.INSENSITIVE)
                     .endGroup()
         }
     }

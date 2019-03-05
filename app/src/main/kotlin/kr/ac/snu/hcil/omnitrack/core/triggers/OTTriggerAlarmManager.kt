@@ -16,11 +16,11 @@ import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
-import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerAlarmInstance
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerSchedule
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerAlarmInstance
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerSchedule
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
 import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService

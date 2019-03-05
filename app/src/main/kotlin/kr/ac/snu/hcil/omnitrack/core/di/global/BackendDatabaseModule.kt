@@ -6,9 +6,9 @@ import dagger.internal.Factory
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.annotations.RealmModule
-import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendRealmMigration
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.*
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.*
+import kr.ac.snu.hcil.omnitrack.core.database.BackendRealmMigration
+import kr.ac.snu.hcil.omnitrack.core.database.models.*
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.*
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -29,7 +29,7 @@ class BackendDatabaseModule {
         return RealmConfiguration.Builder()
                 .name("backend.db")
                 .modules(BackendRealmModule())
-                .schemaVersion(5)
+                .schemaVersion(6)
                 .migration(BackendRealmMigration())
                 .build()
     }
@@ -57,6 +57,8 @@ class BackendDatabaseModule {
         OTTriggerAlarmInstance::class,
         OTTriggerReminderEntry::class,
         OTTriggerSchedule::class,
+    OTTriggerMeasureEntry::class,
+    OTTriggerMeasureHistoryEntry::class,
         UploadTaskInfo::class
 ])
 class BackendRealmModule

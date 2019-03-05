@@ -6,7 +6,7 @@ import com.google.gson.stream.JsonReader
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 

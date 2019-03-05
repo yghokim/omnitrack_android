@@ -5,7 +5,7 @@ import android.text.Html
 import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 

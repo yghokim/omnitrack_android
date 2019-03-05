@@ -19,8 +19,8 @@ import io.realm.RealmConfiguration
 import io.realm.annotations.RealmModule
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.LocalMediaCacheEntry
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UploadTaskInfo
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.LocalMediaCacheEntry
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.UploadTaskInfo
 import kr.ac.snu.hcil.omnitrack.core.net.*
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkNotConnectedException

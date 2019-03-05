@@ -33,7 +33,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTUserDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTUserDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneralAuth
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric

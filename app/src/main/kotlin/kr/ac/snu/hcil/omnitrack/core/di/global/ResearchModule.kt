@@ -7,8 +7,8 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.annotations.RealmModule
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.OTExperimentDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.OTExperimentInvitationDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.research.OTExperimentDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.research.OTExperimentInvitationDAO
 import kr.ac.snu.hcil.omnitrack.core.net.IResearchServerAPI
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import javax.inject.Qualifier

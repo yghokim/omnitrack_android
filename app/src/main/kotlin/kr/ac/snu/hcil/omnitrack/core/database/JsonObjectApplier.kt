@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.database.configured
+package kr.ac.snu.hcil.omnitrack.core.database
 
 import com.google.gson.JsonObject
 import io.realm.RealmObject

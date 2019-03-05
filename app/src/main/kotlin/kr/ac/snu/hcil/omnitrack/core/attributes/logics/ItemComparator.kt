@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.logics
 
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import java.util.*
 
 /**

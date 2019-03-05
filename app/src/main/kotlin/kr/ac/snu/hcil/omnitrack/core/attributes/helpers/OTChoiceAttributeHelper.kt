@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ChoiceSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.ChoiceCategoricalBarChartModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics

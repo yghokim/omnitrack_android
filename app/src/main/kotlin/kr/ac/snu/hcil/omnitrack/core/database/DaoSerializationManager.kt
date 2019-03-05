@@ -1,11 +1,11 @@
-package kr.ac.snu.hcil.omnitrack.core.database.configured
+package kr.ac.snu.hcil.omnitrack.core.database
 
 import dagger.Lazy
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.typeadapters.ServerCompatibleTypeAdapter
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.typeadapters.ServerCompatibleTypeAdapter
 import kr.ac.snu.hcil.omnitrack.core.di.global.*
 import javax.inject.Inject
 import javax.inject.Singleton

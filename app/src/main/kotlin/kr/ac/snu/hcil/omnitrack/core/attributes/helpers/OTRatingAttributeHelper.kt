@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.NumericSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.StarRatingSlider

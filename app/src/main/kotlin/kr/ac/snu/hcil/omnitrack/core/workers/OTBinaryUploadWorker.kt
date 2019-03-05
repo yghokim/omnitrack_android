@@ -9,8 +9,8 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.LocalMediaCacheEntry
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UploadTaskInfo
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.LocalMediaCacheEntry
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.UploadTaskInfo
 import kr.ac.snu.hcil.omnitrack.core.net.IBinaryStorageCore
 import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager

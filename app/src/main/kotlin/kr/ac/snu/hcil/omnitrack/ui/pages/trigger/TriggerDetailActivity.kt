@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.layout_tracker_assign_panel.view.*
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity

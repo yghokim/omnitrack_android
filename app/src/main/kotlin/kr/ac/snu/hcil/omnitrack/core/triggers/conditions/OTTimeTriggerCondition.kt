@@ -9,7 +9,7 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 
 /**
