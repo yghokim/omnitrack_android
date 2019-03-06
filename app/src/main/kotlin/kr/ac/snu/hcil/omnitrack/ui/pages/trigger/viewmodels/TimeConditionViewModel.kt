@@ -25,7 +25,7 @@ class TimeConditionViewModel(trigger: OTTriggerDAO, context: Context) : ATrigger
     val nextAlarmTime: Observable<Nullable<Long>> get() = nextAlarmTimeSubject
 
     init {
-        (context.applicationContext as OTAndroidApp).triggerSystemComponent.inject(this)
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
 
         subscriptions.add(
                 triggerAlarmManager.makeNextAlarmTimeObservable(trigger.objectId!!).subscribe { alarmTime ->

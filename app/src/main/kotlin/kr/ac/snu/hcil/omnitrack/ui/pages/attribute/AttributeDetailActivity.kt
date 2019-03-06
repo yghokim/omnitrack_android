@@ -43,7 +43,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         fun makeIntent(context: Context, dao: OTAttributeDAO): Intent {
 
             val intent = Intent(context, AttributeDetailActivity::class.java)
-            intent.putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, (context.applicationContext as OTAndroidApp).daoSerializationComponent.manager().serializeAttribute(dao))
+            intent.putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, (context.applicationContext as OTAndroidApp).applicationComponent.manager().serializeAttribute(dao))
             return intent
         }
     }

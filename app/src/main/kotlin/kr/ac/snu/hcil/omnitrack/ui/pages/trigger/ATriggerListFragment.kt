@@ -217,7 +217,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         if (requestCode == DETAIL_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
             if (data.hasExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO)) {
                 val resultDao =
-                        (requireActivity().application as OTAndroidApp).daoSerializationComponent.manager().parseTrigger(data.getStringExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO))
+                        (requireActivity().application as OTAndroidApp).applicationComponent.manager().parseTrigger(data.getStringExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO))
                 viewModel.addNewTrigger(resultDao)
             }
         }

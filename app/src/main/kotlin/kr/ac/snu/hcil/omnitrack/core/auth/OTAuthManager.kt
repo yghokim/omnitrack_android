@@ -29,7 +29,6 @@ import io.reactivex.disposables.Disposables
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
@@ -220,7 +219,7 @@ class OTAuthManager @Inject constructor(
 
                             .flatMap { authResult ->
                                 println("Signed in through Google account. try to push device info to server...")
-                                OTDeviceInfo.makeDeviceInfo(context, (context.applicationContext as OTAndroidApp).firebaseComponent)
+                                OTDeviceInfo.makeDeviceInfo(context)
                             }
                             .flatMap { deviceInfo ->
                                 if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {

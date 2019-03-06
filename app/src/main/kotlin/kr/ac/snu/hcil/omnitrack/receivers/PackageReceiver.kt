@@ -3,8 +3,14 @@ package kr.ac.snu.hcil.omnitrack.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import dagger.Lazy
+import dagger.internal.Factory
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.core.workers.OTVersionCheckWorker
 import javax.inject.Inject
 
@@ -16,22 +22,29 @@ class PackageReceiver : BroadcastReceiver() {
     @Inject
     lateinit var versionCheckController: OTVersionCheckWorker.Controller
 
+    @Inject
+    lateinit var triggerSystemManager: Lazy<OTTriggerSystemManager>
+
+    @Inject
+    lateinit var authManager: Lazy<OTAuthManager>
+
+    @field:[Inject Backend]
+    lateinit var realmFactory: Factory<Realm>
+
     override fun onReceive(context: Context, intent: Intent) {
         val app = (context.applicationContext as OTAndroidApp)
-        app.scheduledJobComponent.inject(this)
+        app.applicationComponent.inject(this)
 
         println("package broadcast receiver - ${intent.action}")
 
-        val authManager = app.applicationComponent.getAuthManager()
-        if (authManager.isUserSignedIn()) {
+        if (authManager.get().isUserSignedIn()) {
 
             val reminderCommands = OTReminderCommands(context)
-            val realm = app.applicationComponent.backendRealmFactory().get()
+            val realm = realmFactory.get()
             reminderCommands.restoreReminderNotifications(realm).blockingAwait()
             realm.close()
 
-            val triggerSystemManager = app.triggerSystemComponent.getTriggerSystemManager().get()
-            triggerSystemManager.checkInAllToSystem(authManager.userId!!)
+            triggerSystemManager.get().checkInAllToSystem(authManager.get().userId!!)
         }
 
 

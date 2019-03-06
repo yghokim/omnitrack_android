@@ -98,7 +98,7 @@ class OTDataDrivenTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TY
     var comparison: ComparisonMethod = ComparisonMethod.Exceed
 
     override fun getSerializedString(): String {
-        return OTApp.daoSerializationComponent.dataDrivenConditionTypeAdapter().toJson(this)
+        return OTApp.applicationComponent.dataDrivenConditionTypeAdapter().toJson(this)
     }
 
     override fun isConfigurationValid(context: Context): Single<Pair<Boolean, List<CharSequence>?>> {

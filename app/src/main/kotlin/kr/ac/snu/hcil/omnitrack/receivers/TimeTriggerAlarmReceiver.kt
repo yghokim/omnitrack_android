@@ -94,7 +94,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
 
         override fun onCreate() {
             super.onCreate()
-            (application as OTAndroidApp).triggerSystemComponent.inject(this)
+            (application as OTAndroidApp).applicationComponent.inject(this)
         }
 
         override fun onDestroy() {

@@ -90,7 +90,7 @@ open class OTTriggerDAO : RealmObject() {
                 _condition = when (conditionType) {
                     CONDITION_TYPE_TIME -> serializedCondition?.let { OTTimeTriggerCondition.typeAdapter.fromJson(it) }
                             ?: OTTimeTriggerCondition()
-                    CONDITION_TYPE_DATA -> serializedCondition?.let { OTApp.daoSerializationComponent.dataDrivenConditionTypeAdapter().fromJson(it) }
+                    CONDITION_TYPE_DATA -> serializedCondition?.let { OTApp.applicationComponent.dataDrivenConditionTypeAdapter().fromJson(it) }
                             ?: OTDataDrivenTriggerCondition()
                     else -> null
                 }

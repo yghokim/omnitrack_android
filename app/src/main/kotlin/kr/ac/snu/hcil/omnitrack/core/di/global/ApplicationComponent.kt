@@ -3,10 +3,13 @@ package kr.ac.snu.hcil.omnitrack.core.di.global
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Resources
+import androidx.work.PeriodicWorkRequest
 import com.google.gson.Gson
 import com.udojava.evalex.Expression
 import dagger.Component
+import dagger.Lazy
 import dagger.internal.Factory
+import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -21,16 +24,22 @@ import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions.RealmLazyFunction
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataDrivenTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
+import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
 import kr.ac.snu.hcil.omnitrack.core.workers.*
+import kr.ac.snu.hcil.omnitrack.receivers.PackageReceiver
 import kr.ac.snu.hcil.omnitrack.receivers.RebootReceiver
+import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
+import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.services.messaging.OTFirebaseMessagingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
@@ -55,6 +64,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.export.PackageExportViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.export.UploadTemporaryPackageDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.*
+import kr.ac.snu.hcil.omnitrack.ui.pages.research.ResearchViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.FieldPresetSelectionBottomSheetFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailStructureTabFragment
@@ -62,10 +72,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TrackerAssignPanel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TriggerDetailViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenTriggerConfigurationPanel
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.OfflineTriggerListViewModel
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.*
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.time.LocalTimeFormats
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetProvider
@@ -118,6 +125,20 @@ interface ApplicationComponent {
     @ForGeneric
     fun genericGson(): Gson
 
+    @FirebaseInstanceIdToken
+    fun getFirebaseInstanceIdToken(): Single<String>
+
+
+    fun getTriggerSystemManager(): Lazy<OTTriggerSystemManager>
+
+
+    @ServerFullSync
+    fun getFullSyncPeriodicRequestProvider(): Provider<PeriodicWorkRequest>
+
+
+    fun manager(): DaoSerializationManager
+    fun dataDrivenConditionTypeAdapter(): OTDataDrivenTriggerCondition.ConditionTypeAdapter
+
     fun inject(service: OTFirebaseMessagingService)
 
     fun inject(service: OTShortcutPanelWidgetService)
@@ -134,8 +155,16 @@ interface ApplicationComponent {
 
     fun inject(scale: QuantizedTimeScale)
 
+    fun inject(receiver: PackageReceiver)
 
     //-====
+
+    fun inject(alarmService: TimeTriggerAlarmReceiver.TimeTriggerWakefulHandlingService)
+    fun inject(viewModel: TimeConditionViewModel)
+    fun inject(service: OTReminderService)
+
+    fun inject(viewModel: ResearchViewModel)
+    fun inject(service: OTResearchSynchronizationWorker)
 
     fun shortcutPanelManager(): OTShortcutPanelManager
 

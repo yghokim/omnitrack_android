@@ -43,7 +43,7 @@ class ResearchViewModel(application: Application) : AndroidViewModel(application
     private val subscriptions = CompositeDisposable()
 
     init {
-        getApplication<OTApp>().researchComponent.inject(this)
+        getApplication<OTApp>().applicationComponent.inject(this)
         realm = realmFactory.get()
     }
 

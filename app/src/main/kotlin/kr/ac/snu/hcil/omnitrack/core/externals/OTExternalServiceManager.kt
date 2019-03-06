@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitService
 import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
-import kr.ac.snu.hcil.omnitrack.core.externals.jawbone.JawboneUpService
 import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitService
 import kr.ac.snu.hcil.omnitrack.core.externals.rescuetime.RescueTimeService
 import java.util.*
@@ -26,7 +25,6 @@ class OTExternalServiceManager constructor(
                         //AndroidDeviceService,
                         GoogleFitService(context),
                         FitbitService(context),
-                        JawboneUpService(context),
                         MisfitService(context),
                         RescueTimeService(context)
                         //,MicrosoftBandService

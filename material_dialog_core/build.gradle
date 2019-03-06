@@ -36,7 +36,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$rootProject.ext.androidx_appcompat_version"
     implementation "androidx.recyclerview:recyclerview:$SUPPORT_LIBRARY_VERSION"
     implementation "androidx.annotation:annotation:$SUPPORT_LIBRARY_VERSION"
-    implementation 'com.github.ybq:Android-SpinKit:1.1.0'
+    implementation 'com.github.ybq:Android-SpinKit:1.2.0'
 }
 
 repositories {

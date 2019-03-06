@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.di.global
 
 import com.google.gson.Gson
-import dagger.Component
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -9,7 +8,6 @@ import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
@@ -91,14 +89,6 @@ class DaoSerializationModule {
         return OTDataDrivenTriggerCondition.ConditionTypeAdapter(serviceManager, timeQueryRangeQueryTypeAdapter)
     }
 
-}
-
-@Singleton
-@Component(modules = [ExternalServiceModule::class, DaoSerializationModule::class, BackendDatabaseModule::class])
-interface DaoSerializationComponent {
-
-    fun manager(): DaoSerializationManager
-    fun dataDrivenConditionTypeAdapter(): OTDataDrivenTriggerCondition.ConditionTypeAdapter
 }
 
 

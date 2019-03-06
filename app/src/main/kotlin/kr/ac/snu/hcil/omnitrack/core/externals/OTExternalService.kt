@@ -22,75 +22,7 @@ import javax.inject.Provider
  * Created by younghokim on 16. 7. 28..
  */
 abstract class OTExternalService(val context: Context, val identifier: String, val minimumSDK: Int) : INameDescriptionResourceProvider {
-    /*
-    companion object {
 
-        private val factoryCodeDict = HashMap<String, OTMeasureFactory>()
-
-        val availableServices: Array<OTExternalService> by lazy {
-            arrayOf(
-                    //AndroidDeviceService,
-                    GoogleFitService
-                    , FitbitService
-                    , JawboneUpService
-                    , MisfitService
-                    , RescueTimeService
-                    //,MicrosoftBandService
-                    //,MiBandService
-            ).filter { service -> service.isSupportedInSystem() }.toTypedArray()
-        }
-
-        fun findServiceByIdentifier(identifier: String): OTExternalService? {
-            return availableServices.find { it.identifier == identifier }
-        }
-
-        fun getFilteredMeasureFactories(filter: (OTMeasureFactory) -> Boolean): List<OTMeasureFactory> {
-
-            val list = ArrayList<OTMeasureFactory>()
-            for (service in OTExternalService.availableServices) {
-                for (factory in service.measureFactories) {
-                    if (filter(factory)) {
-                        list.add(factory)
-                    }
-                }
-            }
-
-            return list
-        }
-
-        fun getMeasureFactoryByCode(typeCode: String): OTMeasureFactory? {
-            return factoryCodeDict[typeCode]
-        }
-
-        val preferences: SharedPreferences by lazy { OTApp.instance.getSharedPreferences("ExternalServices", Context.MODE_PRIVATE) }
-
-        fun init() {
-            for (service in availableServices) {
-                service.initialize()
-                for (factory in service.measureFactories) {
-                    println("service: ${service.identifier}")
-                    println("factory service: ${factory.getService()}")
-                    factoryCodeDict.put(factory.typeCode, factory)
-                }
-            }
-        }
-
-
-        /***
-         * Get whether the service's activation state stored in system
-         */
-        fun getIsActivatedFlag(service: OTExternalService): Boolean {
-            return getIsActivatedFlag(service.identifier)
-        }
-
-        fun getIsActivatedFlag(serviceIdentifier: String): Boolean {
-            return preferences.getBoolean(serviceIdentifier + "_activated", false)
-        }
-
-        fun setIsActivatedFlag(service: OTExternalService, isActivated: Boolean) {
-            preferences.edit().putBoolean(service.identifier + "_activated", isActivated).apply()
-        }
-    }*/
 
     enum class ServiceState {
         DEACTIVATED, ACTIVATING, ACTIVATED

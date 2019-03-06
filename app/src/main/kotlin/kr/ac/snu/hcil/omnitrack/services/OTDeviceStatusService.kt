@@ -137,7 +137,7 @@ class OTDeviceStatusService : Service() {
         private fun onDeviceActive(context: Context) {
             //Do Samsung-specific optimization tweaking
             if (Build.MANUFACTURER == "samsung") {
-                val triggerSystemManager = (context.applicationContext as OTAndroidApp).triggerSystemComponent.getTriggerSystemManager()
+                val triggerSystemManager = (context.applicationContext as OTAndroidApp).applicationComponent.getTriggerSystemManager()
                 triggerSystemManager.get().refreshReservedAlarms()
             }
         }

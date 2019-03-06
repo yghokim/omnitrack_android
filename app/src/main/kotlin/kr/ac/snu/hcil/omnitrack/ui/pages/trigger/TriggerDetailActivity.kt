@@ -36,7 +36,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         const val INTENT_EXTRA_TRIGGER_DAO = "trigger_dao"
 
         fun makeNewTriggerIntent(context: Context, baseDao: OTTriggerDAO, options: TriggerInterfaceOptions): Intent {
-            val serialized = (context.applicationContext as OTAndroidApp).daoSerializationComponent.manager().serializeTrigger(baseDao)
+            val serialized = (context.applicationContext as OTAndroidApp).applicationComponent.manager().serializeTrigger(baseDao)
             println(serialized)
             return Intent(context, TriggerDetailActivity::class.java)
                     .setAction(MODE_NEW)
@@ -54,7 +54,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         fun makeEditTriggerIntent(context: Context, baseDao: OTTriggerDAO, options: TriggerInterfaceOptions): Intent {
             return Intent(context, TriggerDetailActivity::class.java)
                     .setAction(MODE_EDIT)
-                    .putExtra(INTENT_EXTRA_TRIGGER_DAO, (context.applicationContext as OTAndroidApp).daoSerializationComponent.manager().serializeTrigger(baseDao))
+                    .putExtra(INTENT_EXTRA_TRIGGER_DAO, (context.applicationContext as OTAndroidApp).applicationComponent.manager().serializeTrigger(baseDao))
                     .putExtra(INTENT_EXTRA_INTERFACE_OPTIONS, options)
         }
     }
@@ -85,12 +85,12 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                     val mode = intent.action
                     when (mode) {
                         MODE_NEW -> {
-                            val baseDao = (application as OTAndroidApp).daoSerializationComponent.manager().parseTrigger(intent.getStringExtra(INTENT_EXTRA_TRIGGER_DAO))
+                            val baseDao = (application as OTAndroidApp).applicationComponent.manager().parseTrigger(intent.getStringExtra(INTENT_EXTRA_TRIGGER_DAO))
                             viewModel.initNew(baseDao, savedInstanceState)
                         }
                         MODE_EDIT -> {
                             if (intent.hasExtra(INTENT_EXTRA_TRIGGER_DAO)) {
-                                val baseDao = (application as OTAndroidApp).daoSerializationComponent.manager().parseTrigger(intent.getStringExtra(INTENT_EXTRA_TRIGGER_DAO))
+                                val baseDao = (application as OTAndroidApp).applicationComponent.manager().parseTrigger(intent.getStringExtra(INTENT_EXTRA_TRIGGER_DAO))
                                 viewModel.initEdit(baseDao, savedInstanceState)
                             } else if (intent.hasExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER)) {
                                 viewModel.initEdit(intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER), userId, savedInstanceState)
