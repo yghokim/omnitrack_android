@@ -14,10 +14,8 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import java.math.BigDecimal
 
 class OTDataDrivenTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_DATA) {
@@ -110,6 +108,7 @@ class OTDataDrivenTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TY
             else {
                 val factory = measure.getFactory<OTMeasureFactory>()
                 if (factory is OTServiceMeasureFactory) {
+                    /*
                     return@defer factory.parentService.onStateChanged.firstOrError().map { state ->
                         when (state) {
                             OTExternalService.ServiceState.ACTIVATED -> Pair(true, null)
@@ -117,11 +116,20 @@ class OTDataDrivenTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TY
                                     "<font color=\"blue\">${context.resources.getString(R.string.msg_service_is_not_activated_format)}</font>",
                                     context.resources.getString(factory.parentService.nameResourceId)))))
                         }
-                    }
+                    }*/
+                    return@defer Single.just(Pair(true, null))
                 } else {
                     return@defer Single.just(Pair(false, listOf("The measure is not a service measure.")))
                 }
             }
+        }
+    }
+
+    fun passesThreshold(value: BigDecimal): Boolean {
+        return when (comparison) {
+            ComparisonMethod.Drop -> value < threshold
+            ComparisonMethod.Exceed -> value > threshold
+            else -> throw IllegalArgumentException("Undefined comparison method.")
         }
     }
 

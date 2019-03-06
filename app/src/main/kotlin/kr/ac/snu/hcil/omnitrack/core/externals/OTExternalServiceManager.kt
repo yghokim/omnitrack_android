@@ -2,21 +2,21 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.content.Context
 import android.content.SharedPreferences
-import kr.ac.snu.hcil.omnitrack.core.di.global.ExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitService
 import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
 import kr.ac.snu.hcil.omnitrack.core.externals.jawbone.JawboneUpService
 import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitService
 import kr.ac.snu.hcil.omnitrack.core.externals.rescuetime.RescueTimeService
 import java.util.*
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class OTExternalServiceManager @Inject constructor(
+class OTExternalServiceManager constructor(
         val context: Context,
-        @ExternalService val preferences: SharedPreferences
+        val preferences: SharedPreferences
 ) {
+
+    init {
+        println("externalServiceManager was created: ${this}")
+    }
 
     private val factoryCodeDict = HashMap<String, OTServiceMeasureFactory>()
 

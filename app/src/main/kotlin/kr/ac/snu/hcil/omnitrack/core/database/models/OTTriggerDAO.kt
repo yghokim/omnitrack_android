@@ -279,7 +279,8 @@ open class OTTriggerDAO : RealmObject() {
 
     fun getPerformFireCompletable(triggerTime: Long, metadata: JsonObject, context: Context): Completable {
         val triggerId = objectId!!
-        val unManagedDAO = this.realm.copyFromRealm(this)
+
+        val unManagedDAO = if (this.isManaged) this.realm.copyFromRealm(this) else this
         return (action?.performAction(this, triggerTime, metadata, context)
                 ?: Completable.error(IllegalStateException("Not proper action instance is generated.")))
                 .doOnComplete {

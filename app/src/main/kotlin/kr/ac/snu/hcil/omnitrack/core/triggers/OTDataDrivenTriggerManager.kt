@@ -1,8 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.content.Context
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequest
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import dagger.Lazy
 import dagger.internal.Factory
@@ -16,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class OTDataDrivenTriggerManager(private val context: Context, private val externalServiceManager: Lazy<OTExternalServiceManager>, private val realmFactory: Factory<Realm>) {
@@ -37,7 +39,7 @@ class OTDataDrivenTriggerManager(private val context: Context, private val exter
     lateinit var timeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>
 
     @field:[Inject DataDrivenTrigger]
-    lateinit var workRequest: Lazy<PeriodicWorkRequest>
+    lateinit var workRequestBuilder: Lazy<OneTimeWorkRequest.Builder>
 
     private val measureEntryIdGenerator = ConcurrentUniqueLongGenerator()
 
@@ -76,7 +78,9 @@ class OTDataDrivenTriggerManager(private val context: Context, private val exter
         val numMeasures = realm.where(OTTriggerMeasureEntry::class.java).count()
         if (numMeasures > 0L) {
             //turn on worker
-            WorkManager.getInstance().enqueueUniquePeriodicWork(WORK_NAME, ExistingPeriodicWorkPolicy.KEEP, workRequest.get())
+            val workInfos = WorkManager.getInstance().getWorkInfosForUniqueWork(WORK_NAME).get()
+            if (workInfos.isEmpty() || (workInfos.none { it.state === WorkInfo.State.RUNNING || it.state === WorkInfo.State.ENQUEUED }))
+                WorkManager.getInstance().enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.REPLACE, workRequestBuilder.get().setInitialDelay(2, TimeUnit.SECONDS).build())
         } else {
             //turn off worker
             WorkManager.getInstance().cancelUniqueWork(WORK_NAME)

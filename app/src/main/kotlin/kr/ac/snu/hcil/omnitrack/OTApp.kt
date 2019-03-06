@@ -267,6 +267,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
                 .applicationModule(appModule)
                 .triggerSystemModule(triggerSystemModule)
                 .backendDatabaseModule(backendDatabaseModule)
+                .externalServiceModule(externalServiceModule)
                 .build()
     }
 
@@ -286,6 +287,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
                 .applicationModule(appModule)
                 .authModule(authModule)
                 .backendDatabaseModule(backendDatabaseModule)
+                .externalServiceModule(externalServiceModule)
                 .firebaseModule(firebaseModule)
                 .networkModule(networkModule)
                 .researchModule(researchModule)
