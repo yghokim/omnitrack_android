@@ -35,6 +35,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
 import kr.ac.snu.hcil.omnitrack.core.workers.*
+import kr.ac.snu.hcil.omnitrack.receivers.DataDrivenTriggerCheckReceiver
 import kr.ac.snu.hcil.omnitrack.receivers.PackageReceiver
 import kr.ac.snu.hcil.omnitrack.receivers.RebootReceiver
 import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
@@ -157,6 +158,8 @@ interface ApplicationComponent {
 
     fun inject(receiver: PackageReceiver)
 
+    fun inject(service: DataDrivenTriggerCheckReceiver.DataDrivenConditionHandlingService)
+
     //-====
 
     fun inject(alarmService: TimeTriggerAlarmReceiver.TimeTriggerWakefulHandlingService)
@@ -278,7 +281,6 @@ interface ApplicationComponent {
     fun inject(worker: OTUsageLogUploadWorker)
     fun inject(worker: OTInformationUploadWorker)
     fun inject(worker: OTSynchronizationWorker)
-    fun inject(worker: OTDataTriggerConditionWorker)
 
     fun inject(task: OTReminderCommands)
 

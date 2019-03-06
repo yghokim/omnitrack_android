@@ -2,20 +2,17 @@ package kr.ac.snu.hcil.omnitrack.receivers
 
 import android.app.Service
 import android.content.BroadcastReceiver
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.os.PowerManager
-import android.util.SparseArray
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.triggers.ITriggerAlarmController
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.services.OTReminderService
+import kr.ac.snu.hcil.omnitrack.utils.system.WakefulBroadcastReceiverStaticLock
 import javax.inject.Inject
 
 /**
@@ -24,53 +21,10 @@ import javax.inject.Inject
 class TimeTriggerAlarmReceiver : BroadcastReceiver() {
     companion object {
         const val TAG = "TimeTriggerAlarmReceiver"
-        private val EXTRA_WAKE_LOCK_ID = "${BuildConfig.APPLICATION_ID}.wakelockid"
 
-        private val mActiveWakeLocks = SparseArray<PowerManager.WakeLock>()
-        private var mNextId = 1
+        val lockImpl = WakefulBroadcastReceiverStaticLock()
 
-        fun startWakefulService(context: Context, intent: Intent): ComponentName? {
-            synchronized(mActiveWakeLocks) {
-                val id = mNextId
-                mNextId++
-                if (mNextId <= 0) {
-                    mNextId = 1
-                }
 
-                intent.putExtra(EXTRA_WAKE_LOCK_ID, id)
-                val comp = context.startService(intent) ?: return null
-
-                val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-                val wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                        "wake:" + comp.flattenToShortString())
-                wl.setReferenceCounted(false)
-                wl.acquire(100000) // remove timeout
-                mActiveWakeLocks.put(id, wl)
-                return comp
-            }
-        }
-
-        fun completeWakefulIntent(intent: Intent): Boolean {
-            val id = intent.getIntExtra(EXTRA_WAKE_LOCK_ID, 0)
-            if (id == 0) {
-                return false
-            }
-            synchronized(mActiveWakeLocks) {
-                val wl = mActiveWakeLocks.get(id)
-                if (wl != null) {
-                    wl.release()
-                    mActiveWakeLocks.remove(id)
-                    return true
-                }
-                // We return true whether or not we actually found the wake lock
-                // the return code is defined to indicate whether the Intent contained
-                // an identifier for a wake lock that it was supposed to match.
-                // We just log a warning here if there is no wake lock found, which could
-                // happen for example if this function is called twice on the same
-                // intent or the process is killed and restarted before processing the intent.
-                return true
-            }
-        }
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -78,15 +32,15 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
         serviceIntent.action = intent.action
         serviceIntent.putExtras(intent)
         OTApp.logger.writeSystemLog("Start wakeful service - ${intent.action}", TAG)
-        startWakefulService(context, serviceIntent)
+        lockImpl.startWakefulService(context, serviceIntent)
     }
 
     class TimeTriggerWakefulHandlingService : Service() {
 
         private val creationSubscriptions = CompositeDisposable()
 
-        override fun onBind(p0: Intent?): IBinder {
-            TODO()
+        override fun onBind(p0: Intent?): IBinder? {
+            return null
         }
 
         @Inject
@@ -110,7 +64,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
 
                     creationSubscriptions.add(
                             triggerAlarmController.onAlarmFired(alarmId).doAfterTerminate {
-                                completeWakefulIntent(intent)
+                                lockImpl.completeWakefulIntent(intent)
                                 OTApp.logger.writeSystemLog("Released wake lock for AlarmReceiver.", TAG)
                                 stopSelf(startId)
                             }.subscribe({
@@ -133,7 +87,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
                     realm.close()
                     OTApp.logger.writeSystemLog("Successfully dismissed reminder by alarm. entryId: $entryId", TAG)
 
-                    completeWakefulIntent(intent)
+                    lockImpl.completeWakefulIntent(intent)
                     OTApp.logger.writeSystemLog("Released wake lock for AlarmReceiver.", TAG)
                     stopSelf(startId)
                 }

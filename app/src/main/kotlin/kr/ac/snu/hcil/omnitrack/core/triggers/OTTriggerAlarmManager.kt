@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import androidx.core.app.AlarmManagerCompat
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
 import dagger.internal.Factory
@@ -280,11 +281,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Factory<Rea
     }
 
     private fun registerSystemAlarm(alarmTimeToReserve: Long, userId: String, alarmId: Int) {
-        if (android.os.Build.VERSION.SDK_INT >= 23) {
-            context.alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTimeToReserve, makeIntent(context, userId, alarmTimeToReserve, alarmId))
-        } else {
-            context.alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeToReserve, makeIntent(context, userId, alarmTimeToReserve, alarmId))
-        }
+        AlarmManagerCompat.setExactAndAllowWhileIdle(context.alarmManager, AlarmManager.RTC_WAKEUP, alarmTimeToReserve, makeIntent(context, userId, alarmTimeToReserve, alarmId))
     }
 
     override fun cancelTrigger(trigger: OTTriggerDAO) {

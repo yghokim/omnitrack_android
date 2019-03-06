@@ -4,7 +4,6 @@ import androidx.work.*
 import dagger.Module
 import dagger.Provides
 import dagger.internal.Factory
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataDrivenTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.workers.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
@@ -154,15 +153,6 @@ class ScheduledJobModule {
                 .build()*/
     }
 
-    @Provides
-    @Singleton
-    @DataDrivenTrigger
-    fun provideDataDrivenMeasureCheckRequest(): OneTimeWorkRequest.Builder {
-        return OneTimeWorkRequestBuilder<OTDataTriggerConditionWorker>()
-                .addTag(OTDataDrivenTriggerManager.WORK_NAME)
-                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.SECONDS)
-    }
-
 }
 
 @Qualifier
@@ -182,7 +172,3 @@ annotation class ServerFullSync
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ResearchSync
-
-@Qualifier
-@Retention(AnnotationRetention.RUNTIME)
-annotation class DataDrivenTrigger

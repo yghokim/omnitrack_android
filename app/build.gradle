@@ -286,6 +286,7 @@ dependencies {
     implementation "com.google.dagger:dagger-android:$rootProject.ext.dagger_version"
     kapt "com.google.dagger:dagger-android-processor:$rootProject.ext.dagger_version"
     kapt "com.google.dagger:dagger-compiler:$rootProject.ext.dagger_version"
+    implementation project(':omnitrack_corelib')
     implementation project(':material_dialog_core')
     implementation project(':material_about')
     implementation project(':fancybuttons')

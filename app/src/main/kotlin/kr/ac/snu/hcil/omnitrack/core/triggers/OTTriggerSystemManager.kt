@@ -28,6 +28,7 @@ class OTTriggerSystemManager(
 
     fun onSystemRebooted() {
         triggerAlarmManager.get().activateOnSystem()
+        dataDrivenTriggerManager.get().activateOnSystem()
     }
 
     fun handleTriggerOn(managedTrigger: OTTriggerDAO) {

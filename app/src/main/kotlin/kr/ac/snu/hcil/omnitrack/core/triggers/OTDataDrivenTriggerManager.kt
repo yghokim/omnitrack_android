@@ -1,10 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
+import androidx.core.app.AlarmManagerCompat
 import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
@@ -12,18 +11,21 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerMeasureEntry
-import kr.ac.snu.hcil.omnitrack.core.di.global.DataDrivenTrigger
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
+import kr.ac.snu.hcil.omnitrack.receivers.DataDrivenTriggerCheckReceiver
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
-import java.util.concurrent.TimeUnit
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
+import org.jetbrains.anko.alarmManager
 import javax.inject.Inject
 
 class OTDataDrivenTriggerManager(private val context: Context, private val externalServiceManager: Lazy<OTExternalServiceManager>, private val realmFactory: Factory<Realm>) {
 
     companion object {
         const val WORK_NAME = "data-driven-condition-measure-check"
+
+        const val REQUEST_CODE = 5244
 
         const val FIELD_FACTORY_CODE = "factoryCode"
         const val FIELD_SERIALIZED_MEASURE = "serializedMeasure"
@@ -37,11 +39,7 @@ class OTDataDrivenTriggerManager(private val context: Context, private val exter
 
     @Inject
     lateinit var timeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>
-
-    @field:[Inject DataDrivenTrigger]
-    lateinit var workRequestBuilder: Lazy<OneTimeWorkRequest.Builder>
-
-    private val measureEntryIdGenerator = ConcurrentUniqueLongGenerator()
+    private val measureEntryIdGenerator: ConcurrentUniqueLongGenerator by lazy { ConcurrentUniqueLongGenerator() }
 
     init {
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
@@ -78,13 +76,38 @@ class OTDataDrivenTriggerManager(private val context: Context, private val exter
         val numMeasures = realm.where(OTTriggerMeasureEntry::class.java).count()
         if (numMeasures > 0L) {
             //turn on worker
+            /*
             val workInfos = WorkManager.getInstance().getWorkInfosForUniqueWork(WORK_NAME).get()
             if (workInfos.isEmpty() || (workInfos.none { it.state === WorkInfo.State.RUNNING || it.state === WorkInfo.State.ENQUEUED }))
                 WorkManager.getInstance().enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.REPLACE, workRequestBuilder.get().setInitialDelay(2, TimeUnit.SECONDS).build())
+                */
+            reserveCheckExecution(context, true)
         } else {
             //turn off worker
+            /*
             WorkManager.getInstance().cancelUniqueWork(WORK_NAME)
+            */
+            context.alarmManager.cancel(makePendingIntent(context))
         }
+    }
+
+
+    private fun makePendingIntent(context: Context): PendingIntent {
+        val receiverIntent = DataDrivenTriggerCheckReceiver.makeIntent(context)
+        return PendingIntent.getBroadcast(context, REQUEST_CODE, receiverIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+
+    fun activateOnSystem() {
+        realmFactory.get().use {
+            reAdjustWorker(it)
+        }
+
+    }
+
+    fun reserveCheckExecution(context: Context, immediate: Boolean) {
+        AlarmManagerCompat.setExactAndAllowWhileIdle(context.alarmManager, AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis() + (if (immediate) 1000 else 5 * TimeHelper.minutesInMilli),
+                makePendingIntent(context))
     }
 
     private fun tryRegisterNewMeasure(trigger: OTTriggerDAO, realm: Realm) {
