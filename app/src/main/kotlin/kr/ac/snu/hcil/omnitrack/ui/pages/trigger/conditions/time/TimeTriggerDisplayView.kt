@@ -24,42 +24,6 @@ import kotlin.properties.Delegates
  * Created by Young-Ho on 8/25/2016.
  */
 class TimeTriggerDisplayView : LinearLayout {
-/*
-    companion object {
-        private val tickerSubscription = SerialDisposable()
-
-        private val shownInstances = HashSet<TimeTriggerDisplayView>()
-
-        private fun registerViewInstance(view: TimeTriggerDisplayView)
-        {
-            if(!shownInstances.contains(view))
-            {
-                shownInstances.add(view)
-                if(tickerSubscription.get() == null || tickerSubscription.isDisposed == true)
-                {
-                    tickerSubscription.set(
-                            Observable.interval(1, TimeUnit.SECONDS)
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe {
-                                        sequence->
-                                        for (instance in shownInstances) {
-                                            instance.refreshNextTriggerTimeTextWithNow(System.currentTimeMillis())
-                                        }
-                                    }
-                    )
-                }
-            }
-        }
-
-        private fun unregisterViewInstance(view: TimeTriggerDisplayView)
-        {
-            if(shownInstances.remove(view) && shownInstances.isEmpty())
-            {
-                tickerSubscription.dispose()
-                tickerSubscription.set(null)
-            }
-        }
-    }*/
 
     private val mainView: TextView by bindView(R.id.ui_value)
     private val nextTriggerView: Chronometer by bindView(R.id.ui_next_trigger)

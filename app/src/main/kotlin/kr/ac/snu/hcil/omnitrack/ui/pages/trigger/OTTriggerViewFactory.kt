@@ -123,7 +123,19 @@ object OTTriggerViewFactory {
 
                 override fun connectViewModelToDisplayView(viewModel: ATriggerConditionViewModel, displayView: View, outSubscription: CompositeDisposable) {
                     if (viewModel is DataDrivenConditionViewModel && displayView is DataDrivenTriggerDisplayView) {
+                        outSubscription.add(
+                                viewModel.latestMeasuredInfo.observeOn(AndroidSchedulers.mainThread()).subscribe { (info) ->
+                                    if (info != null) {
+                                        displayView.setLatestMeasureInfo(info.first, info.second)
+                                    }
+                                }
+                        )
 
+                        outSubscription.add(
+                                viewModel.getServiceStateObservable().subscribe { serviceState ->
+                                    displayView.setServiceState(serviceState)
+                                }
+                        )
                     }
                 }
 

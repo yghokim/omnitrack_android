@@ -50,4 +50,9 @@
     <string name="msg_trigger_alerts_per_day">Count per day</string>
     <string name="message_displayed_on_reminders">Message Displayed on Reminders</string>
 
+    <string name="msg_trigger_data_recent_measure">Recent Measure</string>
+    <string name="msg_trigger_data_recent_measure_no_value">No measured history</string>
+    <string name="msg_trigger_data_service_not_activated">Service not activated</string>
+
+
 </resources>

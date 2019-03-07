@@ -153,7 +153,11 @@ class DataDrivenTriggerCheckReceiver : BroadcastReceiver() {
                                                         //first history entry
                                                         triggerFireJobs.add(trigger.getPerformFireCompletable(now, JsonObject(), this))
                                                     } else {
-                                                        //check last entry
+                                                        //check last non-null entry
+                                                        var startIndex = entry.measureHistory.count() - 2
+                                                        while (startIndex > 0 && entry.measureHistory[startIndex]?.measuredValue == null) {
+
+                                                        }
                                                         val lastMeasureHistoryEntry = entry.measureHistory[entry.measureHistory.count() - 2]
                                                         //TODO Check TimeZone
                                                         if (TimeHelper.isSameDay(lastMeasureHistoryEntry!!.timestamp, now)) {

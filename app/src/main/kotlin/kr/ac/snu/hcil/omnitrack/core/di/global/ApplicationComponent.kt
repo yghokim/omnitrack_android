@@ -295,4 +295,5 @@ interface ApplicationComponent {
     fun inject(dataDrivenTriggerManager: OTDataDrivenTriggerManager)
 
     fun inject(worker: OTDataDrivenTriggerManager.InactiveMeasureEntryClearanceWorker)
+    fun inject(viewModel: DataDrivenConditionViewModel)
 }

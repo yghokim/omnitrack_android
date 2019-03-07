@@ -8,6 +8,7 @@ import androidx.core.app.AlarmManagerCompat
 import androidx.work.*
 import dagger.Lazy
 import dagger.internal.Factory
+import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -21,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.receivers.DataDrivenTriggerCheckReceiver
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import org.jetbrains.anko.alarmManager
@@ -232,6 +234,30 @@ class OTDataDrivenTriggerManager(private val context: Context, private val exter
             reAdjustWorker(realm)
             true
         } else false
+    }
+
+    fun makeLatestMeasuredValueObservable(triggerId: String): Flowable<Nullable<Pair<Double?, Long>>> {
+        return Flowable.defer {
+            val realm = realmFactory.get()
+            val measure = realm.where(OTTriggerMeasureEntry::class.java)
+                    .equalTo("triggers.objectId", triggerId)
+                    .findFirst()
+            if (measure != null) {
+                measure.measureHistory.asFlowable()
+                        .filter { it.isLoaded && it.isValid }
+                        .map { list ->
+                            val latestHistoryEntry = list.maxBy { it.timestamp }
+                            return@map if (latestHistoryEntry != null) {
+                                Nullable(Pair(latestHistoryEntry.measuredValue, latestHistoryEntry.timestamp))
+                            } else Nullable<Pair<Double?, Long>>(null)
+                        }.doOnTerminate {
+                            realm.close()
+                        }
+            } else {
+                realm.close()
+                Flowable.just(Nullable<Pair<Double?, Long>>(null))
+            }
+        }
     }
 
     class InactiveMeasureEntryClearanceWorker(private val context: Context, workerParams: WorkerParameters) : RxWorker(context, workerParams) {
