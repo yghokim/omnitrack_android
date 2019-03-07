@@ -137,8 +137,8 @@ class DataDrivenTriggerCheckReceiver : BroadcastReceiver() {
                                             val newMeasuredValueEntry = it.createObject(OTTriggerMeasureHistoryEntry::class.java, historyEntryIdGenerator.getNewUniqueLong())
                                             newMeasuredValueEntry.timestamp = now
                                             newMeasuredValueEntry.measuredValue = measuredValue
+                                            it.where(OTTriggerMeasureEntry::class.java).equalTo("id", entry.id).findFirst()?.measureHistory?.add(newMeasuredValueEntry)
                                             entry.measureHistory.add(newMeasuredValueEntry)
-                                            it.insertOrUpdate(entry)
                                             OTApp.logger.writeSystemLog("measure value of ${entry.factoryCode}: ${nullableValue.datum}", "OTDataTriggerConditionWorker")
                                         }
                                         realm.close()
