@@ -293,4 +293,6 @@ interface ApplicationComponent {
     fun inject(activity: ExternalServiceActivationActivity)
 
     fun inject(dataDrivenTriggerManager: OTDataDrivenTriggerManager)
+
+    fun inject(worker: OTDataDrivenTriggerManager.InactiveMeasureEntryClearanceWorker)
 }

@@ -22,6 +22,10 @@ open class OTTriggerMeasureEntry : RealmObject() {
     @Required
     var serializedTimeQuery: String? = null
 
+    //if this is turned off, this measure entry is not considered when judging whether to launch the check logic.
+    @Index
+    var isActive: Boolean = true
+
     var measureHistory = RealmList<OTTriggerMeasureHistoryEntry>()
 
     var triggers = RealmList<OTTriggerDAO>()

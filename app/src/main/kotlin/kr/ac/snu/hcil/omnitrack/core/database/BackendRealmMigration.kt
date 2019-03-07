@@ -115,6 +115,7 @@ class BackendRealmMigration : RealmMigration {
                     .setNullable(OTDataDrivenTriggerManager.FIELD_SERIALIZED_MEASURE, true)
                     .addField(OTDataDrivenTriggerManager.FIELD_SERIALIZED_TIME_QUERY, String::class.java, FieldAttribute.REQUIRED)
                     .setNullable(OTDataDrivenTriggerManager.FIELD_SERIALIZED_TIME_QUERY, true)
+                    .addField(OTDataDrivenTriggerManager.FIELD_IS_ACTIVE, Boolean::class.java, FieldAttribute.INDEXED)
                     .addRealmListField(OTDataDrivenTriggerManager.FIELD_MEASURE_HISTORY, schema.get(OTTriggerMeasureHistoryEntry::class.java.simpleName)!!)
                     .addRealmListField(OTDataDrivenTriggerManager.FIELD_TRIGGERS, schema.get(OTTriggerDAO::class.java.simpleName)!!)
 
