@@ -28,7 +28,6 @@ class DataDrivenConditionViewModel(trigger: OTTriggerDAO, context: Context) : AT
 
     init {
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
-
         subscriptions.add(
                 dataDrivenTriggerManager.get().makeLatestMeasuredValueObservable(trigger.objectId!!).subscribe { info ->
                     latestMeasuredInfoSubject.onNextIfDifferAndNotNull(info)
@@ -37,7 +36,7 @@ class DataDrivenConditionViewModel(trigger: OTTriggerDAO, context: Context) : AT
     }
 
     override fun refreshDaoToFront(snapshot: OTTriggerDAO) {
-
+        println("datadriventrigger refresh triggerDAO. ${(snapshot.condition as OTDataDrivenTriggerCondition).measure?.factoryCode}")
     }
 
     override fun onSwitchChanged(isOn: Boolean) {

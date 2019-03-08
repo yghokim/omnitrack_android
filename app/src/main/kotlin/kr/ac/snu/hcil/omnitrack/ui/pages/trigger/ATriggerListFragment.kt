@@ -225,8 +225,14 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         settingsPrompter.handleActivityResult(requestCode, resultCode, data)
     }
 
-    inner class TriggerListAdapter : RecyclerView.Adapter<ATriggerViewHolder>() {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ATriggerViewHolder {
+    inner class TriggerListAdapter : RecyclerView.Adapter<TriggerViewHolder>() {
+
+        override fun onViewDetachedFromWindow(holder: TriggerViewHolder) {
+            super.onViewDetachedFromWindow(holder)
+            holder.onDetach()
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TriggerViewHolder {
             return when (viewType) {
                 VIEWTYPE_GHOST -> {
                     TriggerViewHolder(parent)
@@ -238,7 +244,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             }
         }
 
-        override fun onBindViewHolder(holder: ATriggerViewHolder, position: Int) {
+        override fun onBindViewHolder(holder: TriggerViewHolder, position: Int) {
             holder.bind(getTriggerViewModelAt(position))
         }
 
@@ -259,11 +265,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
     }
 
-    abstract inner class ATriggerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        abstract fun bind(triggerViewModel: TriggerViewModel)
-    }
-
-    inner class TriggerViewHolder(parentView: ViewGroup?) : ATriggerViewHolder(LayoutInflater.from(context).inflate(R.layout.trigger_list_element, parentView, false)), View.OnClickListener {
+    inner class TriggerViewHolder(parentView: ViewGroup?) : RecyclerView.ViewHolder(LayoutInflater.from(context).inflate(R.layout.trigger_list_element, parentView, false)), View.OnClickListener {
         val subscriptions = CompositeDisposable()
 
         private var currentHeaderView: View? = null
@@ -343,7 +345,11 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             }
         }
 
-        override fun bind(triggerViewModel: TriggerViewModel) {
+        fun onDetach() {
+            subscriptions.clear()
+        }
+
+        fun bind(triggerViewModel: TriggerViewModel) {
             subscriptions.clear()
             this.attachedViewModel = triggerViewModel
 
