@@ -9,14 +9,14 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.IConditionConfigurationView
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenConditionViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenTriggerConfigurationPanel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenTriggerDisplayView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.time.SamplingTimeConditionDisplayView
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.time.TimeConditionViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.time.TimeTriggerConfigurationPanel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.time.TimeTriggerDisplayView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerConditionViewModel
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.DataDrivenConditionViewModel
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TimeConditionViewModel
 
 /**
  * Created by younghokim on 2017. 10. 22..

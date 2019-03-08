@@ -72,8 +72,13 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailStructureTabFragme
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TrackerAssignPanel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TriggerDetailViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenConditionViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenTriggerConfigurationPanel
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.*
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.time.TimeConditionViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.OfflineTriggerListViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerViewModel
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.time.LocalTimeFormats
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetProvider

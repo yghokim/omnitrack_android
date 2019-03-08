@@ -80,6 +80,7 @@ class DataDrivenTriggerDisplayView : ConstraintLayout {
     }
 
     fun setLatestMeasureInfo(value: Double?, timestamp: Long) {
+        latestMeasuredInfoView.visibility = View.VISIBLE
         latestMeasuredInfoView.text = TextHelper.fromHtml(
                 "<b>${resources.getString(R.string.msg_trigger_data_recent_measure)}:</b> ${value
                         ?: resources.getString(R.string.msg_trigger_data_recent_measure_no_value)}"

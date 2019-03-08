@@ -16,6 +16,7 @@ import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
+import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerMeasureEntry
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
@@ -244,24 +245,42 @@ class OTDataDrivenTriggerManager(private val context: Context, private val exter
     fun makeLatestMeasuredValueObservable(triggerId: String): Flowable<Nullable<Pair<Double?, Long>>> {
         return Flowable.defer {
             val realm = realmFactory.get()
-            val measure = realm.where(OTTriggerMeasureEntry::class.java)
-                    .equalTo("triggers.objectId", triggerId)
-                    .findFirst()
-            if (measure != null) {
-                measure.measureHistory.asFlowable()
-                        .filter { it.isLoaded && it.isValid }
-                        .map { list ->
-                            val latestHistoryEntry = list.maxBy { it.timestamp }
-                            return@map if (latestHistoryEntry != null) {
-                                Nullable(Pair(latestHistoryEntry.measuredValue, latestHistoryEntry.timestamp))
-                            } else Nullable<Pair<Double?, Long>>(null)
-                        }.doOnTerminate {
-                            realm.close()
+            return@defer realm.where(OTTriggerDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, triggerId)
+                    .findFirstAsync()
+                    .asFlowable<OTTriggerDAO>()
+                    .filter {
+                        it.isLoaded && it.isValid
+                    }.flatMap { trigger ->
+                        val measure = trigger.measureEntries?.filter { it.isActive }?.firstOrNull()
+                        if (measure != null) {
+                            return@flatMap Flowable.just(Nullable(measure))
+                        } else {
+                            //find match
+                            val condition = trigger.condition as OTDataDrivenTriggerCondition
+                            return@flatMap realm.where(OTTriggerMeasureEntry::class.java)
+                                    .equalTo(FIELD_FACTORY_CODE, condition.measure!!.factoryCode)
+                                    .findAllAsync().asFlowable()
+                                    .filter {
+                                        it.isLoaded && it.isValid
+                                    }.map {
+                                        val matchedEntry = it.find { matchCondition(condition, it) }
+                                        return@map Nullable(matchedEntry)
+                                    }
                         }
-            } else {
-                realm.close()
-                Flowable.just(Nullable<Pair<Double?, Long>>(null))
-            }
+                    }.flatMap { (measure) ->
+                        if (measure != null) {
+                            return@flatMap measure.measureHistory.asFlowable()
+                                    .filter { it.isLoaded && it.isValid }
+                                    .map { list ->
+                                        val latestHistoryEntry = list.maxBy { it.timestamp }
+                                        return@map if (latestHistoryEntry != null) {
+                                            Nullable(Pair(latestHistoryEntry.measuredValue, latestHistoryEntry.timestamp))
+                                        } else Nullable<Pair<Double?, Long>>(null)
+                                    }
+                        } else return@flatMap Flowable.just(Nullable<Pair<Double?, Long>>(null))
+                    }.doAfterTerminate {
+                        realm.close()
+                    }
         }
     }
 
