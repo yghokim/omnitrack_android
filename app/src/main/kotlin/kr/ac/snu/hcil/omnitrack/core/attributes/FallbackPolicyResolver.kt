@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.annotation.StringRes
 import io.reactivex.Single
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 
 /**

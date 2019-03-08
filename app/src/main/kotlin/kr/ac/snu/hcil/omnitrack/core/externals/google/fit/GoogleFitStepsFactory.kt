@@ -15,7 +15,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -31,8 +31,7 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
         return CONFIGURATOR_STEP_ATTRIBUTE
     }
 
-    override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
-
+    override val dataTypeName = TypeStringSerializationHelper.TYPENAME_INT
     override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
 
     override val isRangedQueryAvailable: Boolean = true
@@ -70,14 +69,12 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
 
     class Measure(factory: GoogleFitStepsFactory) : OTRangeQueriedMeasure(factory) {
 
-        override val dataTypeName = TypeStringSerializationHelper.TYPENAME_INT
-
-
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             println("Requested Google Fit Step Measure")
             OTApp.logger.writeSystemLog("Start Google Fit step measure", "GoogleFitStepsFactory")
-            return if (service<GoogleFitService>().state == OTExternalService.ServiceState.ACTIVATED) {
-                service<GoogleFitService>().getConnectedClient().toFlowable().flatMap<Nullable<out Any>> { client ->
+            val service = getFactory<GoogleFitStepsFactory>().getService<GoogleFitService>()
+            return if (service.state == OTExternalService.ServiceState.ACTIVATED) {
+                service.getConnectedClient().toFlowable().flatMap<Nullable<out Any>> { client ->
                     Flowable.defer {
 
                         //make a DataSource to designate to use the same step count as Google Fit app.

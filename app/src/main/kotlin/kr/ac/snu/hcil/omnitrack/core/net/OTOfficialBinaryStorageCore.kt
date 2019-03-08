@@ -6,7 +6,7 @@ import dagger.Lazy
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UploadTaskInfo
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.UploadTaskInfo
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import okhttp3.MediaType
 import okhttp3.MultipartBody

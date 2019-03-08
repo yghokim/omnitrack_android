@@ -140,6 +140,15 @@
         </receiver>
 
         <receiver
+            android:name=".receivers.DataDrivenTriggerCheckReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="${applicationId}.action.data_driven_trigger_check" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
             android:name=".widgets.OTShortcutPanelWidgetProvider"
             android:label="@string/msg_shortcut_widget_name">
             <intent-filter>
@@ -190,6 +199,10 @@
 
         <service android:name="com.github.javiersantos.appupdater.services.AppUpdateService" />
         <service android:name=".services.OTDeviceStatusService" />
+
+        <service
+            android:name=".receivers.DataDrivenTriggerCheckReceiver$DataDrivenConditionHandlingService"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

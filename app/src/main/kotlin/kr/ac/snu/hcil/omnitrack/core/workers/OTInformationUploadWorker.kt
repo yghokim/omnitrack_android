@@ -12,7 +12,7 @@ import io.realm.kotlin.where
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTUserDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTUserDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import java.util.concurrent.Executors
@@ -58,7 +58,7 @@ class OTInformationUploadWorker(private val context: Context, private val worker
                 val uid = authManager.userId!!
                 when (informationType) {
                     INFORMATION_DEVICE ->
-                        OTDeviceInfo.makeDeviceInfo(context, app.firebaseComponent).flatMap { deviceInfo ->
+                        OTDeviceInfo.makeDeviceInfo(context).flatMap { deviceInfo ->
                             syncServerController
                                     .putDeviceInfo(deviceInfo)
                         }.map { Result.success() }

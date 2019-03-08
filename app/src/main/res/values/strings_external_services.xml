@@ -68,12 +68,4 @@
     <string name="measure_fitbit_heart_rate_name">Average Heart Rate</string>
     <string name="measure_fitbit_heart_rate_desc">Get the average heart rate during a specific range</string>
 
-    <!-- Jawbone -->
-    <string name="service_jawbone_name">UP by Jawbone</string>
-    <string name="service_jawbone_desc">Get data from Jawbone UP account</string>
-
-    <string name="measure_jawbone_distance_name">Total Distance (meters)</string>
-    <string name="measure_jawbone_distance_desc">Get total distance walked during a specific range</string>
-
-
 </resources>

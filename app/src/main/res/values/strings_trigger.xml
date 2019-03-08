@@ -30,10 +30,14 @@
     <string name="msg_trigger_assign_tracker">+ Assign Tracker</string>
     <string name="msg_trigger_assign_attribute">+ Assign Field</string>
 
-    <string name="msg_trigger_event_measure_selection">Select Measure</string>
-    <string name="msg_trigger_event_comparison_method">Triggered Threshold</string>
-    <string name="msg_trigger_event_comparison_method_higher">When gets higher than</string>
-    <string name="msg_trigger_event_comparison_method_lower">When gets lower than</string>
+    <string name="msg_trigger_data_measure_selection">Select Measure</string>
+    <string name="msg_trigger_data_comparison_method">Thresholding</string>
+    <string name="msg_trigger_data_comparison_method_higher">When gets higher than</string>
+    <string name="msg_trigger_data_comparison_method_lower">When gets lower than</string>
+
+
+    <string name="msg_trigger_data_config_desc_exceed">When a measured value exceeds threshold</string>
+    <string name="msg_trigger_data_config_desc_drop">When a measured value drops below threshold</string>
 
     <string name='msg_trigger_event_msg_tap_to_configure'>Tap to configure</string>
     <string name="msg_trigger_time_finish_on_end_date">Finish on End Date</string>
@@ -45,5 +49,10 @@
     <string name="msg_trigger_ema_display_next_alert_format">Next on %1$s</string>
     <string name="msg_trigger_alerts_per_day">Count per day</string>
     <string name="message_displayed_on_reminders">Message Displayed on Reminders</string>
+
+    <string name="msg_trigger_data_recent_measure">Recent Measure</string>
+    <string name="msg_trigger_data_recent_measure_no_value">No measured history</string>
+    <string name="msg_trigger_data_service_not_activated">Service not activated</string>
+
 
 </resources>

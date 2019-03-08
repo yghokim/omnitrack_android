@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard
 import android.content.Context
 import android.util.AttributeSet
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardViewPagerAdapter
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView

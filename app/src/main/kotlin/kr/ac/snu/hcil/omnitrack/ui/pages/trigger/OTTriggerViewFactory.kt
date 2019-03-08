@@ -5,10 +5,18 @@ import android.util.SparseArray
 import android.view.View
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.IConditionConfigurationView
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenConditionViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenTriggerConfigurationPanel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenTriggerDisplayView
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.time.SamplingTimeConditionDisplayView
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.time.TimeConditionViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.time.TimeTriggerConfigurationPanel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.time.TimeTriggerDisplayView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerConditionViewModel
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TimeConditionViewModel
 
 /**
  * Created by younghokim on 2017. 10. 22..
@@ -85,6 +93,49 @@ object OTTriggerViewFactory {
                                     }
                             )
                         }
+                    }
+                }
+
+            })
+
+            this.append(OTTriggerDAO.CONDITION_TYPE_DATA.toInt(), object : ITriggerConditionViewProvider {
+                override fun getTriggerConditionViewModel(trigger: OTTriggerDAO, context: Context): ATriggerConditionViewModel {
+                    return DataDrivenConditionViewModel(trigger, context)
+                }
+
+                override fun getTriggerDisplayView(original: View?, trigger: OTTriggerDAO, uiContext: Context): View {
+                    val displayView = if (original is DataDrivenTriggerDisplayView) original else DataDrivenTriggerDisplayView(uiContext)
+                    val condition = trigger.condition
+                    if (condition != null && condition is OTDataDrivenTriggerCondition) {
+                        displayView.setMeasureFactory(condition.measure?.getFactory())
+                        displayView.setComparison(condition.comparison)
+                        displayView.setThreshold(condition.threshold)
+                    } else {
+                        displayView.setNullCondition()
+                    }
+
+                    return displayView
+                }
+
+                override fun getTriggerConfigurationPanel(original: View?, uiContext: Context): IConditionConfigurationView {
+                    return if (original is DataDrivenTriggerConfigurationPanel) original else DataDrivenTriggerConfigurationPanel(uiContext)
+                }
+
+                override fun connectViewModelToDisplayView(viewModel: ATriggerConditionViewModel, displayView: View, outSubscription: CompositeDisposable) {
+                    if (viewModel is DataDrivenConditionViewModel && displayView is DataDrivenTriggerDisplayView) {
+                        outSubscription.add(
+                                viewModel.latestMeasuredInfo.observeOn(AndroidSchedulers.mainThread()).subscribe { (info) ->
+                                    if (info != null) {
+                                        displayView.setLatestMeasureInfo(info.first, info.second)
+                                    }
+                                }
+                        )
+
+                        outSubscription.add(
+                                viewModel.getServiceStateObservable().subscribe { serviceState ->
+                                    displayView.setServiceState(serviceState)
+                                }
+                        )
                     }
                 }
 

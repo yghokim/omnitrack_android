@@ -15,7 +15,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import kotlinx.android.synthetic.main.experiment_list_element.view.*
 import kotlinx.android.synthetic.main.fragment_recyclerview_and_fab.view.*
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
+import kr.ac.snu.hcil.omnitrack.core.database.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent

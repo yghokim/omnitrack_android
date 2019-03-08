@@ -98,6 +98,9 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
 
         const val PREFERENCE_KEY_FIREBASE_INSTANCE_ID = "$PREFIX_PREF_KEY.firebase_instance_id"
 
+        lateinit var applicationComponent: ApplicationComponent
+            private set
+
         init {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         }
@@ -220,6 +223,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
 
     override val applicationComponent: ApplicationComponent by lazy {
         DaggerApplicationComponent.builder()
+                .authModule(authModule)
                 .applicationModule(appModule)
                 .firebaseModule(firebaseModule)
                 .usageLoggingModule(usageLoggingModule)
@@ -234,63 +238,9 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
                 .networkModule(networkModule)
                 .informationHelpersModule(InformationHelpersModule())
                 .scriptingModule(ScriptingModule())
+                .researchModule(researchModule)
                 .synchronizationModule(synchronizationModule)
                 .triggerSystemModule(triggerSystemModule)
-                .build()
-    }
-
-    override val firebaseComponent: FirebaseComponent by lazy {
-        DaggerFirebaseComponent.builder()
-                .applicationModule(appModule)
-                .firebaseModule(firebaseModule)
-                .build()
-    }
-
-    override val serializationComponent: SerializationComponent by lazy {
-        DaggerSerializationComponent.builder()
-                .serializationModule(serializationModule)
-                .build()
-    }
-
-    override val scheduledJobComponent: ScheduledJobComponent by lazy {
-        DaggerScheduledJobComponent.builder()
-                .applicationModule(appModule)
-                .scheduledJobModule(scheduledJobModule)
-                .build()
-    }
-
-    override val triggerSystemComponent: TriggerSystemComponent by lazy {
-        DaggerTriggerSystemComponent.builder()
-                .applicationModule(appModule)
-                .triggerSystemModule(triggerSystemModule)
-                .backendDatabaseModule(backendDatabaseModule)
-                .build()
-    }
-
-    override val daoSerializationComponent: DaoSerializationComponent by lazy {
-        DaggerDaoSerializationComponent.builder()
-                .applicationModule(appModule)
-                .backendDatabaseModule(backendDatabaseModule)
-                .designModule(designModule)
-                .serializationModule(serializationModule)
-                .daoSerializationModule(daoSerializationModule)
-                .build()
-    }
-
-    override val researchComponent: ResearchComponent by lazy {
-        DaggerResearchComponent.builder()
-                .applicationModule(appModule)
-                .authModule(authModule)
-                .backendDatabaseModule(backendDatabaseModule)
-                .firebaseModule(firebaseModule)
-                .networkModule(networkModule)
-                .researchModule(researchModule)
-                .serializationModule(serializationModule)
-                .usageLoggingModule(usageLoggingModule)
-                .daoSerializationModule(daoSerializationModule)
-                .designModule(designModule)
-                .triggerSystemModule(triggerSystemModule)
-                .scheduledJobModule(scheduledJobModule)
                 .build()
     }
 
@@ -344,6 +294,8 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
             }
         }
 
+        OTApp.applicationComponent = this.applicationComponent
+
         //initialize modules===============================================
 
         logger = LoggingDbHelper(this)
@@ -354,7 +306,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         //TODO start service in job controller
         //startService(this.binaryUploadServiceController.makeResumeUploadIntent())
 
-        WorkManager.getInstance().enqueue(scheduledJobComponent.getFullSyncPeriodicRequestProvider().get())
+        WorkManager.getInstance().enqueue(applicationComponent.getFullSyncPeriodicRequestProvider().get())
 
 
         if (OTExternalSettingsPrompter.isBatteryOptimizationWhiteListed(this) || ProcessLifecycleOwner.get().lifecycle.currentState >= Lifecycle.State.STARTED) {

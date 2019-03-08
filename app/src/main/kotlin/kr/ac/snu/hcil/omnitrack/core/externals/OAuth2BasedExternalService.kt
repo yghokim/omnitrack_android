@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 import android.content.Context
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.core.dependency.OAuth2LoginDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
@@ -45,7 +46,7 @@ abstract class OAuth2BasedExternalService(context: Context, identifier: String, 
                 }.doOnComplete {
                     println("$identifier OAuth2 signed out.")
                     credential = null
-                }
+                }.subscribeOn(Schedulers.io())
             } else return@defer Completable.complete()
         }
 

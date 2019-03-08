@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.net
 import android.net.Uri
 import io.reactivex.Completable
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UploadTaskInfo
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.UploadTaskInfo
 
 /**
  * Created by younghokim on 2017. 11. 15..

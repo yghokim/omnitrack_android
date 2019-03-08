@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import androidx.core.app.AlarmManagerCompat
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
 import dagger.internal.Factory
@@ -16,11 +17,11 @@ import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
-import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerAlarmInstance
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerSchedule
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerAlarmInstance
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerSchedule
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
 import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
@@ -280,11 +281,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Factory<Rea
     }
 
     private fun registerSystemAlarm(alarmTimeToReserve: Long, userId: String, alarmId: Int) {
-        if (android.os.Build.VERSION.SDK_INT >= 23) {
-            context.alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTimeToReserve, makeIntent(context, userId, alarmTimeToReserve, alarmId))
-        } else {
-            context.alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeToReserve, makeIntent(context, userId, alarmTimeToReserve, alarmId))
-        }
+        AlarmManagerCompat.setExactAndAllowWhileIdle(context.alarmManager, AlarmManager.RTC_WAKEUP, alarmTimeToReserve, makeIntent(context, userId, alarmTimeToReserve, alarmId))
     }
 
     override fun cancelTrigger(trigger: OTTriggerDAO) {

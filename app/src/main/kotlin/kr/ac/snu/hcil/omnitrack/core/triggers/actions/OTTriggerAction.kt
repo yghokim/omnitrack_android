@@ -4,7 +4,7 @@ import android.content.Context
 import com.github.salomonbrys.kotson.jsonArray
 import com.google.gson.JsonObject
 import io.reactivex.Completable
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 
 /**
  * Created by younghokim on 2017. 4. 17..

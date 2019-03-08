@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.logics
 
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 
 /**
  * Created by Young-Ho Kim on 2016-09-07

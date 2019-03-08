@@ -10,6 +10,7 @@ import butterknife.bindView
 import io.reactivex.subjects.PublishSubject
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
+import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
@@ -62,7 +63,7 @@ class AttributeConnectionView : LinearLayout, View.OnClickListener {
         if (source == null) {
             sourceView.setText(R.string.msg_unsupported_connection)
         } else {
-            sourceView.text = source.factory.getFormattedName()
+            sourceView.text = source.getFactory<OTMeasureFactory>().getFormattedName()
         }
 
         if (connection?.isRangedQueryAvailable == true) {

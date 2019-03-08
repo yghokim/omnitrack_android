@@ -5,8 +5,8 @@ import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 
 /**
@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
  */
 class OTTriggerSystemManager(
         val triggerAlarmManager: Lazy<ITriggerAlarmController>,
+        val dataDrivenTriggerManager: Lazy<OTDataDrivenTriggerManager>,
         val realmProvider: Factory<Realm>,
         val context: Context
 ) {
@@ -27,6 +28,7 @@ class OTTriggerSystemManager(
 
     fun onSystemRebooted() {
         triggerAlarmManager.get().activateOnSystem()
+        dataDrivenTriggerManager.get().activateOnSystem()
     }
 
     fun handleTriggerOn(managedTrigger: OTTriggerDAO) {
@@ -34,6 +36,9 @@ class OTTriggerSystemManager(
         when (managedTrigger.conditionType) {
             OTTriggerDAO.CONDITION_TYPE_TIME -> {
                 triggerAlarmManager.get().registerTriggerAlarm(System.currentTimeMillis(), managedTrigger)
+            }
+            OTTriggerDAO.CONDITION_TYPE_DATA -> {
+                dataDrivenTriggerManager.get().registerTrigger(managedTrigger)
             }
         }
     }
@@ -43,6 +48,9 @@ class OTTriggerSystemManager(
         when (managedTrigger.conditionType) {
             OTTriggerDAO.CONDITION_TYPE_TIME -> {
                 triggerAlarmManager.get().cancelTrigger(managedTrigger)
+            }
+            OTTriggerDAO.CONDITION_TYPE_DATA -> {
+                dataDrivenTriggerManager.get().unregisterTrigger(managedTrigger)
             }
         }
 
@@ -61,15 +69,15 @@ class OTTriggerSystemManager(
         println("TriggerSystemManager: tryCheckInToSystem: ${managedTrigger.objectId}")
         if (!BuildConfig.DISABLE_EXTERNAL_ENTITIES || managedTrigger.experimentIdInFlags == BuildConfig.DEFAULT_EXPERIMENT_ID) {
             if (managedTrigger.isOn) {
-
                 when (managedTrigger.conditionType) {
                     OTTriggerDAO.CONDITION_TYPE_TIME -> {
                         triggerAlarmManager.get().continueTriggerInChainIfPossible(managedTrigger)
-                        if (managedTrigger.isOn) {
-                            if (!settingsPrompter.isBatteryOptimizationWhiteListed()) {
-                                settingsPrompter.askUserBatterOptimizationWhitelist()
-                            }
+                        if (!settingsPrompter.isBatteryOptimizationWhiteListed()) {
+                            settingsPrompter.askUserBatterOptimizationWhitelist()
                         }
+                    }
+                    OTTriggerDAO.CONDITION_TYPE_DATA -> {
+                        dataDrivenTriggerManager.get().registerTrigger(managedTrigger)
                     }
                 }
             } else {

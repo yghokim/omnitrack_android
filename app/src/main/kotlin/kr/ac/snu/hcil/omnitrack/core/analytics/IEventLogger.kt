@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.analytics
 
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 
 /**
  * Created by younghokim on 2017. 11. 28..

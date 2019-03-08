@@ -1,20 +1,20 @@
 package kr.ac.snu.hcil.omnitrack.core.di.global
 
 import com.google.gson.Gson
-import dagger.Component
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.typeadapters.*
+import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.typeadapters.*
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
+import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -70,19 +70,25 @@ class DaoSerializationModule {
     @ForServerItem
     fun provideServerItemAdapter(@ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTItemDAO> = ItemTypeAdapter(true, gson)
 
+
     @Provides
     @Singleton
-    fun provideConnectionTypeAdapter(serviceManager: OTExternalServiceManager): OTConnection.ConnectionTypeAdapter {
-        return OTConnection.ConnectionTypeAdapter(serviceManager)
+    fun provideTimeRangeQueryTypeAdapter(): OTTimeRangeQuery.TimeRangeQueryTypeAdapter {
+        return OTTimeRangeQuery.TimeRangeQueryTypeAdapter()
     }
 
-}
+    @Provides
+    @Singleton
+    fun provideConnectionTypeAdapter(serviceManager: OTExternalServiceManager, timeQueryRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>): OTConnection.ConnectionTypeAdapter {
+        return OTConnection.ConnectionTypeAdapter(serviceManager, timeQueryRangeQueryTypeAdapter)
+    }
 
-@Singleton
-@Component(modules = [DaoSerializationModule::class, BackendDatabaseModule::class])
-interface DaoSerializationComponent {
+    @Provides
+    @Singleton
+    fun provideDataDrivenConnectionTypeAdapter(serviceManager: OTExternalServiceManager, timeQueryRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>): OTDataDrivenTriggerCondition.ConditionTypeAdapter {
+        return OTDataDrivenTriggerCondition.ConditionTypeAdapter(serviceManager, timeQueryRangeQueryTypeAdapter)
+    }
 
-    fun manager(): DaoSerializationManager
 }
 
 

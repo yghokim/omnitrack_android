@@ -9,15 +9,17 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProviders
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_trigger_detail.*
 import kotlinx.android.synthetic.main.layout_tracker_assign_panel.view.*
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.IConditionConfigurationView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerInterfaceOptions
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
@@ -34,7 +36,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         const val INTENT_EXTRA_TRIGGER_DAO = "trigger_dao"
 
         fun makeNewTriggerIntent(context: Context, baseDao: OTTriggerDAO, options: TriggerInterfaceOptions): Intent {
-            val serialized = (context.applicationContext as OTAndroidApp).daoSerializationComponent.manager().serializeTrigger(baseDao)
+            val serialized = (context.applicationContext as OTAndroidApp).applicationComponent.manager().serializeTrigger(baseDao)
             println(serialized)
             return Intent(context, TriggerDetailActivity::class.java)
                     .setAction(MODE_NEW)
@@ -52,7 +54,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         fun makeEditTriggerIntent(context: Context, baseDao: OTTriggerDAO, options: TriggerInterfaceOptions): Intent {
             return Intent(context, TriggerDetailActivity::class.java)
                     .setAction(MODE_EDIT)
-                    .putExtra(INTENT_EXTRA_TRIGGER_DAO, (context.applicationContext as OTAndroidApp).daoSerializationComponent.manager().serializeTrigger(baseDao))
+                    .putExtra(INTENT_EXTRA_TRIGGER_DAO, (context.applicationContext as OTAndroidApp).applicationComponent.manager().serializeTrigger(baseDao))
                     .putExtra(INTENT_EXTRA_INTERFACE_OPTIONS, options)
         }
     }
@@ -83,12 +85,12 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                     val mode = intent.action
                     when (mode) {
                         MODE_NEW -> {
-                            val baseDao = (application as OTAndroidApp).daoSerializationComponent.manager().parseTrigger(intent.getStringExtra(INTENT_EXTRA_TRIGGER_DAO))
+                            val baseDao = (application as OTAndroidApp).applicationComponent.manager().parseTrigger(intent.getStringExtra(INTENT_EXTRA_TRIGGER_DAO))
                             viewModel.initNew(baseDao, savedInstanceState)
                         }
                         MODE_EDIT -> {
                             if (intent.hasExtra(INTENT_EXTRA_TRIGGER_DAO)) {
-                                val baseDao = (application as OTAndroidApp).daoSerializationComponent.manager().parseTrigger(intent.getStringExtra(INTENT_EXTRA_TRIGGER_DAO))
+                                val baseDao = (application as OTAndroidApp).applicationComponent.manager().parseTrigger(intent.getStringExtra(INTENT_EXTRA_TRIGGER_DAO))
                                 viewModel.initEdit(baseDao, savedInstanceState)
                             } else if (intent.hasExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER)) {
                                 viewModel.initEdit(intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER), userId, savedInstanceState)
@@ -222,14 +224,18 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
                     msg, yesLabel = R.string.msg_save, noLabel = R.string.msg_do_not_save, onYes =
             {
-                val errorMessages = viewModel.validateConfiguration(this)
-                if (errorMessages == null) {
-                    viewModel.saveFrontToDao()
-                    setResult(Activity.RESULT_OK, makeResultData())
-                    finish()
-                } else {
-                    DialogHelper.makeSimpleAlertBuilder(this, errorMessages.joinToString("\n")).show()
-                }
+                creationSubscriptions.add(
+                        viewModel.validateConfiguration(this).observeOn(AndroidSchedulers.mainThread()).subscribe { (valid, errorMessages) ->
+                            if (valid) {
+                                viewModel.saveFrontToDao()
+                                setResult(Activity.RESULT_OK, makeResultData())
+                                finish()
+                            } else {
+                                DialogHelper.makeSimpleAlertBuilder(this, errorMessages?.joinToString("\n")
+                                        ?: "Configuration is not valid.").show()
+                            }
+                        }
+                )
             }, onNo = { setResult(Activity.RESULT_CANCELED); finish() })
                     .cancelable(true)
                     .neutralText(R.string.msg_cancel).show()
@@ -244,14 +250,18 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
 
     override fun onToolbarRightButtonClicked() {
         ui_script_form.clearFocus()
-        val errorMessages = viewModel.validateConfiguration(this)
-        if (errorMessages == null) {
-            viewModel.saveFrontToDao()
-            setResult(Activity.RESULT_OK, makeResultData())
-            finish()
-        } else {
-            DialogHelper.makeSimpleAlertBuilder(this, errorMessages.joinToString("\n")).show()
-        }
+        creationSubscriptions.add(
+                viewModel.validateConfiguration(this).subscribe { (valid, errorMessages) ->
+                    if (valid) {
+                        viewModel.saveFrontToDao()
+                        setResult(Activity.RESULT_OK, makeResultData())
+                        finish()
+                    } else {
+                        DialogHelper.makeSimpleAlertBuilder(this, errorMessages?.joinToString("\n")
+                                ?: "Configuration is not valid.").show()
+                    }
+                }
+        )
     }
 
     private fun makeResultData(): Intent {

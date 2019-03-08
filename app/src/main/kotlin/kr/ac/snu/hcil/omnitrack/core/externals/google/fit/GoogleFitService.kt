@@ -16,7 +16,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import rx_activity_result2.RxActivityResult
 import java.util.*
@@ -60,7 +60,7 @@ class GoogleFitService(context: Context) : OTExternalService(context, "GoogleFit
         set.toTypedArray()
     }
 
-    override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
+    override fun onRegisterMeasureFactories(): Array<OTServiceMeasureFactory> {
         return arrayOf(GoogleFitStepsFactory(context, this))
     }
 
@@ -144,7 +144,7 @@ class GoogleFitService(context: Context) : OTExternalService(context, "GoogleFit
         return builder
     }
 
-    abstract class GoogleFitMeasureFactory(context: Context, service: GoogleFitService, typeKey: String) : OTMeasureFactory(context, service, typeKey) {
+    abstract class GoogleFitMeasureFactory(context: Context, service: GoogleFitService, typeKey: String) : OTServiceMeasureFactory(context, service, typeKey) {
         abstract val usedAPI: Api<out Api.ApiOptions.NotRequiredOptions>
         abstract val usedScope: Scope
     }

@@ -6,8 +6,8 @@ import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
@@ -16,8 +16,9 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-02.
  */
-class RescueTimeProductivityMeasureFactory(context: Context, service: RescueTimeService) : OTMeasureFactory(context, service, "prd") {
+class RescueTimeProductivityMeasureFactory(context: Context, service: RescueTimeService) : OTServiceMeasureFactory(context, service, "prd") {
 
+    override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_DOUBLE
 
     val configurator = object : IExampleAttributeConfigurator {
         override fun configureExampleAttribute(attr: OTAttributeDAO): Boolean {
@@ -78,10 +79,10 @@ class RescueTimeProductivityMeasureFactory(context: Context, service: RescueTime
 
     class ProductivityMeasure(factory: RescueTimeProductivityMeasureFactory) : OTRangeQueriedMeasure(factory) {
 
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_DOUBLE
 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
-            return service<RescueTimeService>().getSummaryRequest(Date(start), Date(end - 1), (factory as RescueTimeProductivityMeasureFactory).productivityCalculator).toFlowable() as Flowable<Nullable<out Any>>
+            val factory = getFactory<RescueTimeProductivityMeasureFactory>()
+            return factory.getService<RescueTimeService>().getSummaryRequest(Date(start), Date(end - 1), factory.productivityCalculator).toFlowable() as Flowable<Nullable<out Any>>
         }
 
         override fun equals(other: Any?): Boolean {

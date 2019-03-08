@@ -6,8 +6,8 @@ import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
@@ -15,8 +15,9 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-01.
  */
-class MisfitSleepMeasureFactory(context: Context, service: MisfitService) : OTMeasureFactory(context, service, "slp") {
+class MisfitSleepMeasureFactory(context: Context, service: MisfitService) : OTServiceMeasureFactory(context, service, "slp") {
 
+    override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_FOR_TIMESPAN_ATTRIBUTE
     }
@@ -54,13 +55,12 @@ class MisfitSleepMeasureFactory(context: Context, service: MisfitService) : OTMe
 
     class MisfitSleepMeasure(factory: MisfitSleepMeasureFactory) : OTRangeQueriedMeasure(factory) {
 
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
-
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
+            val service = getFactory<MisfitSleepMeasureFactory>().getService<MisfitService>()
             return Flowable.defer {
-                val token = service<MisfitService>().getStoredAccessToken()
+                val token = service.getStoredAccessToken()
                 if (token != null) {
-                    return@defer service<MisfitService>().api.getLatestSleepOnDayRequest(token, Date(start), Date(end - 20)).toFlowable() as Flowable<Nullable<out Any>>
+                    return@defer service.api.getLatestSleepOnDayRequest(token, Date(start), Date(end - 20)).toFlowable() as Flowable<Nullable<out Any>>
                 } else return@defer Flowable.error<Nullable<out Any>>(Exception("no token"))
             }
         }

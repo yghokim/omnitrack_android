@@ -6,7 +6,6 @@ import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
-import kr.ac.snu.hcil.omnitrack.core.di.global.FirebaseComponent
 import kr.ac.snu.hcil.omnitrack.utils.versionName
 
 /**
@@ -34,8 +33,8 @@ class OTDeviceInfo private constructor(context: Context) {
 
         val OS: String get() = "Android api-${android.os.Build.VERSION.SDK_INT}"
 
-        fun makeDeviceInfo(context: Context, firebaseComponent: FirebaseComponent): Single<OTDeviceInfo> {
-            return firebaseComponent.getFirebaseInstanceIdToken().map { token ->
+        fun makeDeviceInfo(context: Context): Single<OTDeviceInfo> {
+            return (context.applicationContext as OTAndroidApp).applicationComponent.getFirebaseInstanceIdToken().map { token ->
                 OTDeviceInfo(context).apply {
                     instanceId = token
                 }

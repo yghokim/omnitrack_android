@@ -1,1 +1,1 @@
-include ':app', ':material_dialog_core', ':UpPlatformSdk', ':material_about', ':fancybuttons', ':TedBottomPicker', ':AppUpdater:appupdater'
+include ':app', ':material_dialog_core', ':material_about', ':fancybuttons', ':TedBottomPicker', ':AppUpdater:appupdater', ':omnitrack_corelib'

@@ -6,9 +6,9 @@ import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
@@ -20,7 +20,7 @@ import java.util.*
 /**
  * Created by younghokim on 16. 9. 3..
  */
-class FitbitRecentSleepTimeMeasureFactory(context: Context, service: FitbitService) : OTMeasureFactory(context, service, "slp") {
+class FitbitRecentSleepTimeMeasureFactory(context: Context, service: FitbitService) : OTServiceMeasureFactory(context, service, "slp") {
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_FOR_TIMESPAN_ATTRIBUTE
     }
@@ -31,6 +31,7 @@ class FitbitRecentSleepTimeMeasureFactory(context: Context, service: FitbitServi
 
     override fun getAttributeType() = OTAttributeManager.TYPE_TIMESPAN
 
+    override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
     override val isRangedQueryAvailable: Boolean = true
     override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Hour
     override val isDemandingUserInput: Boolean = false
@@ -59,7 +60,6 @@ class FitbitRecentSleepTimeMeasureFactory(context: Context, service: FitbitServi
 
     class FitbitRecentSleepTimeMeasure(factory: FitbitRecentSleepTimeMeasureFactory) : OTRangeQueriedMeasure(factory) {
 
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
 
         val converter = object : OAuth2Client.OAuth2RequestConverter<TimeSpan?> {
             override fun process(requestResultStrings: Array<String>): TimeSpan? {
@@ -88,7 +88,7 @@ class FitbitRecentSleepTimeMeasureFactory(context: Context, service: FitbitServi
             val uri = HttpUrl.parse(FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SLEEP, Date(start)))!!.newBuilder()
                     .addQueryParameter("isMainSleep", "true")
                     .build()
-            return service<FitbitService>().getRequest(
+            return getFactory<FitbitRecentSleepTimeMeasureFactory>().getService<FitbitService>().getRequest(
                     converter,
                     uri.toString()).toFlowable() as Flowable<Nullable<out Any>>
         }

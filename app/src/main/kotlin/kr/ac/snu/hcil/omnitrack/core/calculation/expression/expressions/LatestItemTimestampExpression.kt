@@ -5,7 +5,7 @@ import com.udojava.evalex.Expression
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.ExpressionConstants
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.ExpressionConstants.Companion.EXPRESSION_ZERO
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.LongLazyNumber
-import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 

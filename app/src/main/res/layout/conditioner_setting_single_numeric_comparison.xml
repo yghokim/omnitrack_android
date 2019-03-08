@@ -20,13 +20,13 @@
 
     <EditText
         android:id="@+id/ui_compared_number_input"
-        style="@style/ShortTextInputStyle"
+        style="@style/ShortTextFormStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"
         android:layout_weight="1"
         android:inputType="numberDecimal|numberSigned"
         android:text="10000"

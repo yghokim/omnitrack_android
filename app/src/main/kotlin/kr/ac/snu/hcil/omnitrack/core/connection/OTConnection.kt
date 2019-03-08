@@ -5,6 +5,7 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import dagger.Lazy
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
@@ -12,7 +13,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 
@@ -21,7 +22,7 @@ import kr.ac.snu.hcil.omnitrack.utils.TextHelper
  */
 class OTConnection {
 
-    class ConnectionTypeAdapter(val externalServiceManager: OTExternalServiceManager) : TypeAdapter<OTConnection>() {
+    class ConnectionTypeAdapter(val externalServiceManager: OTExternalServiceManager, val timeRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>) : TypeAdapter<OTConnection>() {
         override fun read(reader: JsonReader): OTConnection {
             val connection = OTConnection()
             reader.beginObject()
@@ -45,8 +46,7 @@ class OTConnection {
                     }
 
                     "query" -> {
-                        val adapter = OTTimeRangeQuery.TimeRangeQueryTypeAdapter()
-                        connection.rangedQuery = adapter.read(reader)
+                        connection.rangedQuery = timeRangeQueryTypeAdapter.get().read(reader)
                     }
                 }
             }
@@ -63,14 +63,13 @@ class OTConnection {
                 out.name("factory")
                 out.beginArray()
                 out.value(it.factoryCode)
-                out.jsonValue(it.factory.serializeMeasure(it))
+                out.jsonValue(it.getFactory<OTMeasureFactory>().serializeMeasure(it))
                 out.endArray()
             }
 
             value.rangedQuery?.let {
                 out.name("query")
-                val adapter = OTTimeRangeQuery.TimeRangeQueryTypeAdapter()
-                adapter.write(out, it)
+                timeRangeQueryTypeAdapter.get().write(out, it)
             }
 
             out.endObject()
@@ -93,7 +92,7 @@ class OTConnection {
 
     val isRangedQueryAvailable: Boolean
         get() = if (source != null) {
-            source?.factory?.isRangedQueryAvailable == true
+            source?.getFactory<OTMeasureFactory>()?.isRangedQueryAvailable == true
         } else false
 
 
@@ -128,14 +127,19 @@ class OTConnection {
     fun isAvailableToRequestValue(invalidMessages: MutableList<CharSequence>? = null): Boolean {
         val source = source
         if (source != null) {
-            val service = source.factory.parentService
-            if (service.state == OTExternalService.ServiceState.ACTIVATED) {
-                return true
+            if (source.getFactory<OTMeasureFactory>() is OTServiceMeasureFactory) {
+                val service = source.getFactory<OTServiceMeasureFactory>().parentService
+                if (service.state == OTExternalService.ServiceState.ACTIVATED) {
+                    return true
+                } else {
+                    invalidMessages?.add(TextHelper.fromHtml(String.format(
+                            "<font color=\"blue\">${source.getFactory<OTServiceMeasureFactory>().context.resources.getString(R.string.msg_service_is_not_activated_format)}</font>",
+                            source.getFactory<OTServiceMeasureFactory>().context.resources.getString(service.nameResourceId))))
+                    return false
+                }
             } else {
-                invalidMessages?.add(TextHelper.fromHtml(String.format(
-                        "<font color=\"blue\">${source.factory.context.resources.getString(R.string.msg_service_is_not_activated_format)}</font>",
-                        source.factory.context.resources.getString(service.nameResourceId))))
-                return false
+                //TODO check trigger or reminder status
+                return true
             }
         } else {
             invalidMessages?.add(TextHelper.fromHtml(
@@ -148,15 +152,17 @@ class OTConnection {
     fun makeValidationStateObservable(context: Context): Flowable<Pair<Boolean, CharSequence?>> {
         return source?.let { source ->
             Flowable.defer {
-                val service = source.factory.parentService
-                service.onStateChanged.map { state ->
-                    when (state) {
-                        OTExternalService.ServiceState.ACTIVATED -> Pair(true, null)
-                        else -> Pair<Boolean, CharSequence?>(false, TextHelper.fromHtml(String.format(
-                                "<font color=\"blue\">${context.resources.getString(R.string.msg_service_is_not_activated_format)}</font>",
-                                context.resources.getString(service.nameResourceId))))
-                    }
-                }.toFlowable(BackpressureStrategy.LATEST)
+                if (source.getFactory<OTMeasureFactory>() is OTServiceMeasureFactory) {
+                    val service = source.getFactory<OTServiceMeasureFactory>().parentService
+                    service.onStateChanged.map { state ->
+                        when (state) {
+                            OTExternalService.ServiceState.ACTIVATED -> Pair(true, null)
+                            else -> Pair<Boolean, CharSequence?>(false, TextHelper.fromHtml(String.format(
+                                    "<font color=\"blue\">${context.resources.getString(R.string.msg_service_is_not_activated_format)}</font>",
+                                    context.resources.getString(service.nameResourceId))))
+                        }
+                    }.toFlowable(BackpressureStrategy.LATEST)
+                } else Flowable.just(Pair(true, null)) //TODO check trigger or reminder status
             }
         } ?: Flowable.just(Pair<Boolean, CharSequence?>(false, null))
     }

@@ -4,7 +4,8 @@ import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
 
@@ -38,6 +39,9 @@ object OTTriggerInformationHelper {
                     }
                 } else context.resources.getString(R.string.msg_once)
             }
+            OTTriggerDAO.CONDITION_TYPE_DATA -> {
+                null
+            }
             else -> null
         }
     }
@@ -46,7 +50,16 @@ object OTTriggerInformationHelper {
     fun getConfigDescResId(trigger: OTTriggerDAO): Int? {
         return when (trigger.conditionType) {
             OTTriggerDAO.CONDITION_TYPE_TIME -> getTimeConfigDescResId((trigger.condition as OTTimeTriggerCondition).timeConditionType)
-            OTTriggerDAO.CONDITION_TYPE_DATA -> R.string.trigger_desc_time
+            OTTriggerDAO.CONDITION_TYPE_DATA -> {
+                trigger.condition?.let {
+                    val condition = it as OTDataDrivenTriggerCondition
+                    when (condition.comparison) {
+                        OTDataDrivenTriggerCondition.ComparisonMethod.Exceed -> R.string.msg_trigger_data_config_desc_exceed
+                        OTDataDrivenTriggerCondition.ComparisonMethod.Drop -> R.string.msg_trigger_data_config_desc_drop
+                        else -> null
+                    }
+                }
+            }
             else -> null
         }
     }

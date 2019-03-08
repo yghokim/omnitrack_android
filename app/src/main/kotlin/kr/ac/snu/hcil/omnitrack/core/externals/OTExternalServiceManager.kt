@@ -2,23 +2,22 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.content.Context
 import android.content.SharedPreferences
-import kr.ac.snu.hcil.omnitrack.core.di.global.ExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitService
 import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
-import kr.ac.snu.hcil.omnitrack.core.externals.jawbone.JawboneUpService
 import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitService
 import kr.ac.snu.hcil.omnitrack.core.externals.rescuetime.RescueTimeService
 import java.util.*
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class OTExternalServiceManager @Inject constructor(
+class OTExternalServiceManager constructor(
         val context: Context,
-        @ExternalService val preferences: SharedPreferences
+        val preferences: SharedPreferences
 ) {
 
-    private val factoryCodeDict = HashMap<String, OTMeasureFactory>()
+    init {
+        println("externalServiceManager was created: ${this}")
+    }
+
+    private val factoryCodeDict = HashMap<String, OTServiceMeasureFactory>()
 
     val availableServices: Array<OTExternalService> by lazy {
         val list =
@@ -26,7 +25,6 @@ class OTExternalServiceManager @Inject constructor(
                         //AndroidDeviceService,
                         GoogleFitService(context),
                         FitbitService(context),
-                        JawboneUpService(context),
                         MisfitService(context),
                         RescueTimeService(context)
                         //,MicrosoftBandService
@@ -46,9 +44,9 @@ class OTExternalServiceManager @Inject constructor(
         return availableServices.find { it.identifier == identifier }
     }
 
-    fun getFilteredMeasureFactories(filter: (OTMeasureFactory) -> Boolean): List<OTMeasureFactory> {
+    fun getFilteredMeasureFactories(filter: (OTServiceMeasureFactory) -> Boolean): List<OTServiceMeasureFactory> {
 
-        val list = ArrayList<OTMeasureFactory>()
+        val list = ArrayList<OTServiceMeasureFactory>()
         for (service in availableServices) {
             for (factory in service.measureFactories) {
                 if (filter(factory)) {
@@ -60,7 +58,7 @@ class OTExternalServiceManager @Inject constructor(
         return list
     }
 
-    fun getMeasureFactoryByCode(typeCode: String): OTMeasureFactory? {
+    fun getMeasureFactoryByCode(typeCode: String): OTServiceMeasureFactory? {
         if (availableServices.isNotEmpty())
             return factoryCodeDict[typeCode]
         else return null

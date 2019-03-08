@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProviders
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.fragment_tracker_detail_triggers.*
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
 import java.util.*

@@ -7,7 +7,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import io.reactivex.Maybe
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.getLongCompat
 import kr.ac.snu.hcil.omnitrack.utils.getStringCompat

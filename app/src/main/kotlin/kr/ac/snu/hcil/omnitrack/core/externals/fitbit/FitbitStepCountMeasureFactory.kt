@@ -6,8 +6,8 @@ import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -18,13 +18,13 @@ import java.util.*
 /**
  * Created by younghokim on 16. 9. 3..
  */
-class FitbitStepCountMeasureFactory(context: Context, parentService: FitbitService) : OTMeasureFactory(context, parentService, "step") {
+class FitbitStepCountMeasureFactory(context: Context, parentService: FitbitService) : OTServiceMeasureFactory(context, parentService, "step") {
+
+    override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_STEP_ATTRIBUTE
     }
-
-    override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
 
     override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
 
@@ -60,8 +60,6 @@ class FitbitStepCountMeasureFactory(context: Context, parentService: FitbitServi
 
     class FitbitStepMeasure(factory: FitbitStepCountMeasureFactory) : OTRangeQueriedMeasure(factory) {
 
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
-
         val dailyConverter = object : OAuth2Client.OAuth2RequestConverter<Int?> {
             override fun process(requestResultStrings: Array<String>): Int? {
                 val json = JSONObject(requestResultStrings.first())
@@ -88,13 +86,13 @@ class FitbitStepCountMeasureFactory(context: Context, parentService: FitbitServi
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
 
             return if (TimeHelper.isSameDay(start, end - 10)) {
-                service<FitbitService>().getRequest(
+                getFactory<FitbitStepCountMeasureFactory>().getService<FitbitService>().getRequest(
                         dailyConverter,
                         FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SUMMARY, Date(start))).toFlowable()
                         as Flowable<Nullable<out Any>>
             } else
             //TODO: Can be optimized by querying summary data of middle days.
-                service<FitbitService>().getRequest(intraDayConverter, *FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_STEPS, start, end)).toFlowable()
+                getFactory<FitbitStepCountMeasureFactory>().getService<FitbitService>().getRequest(intraDayConverter, *FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_STEPS, start, end)).toFlowable()
                         as Flowable<Nullable<out Any>>
         }
 

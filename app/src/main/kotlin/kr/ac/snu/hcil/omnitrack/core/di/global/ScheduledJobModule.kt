@@ -152,6 +152,7 @@ class ScheduledJobModule {
                 .addConstraint(Constraint.ON_ANY_NETWORK)
                 .build()*/
     }
+
 }
 
 @Qualifier
@@ -171,9 +172,3 @@ annotation class ServerFullSync
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ResearchSync
-
-
-@Qualifier
-@Retention(AnnotationRetention.RUNTIME)
-annotation class BinaryUpload
-

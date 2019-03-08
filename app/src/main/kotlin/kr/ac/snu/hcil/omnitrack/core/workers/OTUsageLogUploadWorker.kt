@@ -12,7 +12,7 @@ import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UsageLog
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.UsageLog
 import kr.ac.snu.hcil.omnitrack.core.di.global.UsageLogger
 import kr.ac.snu.hcil.omnitrack.core.net.IUsageLogUploadAPI
 import java.util.concurrent.Executors

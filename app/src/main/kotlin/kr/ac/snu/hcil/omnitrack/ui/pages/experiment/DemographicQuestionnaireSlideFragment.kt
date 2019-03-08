@@ -63,12 +63,12 @@ class DemographicQuestionnaireSlideFragment : ExperimentSignUpActivity.SlideFrag
         println("serializedError: $serializedError")
         println("serializedValues: $serializedValues")
         if (serializedError != null) {
-            val errorObj = (requireContext().applicationContext as OTAndroidApp).serializationComponent.genericGson().fromJson(serializedError, JsonObject::class.java)
+            val errorObj = (requireContext().applicationContext as OTAndroidApp).applicationComponent.genericGson().fromJson(serializedError, JsonObject::class.java)
             if (errorObj.getStringCompat("error") == "RequiredFields") {
                 Toast.makeText(requireContext(), "Fill up all the required questions.", Toast.LENGTH_LONG).show()
             }
         } else {
-            val valueObj = (requireContext().applicationContext as OTAndroidApp).serializationComponent.genericGson().fromJson(serializedValues, JsonObject::class.java)
+            val valueObj = (requireContext().applicationContext as OTAndroidApp).applicationComponent.genericGson().fromJson(serializedValues, JsonObject::class.java)
             viewModel.demographicAnswers = valueObj
             viewModel.goNext(slide)
         }
