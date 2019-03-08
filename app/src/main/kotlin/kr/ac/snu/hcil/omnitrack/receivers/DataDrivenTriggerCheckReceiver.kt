@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
 import dagger.Lazy
 import dagger.internal.Factory
@@ -17,12 +18,14 @@ import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerMeasureEntry
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerMeasureHistoryEntry
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
+import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataDrivenTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
@@ -97,6 +100,13 @@ class DataDrivenTriggerCheckReceiver : BroadcastReceiver() {
             }
         }
 
+        private fun makeReminderDeliverable(measure: OTMeasureFactory.OTMeasure, measuredValue: Double, timestamp: Long): JsonObject {
+            return jsonObject(
+                    "measure_code" to measure.getFactory<OTServiceMeasureFactory>().typeCode,
+                    "measured_value" to measuredValue,
+                    "measured_timestamp" to timestamp)
+        }
+
         override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
             this.creationSubscriptions.add(
                     Completable.defer {
@@ -138,7 +148,6 @@ class DataDrivenTriggerCheckReceiver : BroadcastReceiver() {
                                             newMeasuredValueEntry.timestamp = now
                                             newMeasuredValueEntry.measuredValue = measuredValue
                                             it.where(OTTriggerMeasureEntry::class.java).equalTo("id", entry.id).findFirst()?.measureHistory?.add(newMeasuredValueEntry)
-                                            entry.measureHistory.add(newMeasuredValueEntry)
                                             OTApp.logger.writeSystemLog("measure value of ${entry.factoryCode}: ${nullableValue.datum}", "OTDataTriggerConditionWorker")
                                         }
                                         realm.close()
@@ -149,25 +158,19 @@ class DataDrivenTriggerCheckReceiver : BroadcastReceiver() {
                                             entry.triggers.forEach { trigger ->
                                                 val triggerCondition = trigger.condition as OTDataDrivenTriggerCondition
                                                 if (triggerCondition.passesThreshold(bigDecimalValue)) {
-                                                    if (entry.measureHistory.count() < 2) {
+                                                    val todayNonNullMeasures = entry.measureHistory.filter {
+                                                        it.measuredValue != null && TimeHelper.isSameDay(it.timestamp, now) //TODO check timezone
+                                                    }
+                                                    if (todayNonNullMeasures.isEmpty()) {
                                                         //first history entry
-                                                        triggerFireJobs.add(trigger.getPerformFireCompletable(now, JsonObject(), this))
+                                                        triggerFireJobs.add(trigger.getPerformFireCompletable(now,
+                                                                makeReminderDeliverable(triggerCondition.measure!!, measuredValue, now), this))
                                                     } else {
                                                         //check last non-null entry
-                                                        var startIndex = entry.measureHistory.count() - 2
-                                                        while (startIndex > 0 && entry.measureHistory[startIndex]?.measuredValue == null) {
-
-                                                        }
-                                                        val lastMeasureHistoryEntry = entry.measureHistory[entry.measureHistory.count() - 2]
-                                                        //TODO Check TimeZone
-                                                        if (TimeHelper.isSameDay(lastMeasureHistoryEntry!!.timestamp, now)) {
-                                                            if (lastMeasureHistoryEntry.measuredValue == null ||
-                                                                    !triggerCondition.passesThreshold(lastMeasureHistoryEntry.measuredValue!!.toBigDecimal())) {
-                                                                triggerFireJobs.add(trigger.getPerformFireCompletable(now, JsonObject(), this))
-                                                            }
-                                                        } else {
-                                                            //this is the first log of the day.
-                                                            triggerFireJobs.add(trigger.getPerformFireCompletable(now, JsonObject(), this))
+                                                        val lastMeasureHistoryEntry = todayNonNullMeasures.last()
+                                                        if (!triggerCondition.passesThreshold(lastMeasureHistoryEntry.measuredValue!!.toBigDecimal())) {
+                                                            triggerFireJobs.add(trigger.getPerformFireCompletable(now,
+                                                                    makeReminderDeliverable(triggerCondition.measure!!, measuredValue, now), this))
                                                         }
                                                     }
                                                 }
@@ -190,11 +193,15 @@ class DataDrivenTriggerCheckReceiver : BroadcastReceiver() {
                             }.subscribe({
                                 OTApp.logger.writeSystemLog("finished data trigger measure check", "OTDataTriggerConditionWorker")
                                 OTApp.logger.writeSystemLog("Register next data trigger measure check alarm.", "OTDataTriggerConditionWorker")
-                                dataDrivenTriggerManager.get().reserveCheckExecution(this, false)
+                                dataDrivenTriggerManager.get().reserveCheckExecution(this, OTDataDrivenTriggerManager.DELAY_PERIODIC)
                                 lockImpl.completeWakefulIntent(intent)
                                 stopSelf(startId)
                             }, { err ->
                                 err.printStackTrace()
+                                OTApp.logger.writeSystemLog("Retry measure check 5 seconds later", "OTDataTriggerConditionWorker")
+                                dataDrivenTriggerManager.get().reserveCheckExecution(this, OTDataDrivenTriggerManager.DELAY_RETRY)
+                                lockImpl.completeWakefulIntent(intent)
+                                stopSelf(startId)
                             }))
 
             return START_STICKY

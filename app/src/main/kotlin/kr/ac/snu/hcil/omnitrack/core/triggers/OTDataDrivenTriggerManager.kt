@@ -34,6 +34,11 @@ class OTDataDrivenTriggerManager(private val context: Context, private val exter
     companion object {
         const val WORK_NAME = "data-driven-condition-measure-check"
 
+        const val DELAY_IMMEDIATE: Long = 1000
+        const val DELAY_PERIODIC: Long = 5 * TimeHelper.minutesInMilli
+        const val DELAY_RETRY: Long = 5000
+
+
         const val REQUEST_CODE = 5244
 
         const val FIELD_FACTORY_CODE = "factoryCode"
@@ -99,7 +104,7 @@ class OTDataDrivenTriggerManager(private val context: Context, private val exter
                 .equalTo(FIELD_IS_ACTIVE, true).count()
         if (numMeasures > 0L) {
             //turn on worker
-            reserveCheckExecution(context, true)
+            reserveCheckExecution(context, DELAY_IMMEDIATE)
         } else {
             //turn off worker
             context.alarmManager.cancel(makePendingIntent(context))
@@ -148,9 +153,9 @@ class OTDataDrivenTriggerManager(private val context: Context, private val exter
         }
     }
 
-    fun reserveCheckExecution(context: Context, immediate: Boolean) {
+    fun reserveCheckExecution(context: Context, delayMillis: Long) {
         AlarmManagerCompat.setExactAndAllowWhileIdle(context.alarmManager, AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis() + (if (immediate) 1000 else 5 * TimeHelper.minutesInMilli),
+                System.currentTimeMillis() + delayMillis,
                 makePendingIntent(context))
     }
 
