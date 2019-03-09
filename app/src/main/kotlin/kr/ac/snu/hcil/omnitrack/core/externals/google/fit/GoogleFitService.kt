@@ -12,12 +12,12 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kr.ac.snu.hcil.android.common.TextHelper
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import rx_activity_result2.RxActivityResult
 import java.util.*
 

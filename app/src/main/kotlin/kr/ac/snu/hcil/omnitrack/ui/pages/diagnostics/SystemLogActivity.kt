@@ -6,11 +6,11 @@ import android.os.Looper
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import java.util.*
 
 class SystemLogActivity : MultiButtonActionBarActivity(R.layout.activity_system_log) {

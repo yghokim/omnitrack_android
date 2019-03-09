@@ -9,12 +9,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.afollestad.materialdialogs.MaterialDialog
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import kotlinx.android.synthetic.main.component_time_range_picker.view.*
+import kr.ac.snu.hcil.android.common.events.Event
+import kr.ac.snu.hcil.android.common.view.InterfaceHelper
+import kr.ac.snu.hcil.android.common.view.getActivity
+import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
-import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.getActivity
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.text.SimpleDateFormat
 import java.util.*

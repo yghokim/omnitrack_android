@@ -1,13 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales
 
 import android.content.Context
+import kr.ac.snu.hcil.android.common.time.getDayOfMonth
+import kr.ac.snu.hcil.android.common.time.getDayOfWeek
+import kr.ac.snu.hcil.android.common.time.getHourOfDay
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.IAxisScale
-import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
-import kr.ac.snu.hcil.omnitrack.utils.getDayOfWeek
-import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
 import kr.ac.snu.hcil.omnitrack.utils.time.LocalTimeFormats
 import java.util.*
 import javax.inject.Inject

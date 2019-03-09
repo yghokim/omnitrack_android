@@ -2,10 +2,10 @@ package kr.ac.snu.hcil.omnitrack.core.visualization
 
 import android.content.Context
 import android.text.format.DateUtils
+import kr.ac.snu.hcil.android.common.time.getYear
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
-import kr.ac.snu.hcil.omnitrack.utils.getYear
 import kr.ac.snu.hcil.omnitrack.utils.time.LocalTimeFormats
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.util.*

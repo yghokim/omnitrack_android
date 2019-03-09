@@ -1,11 +1,5 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="action_bar_height">50dp</dimen>
-
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-
-    <dimen name="activity_vertical_margin">16dp</dimen>
-
     <dimen name="screen_widget_shortcut_panel_header_height">30dp</dimen>
 
     <dimen name="fab_margin">16dp</dimen>
@@ -46,10 +40,6 @@
 
     <dimen name="star_rating_item_list_view_unit_size">25dp</dimen>
 
-    <dimen name="button_height_tall">60dp</dimen>
-    <dimen name="button_height_normal">50dp</dimen>
-    <dimen name="button_height_small">40dp</dimen>
-    <dimen name="button_height_tiny">35dp</dimen>
 
 
     <dimen name="app_widget_instant_logging_button_height">35dp</dimen>

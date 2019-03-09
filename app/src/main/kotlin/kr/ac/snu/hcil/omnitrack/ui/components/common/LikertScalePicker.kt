@@ -10,11 +10,11 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
+import kr.ac.snu.hcil.android.common.dipSize
+import kr.ac.snu.hcil.android.common.events.Event
+import kr.ac.snu.hcil.android.common.nearestInt
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
-import kr.ac.snu.hcil.omnitrack.utils.dipSize
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.nearestInt
 import kotlin.properties.Delegates
 
 /**

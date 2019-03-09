@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.wizard
 
 import android.content.Context
 import android.view.View
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import kr.ac.snu.hcil.android.common.events.Event
 
 /**
  * Created by Young-Ho Kim on 2016-08-30.

@@ -14,11 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_multibutton_single_recyclerview.*
 import kotlinx.android.synthetic.main.sortable_list_element.view.*
+import kr.ac.snu.hcil.android.common.view.DialogHelper
+import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
+import kr.ac.snu.hcil.android.common.view.container.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import org.jetbrains.anko.contentView
 
 /**

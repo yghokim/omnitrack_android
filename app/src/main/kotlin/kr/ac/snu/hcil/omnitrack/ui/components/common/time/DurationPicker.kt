@@ -15,11 +15,11 @@ import androidx.core.graphics.ColorUtils
 import butterknife.bindView
 import butterknife.bindViews
 import kotlinx.android.synthetic.main.component_duration_picker.view.*
+import kr.ac.snu.hcil.android.common.events.Event
+import kr.ac.snu.hcil.android.common.view.getActivity
+import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.getActivity
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 
 /**

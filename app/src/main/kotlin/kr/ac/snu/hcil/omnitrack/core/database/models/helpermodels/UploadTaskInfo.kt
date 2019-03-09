@@ -4,7 +4,7 @@ import android.net.Uri
 import io.realm.MutableRealmInteger
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
-import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
+import kr.ac.snu.hcil.android.common.file.FileHelper
 
 /**
  * Created by Young-Ho on 3/4/2017.

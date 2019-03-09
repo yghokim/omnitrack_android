@@ -32,6 +32,9 @@ import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import kotlinx.android.synthetic.main.fragment_tracker_detail_triggers.*
 import kotlinx.android.synthetic.main.layout_attached_tracker_list.view.*
 import kotlinx.android.synthetic.main.trigger_list_element.view.*
+import kr.ac.snu.hcil.android.common.view.DialogHelper
+import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
+import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -49,9 +52,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListV
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.OfflineTriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerViewModel
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
-import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import org.jetbrains.anko.verticalMargin
 
 /**

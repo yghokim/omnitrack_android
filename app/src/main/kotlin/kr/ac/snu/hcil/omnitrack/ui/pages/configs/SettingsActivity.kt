@@ -22,6 +22,10 @@ import dagger.internal.Factory
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import kotlinx.android.synthetic.main.common_toolbar_with_buttons.*
+import kr.ac.snu.hcil.android.common.TextHelper
+import kr.ac.snu.hcil.android.common.view.DialogHelper
+import kr.ac.snu.hcil.android.common.view.preference.ColorPreference
+import kr.ac.snu.hcil.android.common.view.preference.ColorPreferenceDialogFragment
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -32,11 +36,7 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.workers.OTVersionCheckWorker
 import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
-import kr.ac.snu.hcil.omnitrack.ui.components.common.preference.ColorPreference
-import kr.ac.snu.hcil.omnitrack.ui.components.common.preference.ColorPreferenceDialogFragment
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
-import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import javax.inject.Inject
 import javax.inject.Provider
 

@@ -21,9 +21,6 @@
     <string name="msg_format_edit_something">%1$s 수정</string>
     <string name="msg_format_new_something">새 %1$s</string>
 
-    <string name="msg_yes">예</string>
-    <string name="msg_no">아니오</string>
-
     <string name="msg_save">저장</string>
 
     <string name="msg_allow_permission">권한 확인하기</string>
@@ -42,9 +39,6 @@
 
     <string name="msg_go_to_add_field">트래커 수정하기</string>
 
-    <string name="msg_ok">확인</string>
-    <string name="msg_apply">적용</string>
-    <string name="msg_cancel">취소</string>
     <string name="msg_discard_creation">생성 취소</string>
     <string name="msg_do_not_save">저장하지 않음</string>
 
@@ -178,7 +172,6 @@
     <string name="msg_connection_panel_time_query">쿼리 시간</string>
     <string name="msg_connection_panel_connected_with">연결된 모듈</string>
 
-    <string name="msg_format_login_to">%1$s에 로그인</string>
 
     <string name="msg_noti_tap_for_tracking_format">탭해서 %1$s 기록</string>
 
@@ -361,7 +354,6 @@
     <string name="msg_latest_version">최신 버젼</string>
     <string name="msg_button_label_latest_version">현재 최신 버젼이 설치되어 있습니다.</string>
     <string name="msg_button_label_new_version_available">Play 스토어 페이지로 이동</string>
-    <string name="msg_close">닫기</string>
     <string name="msg_beta_msg_version_play_store">베타에서는 OmniTrack 구글 계정이 Play 스토어 앱에 선택되어 있어야 페이지가 보일 수 있습니다.</string>
     <string name="msg_attribute_edit_dialog_title">필드 값 수정하기</string>
     <string name="msg_format_attribute_edit_dialog_title">%1$s 수정하기</string>

@@ -57,7 +57,7 @@
                 app:ms_arrow_tint="@color/buttonIconColorDark"
                 app:ms_background_color="@color/editTextFormBackground" />
 
-            <kr.ac.snu.hcil.omnitrack.ui.components.common.text.LinedEditText
+            <kr.ac.snu.hcil.android.common.view.text.LinedEditText
                 android:id="@+id/ui_text_content"
                 style="@style/LongTextInputStyle"
                 android:layout_width="match_parent"

@@ -3,8 +3,8 @@ package kr.ac.snu.hcil.omnitrack.ui.components.visualization
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
+import kr.ac.snu.hcil.android.common.events.Event
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
 
 /**

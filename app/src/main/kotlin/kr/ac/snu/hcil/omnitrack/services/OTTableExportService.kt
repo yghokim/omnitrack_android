@@ -17,6 +17,8 @@ import dagger.internal.Factory
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
+import kr.ac.snu.hcil.android.common.file.StringTableSheet
+import kr.ac.snu.hcil.android.common.file.ZipUtil
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -27,7 +29,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
-import kr.ac.snu.hcil.omnitrack.utils.io.StringTableSheet
 import org.jetbrains.anko.notificationManager
 import java.io.File
 import java.io.FileOutputStream
@@ -306,7 +307,7 @@ class OTTableExportService : WakefulService(TAG) {
 
                                 try {
                                     val outputStream = contentResolver.openOutputStream(exportUri)
-                                    kr.ac.snu.hcil.omnitrack.utils.io.ZipUtil.zip(cacheDirectory!!.absolutePath, outputStream)
+                                    ZipUtil.zip(cacheDirectory!!.absolutePath, outputStream)
                                 } catch (ex: Exception) {
                                     //fail
                                     ex.printStackTrace()

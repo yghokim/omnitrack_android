@@ -96,7 +96,7 @@
                     android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:background="@drawable/attribute_card">
 
-                    <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalCenterAlignedIconTextButton
+                    <kr.ac.snu.hcil.android.common.view.button.VerticalCenterAlignedIconTextButton
                         android:id="@+id/ui_button_new_connection"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

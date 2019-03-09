@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msg_ok">확인</string>
+    <string name="msg_apply">적용</string>
+    <string name="msg_cancel">취소</string>
+    <string name="msg_close">닫기</string>
+
+    <string name="msg_confirm_cancel_and_close_process">현재까지의 과정을 취소하고 페이지를 닫겠습니까?</string>
+    <string name="msg_format_login_to">%1$s에 로그인</string>
+</resources>

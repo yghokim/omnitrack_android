@@ -9,15 +9,11 @@ import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
-import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.salomonbrys.kotson.set
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -29,6 +25,11 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.attribute_list_element.view.*
 import kotlinx.android.synthetic.main.fragment_tracker_detail_structure.*
+import kr.ac.snu.hcil.android.common.DefaultNameGenerator
+import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.dipSize
+import kr.ac.snu.hcil.android.common.view.DialogHelper
+import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.LockedPropertiesHelper
@@ -38,12 +39,10 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.AdapterLinearLayout
-import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
-import kr.ac.snu.hcil.omnitrack.utils.*
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -445,25 +444,14 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
         inner class ViewHolder(val view: View) : AdapterLinearLayout.AViewHolder(view), View.OnClickListener {
 
-            private val previewContainer: LockableFrameLayout by bindView(R.id.ui_preview_container)
-            private val columnNameView: TextView by bindView(R.id.ui_column_name)
-            private val typeIconView: AppCompatImageView by bindView(R.id.ui_attribute_type)
-
-            private val editButton: ImageButton by bindView(R.id.ui_button_edit)
-            private val removeButton: ImageButton by bindView(R.id.ui_button_remove)
-
-            private val requiredMarker: View by bindView(R.id.ui_required_marker)
-
-            private val columnNameButton: View by bindView(R.id.ui_column_name_button)
-
             private val connectionIndicatorStubProxy: ConnectionIndicatorStubProxy
 
             var preview: AAttributeInputView<out Any>? = null
                 set(value) {
                     if (field !== value) {
-                        previewContainer.removeAllViews()
+                        view.ui_preview_container.removeAllViews()
                         if (value != null) {
-                            previewContainer.addView(value, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+                            view.ui_preview_container.addView(value, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
                             value.onCreate(null)
                         }
 
@@ -473,23 +461,23 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
             init {
 
-                previewContainer.locked = true
+                itemView.ui_preview_container.locked = true
 
                 connectionIndicatorStubProxy = ConnectionIndicatorStubProxy(view, R.id.ui_connection_indicator_stub)
 
-                editButton.setOnClickListener(this)
-                removeButton.setOnClickListener(this)
-                columnNameButton.setOnClickListener(this)
+                itemView.ui_button_edit.setOnClickListener(this)
+                itemView.ui_button_remove.setOnClickListener(this)
+                itemView.ui_column_name_button.setOnClickListener(this)
 
                 itemView.ui_button_visible.setOnClickListener(this)
 
-                previewContainer.setOnClickListener(this)
+                itemView.ui_preview_container.setOnClickListener(this)
             }
 
             override fun onClick(view: View) {
-                if (view === editButton || view === previewContainer) {
+                if (view === itemView.ui_button_edit || view === itemView.ui_preview_container) {
                     openAttributeDetailActivity(adapterPosition)
-                } else if (view === removeButton) {
+                } else if (view === itemView.ui_button_remove) {
                     val attrViewModel = currentAttributeViewModelList[adapterPosition]
                     DialogHelper.makeNegativePhrasedYesNoDialogBuilder(activity!!,
                             getString(R.string.msg_remove_field),
@@ -514,7 +502,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                                     it
                                 }
                             }.show()
-                } else if (view === columnNameButton) {
+                } else if (view === itemView.ui_column_name_button) {
 
                     columnNameDialogBuilder
                             .input(null, currentAttributeViewModelList[adapterPosition].name, false) { dialog, input ->
@@ -549,10 +537,10 @@ class TrackerDetailStructureTabFragment : OTFragment() {
             }
 
             fun bindAttribute(attributeViewModel: TrackerDetailViewModel.AttributeInformationViewModel) {
-                typeIconView.setImageResource(attributeViewModel.icon)
-                columnNameView.text = attributeViewModel.name
+                itemView.ui_attribute_type.setImageResource(attributeViewModel.icon)
+                itemView.ui_column_name.text = attributeViewModel.name
 
-                previewContainer.alpha = 0.5f
+                itemView.ui_preview_container.alpha = 0.5f
 
                 viewHolderSubscriptions.add(
                         Observable.combineLatest<Nullable<JsonObject>, Boolean, Boolean>(viewModel.lockedPropertiesObservable, attributeViewModel.isEditable,
@@ -562,10 +550,10 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                                     !trackerEditLocked && !attributeEditLocked
                                 }).subscribe { isEditable: Boolean ->
 
-                            previewContainer.isEnabled = isEditable
-                            columnNameButton.isEnabled = isEditable
-                            editButton.isEnabled = isEditable
-                            editButton.alpha = if (isEditable) 1.0f else 0.2f
+                            itemView.ui_preview_container.isEnabled = isEditable
+                            itemView.ui_column_name_button.isEnabled = isEditable
+                            itemView.ui_button_edit.isEnabled = isEditable
+                            itemView.ui_button_edit.alpha = if (isEditable) 1.0f else 0.2f
                         }
                 )
 
@@ -574,8 +562,8 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                                 BiFunction { lockedProperties: Nullable<JsonObject>, localRemovable: Boolean ->
                                     (!LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_REMOVE_ATTRIBUTES, lockedProperties.datum) && localRemovable)
                                 }).subscribe { isRemovable: Boolean ->
-                            removeButton.isEnabled = isRemovable
-                            removeButton.alpha = if (isRemovable) 1.0f else 0.2f
+                            itemView.ui_button_remove.isEnabled = isRemovable
+                            itemView.ui_button_remove.alpha = if (isRemovable) 1.0f else 0.2f
                         }
                 )
 
@@ -588,7 +576,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
                 viewHolderSubscriptions.add(
                         attributeViewModel.isRequiredObservable.subscribe {
-                            requiredMarker.visibility = if (it) {
+                            itemView.ui_required_marker.visibility = if (it) {
                                 View.VISIBLE
                             } else {
                                 View.INVISIBLE
@@ -606,13 +594,13 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
                 viewHolderSubscriptions.add(
                         attributeViewModel.nameObservable.subscribe { args ->
-                            columnNameView.text = args
+                            itemView.ui_column_name.text = args
                         }
                 )
 
                 viewHolderSubscriptions.add(
                         attributeViewModel.iconObservable.subscribe { args ->
-                            typeIconView.setImageResource(args)
+                            itemView.ui_attribute_type.setImageResource(args)
                         }
                 )
 
@@ -621,14 +609,14 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                             itemView.ui_button_visible.setImageResource(if (isHidden) R.drawable.icon_invisible else R.drawable.icon_visible)
 
                             if (isHidden) {
-                                typeIconView.alpha = 0.2f
-                                columnNameButton.alpha = 0.2f
-                                previewContainer.visibility = View.GONE
+                                itemView.ui_attribute_type.alpha = 0.2f
+                                itemView.ui_column_name_button.alpha = 0.2f
+                                itemView.ui_preview_container.visibility = View.GONE
                                 connectionIndicatorStubProxy.setContainerVisibility(View.GONE)
                             } else {
-                                typeIconView.alpha = 1.0f
-                                columnNameButton.alpha = 1.0f
-                                previewContainer.visibility = View.VISIBLE
+                                itemView.ui_attribute_type.alpha = 1.0f
+                                itemView.ui_column_name_button.alpha = 1.0f
+                                itemView.ui_preview_container.visibility = View.VISIBLE
                                 connectionIndicatorStubProxy.setContainerVisibility(View.VISIBLE)
                             }
                         }

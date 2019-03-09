@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="popupTitle">
+        <item name="fontPath">fonts/Roboto-Light.ttf</item>
+        <item name="android:text">Select Type</item>
+        <item name="android:textColor">@color/colorPointed</item>
+        <item name="android:textSize">22.5sp</item>
+    </style>
+</resources>

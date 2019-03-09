@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.datatypes
 
 import com.google.android.gms.maps.model.LatLng
-import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
+import kr.ac.snu.hcil.android.common.serialization.IStringSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.deserializeLatLng
 import kr.ac.snu.hcil.omnitrack.utils.serialization.serialize
 import java.util.*

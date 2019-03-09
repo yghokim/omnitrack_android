@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import kr.ac.snu.hcil.android.common.nearestInt
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
 

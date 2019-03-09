@@ -17,6 +17,8 @@ import at.markushi.ui.RevealColorView
 import butterknife.bindView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
+import kr.ac.snu.hcil.android.common.TextHelper
+import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -25,8 +27,6 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyControlView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyControlViewModel
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
-import kr.ac.snu.hcil.omnitrack.utils.TextHelper
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import mehdi.sakout.fancybuttons.FancyButton
 import org.jetbrains.anko.dip
 import javax.inject.Inject

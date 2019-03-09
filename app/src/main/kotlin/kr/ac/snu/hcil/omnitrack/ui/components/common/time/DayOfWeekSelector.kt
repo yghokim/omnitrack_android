@@ -12,11 +12,11 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
+import kr.ac.snu.hcil.android.common.BitwiseOperationHelper
+import kr.ac.snu.hcil.android.common.dipSize
+import kr.ac.snu.hcil.android.common.events.Event
+import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
-import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
-import kr.ac.snu.hcil.omnitrack.utils.dipSize
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
 
 /**
  * Created by Young-Ho on 8/25/2016.

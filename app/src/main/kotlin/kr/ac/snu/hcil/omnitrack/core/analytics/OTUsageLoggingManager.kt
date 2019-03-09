@@ -9,6 +9,8 @@ import com.github.salomonbrys.kotson.*
 import com.google.gson.JsonObject
 import dagger.internal.Factory
 import io.realm.Realm
+import kr.ac.snu.hcil.android.common.ConcurrentUniqueLongGenerator
+import kr.ac.snu.hcil.android.common.versionCode
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
@@ -30,8 +32,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.UsageLog
 import kr.ac.snu.hcil.omnitrack.core.di.global.UsageLogger
 import kr.ac.snu.hcil.omnitrack.core.workers.OTUsageLogUploadWorker
-import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
-import kr.ac.snu.hcil.omnitrack.utils.versionCode
 import org.jetbrains.anko.getStackTraceString
 import javax.inject.Inject
 import javax.inject.Provider

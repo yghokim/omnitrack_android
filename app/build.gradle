@@ -243,7 +243,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
 
-    implementation "androidx.appcompat:appcompat:$rootProject.ext.androidx_appcompat_version "
+    implementation "androidx.appcompat:appcompat:$rootProject.ext.androidx_appcompat_version"
     implementation "androidx.recyclerview:recyclerview:$rootProject.ext.android_support_version"
     implementation "androidx.cardview:cardview:$rootProject.ext.android_support_version"
     implementation "androidx.preference:preference:1.1.0-alpha03"
@@ -286,21 +286,24 @@ dependencies {
     implementation "com.google.dagger:dagger-android:$rootProject.ext.dagger_version"
     kapt "com.google.dagger:dagger-android-processor:$rootProject.ext.dagger_version"
     kapt "com.google.dagger:dagger-compiler:$rootProject.ext.dagger_version"
-    implementation project(':omnitrack_corelib')
+    implementation project(':omnitrack_core')
     implementation project(':material_dialog_core')
     implementation project(':material_about')
     implementation project(':fancybuttons')
     implementation project(':TedBottomPicker')
     implementation project(':AppUpdater:appupdater')
+    implementation project(':android_commons')
+    implementation project(':android_commons_view')
+
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "com.google.code.gson:gson:$rootProject.ext.gson_version"
     implementation "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxjava_version"
     implementation "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rxandroid_version"
-    implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.2'
+    implementation "com.github.pwittchen:reactivenetwork-rx2:$rootProject.ext.reactive_network_version"
     implementation 'jp.wasabeef:recyclerview-animators:3.0.0'
     implementation 'com.github.markushi:android-ui:1.2'
-    implementation 'com.github.ybq:Android-SpinKit:1.2.0'
+    implementation "com.github.ybq:Android-SpinKit:$rootProject.ext.spinkit_version"
     implementation "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttp_version"
     implementation "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$rootProject.ext.retrofit_version"
@@ -320,14 +323,11 @@ dependencies {
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.3'
     debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.3'
     compileOnly 'javax.annotation:jsr250-api:1.0'
-    implementation 'com.larswerkman:lobsterpicker:1.0.1'
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
-    implementation 'com.github.VictorAlbertos:RxActivityResult:0.5.0-2.x'
+    implementation "com.github.VictorAlbertos:RxActivityResult:$rootProject.ext.rxactivityresult_version"
     implementation 'com.github.salomonbrys.kotson:kotson:2.5.0'
     implementation 'org.nield:kotlin-statistics:1.2.1'
     implementation 'com.shawnlin:number-picker:2.4.8'
-    implementation 'com.opencsv:opencsv:4.5'
-    implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
 }
 
 repositories {

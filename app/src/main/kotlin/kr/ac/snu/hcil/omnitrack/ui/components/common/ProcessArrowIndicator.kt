@@ -7,7 +7,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
-import kr.ac.snu.hcil.omnitrack.utils.dipSize
+import kr.ac.snu.hcil.android.common.dipSize
 
 /**
  * Created by Young-Ho Kim on 8/7/2016

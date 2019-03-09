@@ -9,10 +9,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import io.reactivex.Single
+import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.view.getActivity
 import kr.ac.snu.hcil.omnitrack.ui.IActivityLifeCycle
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.AInputView
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kotlin.properties.Delegates
 
 /**

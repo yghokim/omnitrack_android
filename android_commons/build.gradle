@@ -1,0 +1,59 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+    lintOptions {
+        checkReleaseBuilds false
+    }
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion rootProject.ext.targetSdkVersion
+
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    testImplementation 'junit:junit:4.12'
+    compileOnly 'javax.annotation:jsr250-api:1.0'
+
+    implementation "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttp_version"
+
+    implementation "androidx.annotation:annotation:$rootProject.ext.android_support_version"
+
+    implementation "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxjava_version"
+    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rxandroid_version"
+    implementation "com.github.VictorAlbertos:RxActivityResult:$rootProject.ext.rxactivityresult_version"
+    implementation "com.github.pwittchen:reactivenetwork-rx2:$rootProject.ext.reactive_network_version"
+
+    implementation "com.google.code.gson:gson:$rootProject.ext.gson_version"
+
+
+    implementation 'com.opencsv:opencsv:4.5'
+    implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
+
+
+
+}
+
+repositories{
+    jcenter()
+    maven { url "https://jitpack.io" }
+}

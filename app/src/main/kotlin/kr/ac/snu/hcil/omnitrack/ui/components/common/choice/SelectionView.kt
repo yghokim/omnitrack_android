@@ -13,9 +13,9 @@ import androidx.annotation.ArrayRes
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kr.ac.snu.hcil.android.common.events.Event
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.BetweenSpacingItemDecoration
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
 import kotlin.properties.Delegates
 

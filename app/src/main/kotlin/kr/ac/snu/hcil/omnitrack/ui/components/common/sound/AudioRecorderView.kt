@@ -17,12 +17,12 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.events.Event
+import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.services.OTAudioPlayService
 import kr.ac.snu.hcil.omnitrack.services.OTAudioRecordService
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit

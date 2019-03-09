@@ -25,7 +25,7 @@
         android:textSize="16sp"
         android:textStyle="bold" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.text.LinedTextView
+    <kr.ac.snu.hcil.android.common.view.text.LinedTextView
         android:id="@+id/ui_input"
         style="@style/LongTextInputStyle"
         android:layout_width="match_parent"

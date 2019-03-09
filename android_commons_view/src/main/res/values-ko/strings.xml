@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msg_ok">확인</string>
+    <string name="msg_yes">예</string>
+    <string name="msg_no">아니오</string>
+</resources>

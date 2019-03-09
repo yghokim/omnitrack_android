@@ -8,8 +8,9 @@ import android.widget.*
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import kr.ac.snu.hcil.android.common.time.*
+import kr.ac.snu.hcil.android.common.view.*
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.*
 import java.util.*
 
 /**

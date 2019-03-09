@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import kr.ac.snu.hcil.android.common.file.FileHelper
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.LocalMediaCacheEntry
@@ -14,7 +15,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.UploadTaskInfo
 import kr.ac.snu.hcil.omnitrack.core.net.IBinaryStorageCore
 import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
-import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import org.jetbrains.anko.notificationManager
 import org.jetbrains.anko.runOnUiThread
 import java.util.concurrent.Executors

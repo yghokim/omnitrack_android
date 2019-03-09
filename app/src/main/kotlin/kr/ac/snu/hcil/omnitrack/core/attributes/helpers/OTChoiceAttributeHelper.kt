@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import io.reactivex.Single
 import io.realm.Realm
+import kr.ac.snu.hcil.android.common.containers.UniqueStringEntryList
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ChoiceSorter
@@ -17,7 +18,6 @@ import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.WordListView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
-import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
 

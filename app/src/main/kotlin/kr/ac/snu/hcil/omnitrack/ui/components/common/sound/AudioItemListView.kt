@@ -11,11 +11,11 @@ import com.github.ybq.android.spinkit.SpinKitView
 import dagger.Lazy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
+import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
 

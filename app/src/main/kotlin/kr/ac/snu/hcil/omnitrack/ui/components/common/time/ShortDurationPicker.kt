@@ -7,9 +7,9 @@ import android.util.AttributeSet
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.android.synthetic.main.component_property_duration_picker.view.*
+import kr.ac.snu.hcil.android.common.events.Event
+import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
 class ShortDurationPicker : ConstraintLayout {
 

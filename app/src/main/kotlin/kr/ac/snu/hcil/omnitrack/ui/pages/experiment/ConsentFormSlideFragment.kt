@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
+import androidx.core.os.bundleOf
+import kr.ac.snu.hcil.android.common.ANDROID_ASSET_PATH
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.ANDROID_ASSET_PATH
-import org.jetbrains.anko.bundleOf
 import us.feras.mdv.MarkdownView
 
 /**

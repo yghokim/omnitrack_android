@@ -9,10 +9,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.simple_layout_with_recycler_view.view.*
+import kr.ac.snu.hcil.android.common.events.IEventListener
+import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
-import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
-import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
 
 abstract class EntitySelectionFragment<EntityType : IReadonlyObjectId, ChildType : IReadonlyObjectId> : OTFragment() {
 

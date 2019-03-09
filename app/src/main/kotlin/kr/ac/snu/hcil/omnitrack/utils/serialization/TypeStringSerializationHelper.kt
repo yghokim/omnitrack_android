@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.utils.serialization
 
 import com.google.android.gms.maps.model.LatLng
+import kr.ac.snu.hcil.android.common.isNumericPrimitive
+import kr.ac.snu.hcil.android.common.toBigDecimal
 import kr.ac.snu.hcil.omnitrack.core.datatypes.*
-import kr.ac.snu.hcil.omnitrack.utils.isNumericPrimitive
-import kr.ac.snu.hcil.omnitrack.utils.toBigDecimal
 import java.math.BigDecimal
 import java.util.*
 

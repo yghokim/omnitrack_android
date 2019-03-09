@@ -12,9 +12,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
+import kr.ac.snu.hcil.android.common.arrayEquals
+import kr.ac.snu.hcil.android.common.events.Event
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.arrayEquals
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kotlin.properties.Delegates
 
 /**

@@ -4,10 +4,10 @@ import android.content.Context
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.net.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.core.dependency.OAuth2LoginDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 
 /**
  * Created by Young-Ho Kim on 16. 9. 3

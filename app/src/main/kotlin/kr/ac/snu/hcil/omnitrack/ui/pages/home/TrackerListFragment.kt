@@ -40,6 +40,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.tracker_list_element.view.*
+import kr.ac.snu.hcil.android.common.view.DialogHelper
+import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
+import kr.ac.snu.hcil.android.common.view.InterfaceHelper
+import kr.ac.snu.hcil.android.common.view.container.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -51,17 +55,12 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.common.container.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.visualization.ChartViewActivity
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
-import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
-import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import org.jetbrains.anko.verticalMargin
 import java.text.SimpleDateFormat
@@ -495,9 +494,9 @@ class TrackerListFragment : OTFragment() {
                 if (view === itemView) {
                     handleTrackerClick(trackerViewModel.trackerDao)
                 } else if (view === editButton) {
-                    startActivityOnDelay(TrackerDetailActivity.makeIntent(trackerId, this@TrackerListFragment.requireContext()))
+                    startActivity(TrackerDetailActivity.makeIntent(trackerId, this@TrackerListFragment.requireContext()))
                 } else if (view === listButton) {
-                    startActivityOnDelay(ItemBrowserActivity.makeIntent(trackerId!!, this@TrackerListFragment.requireContext()))
+                    startActivity(ItemBrowserActivity.makeIntent(trackerId!!, this@TrackerListFragment.requireContext()))
                 } else if (view === removeButton) {
                     DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this@TrackerListFragment.requireContext(), trackerViewModel.trackerName.value
                             ?: "OmniTrack", getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove,
@@ -507,7 +506,7 @@ class TrackerListFragment : OTFragment() {
                                 eventLogger.get().logTrackerChangeEvent(IEventLogger.SUB_REMOVE, trackerViewModel.objectId)
                             }).show()
                 } else if (view === chartViewButton) {
-                    startActivityOnDelay(ChartViewActivity.makeIntent(trackerId!!, this@TrackerListFragment.requireContext()))
+                    startActivity(ChartViewActivity.makeIntent(trackerId!!, this@TrackerListFragment.requireContext()))
 
 
                 } else if (view === expandButton) {

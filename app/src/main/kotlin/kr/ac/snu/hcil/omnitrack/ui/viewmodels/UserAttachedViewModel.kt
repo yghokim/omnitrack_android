@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.viewmodels
 import android.app.Application
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
+import kr.ac.snu.hcil.android.common.containers.Nullable
 
 /**
  * Created by Young-Ho on 6/4/2017.

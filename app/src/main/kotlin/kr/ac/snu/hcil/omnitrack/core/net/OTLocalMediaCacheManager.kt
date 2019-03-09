@@ -8,11 +8,11 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
+import kr.ac.snu.hcil.android.common.file.FileHelper
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.LocalMediaCacheEntry
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
-import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.*

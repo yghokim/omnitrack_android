@@ -8,11 +8,11 @@ import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import dagger.Lazy
+import kr.ac.snu.hcil.android.common.ConcurrentUniqueLongGenerator
+import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.*
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import javax.inject.Inject
 import javax.inject.Singleton
 

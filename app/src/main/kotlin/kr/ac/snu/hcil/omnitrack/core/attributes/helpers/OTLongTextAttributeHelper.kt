@@ -2,13 +2,13 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.content.Context
 import android.view.View
+import kr.ac.snu.hcil.android.common.view.InterfaceHelper
+import kr.ac.snu.hcil.android.common.view.text.LinedTextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
-import kr.ac.snu.hcil.omnitrack.ui.components.common.text.LinedTextView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
@@ -39,7 +39,8 @@ class OTLongTextAttributeHelper(context: Context) : ATextTypeAttributeHelper(con
     }
 
     override fun getViewForItemList(attribute: OTAttributeDAO, context: Context, recycledView: View?): View {
-        val target = recycledView as? LinedTextView ?: LinedTextView(context)
+        val target = recycledView as? LinedTextView
+                ?: LinedTextView(context)
 
         InterfaceHelper.setTextAppearance(target, R.style.longTextForItemListTextAppearance)
 

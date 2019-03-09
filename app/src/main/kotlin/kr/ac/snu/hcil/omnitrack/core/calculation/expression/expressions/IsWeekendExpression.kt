@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions
 
 import com.udojava.evalex.Expression
+import kr.ac.snu.hcil.android.common.time.getDayOfWeek
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.ExpressionConstants
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.LongLazyNumber
-import kr.ac.snu.hcil.omnitrack.utils.getDayOfWeek
 import java.util.*
 
 /**

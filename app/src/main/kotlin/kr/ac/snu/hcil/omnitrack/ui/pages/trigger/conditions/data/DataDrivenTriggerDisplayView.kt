@@ -10,13 +10,13 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import butterknife.bindView
+import kr.ac.snu.hcil.android.common.TextHelper
+import kr.ac.snu.hcil.android.common.dipSize
+import kr.ac.snu.hcil.android.common.view.setPaddingTop
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
-import kr.ac.snu.hcil.omnitrack.utils.TextHelper
-import kr.ac.snu.hcil.omnitrack.utils.dipSize
-import kr.ac.snu.hcil.omnitrack.utils.setPaddingTop
 import org.jetbrains.anko.dip
 import java.math.BigDecimal
 import java.text.DecimalFormat

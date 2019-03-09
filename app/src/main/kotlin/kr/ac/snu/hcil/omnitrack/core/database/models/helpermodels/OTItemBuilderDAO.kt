@@ -4,8 +4,8 @@ import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
+import kr.ac.snu.hcil.android.common.containers.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**

@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.logics
 
-import kr.ac.snu.hcil.omnitrack.utils.toBigDecimal
+import kr.ac.snu.hcil.android.common.toBigDecimal
 
 /**
  * Created by Young-Ho on 10/12/2017.

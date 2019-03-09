@@ -6,10 +6,10 @@ import android.os.Bundle
 import android.view.View
 import com.github.salomonbrys.kotson.set
 import kotlinx.android.synthetic.main.activity_new_item.*
+import kr.ac.snu.hcil.android.common.view.setPaddingBottom
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
-import kr.ac.snu.hcil.omnitrack.utils.setPaddingBottom
 import org.jetbrains.anko.notificationManager
 
 class ItemEditActivity : AItemDetailActivity<ItemEditingViewModel>(ItemEditingViewModel::class.java) {

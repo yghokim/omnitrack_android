@@ -64,7 +64,7 @@
             android:layout_height="match_parent"
             android:background="@drawable/pointed_gradient" />
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.TintFancyButton
+        <kr.ac.snu.hcil.android.common.view.tint.TintFancyButton
             android:id="@+id/ui_button_next"
             style="@style/TransparentButtonStyle"
             android:layout_width="match_parent"

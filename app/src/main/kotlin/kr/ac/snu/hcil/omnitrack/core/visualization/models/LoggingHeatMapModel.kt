@@ -8,6 +8,8 @@ import androidx.core.graphics.ColorUtils
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
+import kr.ac.snu.hcil.android.common.time.getHourOfDay
+import kr.ac.snu.hcil.android.common.time.setHourOfDay
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
@@ -25,8 +27,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.R
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.CategoricalAxisScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
-import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
-import kr.ac.snu.hcil.omnitrack.utils.setHourOfDay
 import java.util.*
 
 /**

@@ -1,13 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
 import android.content.Context
+import kr.ac.snu.hcil.android.common.net.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OAuth2BasedExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 
 /**
  * Created by younghokim on 16. 9. 2..

@@ -20,7 +20,7 @@
         android:textStyle="bold" />
 
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatButton
+    <kr.ac.snu.hcil.android.common.view.tint.DrawableTintAppCompatButton
         android:id="@+id/ui_button_apply"
         style="@style/mapViewOverlayButton"
         android:layout_width="wrap_content"
@@ -34,7 +34,7 @@
         app:drawableStartCompat="@drawable/done"
         app:drawableTint="@color/buttonIconColorDark" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatButton
+    <kr.ac.snu.hcil.android.common.view.tint.DrawableTintAppCompatButton
         android:id="@+id/ui_button_cancel"
 
         style="@style/mapViewOverlayButton"

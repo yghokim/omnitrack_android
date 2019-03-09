@@ -8,11 +8,11 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
+import kr.ac.snu.hcil.android.common.INameDescriptionResourceProvider
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.PermissionDependencyResolver
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ExternalServiceActivationActivity
-import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
 import rx_activity_result2.RxActivityResult
 import java.util.*
 import javax.inject.Inject

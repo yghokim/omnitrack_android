@@ -6,13 +6,13 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
+import kr.ac.snu.hcil.android.common.events.IEventListener
+import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.NumericUpDownPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
-import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
 /**
  * Created by younghokim on 16. 8. 31..
@@ -130,7 +130,7 @@ class TimeQuerySettingPanel : LinearLayout, IEventListener<Int> {
     }
 
 
-    inner open class PivotEntry(val name: String, val mode: Int) {
+    open inner class PivotEntry(val name: String, val mode: Int) {
         constructor(nameResId: Int, mode: Int) : this(resources.getString(nameResId), mode)
 
         open fun applyToQuery(timeQuery: OTTimeRangeQuery) {

@@ -3,11 +3,11 @@ package kr.ac.snu.hcil.omnitrack.core.triggers
 import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import kr.ac.snu.hcil.android.common.BitwiseOperationHelper
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
-import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
 
 /**
  * Created by younghokim on 2017. 10. 21..

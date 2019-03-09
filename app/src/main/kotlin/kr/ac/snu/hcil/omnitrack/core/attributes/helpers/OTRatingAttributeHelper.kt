@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import io.reactivex.Single
 import io.realm.Realm
+import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
@@ -18,7 +19,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.StarScoreView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.LikertScaleInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.StarRatingInputView
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 

@@ -6,8 +6,8 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.widget.TextView
+import kr.ac.snu.hcil.android.common.view.text.EnterHideKeyboardEditorActionListener
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.EnterHideKeyboardEditorActionListener
 import java.math.BigDecimal
 
 /**

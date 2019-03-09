@@ -47,6 +47,10 @@ buildscript {
     ext.rxandroid_version = '2.1.1'
     ext.retrofit_version = '2.5.0'
     ext.okhttp_version = '3.13.1'
+    ext.rxactivityresult_version = '0.5.0-2.x'
+    ext.spinkit_version='1.2.0'
+    ext.reactive_network_version='3.0.2'
+
     ext.gradle_version = '3.2.1'
 
     repositories {

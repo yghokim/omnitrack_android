@@ -11,13 +11,13 @@ import com.google.android.gms.fitness.request.DataReadRequest
 import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
+import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.concurrent.TimeUnit
 

@@ -2,8 +2,12 @@ package kr.ac.snu.hcil.omnitrack.utils.time
 
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
+import kr.ac.snu.hcil.android.common.containers.WritablePair
+import kr.ac.snu.hcil.android.common.time.getDayOfWeek
+import kr.ac.snu.hcil.android.common.time.getHourOfDay
+import kr.ac.snu.hcil.android.common.time.getYear
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.utils.*
+import kr.ac.snu.hcil.omnitrack.utils.toDatetimeString
 import java.io.UnsupportedEncodingException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException

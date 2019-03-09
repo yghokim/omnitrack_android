@@ -7,6 +7,8 @@ import io.realm.OrderedCollectionChangeSet
 import io.realm.OrderedRealmCollectionChangeListener
 import io.realm.RealmResults
 import io.realm.Sort
+import kr.ac.snu.hcil.android.common.move
+import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
@@ -15,8 +17,6 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
-import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
-import kr.ac.snu.hcil.omnitrack.utils.move
 import java.util.*
 import javax.inject.Inject
 

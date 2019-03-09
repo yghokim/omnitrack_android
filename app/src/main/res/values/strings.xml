@@ -28,8 +28,6 @@
 
     <string name="msg_sort_method_timestamp">Logged Time</string>
 
-    <string name="msg_yes">Yes</string>
-    <string name="msg_no">No</string>
 
     <string name="msg_save">Save</string>
     <string name="msg_send">Send</string>
@@ -69,7 +67,6 @@
     <string name="msg_reopen_redirected_page">Open Again</string>
 
 
-    <string name="msg_confirm_cancel_and_close_process">Close the page without completion?</string>
 
     <string name="msg_reminder_omitted">The omitted reminder</string>
 
@@ -89,9 +86,6 @@
 
     <string name="msg_confirm_order">Apply the revised order to the list?</string>
     <string name="msg_discard_apply">Discard</string>
-    <string name="msg_ok">OK</string>
-    <string name="msg_apply">Apply</string>
-    <string name="msg_cancel">Cancel</string>
 
     <string name="msg_discard_creation">Don\'t Create</string>
     <string name="msg_do_not_save">Don\'t Save</string>
@@ -213,8 +207,6 @@
 
     <string name="msg_connection_panel_time_query">Time Query</string>
     <string name="msg_connection_panel_connected_with">Connected with</string>
-
-    <string name="msg_format_login_to">Login to %1$s</string>
 
     <string name="msg_noti_tap_for_tracking_format">Tap to open %1$s</string>
 
@@ -473,7 +465,6 @@
     <string name="msg_latest_version">Latest Version</string>
     <string name="msg_button_label_latest_version">This is the latest version.</string>
     <string name="msg_button_label_new_version_available">Visit Play store to update the app</string>
-    <string name="msg_close">Close</string>
     <string name="msg_beta_msg_version_play_store">The OmniTrack account should be selected in Play Store app to see the Store page.</string>
     <string name="msg_attribute_edit_dialog_title">Modify Field Value</string>
     <string name="msg_format_attribute_edit_dialog_title">Modify %1$s</string>

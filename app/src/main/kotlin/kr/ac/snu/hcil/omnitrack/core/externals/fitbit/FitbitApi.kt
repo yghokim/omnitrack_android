@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
-import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
-import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
+import kr.ac.snu.hcil.android.common.net.AuthConstants
+import kr.ac.snu.hcil.android.common.net.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import org.json.JSONObject
 import java.text.SimpleDateFormat

@@ -60,7 +60,7 @@
         </LinearLayout>
     </TabHost>
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatButton
+    <kr.ac.snu.hcil.android.common.view.tint.DrawableTintAppCompatButton
         android:id="@+id/ui_mode_button"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"

@@ -14,9 +14,9 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kr.ac.snu.hcil.android.common.containers.UniqueStringEntryList
+import kr.ac.snu.hcil.android.common.view.container.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
-import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import java.util.*
 
 /**

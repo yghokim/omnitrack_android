@@ -16,10 +16,10 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.DialogFragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.otaliastudios.cameraview.*
+import kr.ac.snu.hcil.android.common.view.applyTint
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
-import kr.ac.snu.hcil.omnitrack.utils.applyTint
 
 /**
  * Created by Young-Ho Kim on 2017-03-07.

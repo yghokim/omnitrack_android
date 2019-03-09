@@ -10,8 +10,8 @@ import android.util.AttributeSet
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
 /**
  * Created by younghokim on 2017. 4. 15..

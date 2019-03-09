@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.logics
 
-import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
+import kr.ac.snu.hcil.android.common.containers.UniqueStringEntryList
 
 /**
  * Created by Young-Ho on 10/12/2017.

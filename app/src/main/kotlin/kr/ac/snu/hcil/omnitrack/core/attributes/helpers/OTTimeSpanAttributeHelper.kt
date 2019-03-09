@@ -4,6 +4,7 @@ import android.content.Context
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
+import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
@@ -21,7 +22,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimeRangePickerInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.text.SimpleDateFormat

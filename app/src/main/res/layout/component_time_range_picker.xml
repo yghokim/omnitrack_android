@@ -71,7 +71,7 @@
         app:layout_constraintTop_toBottomOf="@+id/ui_button_from"
         tools:text="8 hrs 40 mins 2 secs" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.TintFancyButton
+    <kr.ac.snu.hcil.android.common.view.tint.TintFancyButton
         android:id="@+id/ui_button_down"
         style="@style/TinyCircularFancyButtonStyle.blackAndWhite"
         android:layout_marginEnd="8dp"
@@ -79,7 +79,7 @@
         app:layout_constraintEnd_toStartOf="@id/ui_button_up"
         app:layout_constraintTop_toBottomOf="@+id/ui_button_from" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.TintFancyButton
+    <kr.ac.snu.hcil.android.common.view.tint.TintFancyButton
         android:id="@+id/ui_button_up"
         style="@style/TinyCircularFancyButtonStyle.blackAndWhite"
         app:fb_iconResource="@drawable/ic_arrow_upward_black_24dp"

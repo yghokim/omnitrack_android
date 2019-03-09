@@ -3,8 +3,8 @@ package kr.ac.snu.hcil.omnitrack.core.triggers
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
+import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 
 /**
  * Created by younghokim on 2017. 11. 11..

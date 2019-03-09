@@ -9,13 +9,13 @@ import com.google.gson.Gson
 import dagger.Lazy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_send_report.*
+import kr.ac.snu.hcil.android.common.versionName
+import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.net.IUserReportServerAPI
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.versionName
 
 /**
  * Created by younghokim on 2017. 3. 19..

@@ -13,12 +13,12 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import io.reactivex.Completable
+import kr.ac.snu.hcil.android.common.isDeviceLockedCompat
+import kr.ac.snu.hcil.android.common.isInteractiveCompat
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.ui.activities.ReminderPopupActivity
-import kr.ac.snu.hcil.omnitrack.utils.isDeviceLockedCompat
-import kr.ac.snu.hcil.omnitrack.utils.isInteractiveCompat
 import java.lang.ref.WeakReference
 
 /**

@@ -4,10 +4,10 @@ import android.content.Context
 import android.text.Html
 import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
+import kr.ac.snu.hcil.android.common.INameDescriptionResourceProvider
+import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 
 /**
  * Created by Young-Ho Kim on 16. 7. 28

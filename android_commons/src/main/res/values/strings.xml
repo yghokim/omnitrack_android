@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Android Commons</string>
+
+    <string name="msg_ok">OK</string>
+    <string name="msg_apply">Apply</string>
+    <string name="msg_cancel">Cancel</string>
+    <string name="msg_close">Close</string>
+
+    <string name="msg_confirm_cancel_and_close_process">Close the page without completion?</string>
+    <string name="msg_format_login_to">Login to %1$s</string>
+</resources>

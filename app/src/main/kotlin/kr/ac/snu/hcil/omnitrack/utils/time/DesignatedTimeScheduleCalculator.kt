@@ -1,8 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.utils.time
 
 import com.google.gson.JsonObject
-import kr.ac.snu.hcil.omnitrack.utils.WritablePair
-import kr.ac.snu.hcil.omnitrack.utils.getDayOfWeek
+import kr.ac.snu.hcil.android.common.containers.WritablePair
+import kr.ac.snu.hcil.android.common.time.getDayOfWeek
 import java.util.*
 
 /**

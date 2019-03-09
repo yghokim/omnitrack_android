@@ -25,13 +25,13 @@ import butterknife.bindView
 import com.github.salomonbrys.kotson.set
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.JsonObject
+import kr.ac.snu.hcil.android.common.view.DialogHelper
+import kr.ac.snu.hcil.android.common.view.applyTint
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.applyTint
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 
 class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tracker_detail) {

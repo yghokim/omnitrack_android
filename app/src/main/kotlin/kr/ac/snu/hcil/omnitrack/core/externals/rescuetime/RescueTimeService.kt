@@ -2,13 +2,13 @@ package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 
 import android.content.Context
 import io.reactivex.Single
+import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.net.AuthConstants
+import kr.ac.snu.hcil.android.common.net.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OAuth2BasedExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
-import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 import okhttp3.HttpUrl
 import org.json.JSONArray
 import org.json.JSONObject

@@ -4,10 +4,10 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import io.reactivex.disposables.SerialDisposable
+import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.INativeChartModel
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import kotlin.properties.Delegates
 
 /**

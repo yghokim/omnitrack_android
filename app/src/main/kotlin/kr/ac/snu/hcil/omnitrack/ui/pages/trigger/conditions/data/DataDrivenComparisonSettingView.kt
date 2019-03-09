@@ -12,12 +12,12 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
+import kr.ac.snu.hcil.android.common.events.Event
+import kr.ac.snu.hcil.android.common.view.inflateContent
+import kr.ac.snu.hcil.android.common.view.text.EnterHideKeyboardEditorActionListener
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
-import kr.ac.snu.hcil.omnitrack.utils.EnterHideKeyboardEditorActionListener
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import java.math.BigDecimal
 import kotlin.properties.Delegates
 

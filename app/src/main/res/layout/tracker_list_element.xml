@@ -206,25 +206,25 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_goneMarginTop="@dimen/tracker_list_information_bottom_padding">
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalCenterAlignedIconTextButton
+        <kr.ac.snu.hcil.android.common.view.button.VerticalCenterAlignedIconTextButton
             android:id="@+id/ui_button_edit"
             style="@style/expandedPanelButton"
             app:fb_iconResource="@drawable/pen"
             app:fb_text="@string/msg_menu_details" />
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalCenterAlignedIconTextButton
+        <kr.ac.snu.hcil.android.common.view.button.VerticalCenterAlignedIconTextButton
             android:id="@+id/ui_button_list"
             style="@style/expandedPanelButton"
             app:fb_iconResource="@drawable/list"
             app:fb_text="@string/msg_data_list" />
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalCenterAlignedIconTextButton
+        <kr.ac.snu.hcil.android.common.view.button.VerticalCenterAlignedIconTextButton
             android:id="@+id/ui_button_charts"
             style="@style/expandedPanelButton"
             app:fb_iconResource="@drawable/chart"
             app:fb_text="@string/msg_charts" />
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalCenterAlignedIconTextButton
+        <kr.ac.snu.hcil.android.common.view.button.VerticalCenterAlignedIconTextButton
             android:id="@+id/ui_button_remove"
             style="@style/expandedPanelButton"
             app:fb_iconResource="@drawable/ex"

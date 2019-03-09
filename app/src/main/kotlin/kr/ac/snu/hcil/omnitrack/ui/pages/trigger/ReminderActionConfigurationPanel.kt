@@ -7,12 +7,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import kotlinx.android.synthetic.main.component_reminder_action_config_panel.view.*
+import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.view.setPaddingBottom
+import kr.ac.snu.hcil.android.common.view.setPaddingLeft
+import kr.ac.snu.hcil.android.common.view.setPaddingRight
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.setPaddingBottom
-import kr.ac.snu.hcil.omnitrack.utils.setPaddingLeft
-import kr.ac.snu.hcil.omnitrack.utils.setPaddingRight
 
 class ReminderActionConfigurationPanel : ConstraintLayout {
 

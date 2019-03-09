@@ -13,8 +13,8 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import com.github.ybq.android.spinkit.SpinKitView
 import com.github.ybq.android.spinkit.style.Circle
+import kr.ac.snu.hcil.android.common.view.applyTint
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.applyTint
 import org.jetbrains.anko.dip
 import java.util.concurrent.atomic.AtomicInteger
 

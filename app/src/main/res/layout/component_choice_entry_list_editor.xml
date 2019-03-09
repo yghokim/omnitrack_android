@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatButton
+    <kr.ac.snu.hcil.android.common.view.tint.DrawableTintAppCompatButton
         android:id="@+id/ui_button_new_entry"
         style="@style/Base.Widget.AppCompat.Button.Borderless"
         android:layout_width="match_parent"

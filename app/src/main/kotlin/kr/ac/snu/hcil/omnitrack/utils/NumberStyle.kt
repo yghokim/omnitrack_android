@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.utils
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import kr.ac.snu.hcil.android.common.isNumericPrimitive
 import kr.ac.snu.hcil.omnitrack.R
 import org.atteo.evo.inflector.English
 import java.math.BigDecimal

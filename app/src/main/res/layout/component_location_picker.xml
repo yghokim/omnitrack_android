@@ -7,7 +7,7 @@
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatTextView
+    <kr.ac.snu.hcil.android.common.view.tint.DrawableTintAppCompatTextView
         android:id="@+id/ui_address"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -99,7 +99,7 @@
         app:srcCompat="@drawable/fit" />
 
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatButton
+    <kr.ac.snu.hcil.android.common.view.tint.DrawableTintAppCompatButton
         android:id="@+id/ui_button_adjust"
         style="@style/mapViewOverlayButton"
         android:layout_width="wrap_content"

@@ -6,12 +6,12 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kr.ac.snu.hcil.android.common.containers.ValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
-import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import retrofit2.Retrofit
 
 /**

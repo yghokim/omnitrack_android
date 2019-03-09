@@ -5,8 +5,8 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.widget.TextView
+import kr.ac.snu.hcil.android.common.view.text.EnterHideKeyboardEditorActionListener
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.EnterHideKeyboardEditorActionListener
 
 /**
  * Created by Young-Ho Kim on 2016-07-13.

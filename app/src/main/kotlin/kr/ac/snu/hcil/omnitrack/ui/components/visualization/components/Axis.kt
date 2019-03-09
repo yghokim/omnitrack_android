@@ -7,9 +7,9 @@ import android.graphics.Rect
 import android.graphics.RectF
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import kr.ac.snu.hcil.android.common.dipSize
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.IDrawer
-import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kotlin.properties.Delegates
 
 /**

@@ -19,6 +19,7 @@ import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kr.ac.snu.hcil.android.common.TextHelper
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -29,7 +30,6 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.workers.OTInformationUploadWorker
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
-import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import org.jetbrains.anko.notificationManager
 import java.io.IOException
 import javax.inject.Inject

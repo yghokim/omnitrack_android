@@ -9,8 +9,12 @@ import android.view.MotionEvent
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.shawnlin.numberpicker.NumberPicker
 import kotlinx.android.synthetic.main.component_datetime_picker_immersive.view.*
+import kr.ac.snu.hcil.android.common.time.getAmPm
+import kr.ac.snu.hcil.android.common.time.getHour
+import kr.ac.snu.hcil.android.common.time.getMinute
+import kr.ac.snu.hcil.android.common.time.setHourOfDay
+import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*

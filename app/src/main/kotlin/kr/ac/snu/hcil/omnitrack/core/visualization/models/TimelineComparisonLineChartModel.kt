@@ -4,6 +4,8 @@ import android.content.Context
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
+import kr.ac.snu.hcil.android.common.isNumericPrimitive
+import kr.ac.snu.hcil.android.common.toBigDecimal
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
@@ -15,8 +17,6 @@ import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.MultiLineChartDrawer
-import kr.ac.snu.hcil.omnitrack.utils.isNumericPrimitive
-import kr.ac.snu.hcil.omnitrack.utils.toBigDecimal
 import java.math.BigDecimal
 import java.util.*
 

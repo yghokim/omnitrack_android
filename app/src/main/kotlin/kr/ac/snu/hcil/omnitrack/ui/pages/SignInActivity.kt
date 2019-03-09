@@ -17,6 +17,8 @@ import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_sign_in.*
+import kr.ac.snu.hcil.android.common.net.NetworkNotConnectedException
+import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -26,8 +28,6 @@ import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.di.global.ServerResponsive
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.net.NetworkNotConnectedException
 import java.util.concurrent.CancellationException
 import javax.inject.Inject
 import javax.inject.Provider

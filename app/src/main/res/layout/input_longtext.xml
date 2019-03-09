@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.text.LinedEditText
+    <kr.ac.snu.hcil.android.common.view.text.LinedEditText
         android:id="@+id/ui_value"
         style="@style/LongTextInputStyle"
         android:layout_width="match_parent"

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
+    <kr.ac.snu.hcil.android.common.view.container.LockableFrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

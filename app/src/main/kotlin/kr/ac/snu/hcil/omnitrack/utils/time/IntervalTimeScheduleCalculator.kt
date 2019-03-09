@@ -2,12 +2,12 @@ package kr.ac.snu.hcil.omnitrack.utils.time
 
 import android.text.format.DateUtils
 import com.google.gson.JsonObject
+import kr.ac.snu.hcil.android.common.containers.WritablePair
+import kr.ac.snu.hcil.android.common.time.getDayOfWeek
+import kr.ac.snu.hcil.android.common.time.getHourOfDay
+import kr.ac.snu.hcil.android.common.time.setHourOfDay
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
-import kr.ac.snu.hcil.omnitrack.utils.WritablePair
-import kr.ac.snu.hcil.omnitrack.utils.getDayOfWeek
-import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
-import kr.ac.snu.hcil.omnitrack.utils.setHourOfDay
 import java.util.*
 
 /**

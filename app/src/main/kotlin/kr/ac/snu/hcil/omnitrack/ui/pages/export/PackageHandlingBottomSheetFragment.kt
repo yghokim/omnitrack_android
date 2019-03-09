@@ -11,10 +11,10 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.bottomsheet_handle_extracted_package.view.*
+import kr.ac.snu.hcil.android.common.file.FileHelper
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
-import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import java.text.SimpleDateFormat
 import java.util.*
 

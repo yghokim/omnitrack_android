@@ -3,6 +3,8 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 import android.content.Context
 import io.reactivex.Single
 import io.realm.Realm
+import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.convertNumericToDouble
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
@@ -13,9 +15,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
-import kr.ac.snu.hcil.omnitrack.utils.convertNumericToDouble
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.math.BigDecimal
 

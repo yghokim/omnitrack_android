@@ -1,8 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.utils.time
 
 import com.google.gson.JsonObject
-import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
-import kr.ac.snu.hcil.omnitrack.utils.WritablePair
+import kr.ac.snu.hcil.android.common.BitwiseOperationHelper
+import kr.ac.snu.hcil.android.common.containers.WritablePair
 
 /**
  * Created by Young-Ho on 5/31/2017.

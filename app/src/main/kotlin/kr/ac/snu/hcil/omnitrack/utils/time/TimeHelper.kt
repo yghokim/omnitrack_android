@@ -2,8 +2,9 @@ package kr.ac.snu.hcil.omnitrack.utils.time
 
 import android.content.Context
 import android.text.format.DateUtils
+import kr.ac.snu.hcil.android.common.BitwiseOperationHelper
+import kr.ac.snu.hcil.android.common.time.*
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.*
 import java.text.SimpleDateFormat
 import java.util.*
 

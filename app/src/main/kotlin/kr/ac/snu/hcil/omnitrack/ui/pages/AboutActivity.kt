@@ -8,12 +8,12 @@ import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem
 import com.danielstone.materialaboutlibrary.items.MaterialAboutTitleItem
 import com.danielstone.materialaboutlibrary.model.MaterialAboutCard
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList
+import kr.ac.snu.hcil.android.common.ANDROID_ASSET_PATH
+import kr.ac.snu.hcil.android.common.versionName
+import kr.ac.snu.hcil.android.common.view.dialog.WebviewScreenDialogFragment
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.VersionCheckDialogFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.WebviewScreenDialogFragment
-import kr.ac.snu.hcil.omnitrack.utils.ANDROID_ASSET_PATH
-import kr.ac.snu.hcil.omnitrack.utils.versionName
 
 /**
  * Created by younghokim on 2017. 1. 25..

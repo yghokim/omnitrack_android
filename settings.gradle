@@ -1,1 +1,1 @@
-include ':app', ':material_dialog_core', ':material_about', ':fancybuttons', ':TedBottomPicker', ':AppUpdater:appupdater', ':omnitrack_corelib'
+include ':app', ':material_dialog_core', ':material_about', ':fancybuttons', ':TedBottomPicker', ':AppUpdater:appupdater', ':omnitrack_core', ':android_commons', ':android_commons_view'

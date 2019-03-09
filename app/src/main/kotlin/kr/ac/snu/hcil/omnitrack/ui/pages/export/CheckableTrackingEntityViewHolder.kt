@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.tracker_for_package_list_element.view.*
+import kr.ac.snu.hcil.android.common.events.IEventListener
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
 
 abstract class ACheckableTrackingEntityViewHolder<EntityType, ChildType>(parent: ViewGroup, val useChildrenList: Boolean) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.tracker_for_package_list_element, parent, false)), View.OnClickListener {
 

@@ -5,6 +5,7 @@ import android.util.SparseArray
 import android.view.View
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import kr.ac.snu.hcil.android.common.time.Time
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
@@ -47,7 +48,7 @@ object OTTriggerViewFactory {
 
                             when (condition.timeConditionType) {
                                 OTTimeTriggerCondition.TIME_CONDITION_ALARM -> {
-                                    val time = kr.ac.snu.hcil.omnitrack.utils.time.Time(condition.alarmTimeHour.toInt(), condition.alarmTimeMinute.toInt(), 0)
+                                    val time = Time(condition.alarmTimeHour.toInt(), condition.alarmTimeMinute.toInt(), 0)
                                     displayView.setAlarmInformation(time.hour, time.minute, time.amPm)
                                 }
                                 OTTimeTriggerCondition.TIME_CONDITION_INTERVAL -> {

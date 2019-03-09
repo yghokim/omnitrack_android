@@ -13,6 +13,9 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.*
+import kr.ac.snu.hcil.android.common.DefaultNameGenerator
+import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -30,7 +33,8 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.workers.OTSynchronizationWorker
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
-import kr.ac.snu.hcil.omnitrack.utils.*
+import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
+import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import java.util.*
 import javax.inject.Inject
 

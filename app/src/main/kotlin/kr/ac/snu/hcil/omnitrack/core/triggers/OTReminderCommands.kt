@@ -19,6 +19,8 @@ import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.Sort
+import kr.ac.snu.hcil.android.common.ConcurrentUniqueLongGenerator
+import kr.ac.snu.hcil.android.common.isInteractiveCompat
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -38,9 +40,7 @@ import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
 import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemActivity
-import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
-import kr.ac.snu.hcil.omnitrack.utils.isInteractiveCompat
 import org.jetbrains.anko.alarmManager
 import org.jetbrains.anko.notificationManager
 import org.jetbrains.anko.powerManager

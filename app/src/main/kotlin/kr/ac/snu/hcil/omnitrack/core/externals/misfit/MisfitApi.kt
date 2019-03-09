@@ -7,13 +7,13 @@ import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.net.AuthConstants
+import kr.ac.snu.hcil.android.common.net.WebServiceLoginActivity
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
-import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
 import okhttp3.FormBody
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient

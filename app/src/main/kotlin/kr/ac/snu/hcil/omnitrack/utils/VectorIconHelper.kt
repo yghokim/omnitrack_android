@@ -12,6 +12,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.annotations.RealmModule
+import kr.ac.snu.hcil.android.common.view.applyTint
 import org.jetbrains.anko.dip
 import java.io.File
 import java.io.FileOutputStream

@@ -8,8 +8,8 @@ import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentActivity
 import io.reactivex.Single
+import kr.ac.snu.hcil.android.common.TextHelper
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 
 /**
  * Created by younghokim on 2017. 5. 17..

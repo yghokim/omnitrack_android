@@ -13,8 +13,8 @@ import android.widget.*
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import org.jetbrains.anko.dip
 import kotlin.properties.Delegates
 

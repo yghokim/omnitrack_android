@@ -18,6 +18,7 @@ import androidx.viewpager.widget.ViewPager
 import butterknife.bindView
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.layout_home_sidebar.*
+import kr.ac.snu.hcil.android.common.net.NetworkNotConnectedException
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -26,7 +27,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceListFragment
-import kr.ac.snu.hcil.omnitrack.utils.net.NetworkNotConnectedException
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 import javax.inject.Inject
 

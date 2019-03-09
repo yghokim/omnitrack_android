@@ -7,15 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.FrameLayout
+import kr.ac.snu.hcil.android.common.events.IEventListener
+import kr.ac.snu.hcil.android.common.view.container.viewholder.SimpleNameDescriptionViewHolder
+import kr.ac.snu.hcil.android.common.view.container.viewholder.SimpleTextViewHolder
+import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.SimpleNameDescriptionViewHolder
-import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.SimpleTextViewHolder
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
-import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
 /**
  * Created by Young-Ho Kim on 2016-09-30.

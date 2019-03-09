@@ -3,11 +3,11 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 import android.content.Context
 import android.net.Uri
 import io.reactivex.Single
+import kr.ac.snu.hcil.android.common.file.FileHelper
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
-import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.io.File
 import java.io.FileInputStream

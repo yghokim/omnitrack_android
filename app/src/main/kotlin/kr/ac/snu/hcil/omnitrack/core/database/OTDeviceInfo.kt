@@ -5,8 +5,8 @@ import androidx.annotation.Keep
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
 import io.reactivex.Single
+import kr.ac.snu.hcil.android.common.versionName
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
-import kr.ac.snu.hcil.omnitrack.utils.versionName
 
 /**
  * Created by Young-Ho on 9/24/2017.

@@ -10,8 +10,8 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.annotation.StringRes
 import com.github.ybq.android.spinkit.SpinKitView
+import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
 /**
  * Created by younghokim on 2017. 3. 8..

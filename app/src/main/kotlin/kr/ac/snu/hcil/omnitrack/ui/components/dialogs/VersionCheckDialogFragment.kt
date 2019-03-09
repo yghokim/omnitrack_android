@@ -14,9 +14,9 @@ import androidx.fragment.app.DialogFragment
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables
+import kr.ac.snu.hcil.android.common.versionName
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.versionName
 
 /**
  * Created by Young-Ho Kim on 2017-04-10.

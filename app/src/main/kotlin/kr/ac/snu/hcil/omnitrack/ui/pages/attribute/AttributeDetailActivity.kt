@@ -15,6 +15,9 @@ import com.github.salomonbrys.kotson.set
 import com.jaredrummler.materialspinner.MaterialSpinner
 import dagger.Lazy
 import kotlinx.android.synthetic.main.activity_attribute_detail.*
+import kr.ac.snu.hcil.android.common.view.DialogHelper
+import kr.ac.snu.hcil.android.common.view.setPaddingLeft
+import kr.ac.snu.hcil.android.common.view.setPaddingRight
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -29,9 +32,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.setPaddingLeft
-import kr.ac.snu.hcil.omnitrack.utils.setPaddingRight
 import java.util.*
 import javax.inject.Inject
 

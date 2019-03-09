@@ -15,6 +15,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
+import kr.ac.snu.hcil.android.common.ConcurrentUniqueLongGenerator
+import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.system.WakefulBroadcastReceiverStaticLock
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -28,10 +31,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataDrivenTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
-import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
-import kr.ac.snu.hcil.omnitrack.utils.system.WakefulBroadcastReceiverStaticLock
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import org.jetbrains.anko.getStackTraceString
 import javax.inject.Inject

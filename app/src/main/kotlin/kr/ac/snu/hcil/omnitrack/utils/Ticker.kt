@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.utils
 
 import android.os.Handler
 import android.os.SystemClock
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import kr.ac.snu.hcil.android.common.events.Event
 
 /**
  * Created by Young-Ho Kim on 2016-08-30.

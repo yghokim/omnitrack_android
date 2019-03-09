@@ -8,14 +8,14 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import butterknife.bindView
 import io.reactivex.subjects.PublishSubject
+import kr.ac.snu.hcil.android.common.TextHelper
+import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.events.Event
+import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.TextHelper
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
 /**
  * Created by Young-Ho Kim on 16. 8. 11

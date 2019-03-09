@@ -9,6 +9,7 @@ import io.reactivex.subjects.BehaviorSubject
 import io.realm.OrderedCollectionChangeSet
 import io.realm.OrderedRealmCollectionChangeListener
 import io.realm.RealmResults
+import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
@@ -22,7 +23,6 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import java.util.*
 import javax.inject.Inject

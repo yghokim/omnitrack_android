@@ -13,6 +13,8 @@ import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
+import kr.ac.snu.hcil.android.common.ConcurrentUniqueLongGenerator
+import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
@@ -22,8 +24,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerMeasu
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.receivers.DataDrivenTriggerCheckReceiver
-import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import org.jetbrains.anko.alarmManager

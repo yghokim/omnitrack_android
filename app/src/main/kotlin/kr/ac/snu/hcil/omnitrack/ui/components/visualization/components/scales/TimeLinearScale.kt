@@ -2,12 +2,12 @@ package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales
 
 import android.content.Context
 import android.text.format.DateUtils
+import kr.ac.snu.hcil.android.common.time.getHourOfDay
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.IAxisScale
-import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
 import java.util.*
 
 /**

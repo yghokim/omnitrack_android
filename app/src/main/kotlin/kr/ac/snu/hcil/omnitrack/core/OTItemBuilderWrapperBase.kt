@@ -8,13 +8,13 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
+import kr.ac.snu.hcil.android.common.containers.AnyValueWithTimestamp
+import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTItemBuilderDAO
-import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import javax.inject.Provider
 

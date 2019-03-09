@@ -2,8 +2,8 @@ package kr.ac.snu.hcil.omnitrack.core.synchronization
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import kr.ac.snu.hcil.omnitrack.utils.toBoolean
-import kr.ac.snu.hcil.omnitrack.utils.toInt
+import kr.ac.snu.hcil.android.common.toBoolean
+import kr.ac.snu.hcil.android.common.toInt
 import org.jetbrains.anko.db.*
 
 /**

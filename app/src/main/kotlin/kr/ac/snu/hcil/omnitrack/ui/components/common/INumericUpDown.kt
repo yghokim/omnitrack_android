@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common
 
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import kr.ac.snu.hcil.android.common.events.Event
 
 interface INumericUpDown {
 

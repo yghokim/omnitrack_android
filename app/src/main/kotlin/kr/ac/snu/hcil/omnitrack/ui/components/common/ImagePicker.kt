@@ -14,12 +14,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.component_image_picker.view.*
+import kr.ac.snu.hcil.android.common.events.Event
+import kr.ac.snu.hcil.android.common.view.applyTint
+import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CameraPickDialogFragment
-import kr.ac.snu.hcil.omnitrack.utils.applyTint
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*

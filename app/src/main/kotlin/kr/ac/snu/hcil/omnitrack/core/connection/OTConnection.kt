@@ -8,14 +8,14 @@ import com.google.gson.stream.JsonWriter
 import dagger.Lazy
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
+import kr.ac.snu.hcil.android.common.TextHelper
+import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 
 /**
  * Created by Young-Ho Kim on 2016-08-11.

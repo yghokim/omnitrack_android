@@ -7,6 +7,8 @@ import androidx.core.content.ContextCompat
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
+import kr.ac.snu.hcil.android.common.DataHelper
+import kr.ac.snu.hcil.android.common.dipSize
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
@@ -23,8 +25,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.D
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.NumericScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
-import kr.ac.snu.hcil.omnitrack.utils.DataHelper
-import kr.ac.snu.hcil.omnitrack.utils.dipSize
 
 /**
  * Created by younghokim on 2017. 5. 8..

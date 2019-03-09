@@ -12,7 +12,7 @@
 
     >
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatTextView
+    <kr.ac.snu.hcil.android.common.view.tint.DrawableTintAppCompatTextView
         android:id="@+id/ui_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalCenterAlignedIconTextButton
+            <kr.ac.snu.hcil.android.common.view.button.VerticalCenterAlignedIconTextButton
                 android:id="@+id/ui_button"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/button_height_small"

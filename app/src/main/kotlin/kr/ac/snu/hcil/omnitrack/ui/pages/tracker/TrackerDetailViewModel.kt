@@ -12,6 +12,9 @@ import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import io.realm.Realm
 import io.realm.RealmChangeListener
+import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.move
+import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -35,7 +38,9 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
-import kr.ac.snu.hcil.omnitrack.utils.*
+import kr.ac.snu.hcil.omnitrack.utils.executeTransactionAsObservable
+import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
+import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import org.jetbrains.anko.collections.forEachWithIndex
 import java.util.*
 import javax.inject.Inject

@@ -25,18 +25,18 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_new_item.*
+import kr.ac.snu.hcil.android.common.containers.AnyValueWithTimestamp
+import kr.ac.snu.hcil.android.common.view.DialogHelper
+import kr.ac.snu.hcil.android.common.view.InterfaceHelper
+import kr.ac.snu.hcil.android.common.view.container.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
-import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
-import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import java.util.*
 import kotlin.properties.Delegates
 

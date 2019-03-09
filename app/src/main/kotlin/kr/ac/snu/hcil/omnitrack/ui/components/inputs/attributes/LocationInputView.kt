@@ -24,9 +24,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.component_location_picker.view.*
+import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.view.contains
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.contains
 import kr.ac.snu.hcil.omnitrack.utils.getAddress
 import java.util.concurrent.TimeUnit
 

@@ -4,13 +4,13 @@ import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import io.reactivex.Completable
 import io.reactivex.Single
+import kr.ac.snu.hcil.android.common.TextHelper
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 
 /**
  * Created by Young-Ho on 9/1/2016.

@@ -5,11 +5,11 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
+import kr.ac.snu.hcil.android.common.TextHelper
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditActivity
-import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 
 /**
  * Created by Young-Ho Kim on 16. 9. 1

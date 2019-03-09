@@ -24,6 +24,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
 import io.realm.Realm
 import kotlinx.android.synthetic.main.layout_home_sidebar.view.*
+import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -43,7 +44,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.export.PackageExportActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.research.ResearchActivity
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import javax.inject.Inject
 import javax.inject.Provider
 

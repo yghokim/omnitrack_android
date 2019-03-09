@@ -6,13 +6,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import io.reactivex.disposables.CompositeDisposable
+import kr.ac.snu.hcil.android.common.system.WakefulBroadcastReceiverStaticLock
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.triggers.ITriggerAlarmController
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.services.OTReminderService
-import kr.ac.snu.hcil.omnitrack.utils.system.WakefulBroadcastReceiverStaticLock
 import javax.inject.Inject
 
 /**

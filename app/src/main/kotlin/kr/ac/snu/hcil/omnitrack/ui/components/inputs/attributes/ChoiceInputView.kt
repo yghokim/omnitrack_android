@@ -20,6 +20,11 @@ import com.afollestad.materialdialogs.MaterialDialog
 import dagger.internal.Factory
 import io.realm.Realm
 import kotlinx.android.synthetic.main.input_choice.view.*
+import kr.ac.snu.hcil.android.common.arrayEquals
+import kr.ac.snu.hcil.android.common.containers.UniqueStringEntryList
+import kr.ac.snu.hcil.android.common.view.DialogHelper
+import kr.ac.snu.hcil.android.common.view.setPaddingLeft
+import kr.ac.snu.hcil.android.common.view.tint.TintFancyButton
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -31,12 +36,7 @@ import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
-import kr.ac.snu.hcil.omnitrack.ui.components.common.TintFancyButton
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
-import kr.ac.snu.hcil.omnitrack.utils.arrayEquals
-import kr.ac.snu.hcil.omnitrack.utils.setPaddingLeft
 import org.jetbrains.anko.backgroundColorResource
 import org.jetbrains.anko.dip
 import java.util.*

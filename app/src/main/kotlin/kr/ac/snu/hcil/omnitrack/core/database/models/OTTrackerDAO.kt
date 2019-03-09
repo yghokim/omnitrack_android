@@ -10,6 +10,8 @@ import io.realm.annotations.Ignore
 import io.realm.annotations.Index
 import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
+import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.LockedPropertiesHelper
@@ -17,8 +19,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTStringStringEntryDAO
-import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import java.util.*
 
 /**

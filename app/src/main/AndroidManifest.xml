@@ -247,7 +247,7 @@
 
         <activity android:name=".ui.pages.items.ItemBrowserActivity" />
         <activity
-            android:name=".ui.components.common.activity.WebServiceLoginActivity"
+            android:name="kr.ac.snu.hcil.android.common.net.WebServiceLoginActivity"
             android:configChanges="orientation|screenSize" />
         <activity android:name=".ui.pages.visualization.ChartViewActivity" />
         <activity

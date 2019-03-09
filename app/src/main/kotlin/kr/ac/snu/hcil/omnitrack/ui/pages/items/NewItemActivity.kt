@@ -13,6 +13,8 @@ import com.google.gson.JsonObject
 import dagger.internal.Factory
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_new_item.*
+import kr.ac.snu.hcil.android.common.net.WebServiceLoginActivity
+import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -22,8 +24,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerRemin
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.services.OTReminderService
-import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import javax.inject.Inject
 import javax.inject.Provider
 

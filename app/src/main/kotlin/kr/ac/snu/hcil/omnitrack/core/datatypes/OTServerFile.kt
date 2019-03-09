@@ -6,7 +6,7 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
+import kr.ac.snu.hcil.android.common.file.FileHelper
 
 /**
  * Created by younghokim on 2017. 11. 17..

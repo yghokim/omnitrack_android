@@ -5,10 +5,10 @@ import android.content.Intent
 import android.os.Bundle
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 
 
 /**
