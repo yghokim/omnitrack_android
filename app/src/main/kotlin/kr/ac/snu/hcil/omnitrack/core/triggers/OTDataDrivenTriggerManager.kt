@@ -3,7 +3,9 @@ package kr.ac.snu.hcil.omnitrack.core.triggers
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
+import android.os.SystemClock
 import androidx.core.app.AlarmManagerCompat
 import androidx.work.*
 import dagger.Lazy
@@ -30,14 +32,16 @@ import org.jetbrains.anko.alarmManager
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class OTDataDrivenTriggerManager(private val context: Context, private val externalServiceManager: Lazy<OTExternalServiceManager>, private val realmFactory: Factory<Realm>) {
+class OTDataDrivenTriggerManager(private val context: Context, private val preferences: Lazy<SharedPreferences>, private val externalServiceManager: Lazy<OTExternalServiceManager>, private val realmFactory: Factory<Realm>) {
 
     companion object {
         const val WORK_NAME = "data-driven-condition-measure-check"
 
         const val DELAY_IMMEDIATE: Long = 1000
-        const val DELAY_PERIODIC: Long = 5 * TimeHelper.minutesInMilli
+        const val DELAY_PERIODIC: Long = 5 * TimeHelper.secondsInMilli
         const val DELAY_RETRY: Long = 5000
+
+        const val PREF_KEY_NEXT_CHECK_TIME_ELAPSED = "pref_data_driven_trigger_next_check_time_elapsed"
 
 
         const val REQUEST_CODE = 5244
@@ -109,6 +113,7 @@ class OTDataDrivenTriggerManager(private val context: Context, private val exter
             reserveCheckExecution(context, DELAY_IMMEDIATE)
         } else {
             //turn off worker
+            preferences.get().edit().remove(PREF_KEY_NEXT_CHECK_TIME_ELAPSED).apply()
             context.alarmManager.cancel(makePendingIntent(context))
         }
     }
@@ -156,9 +161,17 @@ class OTDataDrivenTriggerManager(private val context: Context, private val exter
     }
 
     fun reserveCheckExecution(context: Context, delayMillis: Long) {
-        AlarmManagerCompat.setExactAndAllowWhileIdle(context.alarmManager, AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis() + delayMillis,
+        val nextTime = SystemClock.elapsedRealtime() + delayMillis
+        preferences.get().edit().putLong(PREF_KEY_NEXT_CHECK_TIME_ELAPSED, nextTime).apply()
+        AlarmManagerCompat.setExactAndAllowWhileIdle(context.alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                nextTime,
                 makePendingIntent(context))
+    }
+
+    fun getNextCheckTimeElapsed(): Long? {
+        return preferences.get().getLong(PREF_KEY_NEXT_CHECK_TIME_ELAPSED, -1).let {
+            if (it == -1L) null else it
+        }
     }
 
     private fun tryRegisterNewMeasure(trigger: OTTriggerDAO, realm: Realm) {
@@ -251,32 +264,40 @@ class OTDataDrivenTriggerManager(private val context: Context, private val exter
                     .asFlowable()
                     .filter {
                         it.isLoaded && it.isValid && it.isNotEmpty()
-                    }.flatMap { triggers ->
+                    }.map { triggers ->
                         val trigger = triggers.first()!!
                         val measure = trigger.measureEntries?.filter { it.isActive }?.firstOrNull()
                         if (measure != null) {
-                            return@flatMap Flowable.just(Nullable(measure))
+                            return@map Nullable(measure)
                         } else {
                             //find match
                             val condition = trigger.condition as OTDataDrivenTriggerCondition
-                            return@flatMap realm.where(OTTriggerMeasureEntry::class.java)
+                            return@map Nullable(realm.where(OTTriggerMeasureEntry::class.java)
                                     .equalTo(FIELD_FACTORY_CODE, condition.measure!!.factoryCode)
                                     .equalTo(FIELD_IS_ACTIVE, true)
-                                    .findAllAsync().asFlowable()
-                                    .filter {
-                                        it.isLoaded && it.isValid
-                                    }.map {
-                                        val matchedEntry = it.findLast { matchCondition(condition, it) }
-                                        return@map Nullable(matchedEntry)
-                                    }
+                                    .findAll()
+                                    .find {
+                                        matchCondition(condition, it)
+                                    })
+                            /*.findAllAsync().asFlowable()
+                            .filter {
+                                it.isLoaded && it.isValid
+                            }.map {
+                                val matchedEntry = it.findLast { matchCondition(condition, it) }
+                                return@map Nullable(matchedEntry)
+                            }*/
                         }
-                    }.map { (measure) ->
+                    }.flatMap { (measure) ->
                         if (measure != null) {
-                            val latestHistoryEntry = measure.measureHistory.maxBy { it.timestamp }
-                            return@map if (latestHistoryEntry != null) {
-                                Nullable(Pair(latestHistoryEntry.measuredValue, latestHistoryEntry.timestamp))
-                            } else Nullable<Pair<Double?, Long>>(null)
-                        } else return@map Nullable<Pair<Double?, Long>>(null)
+                            return@flatMap measure.asFlowable<OTTriggerMeasureEntry>().filter { it.isLoaded && it.isValid && it.triggers.any { it.objectId == triggerId } }
+                                    .map { measure ->
+                                        val latestHistoryEntry = measure.measureHistory.maxBy { it.timestamp }
+                                        return@map if (latestHistoryEntry != null) {
+                                            Nullable(Pair(latestHistoryEntry.measuredValue, latestHistoryEntry.timestamp))
+                                        } else Nullable<Pair<Double?, Long>>(null)
+                                    }
+
+                        } else Flowable.just(Nullable<Pair<Double?, Long>>(null))
                     }.doAfterTerminate {
                         realm.close()
                     }

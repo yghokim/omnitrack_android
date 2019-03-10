@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.di.global
 
 import android.content.Context
+import android.content.SharedPreferences
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -26,8 +27,8 @@ class TriggerSystemModule {
 
     @Provides
     @Singleton
-    fun provideDataDrivenTriggerManager(context: Context, externalServiceManager: Lazy<OTExternalServiceManager>, @Backend realmFactory: Factory<Realm>): OTDataDrivenTriggerManager {
-        return OTDataDrivenTriggerManager(context, externalServiceManager, realmFactory)
+    fun provideDataDrivenTriggerManager(@Default preferences: Lazy<SharedPreferences>, context: Context, externalServiceManager: Lazy<OTExternalServiceManager>, @Backend realmFactory: Factory<Realm>): OTDataDrivenTriggerManager {
+        return OTDataDrivenTriggerManager(context, preferences, externalServiceManager, realmFactory)
     }
 
     @Provides

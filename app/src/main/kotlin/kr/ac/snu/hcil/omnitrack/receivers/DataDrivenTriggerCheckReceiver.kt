@@ -76,11 +76,19 @@ class DataDrivenTriggerCheckReceiver : BroadcastReceiver() {
         override fun onCreate() {
             super.onCreate()
             (application as OTAndroidApp).applicationComponent.inject(this)
+
+            OTApp.logger.writeSystemLog("create data driven trigger check service.", "OTDataTriggerConditionWorker")
         }
 
         override fun onDestroy() {
             super.onDestroy()
             creationSubscriptions.clear()
+            val nextCheckTime = dataDrivenTriggerManager.get().getNextCheckTimeElapsed()
+
+            OTApp.logger.writeSystemLog("destroy data driven trigger check service. NextCheckTime: ${nextCheckTime}", "OTDataTriggerConditionWorker")
+            if (nextCheckTime != null) {
+
+            }
         }
 
         override fun onBind(intent: Intent?): IBinder? {
@@ -148,7 +156,7 @@ class DataDrivenTriggerCheckReceiver : BroadcastReceiver() {
                                             newMeasuredValueEntry.timestamp = now
                                             newMeasuredValueEntry.measuredValue = measuredValue
                                             it.where(OTTriggerMeasureEntry::class.java).equalTo("id", entry.id).findFirst()?.measureHistory?.add(newMeasuredValueEntry)
-                                            OTApp.logger.writeSystemLog("measure value of ${entry.factoryCode}: ${nullableValue.datum}", "OTDataTriggerConditionWorker")
+                                            OTApp.logger.writeSystemLog("measure value of ${entry.factoryCode}: ${newMeasuredValueEntry.measuredValue}", "OTDataTriggerConditionWorker")
                                         }
                                         realm.close()
 
@@ -185,7 +193,7 @@ class DataDrivenTriggerCheckReceiver : BroadcastReceiver() {
                         } else {
                             return@defer Completable.complete()
                         }
-                    }.observeOn(AndroidSchedulers.mainThread())
+                    }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                             .doOnSubscribe {
                                 OTApp.logger.writeSystemLog("start data trigger measure check", "OTDataTriggerConditionWorker")
                             }.doOnError {
