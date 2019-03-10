@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.visualization
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.net.http.SslError
 import android.util.AttributeSet
 import android.view.Gravity
@@ -16,7 +17,6 @@ import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.IWebBasedChartModel
-import kr.ac.snu.hcil.omnitrack.utils.argbIntToCssString
 import org.jetbrains.anko.runOnUiThread
 import kotlin.properties.Delegates
 
@@ -118,6 +118,10 @@ class WebBasedChartView : FrameLayout, IChartView {
             webView.layoutParams = FrameLayout.LayoutParams(width, height)
             requestLayout()
         }
+    }
+
+    private fun argbIntToCssString(color: Int): String {
+        return "rgba(${Color.red(color)}, ${Color.green(color)}, ${Color.blue(color)}, ${Color.alpha(color).toFloat() / 255})"
     }
 
     @JavascriptInterface

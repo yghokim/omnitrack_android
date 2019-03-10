@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import kr.ac.snu.hcil.android.common.events.Event
 import kr.ac.snu.hcil.android.common.view.applyTint
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
+import kr.ac.snu.hcil.omnitrack.core.types.Fraction
 import kotlin.properties.Delegates
 
 /**

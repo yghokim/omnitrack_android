@@ -10,10 +10,10 @@ import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.utils.getBooleanCompat
-import kr.ac.snu.hcil.omnitrack.utils.getIntCompat
-import kr.ac.snu.hcil.omnitrack.utils.getLongCompat
-import kr.ac.snu.hcil.omnitrack.utils.getStringCompat
+import kr.ac.snu.hcil.omnitrack.core.serialization.getBooleanCompat
+import kr.ac.snu.hcil.omnitrack.core.serialization.getIntCompat
+import kr.ac.snu.hcil.omnitrack.core.serialization.getLongCompat
+import kr.ac.snu.hcil.omnitrack.core.serialization.getStringCompat
 import java.util.*
 
 /**

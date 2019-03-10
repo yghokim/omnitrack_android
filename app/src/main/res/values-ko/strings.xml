@@ -499,13 +499,6 @@
         <item>무직/가사</item>
     </string-array>
 
-    <string-array name="choice_preview_entries">
-        <item>선택 항목 1</item>
-        <item>선택 항목 2</item>
-        <item>선택 항목 3</item>
-    </string-array>
-
-
     <string-array name="supported_language_names">
         <item>영어</item>
         <item>한국어</item>

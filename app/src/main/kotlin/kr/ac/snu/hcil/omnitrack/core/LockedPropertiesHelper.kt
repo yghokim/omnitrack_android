@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
-import kr.ac.snu.hcil.omnitrack.utils.getBooleanCompat
+import kr.ac.snu.hcil.omnitrack.core.serialization.getBooleanCompat
 
 /**
  * Created by Young-Ho on 1/19/2018.

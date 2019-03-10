@@ -9,9 +9,9 @@ import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTStringStringEntryDAO
-import kr.ac.snu.hcil.omnitrack.utils.getBooleanCompat
-import kr.ac.snu.hcil.omnitrack.utils.getIntCompat
-import kr.ac.snu.hcil.omnitrack.utils.getStringCompat
+import kr.ac.snu.hcil.omnitrack.core.serialization.getBooleanCompat
+import kr.ac.snu.hcil.omnitrack.core.serialization.getIntCompat
+import kr.ac.snu.hcil.omnitrack.core.serialization.getStringCompat
 import java.util.*
 
 /**

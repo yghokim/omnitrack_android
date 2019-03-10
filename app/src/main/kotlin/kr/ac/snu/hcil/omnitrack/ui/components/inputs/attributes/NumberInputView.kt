@@ -16,7 +16,7 @@ import android.widget.TextView
 import kr.ac.snu.hcil.android.common.isNumericPrimitive
 import kr.ac.snu.hcil.android.common.toBigDecimal
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
+import kr.ac.snu.hcil.omnitrack.core.types.NumberStyle
 import java.math.BigDecimal
 import kotlin.properties.Delegates
 

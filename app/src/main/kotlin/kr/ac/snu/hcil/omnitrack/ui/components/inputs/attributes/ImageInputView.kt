@@ -18,8 +18,8 @@ import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.android.common.view.getActivity
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
+import kr.ac.snu.hcil.omnitrack.core.types.OTServerFile
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ImagePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CameraPickDialogFragment
 import org.jetbrains.anko.runOnUiThread

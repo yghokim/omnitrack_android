@@ -17,9 +17,9 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
+import kr.ac.snu.hcil.omnitrack.core.types.OTServerFile
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject

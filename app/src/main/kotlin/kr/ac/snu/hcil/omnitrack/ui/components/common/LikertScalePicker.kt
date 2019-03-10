@@ -14,7 +14,7 @@ import kr.ac.snu.hcil.android.common.dipSize
 import kr.ac.snu.hcil.android.common.events.Event
 import kr.ac.snu.hcil.android.common.nearestInt
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
+import kr.ac.snu.hcil.omnitrack.core.types.Fraction
 import kotlin.properties.Delegates
 
 /**

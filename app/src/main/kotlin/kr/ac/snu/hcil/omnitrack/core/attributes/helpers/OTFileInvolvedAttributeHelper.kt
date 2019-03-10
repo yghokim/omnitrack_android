@@ -6,9 +6,9 @@ import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.file.FileHelper
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
-import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
+import kr.ac.snu.hcil.omnitrack.core.types.OTServerFile
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream

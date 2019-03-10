@@ -24,6 +24,7 @@ import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.PropertyViewFactory
 import java.util.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
@@ -147,7 +148,7 @@ abstract class OTAttributeHelper(protected val context: Context) {
     }
 
     open fun makePropertyView(propertyKey: String, context: Context): APropertyView<out Any> {
-        val view = getPropertyHelper<Any>(propertyKey).makeView(context)
+        val view = PropertyViewFactory.makeView(getPropertyHelper<Any>(propertyKey), context)
         view.title = getPropertyTitle(propertyKey)
         val initialValue = getPropertyInitialValue(propertyKey)
         if (initialValue != null)

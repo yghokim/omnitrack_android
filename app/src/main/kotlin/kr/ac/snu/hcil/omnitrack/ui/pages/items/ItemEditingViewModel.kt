@@ -9,9 +9,9 @@ import io.reactivex.Maybe
 import kr.ac.snu.hcil.android.common.containers.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.utils.getLongCompat
-import kr.ac.snu.hcil.omnitrack.utils.getStringCompat
-import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
+import kr.ac.snu.hcil.omnitrack.core.serialization.getLongCompat
+import kr.ac.snu.hcil.omnitrack.core.serialization.getStringCompat
 
 /**
  * Created by Young-Ho on 10/15/2017.

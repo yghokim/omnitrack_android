@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="property_rating_options_leftmost_label_example">전혀 그렇지 않다</string>
+    <string name="property_rating_options_rightmost_label_example">매우 그렇다</string>
+
+    <string name="property_rating_display_type_likert">Likert 척도</string>
+    <string name="property_rating_display_type_stars">별점</string>
+
+    <string name="property_number_style_unit_position_front">숫자 앞</string>
+    <string name="property_number_style_unit_position_rear">숫자 뒤</string>
+    <string name="property_number_style_unit_position_none">표시하지 않음</string>
+</resources>

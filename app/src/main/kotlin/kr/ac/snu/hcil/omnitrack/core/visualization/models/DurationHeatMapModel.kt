@@ -9,11 +9,11 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.ISingleNumberAttributeHe
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTRatingAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
+import kr.ac.snu.hcil.omnitrack.core.types.RatingOptions
+import kr.ac.snu.hcil.omnitrack.core.types.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.IWebBasedChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.TrackerChartModel
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
-import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
 
 /**
  * Created by younghokim on 2017. 11. 25..

@@ -1,11 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.properties
 
-import android.content.Context
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.RatingOptionsPropertyView
-import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
+import kr.ac.snu.hcil.omnitrack.core.types.RatingOptions
 
 /**
  * Created by Young-Ho Kim on 2016-09-23.
@@ -29,7 +26,4 @@ class OTRatingOptionsPropertyHelper : OTPropertyHelper<RatingOptions>() {
         }
     }
 
-    override fun makeView(context: Context): APropertyView<RatingOptions> {
-        return RatingOptionsPropertyView(context, null)
-    }
 }

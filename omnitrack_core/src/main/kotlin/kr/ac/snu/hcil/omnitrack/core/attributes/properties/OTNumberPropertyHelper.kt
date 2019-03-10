@@ -1,8 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.properties
 
-import android.content.Context
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.NumberPropertyView
 import java.math.BigDecimal
 
 /**
@@ -18,7 +15,4 @@ class OTNumberPropertyHelper : OTPropertyHelper<BigDecimal>() {
         return BigDecimal(serialized)
     }
 
-    override fun makeView(context: Context): APropertyView<BigDecimal> {
-        return NumberPropertyView(context, null)
-    }
 }

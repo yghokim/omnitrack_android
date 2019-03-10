@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">OmniTrack.Core.Types</string>
+
+    <string name="property_rating_options_leftmost_label_example">strongly disagree</string>
+    <string name="property_rating_options_rightmost_label_example">strongly agree</string>
+
+    <string name="property_rating_display_type_likert">Likert Scale</string>
+    <string name="property_rating_display_type_stars">Stars</string>
+
+    <string name="property_number_style_unit_position_front">Front</string>
+    <string name="property_number_style_unit_position_rear">Rear</string>
+    <string name="property_number_style_unit_position_none">None</string>
+</resources>

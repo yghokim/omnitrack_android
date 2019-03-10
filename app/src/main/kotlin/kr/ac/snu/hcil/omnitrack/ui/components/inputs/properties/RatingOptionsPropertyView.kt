@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import com.google.gson.Gson
 import kr.ac.snu.hcil.android.common.events.IEventListener
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
+import kr.ac.snu.hcil.omnitrack.core.types.RatingOptions
 
 /**
  * Created by Young-Ho Kim on 2016-09-23.

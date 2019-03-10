@@ -1,24 +1,11 @@
-package kr.ac.snu.hcil.omnitrack.utils.serialization
+package kr.ac.snu.hcil.omnitrack.core.serialization
 
 import com.google.android.gms.maps.model.LatLng
 import kr.ac.snu.hcil.android.common.isNumericPrimitive
 import kr.ac.snu.hcil.android.common.toBigDecimal
-import kr.ac.snu.hcil.omnitrack.core.datatypes.*
+import kr.ac.snu.hcil.omnitrack.core.types.*
 import java.math.BigDecimal
 import java.util.*
-
-/**
- * Created by Young-Ho Kim on 2016-07-27.
- */
-
-fun LatLng.serialize(): String {
-    return "$latitude,$longitude"
-}
-
-fun deserializeLatLng(serialized: String): LatLng {
-    val s = serialized.split(",")
-    return LatLng(s[0].toDouble(), s[1].toDouble())
-}
 
 object TypeStringSerializationHelper {
 

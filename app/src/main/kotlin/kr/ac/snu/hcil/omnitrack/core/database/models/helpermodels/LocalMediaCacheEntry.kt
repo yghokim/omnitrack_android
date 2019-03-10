@@ -5,7 +5,7 @@ import io.realm.RealmObject
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.android.common.file.FileHelper
-import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
+import kr.ac.snu.hcil.omnitrack.core.types.OTServerFile
 
 /**
  * Created by Young-Ho on 11/16/2017.

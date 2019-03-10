@@ -5,7 +5,7 @@ import android.content.Context
 import android.util.AttributeSet
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
+import kr.ac.snu.hcil.omnitrack.core.types.NumberStyle
 
 /**
  * Created by Young-Ho Kim on 2016-09-05.
