@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common.container
+package kr.ac.snu.hcil.android.common.view.container
 
 import android.content.Context
 import android.util.AttributeSet

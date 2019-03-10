@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common.wizard
+package kr.ac.snu.hcil.android.common.view.wizard
 
 import android.content.Context
 import android.util.AttributeSet
@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.viewpager.widget.ViewPager
-import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.android.common.view.R
 import java.util.*
 
 /**

@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common.container
+package kr.ac.snu.hcil.android.common.view.container
 
 import android.animation.Animator
 import android.animation.AnimatorSet
@@ -18,9 +18,7 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.transition.TransitionManager
-import com.jmedeisis.draglinearlayout.DragLinearLayout
-import kotlinx.android.synthetic.main.attribute_list_element.view.*
-import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.android.common.view.R
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -188,7 +186,7 @@ class AdapterLinearLayout : DragLinearLayout {
                         val view = makeView(position)
                         view.id = View.generateViewId()
                         addViewInLayout(view, position, view.layoutParams)
-                        setViewDraggable(view, view.ui_drag_handle)
+                        setViewDraggable(view, view.findViewById(R.id.ui_drag_handle))
                         requestLayout()
                     }
                 }
@@ -336,7 +334,7 @@ class AdapterLinearLayout : DragLinearLayout {
 
                 if (this.indexOfChild(view) == -1) {
                     addViewInLayout(view, i, view.layoutParams)
-                    setViewDraggable(view, view.ui_drag_handle)
+                    setViewDraggable(view, view.findViewById(R.id.ui_drag_handle))
                 }
                 //addView(view)
                 //addView(viewHolder.itemView)

@@ -14,6 +14,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
+import kr.ac.snu.hcil.android.common.view.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
@@ -27,7 +28,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
-import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import org.jetbrains.anko.padding
 import java.util.*

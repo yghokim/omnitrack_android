@@ -10,13 +10,13 @@
         android:layout_width="match_parent"
 
         android:layout_height="wrap_content"
-        android:layout_marginBottom="26dp"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="30dp"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="26dp"
         android:gravity="center" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.container.ManualViewPager
+    <kr.ac.snu.hcil.android.common.view.container.ManualViewPager
         android:id="@+id/ui_wizard_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -42,10 +42,10 @@
             style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:visibility="gone"
             android:layout_weight="1"
             android:text="@string/msg_cancel"
-            android:textColor="@color/colorRed.Light" />
+            android:textColor="@color/colorRed.Light"
+            android:visibility="gone" />
 
 
         <Button

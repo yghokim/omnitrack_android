@@ -2,11 +2,11 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard
 
 import android.content.Context
 import android.util.AttributeSet
+import kr.ac.snu.hcil.android.common.view.wizard.AWizardPage
+import kr.ac.snu.hcil.android.common.view.wizard.AWizardViewPagerAdapter
+import kr.ac.snu.hcil.android.common.view.wizard.WizardView
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
-import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardViewPagerAdapter
-import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.pages.SourceConfigurationPage
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.pages.SourceSelectionPage
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.pages.TimeQueryPage

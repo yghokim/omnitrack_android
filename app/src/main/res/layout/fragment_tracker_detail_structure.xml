@@ -110,7 +110,7 @@
                         android:textColor="@color/colorAccent" />
                 </FrameLayout>
 
-                <kr.ac.snu.hcil.omnitrack.ui.components.common.container.AdapterLinearLayout
+                <kr.ac.snu.hcil.android.common.view.container.AdapterLinearLayout
                     android:id="@+id/ui_attribute_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

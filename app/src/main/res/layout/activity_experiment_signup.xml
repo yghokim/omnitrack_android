@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/diagonal_gradient">
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.container.ManualViewPager
+    <kr.ac.snu.hcil.android.common.view.container.ManualViewPager
         android:id="@+id/main_viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

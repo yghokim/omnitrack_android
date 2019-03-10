@@ -26,6 +26,10 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
 }
 
 dependencies {
@@ -35,7 +39,10 @@ dependencies {
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
     implementation "androidx.appcompat:appcompat:$rootProject.ext.androidx_appcompat_version"
+    implementation "androidx.transition:transition:$rootProject.ext.android_support_version"
     implementation "androidx.recyclerview:recyclerview:$rootProject.ext.android_support_version"
+    implementation "androidx.viewpager:viewpager:$rootProject.ext.android_support_version"
+
     implementation "androidx.vectordrawable:vectordrawable:1.0.1"
     implementation "androidx.vectordrawable:vectordrawable-animated:$rootProject.ext.android_support_version"
     implementation "androidx.preference:preference:1.1.0-alpha03"

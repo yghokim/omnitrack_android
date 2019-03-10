@@ -5,6 +5,7 @@ import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.BuildConfig
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
@@ -118,6 +119,7 @@ class OTTriggerSystemManager(
     }
 
     fun checkInAllToSystem(userId: String): Int {
+        OTApp.logger.writeSystemLog("Checkin all the triggers in the system.", "TriggerSystemManager")
         val realm = realmProvider.get()
 
         val triggers = realm.where(OTTriggerDAO::class.java)
@@ -126,6 +128,7 @@ class OTTriggerSystemManager(
                 .equalTo("isOn", true)
                 .findAll()
 
+        dataDrivenTriggerManager.get().setSuspendReadjustWorker(true)
         triggers.forEach { trigger ->
             if (trigger.liveTrackerCount > 0) {
                 if (BuildConfig.DISABLE_EXTERNAL_ENTITIES && trigger.experimentIdInFlags != BuildConfig.DEFAULT_EXPERIMENT_ID) {
@@ -134,6 +137,8 @@ class OTTriggerSystemManager(
             }
         }
         val numTriggers = triggers.size
+        dataDrivenTriggerManager.get().setSuspendReadjustWorker(false)
+        dataDrivenTriggerManager.get().reAdjustWorker(realm)
         realm.close()
         return numTriggers
     }

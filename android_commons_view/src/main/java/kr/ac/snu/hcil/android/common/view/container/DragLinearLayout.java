@@ -1,4 +1,4 @@
-package com.jmedeisis.draglinearlayout;
+package kr.ac.snu.hcil.android.common.view.container;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -26,9 +26,11 @@ import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import kr.ac.snu.hcil.omnitrack.R;
+import kr.ac.snu.hcil.android.common.view.R;
 
 /**
+ * This code was forked from com.jmedeisis.draglinearlayout
+ * https://github.com/justasm/DragLinearLayout
  * A LinearLayout that supports children Views that can be dragged and swapped around.
  * See {@link #addDragView(android.view.View, android.view.View)},
  * {@link #addDragView(android.view.View, android.view.View, int)},
@@ -56,7 +58,7 @@ public class DragLinearLayout extends LinearLayout {
      */
     private final SparseArray<DraggableChild> draggableChildren;
     /**
-     * The currently dragged item, if {@link com.jmedeisis.draglinearlayout.DragLinearLayout.DragItem#detecting}.
+     * The currently dragged item, if {@link DragLinearLayout.DragItem#detecting}.
      */
     private final DragItem draggedItem;
     private final int slop;
@@ -264,7 +266,7 @@ public class DragLinearLayout extends LinearLayout {
     }
 
     /**
-     * See {@link com.jmedeisis.draglinearlayout.DragLinearLayout.OnViewSwapListener}.
+     * See {@link DragLinearLayout.OnViewSwapListener}.
      */
     public void setOnViewSwapListener(OnViewSwapListener swapListener) {
         this.swapListener = swapListener;
@@ -280,7 +282,7 @@ public class DragLinearLayout extends LinearLayout {
 
     /**
      * Initiates a new {@link #draggedItem} unless the current one is still
-     * {@link com.jmedeisis.draglinearlayout.DragLinearLayout.DragItem#detecting}.
+     * {@link DragLinearLayout.DragItem#detecting}.
      */
     private void startDetectingDrag(View child) {
         if (draggedItem.detecting)
@@ -654,7 +656,7 @@ public class DragLinearLayout extends LinearLayout {
     }
 
     /**
-     * Use with {@link com.jmedeisis.draglinearlayout.DragLinearLayout#setOnViewSwapListener(com.jmedeisis.draglinearlayout.DragLinearLayout.OnViewSwapListener)}
+     * Use with {@link DragLinearLayout#setOnViewSwapListener(DragLinearLayout.OnViewSwapListener)}
      * to listen for draggable view swaps.
      */
     public interface OnViewSwapListener {

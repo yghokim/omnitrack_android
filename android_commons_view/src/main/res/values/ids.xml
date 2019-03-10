@@ -4,6 +4,7 @@
     <item name="description" type="id" />
     <item name="icon" type="id" />
     <item name="textView" type="id" />
+    <item name="ui_drag_handle" type="id" />
 
 
 </resources>

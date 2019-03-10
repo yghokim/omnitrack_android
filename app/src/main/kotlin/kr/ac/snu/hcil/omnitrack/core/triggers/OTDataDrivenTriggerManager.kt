@@ -30,15 +30,17 @@ import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import org.jetbrains.anko.alarmManager
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 class OTDataDrivenTriggerManager(private val context: Context, private val preferences: Lazy<SharedPreferences>, private val externalServiceManager: Lazy<OTExternalServiceManager>, private val realmFactory: Factory<Realm>) {
 
     companion object {
+        const val TAG = "OTDataDrivenTriggerManager"
         const val WORK_NAME = "data-driven-condition-measure-check"
 
         const val DELAY_IMMEDIATE: Long = 1000
-        const val DELAY_PERIODIC: Long = 5 * TimeHelper.secondsInMilli
+        const val DELAY_PERIODIC: Long = 5 * TimeHelper.minutesInMilli
         const val DELAY_RETRY: Long = 5000
 
         const val PREF_KEY_NEXT_CHECK_TIME_ELAPSED = "pref_data_driven_trigger_next_check_time_elapsed"
@@ -57,12 +59,18 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
         const val FIELD_IS_ACTIVE = "isActive"
     }
 
+    private var suspendReadjustWorker = AtomicBoolean(false)
+
     @Inject
     lateinit var timeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>
     private val measureEntryIdGenerator: ConcurrentUniqueLongGenerator by lazy { ConcurrentUniqueLongGenerator() }
 
     init {
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
+    }
+
+    fun setSuspendReadjustWorker(suspend: Boolean) {
+        this.suspendReadjustWorker.set(suspend)
     }
 
     private fun matchCondition(condition: OTDataDrivenTriggerCondition, measureEntry: OTTriggerMeasureEntry): Boolean {
@@ -105,16 +113,21 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
 
     }
 
-    private fun reAdjustWorker(realm: Realm) {
-        val numMeasures = realm.where(OTTriggerMeasureEntry::class.java)
-                .equalTo(FIELD_IS_ACTIVE, true).count()
-        if (numMeasures > 0L) {
-            //turn on worker
-            reserveCheckExecution(context, DELAY_IMMEDIATE)
-        } else {
-            //turn off worker
-            preferences.get().edit().remove(PREF_KEY_NEXT_CHECK_TIME_ELAPSED).apply()
-            context.alarmManager.cancel(makePendingIntent(context))
+    fun reAdjustWorker(realm: Realm) {
+        if (!suspendReadjustWorker.get()) {
+            OTApp.logger.writeSystemLog("readjust worker", TAG)
+            val numMeasures = realm.where(OTTriggerMeasureEntry::class.java)
+                    .equalTo(FIELD_IS_ACTIVE, true).count()
+            if (numMeasures > 0L) {
+                //turn on worker
+                OTApp.logger.writeSystemLog("${numMeasures} measures are active. register an alarm", TAG)
+                reserveCheckExecution(context, DELAY_IMMEDIATE)
+            } else {
+                //turn off worker
+                OTApp.logger.writeSystemLog("No measures are active. cancel the alarm", TAG)
+                preferences.get().edit().remove(PREF_KEY_NEXT_CHECK_TIME_ELAPSED).apply()
+                context.alarmManager.cancel(makePendingIntent(context))
+            }
         }
     }
 

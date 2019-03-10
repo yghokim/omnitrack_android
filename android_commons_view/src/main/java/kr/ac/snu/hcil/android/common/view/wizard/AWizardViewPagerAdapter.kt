@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common.wizard
+package kr.ac.snu.hcil.android.common.view.wizard
 
 import android.content.Context
 import android.view.View
