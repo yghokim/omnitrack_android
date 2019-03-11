@@ -4,12 +4,12 @@ import io.realm.DynamicRealm
 import io.realm.FieldAttribute
 import io.realm.RealmMigration
 import io.realm.RealmObjectSchema
-import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerAlarmInstance
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerMeasureEntry
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerMeasureHistoryEntry
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerReminderEntry
+import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataDrivenTriggerManager
 
 

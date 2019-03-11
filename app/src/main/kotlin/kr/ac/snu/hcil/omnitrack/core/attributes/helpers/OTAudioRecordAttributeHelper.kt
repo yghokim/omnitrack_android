@@ -3,8 +3,8 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 import android.Manifest
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import java.util.*
 
 /**

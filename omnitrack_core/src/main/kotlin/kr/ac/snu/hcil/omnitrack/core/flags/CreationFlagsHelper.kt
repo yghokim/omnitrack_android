@@ -1,6 +1,5 @@
-package kr.ac.snu.hcil.omnitrack.core
+package kr.ac.snu.hcil.omnitrack.core.flags
 
-import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.core.serialization.getBooleanCompat
 import kr.ac.snu.hcil.omnitrack.core.serialization.getStringCompat
@@ -28,12 +27,12 @@ object CreationFlagsHelper : AFlagsHelperBase() {
         constructor(base: String) : super(base)
 
         fun setExperiment(experimentId: String?): Builder {
-            this.json.set("experiment", experimentId)
+            this.json.addProperty("experiment", experimentId)
             return this
         }
 
         fun setInjected(injected: Boolean): Builder {
-            this.json.set("injected", injected)
+            this.json.addProperty("injected", injected)
             return this
         }
     }

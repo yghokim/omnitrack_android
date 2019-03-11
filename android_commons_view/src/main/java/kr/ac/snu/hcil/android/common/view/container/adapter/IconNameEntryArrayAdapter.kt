@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.utils
+package kr.ac.snu.hcil.android.common.view.container.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
-import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.android.common.view.R
 
 /**
  * Created by younghokim on 16. 8. 24..

@@ -7,10 +7,10 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.serialization.getBooleanCompat
 import kr.ac.snu.hcil.omnitrack.core.serialization.getIntCompat
 import kr.ac.snu.hcil.omnitrack.core.serialization.getLongCompat

@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
+import kr.ac.snu.hcil.omnitrack.core.attributes.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimeSpanIntervalSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimeSpanPivotalSorter
@@ -18,7 +19,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemValueEntryDAO
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.core.types.TimeSpan
-import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import java.text.SimpleDateFormat
 import java.util.*
 

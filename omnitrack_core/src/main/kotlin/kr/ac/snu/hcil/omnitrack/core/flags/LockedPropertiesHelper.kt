@@ -1,6 +1,5 @@
-package kr.ac.snu.hcil.omnitrack.core
+package kr.ac.snu.hcil.omnitrack.core.flags
 
-import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.core.serialization.getBooleanCompat
 
@@ -39,7 +38,7 @@ object LockedPropertiesHelper : AFlagsHelperBase() {
 
     class Builder : BuilderBase() {
         fun setLocked(key: String, isLocked: Boolean?): Builder {
-            this.json.set(key, isLocked)
+            this.json.addProperty(key, isLocked)
             return this
         }
     }

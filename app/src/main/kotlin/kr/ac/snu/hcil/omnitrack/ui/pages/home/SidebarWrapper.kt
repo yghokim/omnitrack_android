@@ -25,6 +25,7 @@ import io.reactivex.disposables.SerialDisposable
 import io.realm.Realm
 import kotlinx.android.synthetic.main.layout_home_sidebar.view.*
 import kr.ac.snu.hcil.android.common.view.DialogHelper
+import kr.ac.snu.hcil.android.common.view.container.adapter.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -38,7 +39,6 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.workers.OTInformationUploadWorker
 import kr.ac.snu.hcil.omnitrack.core.workers.OTResearchSynchronizationWorker
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
-import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity

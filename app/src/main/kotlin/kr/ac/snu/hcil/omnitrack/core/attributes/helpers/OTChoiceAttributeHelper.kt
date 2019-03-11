@@ -4,6 +4,7 @@ import android.content.Context
 import io.realm.Realm
 import kr.ac.snu.hcil.android.common.containers.UniqueStringEntryList
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ChoiceSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListPropertyHelper
@@ -13,7 +14,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.ChoiceCategoricalBarChartModel
-import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import java.util.*
 
 /**

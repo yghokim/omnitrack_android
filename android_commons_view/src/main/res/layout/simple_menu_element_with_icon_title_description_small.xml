@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/button_height_small"
     android:background="@drawable/transparent_button_background"
@@ -12,11 +12,10 @@
         android:layout_width="@dimen/button_height_small"
         android:layout_height="@dimen/button_height_small"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:padding="8dp"
         android:scaleType="fitXY"
-        android:tint="@color/buttonIconColorDark"
-        app:srcCompat="@drawable/trashcan" />
+        android:tint="@color/buttonIconColorDark" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,15 +28,15 @@
             style="@style/Base.TextAppearance.AppCompat.Menu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Title"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            tools:text="Title" />
 
         <TextView
             android:id="@+id/description"
             style="12sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="description"
-            android:textColor="@color/textColorLight" />
+            android:textColor="@color/textColorLight"
+            tools:text="description" />
     </LinearLayout>
 </LinearLayout>

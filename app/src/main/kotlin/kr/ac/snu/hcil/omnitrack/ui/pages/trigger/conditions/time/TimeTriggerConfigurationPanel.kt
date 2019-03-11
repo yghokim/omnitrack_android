@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.trigger_time_trigger_config_panel.view.*
 import kr.ac.snu.hcil.android.common.events.IEventListener
 import kr.ac.snu.hcil.android.common.time.*
 import kr.ac.snu.hcil.android.common.view.InterfaceHelper
+import kr.ac.snu.hcil.android.common.view.container.adapter.IconNameEntryArrayAdapter
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
@@ -29,7 +30,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.ConditionConfigurationPanelImpl
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.IConditionConfigurationView
-import kr.ac.snu.hcil.omnitrack.utils.IconNameEntryArrayAdapter
 import org.jetbrains.anko.backgroundResource
 import java.text.SimpleDateFormat
 import java.util.*

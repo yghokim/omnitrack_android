@@ -1,11 +1,11 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders
+package kr.ac.snu.hcil.android.common.view.container.adapter
 
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import kr.ac.snu.hcil.android.common.view.R
 import kr.ac.snu.hcil.android.common.view.container.viewholder.SimpleIconNameDescriptionViewHolder
 import kr.ac.snu.hcil.android.common.view.inflateContent
-import kr.ac.snu.hcil.omnitrack.R
 
 /**
  * Created by younghokim on 2017. 3. 6..

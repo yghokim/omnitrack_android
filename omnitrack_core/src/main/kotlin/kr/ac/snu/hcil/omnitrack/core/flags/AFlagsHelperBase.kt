@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core
+package kr.ac.snu.hcil.omnitrack.core.flags
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -18,7 +18,7 @@ abstract class AFlagsHelperBase {
     }
 
     fun parseFlags(json: String): JsonObject {
-        return AFlagsHelperBase.parseFlags(json)
+        return Companion.parseFlags(json)
     }
 
     open class BuilderBase {
