@@ -29,26 +29,8 @@ class LoggingDbHelper(context: Context) : SQLiteOpenHelper(context, "logging.db"
         override val tableName: String = "system_logs"
     }
 
-    object SessionLogScheme : TableScheme() {
-        val ACTIVITY = "activity"
-        val ELAPSED_TIME = "elapsed_time"
-        val FROM = "opened_from"
-        val CONTENT = "content"
-
-        override val creationColumnContentString: String = "$ACTIVITY TEXT, $ELAPSED_TIME INTEGER, $FROM TEXT, $CONTENT TEXT"
-
-        override val intrinsicColumnNames: Array<String> = arrayOf(ACTIVITY, ELAPSED_TIME, FROM, CONTENT)
-
-        override val tableName: String = "session_logs"
-
-        init {
-            appendIndexQueryString(false, "timestamp_index", LOGGED_AT)
-        }
-    }
-
-
     override fun onCreate(db: SQLiteDatabase) {
-        val tables = arrayOf(SystemLogScheme, SessionLogScheme)
+        val tables = arrayOf(SystemLogScheme)
 
         for (scheme in tables) {
             db.execSQL(scheme.creationQueryString)

@@ -4,6 +4,7 @@ import android.content.Context
 import io.reactivex.Completable
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.*
+import kr.ac.snu.hcil.android.common.onNextIfDifferAndNotNull
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
@@ -17,7 +18,6 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.OTTriggerViewFactory
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionAsObservable
-import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import java.util.*
 import javax.inject.Inject
 

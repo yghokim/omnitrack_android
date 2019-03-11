@@ -14,8 +14,6 @@
 
     <string name="dateformat_day_of_week_short">E</string>
 
-    <string name="time_duration_no_difference">Same time</string>
-
     <string name="time_duration_hour">h</string>
     <string name="time_duration_minute">m</string>
     <string name="time_duration_second">s</string>
@@ -27,51 +25,7 @@
 
     <string name="time_just_now">Just now</string>
 
-    <plurals name="time_duration_day">
-        <item quantity="zero">0 days</item>
-        <item quantity="one">1 day</item>
-        <item quantity="other">%d days</item>
-    </plurals>
 
-    <plurals name="time_duration_hour">
-        <item quantity="zero">0 hours</item>
-        <item quantity="one">1 hour</item>
-        <item quantity="other">%d hours</item>
-    </plurals>
-
-    <plurals name="time_duration_minute">
-        <item quantity="zero">0 minutes</item>
-        <item quantity="one">1 minute</item>
-        <item quantity="other">%d minutes</item>
-    </plurals>
-
-    <plurals name="time_duration_second">
-        <item quantity="zero">0 seconds</item>
-        <item quantity="one">1 second</item>
-        <item quantity="other">%d seconds</item>
-    </plurals>
-
-    <plurals name="time_duration_hour_short">
-        <item quantity="zero">0 hrs</item>
-        <item quantity="one">1 hr</item>
-        <item quantity="other">%d hrs</item>
-    </plurals>
-
-    <plurals name="time_duration_minute_short">
-        <item quantity="zero">0 mins</item>
-        <item quantity="one">1 min</item>
-        <item quantity="other">%d mins</item>
-    </plurals>
-
-    <plurals name="time_duration_second_short">
-        <item quantity="zero">0 secs</item>
-        <item quantity="one">1 sec</item>
-        <item quantity="other">%d secs</item>
-    </plurals>
-
-    <string name="msg_today">Today</string>
-    <string name="msg_yesterday">Yesterday</string>
-    <string name="msg_tracker_list_date_format">MMMM dd</string>
     <string name="msg_tracker_list_time_format">hh:mm a</string>
 
 

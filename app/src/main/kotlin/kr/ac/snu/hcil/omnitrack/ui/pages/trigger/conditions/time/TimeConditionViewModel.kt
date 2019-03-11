@@ -5,11 +5,11 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.onNextIfDifferAndNotNull
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.ITriggerAlarmController
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerConditionViewModel
-import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import javax.inject.Inject
 
 /**

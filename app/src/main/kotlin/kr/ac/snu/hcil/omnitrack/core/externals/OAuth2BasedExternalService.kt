@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.content.Context
+import android.content.SharedPreferences
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -12,25 +13,25 @@ import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 /**
  * Created by Young-Ho Kim on 16. 9. 3
  */
-abstract class OAuth2BasedExternalService(context: Context, identifier: String, minimumSDK: Int) : OTExternalService(context, identifier, minimumSDK), OAuth2Client.OAuth2CredentialRefreshedListener {
+abstract class OAuth2BasedExternalService(context: Context, preferences: SharedPreferences, identifier: String, minimumSDK: Int) : OTExternalService(context, preferences, identifier, minimumSDK), OAuth2Client.OAuth2CredentialRefreshedListener {
 
     protected val authClient: OAuth2Client by lazy {
         makeNewAuth2Client()
     }
 
     var credential: OAuth2Client.Credential?
-        get() = OAuth2Client.Credential.restore(externalServiceManager.get().preferences, identifier)
+        get() = OAuth2Client.Credential.restore(preferences, identifier)
         set(value) {
             if (value != null)
-                value.store(externalServiceManager.get().preferences, identifier)
+                value.store(preferences, identifier)
             else {
-                credential?.remove(externalServiceManager.get().preferences, identifier)
+                credential?.remove(preferences, identifier)
             }
         }
 
     override fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
         return super.onRegisterDependencies() + arrayOf(
-                OAuth2LoginDependencyResolver(authClient, identifier, externalServiceManager.get().preferences, context.resources.getString(nameResourceId))
+                OAuth2LoginDependencyResolver(authClient, identifier, preferences, context.resources.getString(nameResourceId))
 
         )
     }

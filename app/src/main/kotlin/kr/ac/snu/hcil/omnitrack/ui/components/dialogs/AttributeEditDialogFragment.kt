@@ -11,6 +11,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProviders
 import com.afollestad.materialdialogs.MaterialDialog
+import dagger.Lazy
 import dagger.internal.Factory
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -18,6 +19,7 @@ import io.reactivex.disposables.SerialDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.Realm
 import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.onNextIfDifferAndNotNull
 import kr.ac.snu.hcil.android.common.view.container.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -27,8 +29,8 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactoryManager
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
-import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import javax.inject.Inject
 
 /**
@@ -75,6 +77,9 @@ class AttributeEditDialogFragment : DialogFragment() {
 
     @Inject
     lateinit var dbManager: BackendDbManager
+
+    @Inject
+    lateinit var attributeViewFActoryManager: Lazy<AttributeViewFactoryManager>
 
     private val subscriptions = CompositeDisposable()
 
@@ -267,7 +272,8 @@ class AttributeEditDialogFragment : DialogFragment() {
         val attributeName = BehaviorSubject.create<String>()
 
         fun makeItemView(context: Context, originalView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
-            val view = attribute.getHelper(getApplication()).getInputView(context, false, attribute, originalView)
+            val view = (context.applicationContext as OTAndroidApp).applicationComponent
+                    .getAttributeViewFactoryManager().get(attribute.type).getInputView(context, false, attribute, originalView)
             view.boundAttributeObjectId = attribute.objectId
             return view
         }

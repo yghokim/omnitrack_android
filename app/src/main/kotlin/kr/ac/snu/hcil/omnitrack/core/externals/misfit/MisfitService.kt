@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.fragment.app.FragmentActivity
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -15,7 +16,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 /**
  * Created by Young-Ho on 9/1/2016.
  */
-class MisfitService(context: Context) : OTExternalService(context, "MisfitService", 0) {
+class MisfitService(context: Context, pref: SharedPreferences) : OTExternalService(context, pref, "MisfitService", 0) {
 
     companion object {
         const val PREFERENCE_ACCESS_TOKEN = "misfit_access_token"
@@ -34,14 +35,14 @@ class MisfitService(context: Context) : OTExternalService(context, "MisfitServic
     }
 
     fun getStoredAccessToken(): String? {
-        if (externalServiceManager.get().preferences.contains(PREFERENCE_ACCESS_TOKEN)) {
-            return externalServiceManager.get().preferences.getString(PREFERENCE_ACCESS_TOKEN, "")
+        if (preferences.contains(PREFERENCE_ACCESS_TOKEN)) {
+            return preferences.getString(PREFERENCE_ACCESS_TOKEN, "")
         } else return null
     }
 
     override fun onDeactivate(): Completable {
         return Completable.defer {
-            externalServiceManager.get().preferences.edit().remove(PREFERENCE_ACCESS_TOKEN).apply()
+            preferences.edit().remove(PREFERENCE_ACCESS_TOKEN).apply()
             return@defer Completable.complete()
         }
     }
@@ -76,7 +77,7 @@ class MisfitService(context: Context) : OTExternalService(context, "MisfitServic
         override fun tryResolve(activity: FragmentActivity): Single<Boolean> {
             return parentService.api.authorize(activity).doOnSuccess {
                 token ->
-                parentService.externalServiceManager.get().preferences.edit().putString(MisfitService.PREFERENCE_ACCESS_TOKEN, token).apply()
+                parentService.preferences.edit().putString(MisfitService.PREFERENCE_ACCESS_TOKEN, token).apply()
             }.map { token -> !token.isBlank() }.onErrorReturn { err -> false }
         }
 

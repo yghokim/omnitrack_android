@@ -6,6 +6,7 @@ import com.google.gson.JsonObject
 import io.reactivex.Maybe
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.android.common.containers.AnyValueWithTimestamp
+import kr.ac.snu.hcil.android.common.onNextIfDifferAndNotNull
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
@@ -14,7 +15,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTItemBuilderD
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTItemBuilderFieldValueEntry
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
-import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import java.util.*
 
 /**

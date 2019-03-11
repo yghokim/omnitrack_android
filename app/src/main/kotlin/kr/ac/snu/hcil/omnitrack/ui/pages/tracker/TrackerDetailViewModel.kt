@@ -14,6 +14,7 @@ import io.realm.Realm
 import io.realm.RealmChangeListener
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.move
+import kr.ac.snu.hcil.android.common.onNextIfDifferAndNotNull
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
@@ -40,7 +41,6 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionAsObservable
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
-import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import org.jetbrains.anko.collections.forEachWithIndex
 import java.util.*
 import javax.inject.Inject
@@ -692,7 +692,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 }
             }
 
-            val helper = attributeManager.getAttributeHelper(editedDao.type)
+            val helper = attributeManager.get(editedDao.type)
             icon = helper.getTypeSmallIconResourceId(editedDao)
             if (changed) {
                 onPropertyChanged.onNext(System.currentTimeMillis())

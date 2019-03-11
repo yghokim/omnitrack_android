@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msg_go_to_store">스토어로 가기</string>
+
+    <string name="msg_format_third_party_app_dependency_fatal_failed_message"><b>%1$s</b> 앱이 설치되어 있지 않습니다.</string>
+    <string name="msg_format_third_party_app_dependency_passed_message"><b>%1$s</b> 앱이 설치되어 있습니다.</string>
+    <string name="msg_format_third_party_app_dependency_non_fatal_failed_message"><b>%1$s</b> 앱이 설치되어 있지 않습니다. 이 디바이스에서 측정된 값을 가져오려면 앱을 설치하고 활성화해야 합니다.</string>
+
+    <string name="msg_sign_in">로그인</string>
+
+    <string name="msg_format_dependency_sign_in_passed"><b>%1$s</b> 서비스에 로그인되어 있습니다.</string>
+    <string name="msg_format_dependency_sign_in_failed"><b>%1$s</b> 서비스에 로그인되어 있지 않습니다.</string>
+
+</resources>

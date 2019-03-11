@@ -25,7 +25,6 @@ import kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions.RealmLaz
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
@@ -48,6 +47,7 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ColorPaletteView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioItemListView
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactoryManager
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AudioRecordInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView
@@ -137,6 +137,8 @@ interface ApplicationComponent {
 
     fun getTriggerSystemManager(): Lazy<OTTriggerSystemManager>
 
+    fun getAttributeViewFactoryManager(): AttributeViewFactoryManager
+
 
     @ServerFullSync
     fun getFullSyncPeriodicRequestProvider(): Provider<PeriodicWorkRequest>
@@ -153,8 +155,6 @@ interface ApplicationComponent {
 
     fun inject(view: ColorPaletteView)
     fun inject(drawer: MultiLineChartDrawer)
-
-    fun inject(externalService: OTExternalService)
 
     fun inject(panel: DataDrivenTriggerConfigurationPanel)
     fun inject(page: SourceSelectionPage)

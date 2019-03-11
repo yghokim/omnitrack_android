@@ -1,8 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.content.Context
-import android.view.View
-import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.android.common.containers.UniqueStringEntryList
 import kr.ac.snu.hcil.omnitrack.R
@@ -16,9 +14,6 @@ import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.ChoiceCategoricalBarChartModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
-import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.WordListView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
 import java.util.*
 
 /**
@@ -86,73 +81,17 @@ class OTChoiceAttributeHelper(context: Context) : OTAttributeHelper(context) {
         }
     }
 
-    private fun getIsMultiSelectionAllowed(attribute: OTAttributeDAO): Boolean? {
+    fun getIsMultiSelectionAllowed(attribute: OTAttributeDAO): Boolean? {
         return getDeserializedPropertyValue<Boolean>(PROPERTY_MULTISELECTION, attribute)
     }
 
-    private fun getIsAppendingFromViewAllowed(attribute: OTAttributeDAO): Boolean {
+    fun getIsAppendingFromViewAllowed(attribute: OTAttributeDAO): Boolean {
         return getDeserializedPropertyValue<Boolean>(PROPERTY_ALLOW_APPENDING_FROM_VIEW, attribute)
                 ?: false
     }
 
     fun getChoiceEntries(attribute: OTAttributeDAO): UniqueStringEntryList? {
         return getDeserializedPropertyValue(PROPERTY_ENTRIES, attribute)
-    }
-
-    override fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int = AAttributeInputView.VIEW_TYPE_CHOICE
-
-    override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
-        if (inputView is ChoiceInputView) {
-            inputView.entries = getChoiceEntries(attribute)?.toArray() ?: emptyArray()
-            inputView.multiSelectionMode = getIsMultiSelectionAllowed(attribute) == true
-            inputView.allowAppendingFromView = getIsAppendingFromViewAllowed(attribute)
-        }
-    }
-
-    override fun getInputView(context: Context, previewMode: Boolean, attribute: OTAttributeDAO, recycledView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
-        val inputView = super.getInputView(context, previewMode, attribute, recycledView)
-        if (inputView is ChoiceInputView) {
-            if (inputView.entries.isEmpty()) {
-                inputView.entries = (propertyManager.getHelper(OTPropertyManager.EPropertyType.ChoiceEntryList) as OTChoiceEntryListPropertyHelper).previewChoiceEntries
-            }
-        }
-
-        return inputView
-    }
-
-    override fun getViewForItemList(attribute: OTAttributeDAO, context: Context, recycledView: View?): View {
-        val target: WordListView = recycledView as? WordListView ?: WordListView(context)
-
-        target.useColors = true
-
-        return target
-    }
-
-    override fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {
-        return Single.defer {
-            if (view is WordListView) {
-                view.colorIndexList.clear()
-
-                if (value is IntArray && value.size > 0) {
-                    val entries = getChoiceEntries(attribute)
-                    if (entries != null) {
-                        val list = ArrayList<String>()
-                        for (idEntry in value.withIndex()) {
-                            val indexInEntries = entries.indexOf(idEntry.value)
-                            if (indexInEntries >= 0) {
-                                list.add(entries[indexInEntries].text)
-                                view.colorIndexList.add(indexInEntries)
-                            }
-                        }
-
-                        view.words = list.toTypedArray()
-                    }
-                } else {
-                    view.words = arrayOf()
-                }
-                Single.just(true)
-            } else super.applyValueToViewForItemList(attribute, value, view)
-        }
     }
 
     override fun makeRecommendedChartModels(attribute: OTAttributeDAO, realm: Realm): Array<ChartModel<*>> {

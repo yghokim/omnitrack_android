@@ -9,6 +9,7 @@ import io.realm.OrderedRealmCollectionChangeListener
 import io.realm.RealmResults
 import io.realm.Sort
 import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.onNextIfDifferAndNotNull
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
@@ -22,7 +23,6 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
-import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import javax.inject.Inject
 
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")

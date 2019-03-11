@@ -257,11 +257,7 @@ open class OTAttributeDAO : RealmObject() {
     }
 
     fun getHelper(context: Context): OTAttributeHelper {
-        return (context.applicationContext as OTAndroidApp).applicationComponent.getAttributeManager().getAttributeHelper(type)
-    }
-
-    fun getInputViewType(context: Context, previewMode: Boolean): Int {
-        return getHelper(context).getInputViewType(previewMode, this)
+        return (context.applicationContext as OTAndroidApp).applicationComponent.getAttributeManager().get(type)
     }
 
     fun initialize(context: Context) {

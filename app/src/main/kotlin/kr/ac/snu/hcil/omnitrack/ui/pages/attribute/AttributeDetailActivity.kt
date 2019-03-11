@@ -29,6 +29,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactoryManager
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
@@ -50,6 +51,10 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     @Inject
     lateinit var attributeManager: OTAttributeManager
+
+    @Inject
+    lateinit var attributeViewFactoryManager: Lazy<AttributeViewFactoryManager>
+
     @Inject
     lateinit var serializationManager: Lazy<DaoSerializationManager>
 
@@ -189,14 +194,14 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                 viewModel.typeObservable.subscribe { type ->
                     println("type changed: $type")
                     try {
-                        val attrHelper = attributeManager.getAttributeHelper(type)
+                        val attrHelper = attributeManager.get(type)
                         ui_recyclerview_with_fallback.removeAllViewsInLayout()
 
                         val layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
 
                         propertyViewList.clear()
-                        for (entryWithIndex in attrHelper.makePropertyViews(this).withIndex()) {
+                        for (entryWithIndex in attributeViewFactoryManager.get().get(type).makePropertyViews(this).withIndex()) {
                             println("setting property view for ${entryWithIndex.value.first}")
                             val entry = entryWithIndex.value
 

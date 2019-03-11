@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.google.fit
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.Api
@@ -24,7 +25,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 16. 8. 8
  */
-class GoogleFitService(context: Context) : OTExternalService(context, "GoogleFitService", 19) {
+class GoogleFitService(context: Context, pref: SharedPreferences) : OTExternalService(context, pref, "GoogleFitService", 19) {
 
     override fun isSupportedInSystem(): Boolean {
         return true

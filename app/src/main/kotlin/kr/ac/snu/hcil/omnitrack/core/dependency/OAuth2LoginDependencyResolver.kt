@@ -9,7 +9,6 @@ import kr.ac.snu.hcil.android.common.TextHelper
 import kr.ac.snu.hcil.android.common.net.AuthConstants
 import kr.ac.snu.hcil.android.common.net.OAuth2Client
 import kr.ac.snu.hcil.android.common.net.WebServiceLoginActivity
-import kr.ac.snu.hcil.omnitrack.R
 import okhttp3.HttpUrl
 import rx_activity_result2.RxActivityResult
 
@@ -23,7 +22,7 @@ class OAuth2LoginDependencyResolver(val authClient: OAuth2Client, val identifier
             if (credential != null) {
                 return@defer Single.just(DependencyCheckResult(DependencyState.Passed, TextHelper.fromHtml(TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_passed, serviceName)), ""))
             } else {
-                return@defer Single.just(DependencyCheckResult(DependencyState.FatalFailed, TextHelper.fromHtml(TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_failed, serviceName)), authClient.context.getString(R.string.msg_sign_in)))
+                return@defer Single.just(DependencyCheckResult(DependencyState.FatalFailed, TextHelper.fromHtml(TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_failed, serviceName)), authClient.context.getString(kr.ac.snu.hcil.omnitrack.core.dependency.R.string.msg_sign_in)))
             }
         }
     }

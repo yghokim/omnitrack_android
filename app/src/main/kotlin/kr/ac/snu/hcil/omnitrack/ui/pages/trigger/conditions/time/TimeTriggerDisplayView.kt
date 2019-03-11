@@ -15,8 +15,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import butterknife.bindView
+import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.util.regex.Pattern
 import kotlin.properties.Delegates
 

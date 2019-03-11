@@ -1,13 +1,9 @@
-package kr.ac.snu.hcil.omnitrack.utils.time
+package kr.ac.snu.hcil.omnitrack.core.triggers.logic.scheduling
 
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.android.common.containers.WritablePair
-import kr.ac.snu.hcil.android.common.time.getDayOfWeek
-import kr.ac.snu.hcil.android.common.time.getHourOfDay
-import kr.ac.snu.hcil.android.common.time.getYear
-import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.utils.toDatetimeString
+import kr.ac.snu.hcil.android.common.time.*
 import java.io.UnsupportedEncodingException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -209,10 +205,11 @@ class ExperienceSamplingTimeScheduleCalculator(
             cacheCal.add(Calendar.DAY_OF_YEAR, 1)
         } while (result == null)
 
+        /*
         OTApp.logger.writeSystemLog("EMA trigger calculation: Last: ${last?.toDatetimeString()
                 ?: "null"}, now: ${now.toDatetimeString()} " +
                 "EMA trigger timestamp list: \n" + currentRandomPoints.joinToString("\n") { it.toDatetimeString() } + "\npicked timestamp: " + result.pingIndex, TAG)
-
+*/
         return result
     }
 

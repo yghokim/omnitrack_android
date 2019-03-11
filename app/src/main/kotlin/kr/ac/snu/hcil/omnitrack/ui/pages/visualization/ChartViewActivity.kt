@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -25,7 +26,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDivider
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.IChartView
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.NativeChartView
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.WebBasedChartView
-import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 
 class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_view), View.OnClickListener {
 

@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import androidx.fragment.app.Fragment
 import io.reactivex.Completable
@@ -9,28 +10,21 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.android.common.INameDescriptionResourceProvider
-import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.PermissionDependencyResolver
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ExternalServiceActivationActivity
 import rx_activity_result2.RxActivityResult
 import java.util.*
-import javax.inject.Inject
-import javax.inject.Provider
 
 /**
  * Created by younghokim on 16. 7. 28..
  */
-abstract class OTExternalService(val context: Context, val identifier: String, val minimumSDK: Int) : INameDescriptionResourceProvider {
+abstract class OTExternalService(val context: Context, val preferences: SharedPreferences, val identifier: String, val minimumSDK: Int) : INameDescriptionResourceProvider {
 
 
     enum class ServiceState {
         DEACTIVATED, ACTIVATING, ACTIVATED
     }
-
-
-    @Inject
-    protected lateinit var externalServiceManager: Provider<OTExternalServiceManager>
 
     open val isInternetRequiredForActivation = true
 
@@ -65,14 +59,19 @@ abstract class OTExternalService(val context: Context, val identifier: String, v
     val onStateChanged: BehaviorSubject<ServiceState> = BehaviorSubject.create<ServiceState>().apply { onNext(ServiceState.DEACTIVATED) }
 
     init {
-
-        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
-
-        state = if (externalServiceManager.get().getIsActivatedFlag(identifier) == true) {
+        state = if (getIsActivatedFlag(identifier) == true) {
             ServiceState.ACTIVATED
         } else {
             ServiceState.DEACTIVATED
         }
+    }
+
+    fun getIsActivatedFlag(serviceIdentifier: String): Boolean {
+        return preferences.getBoolean(serviceIdentifier + "_activated", false)
+    }
+
+    fun setIsActivatedFlag(service: OTExternalService, isActivated: Boolean) {
+        preferences.edit().putBoolean(service.identifier + "_activated", isActivated).apply()
     }
 
     internal fun initialize() {
@@ -105,10 +104,10 @@ abstract class OTExternalService(val context: Context, val identifier: String, v
                 .doOnSuccess {
                     result ->
                     if (result == true) {
-                        externalServiceManager.get().setIsActivatedFlag(this, true)
+                        setIsActivatedFlag(this, true)
                         state = ServiceState.ACTIVATED
                     } else {
-                        externalServiceManager.get().setIsActivatedFlag(this, false)
+                        setIsActivatedFlag(this, false)
                         state = ServiceState.DEACTIVATED
                     }
                 }
@@ -127,7 +126,7 @@ abstract class OTExternalService(val context: Context, val identifier: String, v
 
     fun deactivate(): Completable {
         return Completable.defer {
-            externalServiceManager.get().setIsActivatedFlag(this, false)
+            setIsActivatedFlag(this, false)
             state = ServiceState.DEACTIVATED
             onDeactivate()
         }

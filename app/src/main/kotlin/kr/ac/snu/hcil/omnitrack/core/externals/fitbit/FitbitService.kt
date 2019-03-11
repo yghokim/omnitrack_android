@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
 import android.content.Context
+import android.content.SharedPreferences
 import kr.ac.snu.hcil.android.common.net.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
@@ -12,7 +13,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 /**
  * Created by younghokim on 16. 9. 2..
  */
-class FitbitService(context: Context) : OAuth2BasedExternalService(context, "FitbitService", 0) {
+class FitbitService(context: Context, pref: SharedPreferences) : OAuth2BasedExternalService(context, pref, "FitbitService", 0) {
     companion object {
         const val SCOPE_ACTIVITY = "activity"
         const val SCOPE_HEARTRATE = "heartrate"

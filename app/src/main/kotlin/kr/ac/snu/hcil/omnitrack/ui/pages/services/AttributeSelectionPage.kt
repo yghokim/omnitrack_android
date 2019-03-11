@@ -160,7 +160,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
         }
 
         fun bind(attributeDao: OTAttributeDAO) {
-            val helper = attributeManager.getAttributeHelper(attributeDao.type)
+            val helper = attributeManager.get(attributeDao.type)
             icon.setImageResource(helper.getTypeSmallIconResourceId(attributeDao))
             this.attributeDao = attributeDao
             textView.text = attributeDao.name
@@ -187,27 +187,27 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
 
                 AttributePresetInfo(OTAttributeManager.TYPE_TIME, R.drawable.field_icon_time_hour, context.getString(R.string.type_timepoint_time_name), context.getString(R.string.type_timepoint_time_desc),
                         { dao, realm ->
-                            attributeManager.getAttributeHelper(OTAttributeManager.TYPE_TIME)
+                            attributeManager.get(OTAttributeManager.TYPE_TIME)
                                     .setPropertyValue(OTTimeAttributeHelper.GRANULARITY, OTTimeAttributeHelper.GRANULARITY_MINUTE, dao, realm)
                             dao
                         }),
 
                 AttributePresetInfo(OTAttributeManager.TYPE_TIME, R.drawable.field_icon_time_date, context.getString(R.string.type_timepoint_date_name), context.getString(R.string.type_timepoint_date_desc),
                         { dao, realm ->
-                            attributeManager.getAttributeHelper(OTAttributeManager.TYPE_TIME)
+                            attributeManager.get(OTAttributeManager.TYPE_TIME)
                                     .setPropertyValue(OTTimeAttributeHelper.GRANULARITY, OTTimeAttributeHelper.GRANULARITY_DAY, dao, realm)
                             dao
                         }),
 
                 AttributePresetInfo(OTAttributeManager.TYPE_TIMESPAN, R.drawable.field_icon_timer, context.getString(R.string.type_timespan_name), context.getString(R.string.type_timespan_desc),
                         { dao, realm ->
-                            attributeManager.getAttributeHelper(OTAttributeManager.TYPE_TIMESPAN)
+                            attributeManager.get(OTAttributeManager.TYPE_TIMESPAN)
                                     .setPropertyValue(OTTimeSpanAttributeHelper.PROPERTY_GRANULARITY, OTTimeSpanAttributeHelper.GRANULARITY_MINUTE, dao, realm)
                             dao
                         }),
                 AttributePresetInfo(OTAttributeManager.TYPE_TIMESPAN, R.drawable.field_icon_time_range_date, context.getString(R.string.type_timespan_date_name), context.getString(R.string.type_timespan_date_desc),
                         { dao, realm ->
-                            attributeManager.getAttributeHelper(OTAttributeManager.TYPE_TIMESPAN)
+                            attributeManager.get(OTAttributeManager.TYPE_TIMESPAN)
                                     .setPropertyValue(OTTimeSpanAttributeHelper.PROPERTY_GRANULARITY, OTTimeSpanAttributeHelper.GRANULARITY_DAY, dao, realm)
                             dao
                         }),
@@ -217,14 +217,14 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
 
                 AttributePresetInfo(OTAttributeManager.TYPE_CHOICE, R.drawable.field_icon_singlechoice, context.getString(R.string.type_single_choice_name), context.getString(R.string.type_single_choice_desc),
                         { dao, realm ->
-                            attributeManager.getAttributeHelper(OTAttributeManager.TYPE_CHOICE)
+                            attributeManager.get(OTAttributeManager.TYPE_CHOICE)
                                     .setPropertyValue(OTChoiceAttributeHelper.PROPERTY_MULTISELECTION, false, dao, realm)
                             dao
                         }),
 
                 AttributePresetInfo(OTAttributeManager.TYPE_CHOICE, R.drawable.field_icon_multiplechoice, context.getString(R.string.type_multiple_choices_name), context.getString(R.string.type_multiple_choices_desc),
                         { dao, realm ->
-                            attributeManager.getAttributeHelper(OTAttributeManager.TYPE_CHOICE)
+                            attributeManager.get(OTAttributeManager.TYPE_CHOICE)
                                     .setPropertyValue(OTChoiceAttributeHelper.PROPERTY_MULTISELECTION, true, dao, realm)
                             dao
                         })

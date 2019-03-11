@@ -19,6 +19,7 @@ import com.github.salomonbrys.kotson.set
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import dagger.Lazy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
@@ -52,6 +53,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactoryManager
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.verticalMargin
 import java.text.SimpleDateFormat
@@ -76,6 +78,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     @Inject
     lateinit var attributeManager: OTAttributeManager
+
+    @Inject
+    lateinit var attributeViewFactoryManager: Lazy<AttributeViewFactoryManager>
 
     private lateinit var viewModel: ItemListViewModel
 
@@ -477,7 +482,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 monthView.text = String.format(Locale.US, "%tb", cal)
                 dayView.text = cal.getDayOfMonth().toString()
 
-                var text = "${itemVM.loggingSource.sourceText(this@ItemBrowserActivity)}\n${(attributeManager.getAttributeHelper(OTAttributeManager.TYPE_TIME) as OTTimeAttributeHelper).formats[OTTimeAttributeHelper.GRANULARITY_MINUTE]!!.format(Date(itemVM.timestamp))}"
+                var text = "${itemVM.loggingSource.sourceText(this@ItemBrowserActivity)}\n${(attributeManager.get(OTAttributeManager.TYPE_TIME) as OTTimeAttributeHelper).formats[OTTimeAttributeHelper.GRANULARITY_MINUTE]!!.format(Date(itemVM.timestamp))}"
 
                 if (itemVM.timezone != null) {
                     text += " (${cal.timeZone.displayName})"
@@ -524,7 +529,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                 override fun getItemViewType(position: Int): Int {
                     if (this@ItemElementViewHolder.adapterPosition != -1 && getParent().getItemValueOf(viewModel.attributes[position].localId) != null)
-                        return viewModel.attributes[position].getHelper(this@ItemBrowserActivity).getViewForItemListContainerType()
+                        return attributeViewFactoryManager.get().get(viewModel.attributes[position].type).getViewForItemListContainerType()
                     else return 5
                 }
 
@@ -602,14 +607,14 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                         val itemValue = getParent().getItemValueOf(attribute.localId)
                         if (itemValue != null) {
-                            val newValueView = attribute.getHelper(this@ItemBrowserActivity).getViewForItemList(attribute, this@ItemBrowserActivity, valueView)
+                            val newValueView = attributeViewFactoryManager.get().get(attribute.type).getViewForItemList(attribute, this@ItemBrowserActivity, valueView)
                             if (newValueView is IActivityLifeCycle && newValueView !== valueView) {
                                 newValueView.onCreate(null)
                             }
                             newValueView.setOnClickListener(this)
                             changeNewValueView(newValueView)
 
-                            valueApplySubscription.set(attribute.getHelper(this@ItemBrowserActivity).applyValueToViewForItemList(attribute, itemValue, valueView).subscribe({
+                            valueApplySubscription.set(attributeViewFactoryManager.get().get(attribute.type).applyValueToViewForItemList(this@ItemBrowserActivity, attribute, itemValue, valueView).subscribe({
 
                             }, {
                             }))

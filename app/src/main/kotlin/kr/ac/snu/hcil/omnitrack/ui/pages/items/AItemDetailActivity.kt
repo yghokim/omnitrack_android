@@ -264,7 +264,8 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
         }
 
         override fun getItemViewType(position: Int): Int {
-            return getItem(position).attributeDAO.getInputViewType(this@AItemDetailActivity, false)
+            val attr = getItem(position).attributeDAO
+            return (applicationContext as OTAndroidApp).applicationComponent.getAttributeViewFactoryManager().get(attr.type).getInputViewType(false, attr)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -379,7 +380,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
                 internalSubscriptions.clear()
 
-                attributeViewModel.attributeDAO.getHelper(this@AItemDetailActivity).refreshInputViewUI(inputView, attributeViewModel.attributeDAO)
+                (applicationContext as OTAndroidApp).applicationComponent.getAttributeViewFactoryManager().get(attributeViewModel.attributeDAO.type).refreshInputViewUI(inputView, attributeViewModel.attributeDAO)
                 internalSubscriptions.add(
                         attributeViewModel.columnNameObservable.subscribe { name ->
                             columnNameView.text = name
@@ -411,7 +412,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
                 internalSubscriptions.add(
                         attributeViewModel.onAttributeChanged.subscribe {
-                            attributeViewModel.attributeDAO.getHelper(this@AItemDetailActivity).refreshInputViewUI(inputView, attributeViewModel.attributeDAO)
+                            (applicationContext as OTAndroidApp).applicationComponent.getAttributeViewFactoryManager().get(attributeViewModel.attributeDAO.type).refreshInputViewUI(inputView, attributeViewModel.attributeDAO)
                         }
                 )
 

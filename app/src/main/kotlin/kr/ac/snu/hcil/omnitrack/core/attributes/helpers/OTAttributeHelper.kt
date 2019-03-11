@@ -1,19 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.content.Context
-import android.view.View
-import android.widget.TextView
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
 import io.realm.Sort
-import kr.ac.snu.hcil.android.common.TextHelper
 import kr.ac.snu.hcil.android.common.containers.Nullable
-import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
@@ -22,12 +17,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.PropertyViewFactory
-import java.util.ArrayList
-import kotlin.collections.HashMap
-import kotlin.collections.LinkedHashMap
 import kotlin.collections.set
 
 /**
@@ -35,7 +24,7 @@ import kotlin.collections.set
  */
 abstract class OTAttributeHelper(protected val context: Context) {
 
-    protected val propertyManager: OTPropertyManager
+    val propertyManager: OTPropertyManager
         get() = (context.applicationContext as OTAndroidApp).applicationComponent.getPropertyManager()
 
     val FALLBACK_POLICY_RESOLVER_EMPTY_VALUE = object : FallbackPolicyResolver(context.applicationContext, R.string.msg_empty_value) {
@@ -147,23 +136,6 @@ abstract class OTAttributeHelper(protected val context: Context) {
         throw IllegalAccessException("Must not reach here.")
     }
 
-    open fun makePropertyView(propertyKey: String, context: Context): APropertyView<out Any> {
-        val view = PropertyViewFactory.makeView(getPropertyHelper<Any>(propertyKey), context)
-        view.title = getPropertyTitle(propertyKey)
-        val initialValue = getPropertyInitialValue(propertyKey)
-        if (initialValue != null)
-            view.value = initialValue
-        return view
-    }
-
-    open fun makePropertyViews(context: Context): Collection<Pair<String, View>> {
-        val result = ArrayList<Pair<String, View>>()
-        for (key in propertyKeys) {
-            result.add(Pair(key, makePropertyView(key, context)))
-        }
-        return result
-    }
-
     //Input Values=======================================================================================================
 
     open fun isAttributeValueVolatile(attribute: OTAttributeDAO): Boolean {
@@ -184,55 +156,8 @@ abstract class OTAttributeHelper(protected val context: Context) {
         }
     }
 
-    //Input View=========================================================================================================
-    abstract fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int
-
-    open fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {}
-    //reuse recycled view if possible.
-    open fun getInputView(context: Context, previewMode: Boolean, attribute: OTAttributeDAO, recycledView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
-        val view =
-                if ((recycledView?.typeId == getInputViewType(previewMode, attribute))) {
-                    recycledView
-                } else {
-                    AAttributeInputView.makeInstance(getInputViewType(previewMode, attribute), context)
-                }
-
-        refreshInputViewUI(view, attribute)
-        view.previewMode = previewMode
-        return view
-    }
-
-    //Item list view==========================================================================================================================
     open fun formatAttributeValue(attribute: OTAttributeDAO, value: Any): CharSequence {
         return value.toString()
-    }
-
-    open fun getViewForItemListContainerType(): Int {
-        return OTAttributeManager.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE
-    }
-
-    open fun getViewForItemList(attribute: OTAttributeDAO, context: Context, recycledView: View?): View {
-
-        val target: TextView = recycledView as? TextView ?: TextView(context)
-
-        InterfaceHelper.setTextAppearance(target, R.style.viewForItemListTextAppearance)
-
-        target.background = null
-
-        return target
-    }
-
-    open fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {
-        return Single.defer<Boolean> {
-            if (view is TextView) {
-                if (value != null) {
-                    view.text = TextHelper.stringWithFallback(formatAttributeValue(attribute, value), "-")
-                } else {
-                    view.text = view.context.getString(R.string.msg_empty_value)
-                }
-                Single.just(true)
-            } else Single.just(false)
-        }
     }
 
     //Configuration=======================================================================================

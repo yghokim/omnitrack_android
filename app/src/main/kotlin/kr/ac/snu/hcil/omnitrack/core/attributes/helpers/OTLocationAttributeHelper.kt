@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 import android.Manifest
 import android.content.Context
 import android.location.Location
-import android.view.View
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.model.LatLng
 import com.patloew.rxlocation.RxLocation
@@ -13,12 +12,9 @@ import io.realm.Realm
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
-import kr.ac.snu.hcil.omnitrack.ui.components.common.LiteMapView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import java.util.concurrent.TimeUnit
 
 /**
@@ -74,8 +70,6 @@ class OTLocationAttributeHelper(context: Context) : OTAttributeHelper(context) {
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_LATITUDE_LONGITUDE
 
-    override fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int = AAttributeInputView.VIEW_TYPE_LOCATION
-
     override fun formatAttributeValue(attribute: OTAttributeDAO, value: Any): CharSequence {
         return if (value is LatLng) {
             "${Location.convert(value.latitude, Location.FORMAT_DEGREES)},${Location.convert(value.longitude, Location.FORMAT_DEGREES)}"
@@ -84,25 +78,5 @@ class OTLocationAttributeHelper(context: Context) : OTAttributeHelper(context) {
 
     override fun initialize(attribute: OTAttributeDAO) {
         attribute.fallbackValuePolicy = OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE
-    }
-
-    //item list===========================================================================
-    override fun getViewForItemListContainerType(): Int {
-        return OTAttributeManager.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE
-    }
-
-    override fun getViewForItemList(attribute: OTAttributeDAO, context: Context, recycledView: View?): View {
-        return recycledView as? LiteMapView ?: LiteMapView(context)
-    }
-
-    override fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {
-        return Single.defer {
-            if (view is LiteMapView && value != null) {
-                if (value is LatLng) {
-                    view.location = value
-                    Single.just(true)
-                } else Single.just(false)
-            } else super.applyValueToViewForItemList(attribute, value, view)
-        }
     }
 }

@@ -78,7 +78,7 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm, va
                 synchronized(data) {
                     data.clear()
                     for (categoryId in categoriesCache) {
-                        val entry = (attributeManager.getAttributeHelper(OTAttributeManager.TYPE_CHOICE) as OTChoiceAttributeHelper).getChoiceEntries(attribute)?.findWithId(categoryId)
+                        val entry = (attributeManager.get(OTAttributeManager.TYPE_CHOICE) as OTChoiceAttributeHelper).getChoiceEntries(attribute)?.findWithId(categoryId)
                         println("entry: ${entry?.text}, count: ${counterDictCache[categoryId]}")
                         if (entry != null) {
                             println("entry add")

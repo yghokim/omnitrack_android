@@ -46,3 +46,11 @@ fun Calendar.setHourOfDay(hour: Int, cutUnder: Boolean = false) {
         set(Calendar.MILLISECOND, 0)
     }
 }
+
+fun Long.toDatetimeString(): String {
+    return TimeHelper.FORMAT_ISO_8601.format(Date(this))
+}
+
+fun Long.toDateString(): String {
+    return TimeHelper.FORMAT_YYYY_MM_DD.format(Date(this))
+}

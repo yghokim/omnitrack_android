@@ -22,11 +22,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.core.types.TimePoint
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
-import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DateTimePicker
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -89,8 +84,6 @@ class OTTimeAttributeHelper(context: Context) : OTAttributeHelper(context) {
 
     override val propertyKeys: Array<String> = arrayOf(GRANULARITY)
 
-    override fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int = AAttributeInputView.VIEW_TYPE_TIME_POINT
-
     override fun <T> getPropertyHelper(propertyKey: String): OTPropertyHelper<T> {
         return when (propertyKey) {
             GRANULARITY -> propertyManager.getHelper(OTPropertyManager.EPropertyType.Selection)
@@ -112,32 +105,11 @@ class OTTimeAttributeHelper(context: Context) : OTAttributeHelper(context) {
         }
     }
 
-    override fun makePropertyView(propertyKey: String, context: Context): APropertyView<out Any> {
-        val superView = super.makePropertyView(propertyKey, context)
-        if (propertyKey == GRANULARITY && superView is SelectionPropertyView) {
-            superView.setEntries(arrayOf(context.resources.getString(R.string.property_time_granularity_day),
-                    context.resources.getString(R.string.property_time_granularity_minute),
-                    context.resources.getString(R.string.property_time_granularity_second)
-
-            ))
-        }
-
-        return superView
-    }
 
     fun getGranularity(attribute: OTAttributeDAO): Int {
         return getDeserializedPropertyValue<Int>(GRANULARITY, attribute) ?: GRANULARITY_SECOND
     }
 
-    override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
-        if (inputView is TimePointInputView) {
-            when (getGranularity(attribute)) {
-                GRANULARITY_DAY -> inputView.setPickerMode(DateTimePicker.DATE)
-                GRANULARITY_MINUTE -> inputView.setPickerMode(DateTimePicker.MINUTE)
-                GRANULARITY_SECOND -> inputView.setPickerMode(DateTimePicker.SECOND)
-            }
-        }
-    }
 
     override fun initialize(attribute: OTAttributeDAO) {
         attribute.fallbackValuePolicy = OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE

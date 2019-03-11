@@ -1,10 +1,9 @@
-package kr.ac.snu.hcil.omnitrack.utils.time
+package kr.ac.snu.hcil.android.common.time
 
 import android.content.Context
 import android.text.format.DateUtils
 import kr.ac.snu.hcil.android.common.BitwiseOperationHelper
-import kr.ac.snu.hcil.android.common.time.*
-import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.android.common.R
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -146,7 +145,7 @@ object TimeHelper {
             if (yesterdayCal.getYear() == cal.getYear() && yesterdayCal.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR)) {
                 return context.resources.getString(R.string.msg_yesterday)
             } else {
-                return SimpleDateFormat(context.resources.getString(R.string.msg_tracker_list_date_format)).format(cal.time)
+                return SimpleDateFormat(context.resources.getString(R.string.msg_simple_date_format)).format(cal.time)
             }
         }
     }
@@ -236,9 +235,9 @@ object TimeHelper {
 
     fun getDayOfWeekName(date: Date, length: Length): CharSequence {
         return when (length) {
-            Length.FULL -> DAY_OF_WEEK_FULL_FORMAT.format(date)
-            Length.SHORT -> DAY_OF_WEEK_SHORT_FORMAT.format(date)
-            Length.SHORTEST -> DAY_OF_WEEK_SHORT_FORMAT.format(date)
+            TimeHelper.Length.FULL -> DAY_OF_WEEK_FULL_FORMAT.format(date)
+            TimeHelper.Length.SHORT -> DAY_OF_WEEK_SHORT_FORMAT.format(date)
+            TimeHelper.Length.SHORTEST -> DAY_OF_WEEK_SHORT_FORMAT.format(date)
         }
     }
 

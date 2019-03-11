@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 
 import android.content.Context
+import android.content.SharedPreferences
 import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.net.AuthConstants
@@ -17,7 +18,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-02.
  */
-class RescueTimeService(context: Context) : OAuth2BasedExternalService(context, "RescueTimeService", 0) {
+class RescueTimeService(context: Context, pref: SharedPreferences) : OAuth2BasedExternalService(context, pref, "RescueTimeService", 0) {
 
     companion object {
         const val AUTHORIZATION_URL = "https://www.rescuetime.com/oauth/authorize"

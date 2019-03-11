@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.datatypes
 
 import kr.ac.snu.hcil.android.common.serialization.IStringSerializable
-import kr.ac.snu.hcil.omnitrack.utils.toDatetimeString
+import kr.ac.snu.hcil.android.common.time.toDatetimeString
 import java.util.*
 
 /**

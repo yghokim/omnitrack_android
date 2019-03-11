@@ -2,13 +2,13 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.util.SparseArray
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import dagger.Lazy
 import kr.ac.snu.hcil.android.common.ConcurrentUniqueLongGenerator
+import kr.ac.snu.hcil.android.common.containers.CachedObjectPoolWithIntegerKey
 import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.*
@@ -20,7 +20,7 @@ import javax.inject.Singleton
  * Created by Young-Ho on 10/7/2017.
  */
 @Singleton
-class OTAttributeManager @Inject constructor(val context: Context, val authManager: Lazy<OTAuthManager>) {
+class OTAttributeManager @Inject constructor(val context: Context, val authManager: Lazy<OTAuthManager>) : CachedObjectPoolWithIntegerKey<OTAttributeHelper>() {
 
     companion object {
         const val VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE = 0
@@ -39,27 +39,20 @@ class OTAttributeManager @Inject constructor(val context: Context, val authManag
 
     }
 
-    private val attributeCharacteristicsTable = SparseArray<OTAttributeHelper>()
-
-    fun getAttributeHelper(type: Int): OTAttributeHelper {
-        val characteristics = attributeCharacteristicsTable[type]
-        if (characteristics == null) {
-            val fallback = when (type) {
-                TYPE_NUMBER -> OTNumberAttributeHelper(context)
-                TYPE_TIME -> OTTimeAttributeHelper(context)
-                TYPE_TIMESPAN -> OTTimeSpanAttributeHelper(context)
-                TYPE_SHORT_TEXT -> OTShortTextAttributeHelper(context)
-                TYPE_LONG_TEXT -> OTLongTextAttributeHelper(context)
-                TYPE_LOCATION -> OTLocationAttributeHelper(context)
-                TYPE_CHOICE -> OTChoiceAttributeHelper(context)
-                TYPE_RATING -> OTRatingAttributeHelper(context)
-                TYPE_IMAGE -> OTImageAttributeHelper(context)
-                TYPE_AUDIO -> OTAudioRecordAttributeHelper(context)
-                else -> throw Exception("Unsupported type key: $type")
-            }
-            this.attributeCharacteristicsTable.setValueAt(type, fallback)
-            return fallback
-        } else return characteristics
+    override fun createNewInstance(key: Int): OTAttributeHelper {
+        return when (key) {
+            TYPE_NUMBER -> OTNumberAttributeHelper(context)
+            TYPE_TIME -> OTTimeAttributeHelper(context)
+            TYPE_TIMESPAN -> OTTimeSpanAttributeHelper(context)
+            TYPE_SHORT_TEXT -> OTShortTextAttributeHelper(context)
+            TYPE_LONG_TEXT -> OTLongTextAttributeHelper(context)
+            TYPE_LOCATION -> OTLocationAttributeHelper(context)
+            TYPE_CHOICE -> OTChoiceAttributeHelper(context)
+            TYPE_RATING -> OTRatingAttributeHelper(context)
+            TYPE_IMAGE -> OTImageAttributeHelper(context)
+            TYPE_AUDIO -> OTAudioRecordAttributeHelper(context)
+            else -> throw Exception("Unsupported type key: $key")
+        }
     }
 
     private val attributeLocalIdGenerator = ConcurrentUniqueLongGenerator()
@@ -73,7 +66,7 @@ class OTAttributeManager @Inject constructor(val context: Context, val authManag
     }
 
     fun showPermissionCheckDialog(fragment: Fragment, typeId: Int, typeName: String, onGranted: (Boolean) -> Unit, onDenied: (() -> Unit)? = null): MaterialDialog? {
-        val requiredPermissions = getAttributeHelper(typeId).getRequiredPermissions(null)
+        val requiredPermissions = get(typeId).getRequiredPermissions(null)
         if (requiredPermissions != null) {
             val notGrantedPermissions = requiredPermissions.filter { ContextCompat.checkSelfPermission(fragment.requireContext(), it) != PackageManager.PERMISSION_GRANTED }
             if (notGrantedPermissions.isNotEmpty()) {

@@ -89,27 +89,27 @@ class FieldPresetSelectionBottomSheetFragment : DismissingBottomSheetDialogFragm
 
                 AttributePresetInfo(OTAttributeManager.TYPE_TIME, R.drawable.field_icon_time_hour, this.getString(R.string.type_timepoint_time_name), this.getString(R.string.type_timepoint_time_desc),
                         { dao, realm ->
-                            attributeManager.getAttributeHelper(OTAttributeManager.TYPE_TIME)
+                            attributeManager.get(OTAttributeManager.TYPE_TIME)
                                     .setPropertyValue(OTTimeAttributeHelper.GRANULARITY, OTTimeAttributeHelper.GRANULARITY_MINUTE, dao, realm)
                             dao
                         }),
 
                 AttributePresetInfo(OTAttributeManager.TYPE_TIME, R.drawable.field_icon_time_date, this.getString(R.string.type_timepoint_date_name), this.getString(R.string.type_timepoint_date_desc),
                         { dao, realm ->
-                            attributeManager.getAttributeHelper(OTAttributeManager.TYPE_TIME)
+                            attributeManager.get(OTAttributeManager.TYPE_TIME)
                                     .setPropertyValue(OTTimeAttributeHelper.GRANULARITY, OTTimeAttributeHelper.GRANULARITY_DAY, dao, realm)
                             dao
                         }),
 
                 AttributePresetInfo(OTAttributeManager.TYPE_TIMESPAN, R.drawable.field_icon_timer, this.getString(R.string.type_timespan_name), this.getString(R.string.type_timespan_desc),
                         { dao, realm ->
-                            attributeManager.getAttributeHelper(OTAttributeManager.TYPE_TIMESPAN)
+                            attributeManager.get(OTAttributeManager.TYPE_TIMESPAN)
                                     .setPropertyValue(OTTimeSpanAttributeHelper.PROPERTY_GRANULARITY, OTTimeSpanAttributeHelper.GRANULARITY_MINUTE, dao, realm)
                             dao
                         }),
                 AttributePresetInfo(OTAttributeManager.TYPE_TIMESPAN, R.drawable.field_icon_time_range_date, this.getString(R.string.type_timespan_date_name), this.getString(R.string.type_timespan_date_desc),
                         { dao, realm ->
-                            attributeManager.getAttributeHelper(OTAttributeManager.TYPE_TIMESPAN)
+                            attributeManager.get(OTAttributeManager.TYPE_TIMESPAN)
                                     .setPropertyValue(OTTimeSpanAttributeHelper.PROPERTY_GRANULARITY, OTTimeSpanAttributeHelper.GRANULARITY_DAY, dao, realm)
                             dao
                         }),
@@ -119,14 +119,14 @@ class FieldPresetSelectionBottomSheetFragment : DismissingBottomSheetDialogFragm
 
                 AttributePresetInfo(OTAttributeManager.TYPE_CHOICE, R.drawable.field_icon_singlechoice, this.getString(R.string.type_single_choice_name), this.getString(R.string.type_single_choice_desc),
                         { dao, realm ->
-                            attributeManager.getAttributeHelper(OTAttributeManager.TYPE_CHOICE)
+                            attributeManager.get(OTAttributeManager.TYPE_CHOICE)
                                     .setPropertyValue(OTChoiceAttributeHelper.PROPERTY_MULTISELECTION, false, dao, realm)
                             dao
                         }),
 
                 AttributePresetInfo(OTAttributeManager.TYPE_CHOICE, R.drawable.field_icon_multiplechoice, this.getString(R.string.type_multiple_choices_name), this.getString(R.string.type_multiple_choices_desc),
                         { dao, realm ->
-                            attributeManager.getAttributeHelper(OTAttributeManager.TYPE_CHOICE)
+                            attributeManager.get(OTAttributeManager.TYPE_CHOICE)
                                     .setPropertyValue(OTChoiceAttributeHelper.PROPERTY_MULTISELECTION, true, dao, realm)
                             dao
                         })

@@ -5,6 +5,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
 import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
@@ -18,12 +19,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemValueEntryDAO
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.core.types.TimeSpan
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
-import kr.ac.snu.hcil.omnitrack.ui.components.common.time.TimeRangePicker
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimeRangePickerInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
-import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -79,16 +74,6 @@ class OTTimeSpanAttributeHelper(context: Context) : OTAttributeHelper(context) {
         } as OTPropertyHelper<T>
     }
 
-    override fun makePropertyView(propertyKey: String, context: Context): APropertyView<out Any> {
-        val superView = super.makePropertyView(propertyKey, context)
-        if (propertyKey == PROPERTY_GRANULARITY && superView is SelectionPropertyView) {
-            superView.setEntries(arrayOf(context.resources.getString(R.string.property_time_granularity_day),
-                    context.resources.getString(R.string.property_time_granularity_minute)
-            ))
-        }
-
-        return superView
-    }
 
     fun getGranularity(attribute: OTAttributeDAO): Int {
         return getDeserializedPropertyValue<Int>(PROPERTY_GRANULARITY, attribute) ?: GRANULARITY_MINUTE
@@ -105,21 +90,6 @@ class OTTimeSpanAttributeHelper(context: Context) : OTAttributeHelper(context) {
         return when (propertyKey) {
             PROPERTY_GRANULARITY -> GRANULARITY_DAY
             else -> null
-        }
-    }
-
-
-    override fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int = AAttributeInputView.VIEW_TYPE_TIME_RANGE_PICKER
-
-    override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
-        if (inputView is TimeRangePickerInputView) {
-            val granularity = when (getGranularity(attribute)) {
-                GRANULARITY_DAY -> TimeRangePicker.Granularity.DATE
-                GRANULARITY_MINUTE -> TimeRangePicker.Granularity.TIME
-                else -> TimeRangePicker.Granularity.TIME
-            }
-
-            inputView.setGranularity(granularity)
         }
     }
 

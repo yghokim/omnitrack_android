@@ -40,6 +40,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.tracker_list_element.view.*
+import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.android.common.view.InterfaceHelper
@@ -61,7 +62,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.visualization.ChartViewActivity
-import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import org.jetbrains.anko.verticalMargin
 import java.text.SimpleDateFormat
 import java.util.*

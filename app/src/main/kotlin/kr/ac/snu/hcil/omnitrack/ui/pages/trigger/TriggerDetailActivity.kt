@@ -13,6 +13,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_trigger_detail.*
 import kotlinx.android.synthetic.main.layout_tracker_assign_panel.view.*
 import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.onNextIfDifferAndNotNull
 import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -23,7 +24,6 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.IConditionConfigurationView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerInterfaceOptions
-import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 
 /**
  * Created by younghokim on 2017-10-24.

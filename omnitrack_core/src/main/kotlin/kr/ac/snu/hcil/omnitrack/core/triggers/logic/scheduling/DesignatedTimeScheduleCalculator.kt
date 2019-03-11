@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.utils.time
+package kr.ac.snu.hcil.omnitrack.core.triggers.logic.scheduling
 
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.android.common.containers.WritablePair

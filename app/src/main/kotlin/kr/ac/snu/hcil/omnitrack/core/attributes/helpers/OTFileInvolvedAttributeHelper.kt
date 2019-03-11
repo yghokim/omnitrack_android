@@ -23,7 +23,7 @@ abstract class OTFileInvolvedAttributeHelper(context: Context) : OTAttributeHelp
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_SERVERFILE
 
     @Inject
-    protected lateinit var localCacheManager: OTLocalMediaCacheManager
+    lateinit var localCacheManager: OTLocalMediaCacheManager
 
     init {
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)

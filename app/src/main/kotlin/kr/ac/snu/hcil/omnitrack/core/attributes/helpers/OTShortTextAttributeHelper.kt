@@ -5,7 +5,6 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -25,8 +24,4 @@ class OTShortTextAttributeHelper(context: Context) : ATextTypeAttributeHelper(co
     }
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_STRING
-
-    override fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int {
-        return AAttributeInputView.VIEW_TYPE_SHORT_TEXT
-    }
 }

@@ -5,13 +5,13 @@ import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.net.OAuth2Client
+import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
-import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import org.json.JSONObject
 import java.util.*
 

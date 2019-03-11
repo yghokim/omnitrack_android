@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">OmniTrack Core Dependencies</string>
+
+
+    <string name="msg_go_to_store">Go to Store</string>
+
+    <string name="msg_format_third_party_app_dependency_fatal_failed_message"><b>%1$s</b> is not installed, which is necessary.</string>
+    <string name="msg_format_third_party_app_dependency_passed_message">The <b>%1$s</b> app is installed in this device.</string>
+    <string name="msg_format_third_party_app_dependency_non_fatal_failed_message"><b>%1$s</b> is not installed, which is recommended. If you need data measured by this phone, you have to install the application and activate it.</string>
+
+    <string name="msg_sign_in">Sign In</string>
+
+    <string name="msg_format_dependency_sign_in_passed">You are signed in the <b>%1$s</b> service.</string>
+    <string name="msg_format_dependency_sign_in_failed">You are not signed in the <b>%1$s</b> service.</string>
+
+</resources>

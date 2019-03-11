@@ -6,8 +6,10 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.cookpad.android.licensetools'
 apply plugin: 'com.getkeepsafe.dexcount'
 
-import java.util.regex.Pattern
+
 import org.apache.http.client.utils.URIBuilder
+
+import java.util.regex.Pattern
 
 def keystoreProperties = project.keystoreProperties
 
@@ -288,6 +290,8 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$rootProject.ext.dagger_version"
     implementation project(':omnitrack_core')
     implementation project(':omnitrack_core_types')
+    implementation project(':omnitrack_core_dependencyresolver')
+
     implementation project(':material_dialog_core')
     implementation project(':material_about')
     implementation project(':fancybuttons')

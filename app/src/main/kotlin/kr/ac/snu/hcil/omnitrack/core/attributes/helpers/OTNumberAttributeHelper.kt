@@ -15,8 +15,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.core.types.NumberStyle
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
 import java.math.BigDecimal
 
 /**
@@ -77,7 +75,7 @@ class OTNumberAttributeHelper(context: Context) : OTAttributeHelper(context), IS
         }
     }
 
-    private fun getNumberStyle(attribute: OTAttributeDAO): NumberStyle? {
+    fun getNumberStyle(attribute: OTAttributeDAO): NumberStyle? {
         return getDeserializedPropertyValue(NUMBERSTYLE, attribute)
     }
 
@@ -86,16 +84,6 @@ class OTNumberAttributeHelper(context: Context) : OTAttributeHelper(context), IS
             NUMBERSTYLE -> NumberStyle()
             BUTTON_UNIT -> BigDecimal.ONE
             else -> null
-        }
-    }
-
-
-    override fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int = AAttributeInputView.VIEW_TYPE_NUMBER
-
-    override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
-        if (inputView is NumberInputView) {
-            inputView.numberStyle = getNumberStyle(attribute) ?: NumberStyle()
-            inputView.moveUnit = getDeserializedPropertyValue<BigDecimal>(BUTTON_UNIT, attribute) ?: BigDecimal.ONE
         }
     }
 

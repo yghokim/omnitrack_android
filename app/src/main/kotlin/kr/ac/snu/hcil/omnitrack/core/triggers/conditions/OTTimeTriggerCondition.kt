@@ -8,9 +8,9 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import io.reactivex.Single
+import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 
 /**
  * Created by younghokim on 2017. 10. 18..

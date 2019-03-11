@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msg_today">오늘</string>
+    <string name="msg_yesterday">어제</string>
+
+    <string name="time_duration_no_difference">동일한 시간</string>
+
+    <string name="msg_simple_date_format">M월 d일</string>
+
+    <plurals name="time_duration_day">
+        <item quantity="other">%d일</item>
+    </plurals>
+
+    <plurals name="time_duration_hour">
+        <item quantity="other">%d시간</item>
+    </plurals>
+
+    <plurals name="time_duration_minute">
+        <item quantity="other">%d분</item>
+    </plurals>
+
+    <plurals name="time_duration_second">
+        <item quantity="other">%d초</item>
+    </plurals>
+
+    <plurals name="time_duration_hour_short">
+        <item quantity="other">%d시간</item>
+    </plurals>
+
+    <plurals name="time_duration_minute_short">
+        <item quantity="other">%d분</item>
+    </plurals>
+
+    <plurals name="time_duration_second_short">
+        <item quantity="other">%d초</item>
+    </plurals>
+
+</resources>

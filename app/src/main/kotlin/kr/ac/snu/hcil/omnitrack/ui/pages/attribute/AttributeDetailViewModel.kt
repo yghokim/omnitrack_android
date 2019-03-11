@@ -8,6 +8,7 @@ import dagger.Lazy
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.android.common.onNextIfDifferAndNotNull
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -16,7 +17,6 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
-import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import java.util.*
 import javax.inject.Inject
 
@@ -35,7 +35,7 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
 
     val isValid: Boolean get() = attributeDAO?.isValid == true
 
-    val attributeHelper: OTAttributeHelper? get() = attributeDAO?.let { attributeManager.getAttributeHelper(it.type) }
+    val attributeHelper: OTAttributeHelper? get() = attributeDAO?.let { attributeManager.get(it.type) }
 
     val isInDatabase: Boolean get() = attributeDAO?.isManaged == true
 

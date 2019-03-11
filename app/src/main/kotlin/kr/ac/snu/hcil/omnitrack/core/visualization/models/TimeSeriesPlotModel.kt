@@ -39,7 +39,7 @@ class TimeSeriesPlotModel(tracker: OTTrackerDAO, protected val timeAttribute: OT
 
     override fun reloadData(): Single<List<Pair<Long, Double>>> {
         return Single.defer {
-            val yAttributeHelper = yAttribute.let { attributeManager.getAttributeHelper(it.type) }
+            val yAttributeHelper = yAttribute.let { attributeManager.get(it.type) }
             if (yAttributeHelper is ISingleNumberAttributeHelper) {
                 val items = dbManager.getItemsQueriedWithTimeAttribute(tracker.objectId, getTimeScope(), timeAttributeLocalId, realm)
                 return@defer Single.just(

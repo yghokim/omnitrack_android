@@ -18,6 +18,8 @@ import io.realm.Sort
 import kr.ac.snu.hcil.android.common.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.isInteractiveCompat
+import kr.ac.snu.hcil.android.common.time.TimeHelper
+import kr.ac.snu.hcil.android.common.time.toDatetimeString
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
@@ -26,14 +28,12 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerAlarmInstance
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerSchedule
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
+import kr.ac.snu.hcil.omnitrack.core.triggers.logic.scheduling.DesignatedTimeScheduleCalculator
+import kr.ac.snu.hcil.omnitrack.core.triggers.logic.scheduling.ExperienceSamplingTimeScheduleCalculator
+import kr.ac.snu.hcil.omnitrack.core.triggers.logic.scheduling.IntervalTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
 import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
-import kr.ac.snu.hcil.omnitrack.utils.time.DesignatedTimeScheduleCalculator
-import kr.ac.snu.hcil.omnitrack.utils.time.ExperienceSamplingTimeScheduleCalculator
-import kr.ac.snu.hcil.omnitrack.utils.time.IntervalTimeScheduleCalculator
-import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
-import kr.ac.snu.hcil.omnitrack.utils.toDatetimeString
 import org.jetbrains.anko.alarmManager
 import org.jetbrains.anko.powerManager
 import org.jetbrains.anko.runOnUiThread

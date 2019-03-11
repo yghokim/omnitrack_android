@@ -36,10 +36,10 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactoryManager
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
@@ -108,10 +108,10 @@ class TrackerDetailStructureTabFragment : OTFragment() {
     lateinit var serializationManager: Lazy<DaoSerializationManager>
 
     @Inject
-    lateinit var attributeManager: OTAttributeManager
+    lateinit var tutorialManager: TutorialManager
 
     @Inject
-    lateinit var tutorialManager: TutorialManager
+    lateinit var attributeViewFactoryManager: Lazy<AttributeViewFactoryManager>
 
     override fun onInject(app: OTAndroidApp) {
         app.applicationComponent.inject(this)
@@ -625,14 +625,14 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 viewHolderSubscriptions.add(
                         attributeViewModel.typeObservable.subscribe { args ->
 
-                            preview = attributeManager.getAttributeHelper(args).getInputView(requireContext(), true, attributeViewModel.makeFrontalChangesToDao(), preview)
+                            preview = attributeViewFactoryManager.get().get(args).getInputView(requireContext(), true, attributeViewModel.makeFrontalChangesToDao(), preview)
                         }
                 )
 
                 viewHolderSubscriptions.add(
                         attributeViewModel.onPropertyChanged.subscribe {
                             attributeViewModel.typeObservable.value?.let { type ->
-                                preview = attributeManager.getAttributeHelper(type).getInputView(requireContext(), true, attributeViewModel.makeFrontalChangesToDao(), preview)
+                                preview = attributeViewFactoryManager.get().get(type).getInputView(requireContext(), true, attributeViewModel.makeFrontalChangesToDao(), preview)
                             }
                         }
                 )

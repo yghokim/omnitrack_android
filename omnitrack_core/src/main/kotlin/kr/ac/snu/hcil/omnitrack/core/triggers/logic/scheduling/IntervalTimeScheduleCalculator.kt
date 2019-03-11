@@ -1,13 +1,14 @@
-package kr.ac.snu.hcil.omnitrack.utils.time
+package kr.ac.snu.hcil.omnitrack.core.triggers.logic.scheduling
 
 import android.text.format.DateUtils
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.android.common.containers.WritablePair
+import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.android.common.time.getDayOfWeek
 import kr.ac.snu.hcil.android.common.time.getHourOfDay
 import kr.ac.snu.hcil.android.common.time.setHourOfDay
-import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
+//import kr.ac.snu.hcil.omnitrack.OTApp
+//import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import java.util.*
 
 /**
@@ -54,7 +55,7 @@ class IntervalTimeScheduleCalculator : TimeScheduleCalculator() {
     override fun calculateInfiniteNextTime(last: Long?, now: Long): WritablePair<Long, JsonObject?>? {
 
         println("trigger time last: $last, now: $now")
-        OTApp.logger.writeSystemLog("calc next alarm. last: ${last?.let { LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(last)) }}, now: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(now))}", "IntervalTimeScheduleCalculator")
+        //OTApp.logger.writeSystemLog("calc next alarm. last: ${last?.let { LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(last)) }}, now: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(now))}", "IntervalTimeScheduleCalculator")
         val realPivot: Long = last ?: now
         val isHourRangeBound = fromHourOfDay != toHourOfDay
 
