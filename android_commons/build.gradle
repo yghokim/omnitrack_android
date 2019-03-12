@@ -44,7 +44,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     testImplementation 'junit:junit:4.12'
-    compileOnly 'javax.annotation:jsr250-api:1.0'
 
     implementation "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttp_version"
 
@@ -52,7 +51,6 @@ dependencies {
 
     implementation "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxjava_version"
     implementation "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rxandroid_version"
-    implementation "com.github.VictorAlbertos:RxActivityResult:$rootProject.ext.rxactivityresult_version"
     implementation "com.github.pwittchen:reactivenetwork-rx2:$rootProject.ext.reactive_network_version"
 
     implementation "com.google.code.gson:gson:$rootProject.ext.gson_version"
