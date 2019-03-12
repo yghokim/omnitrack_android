@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.android.common.view
 
 import android.content.Context
 import android.graphics.Canvas

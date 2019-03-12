@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:padding="16dp">
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyControlView
+    <kr.ac.snu.hcil.omnitrack.views.dependency.DependencyControlView
         android:id="@+id/ui_dependency_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

@@ -346,8 +346,6 @@
     <string name="msg_uploading_file_to_server">Uploading file to Server</string>
     <string name="msg_uploading">Uploading…</string>
 
-    <string name="msg_mandatory">Mandatory</string>
-    <string name="msg_optional">Optional</string>
     <string name="msg_format_service_activate_button">Activate %1$s in OmniTrack</string>
 
     <string name="msg_background_logging_notification_title_format">Logging %1$s item</string>
@@ -574,7 +572,6 @@
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="msg_pref_reminder_noti_rington_title">Reminder Notification Ringtone</string>
     <string name="msg_pref_category_general">General</string>
-    <string name="msg_checking">Checking…</string>
     <string name="msg_pref_category_language">Language</string>
     <string name="msg_pref_follow_device_language">Follow device language</string>
     <string name="msg_pref_follow_device_language_summary">Use the system language. English is used by default.</string>

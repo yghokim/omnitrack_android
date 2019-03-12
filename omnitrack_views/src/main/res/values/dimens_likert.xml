@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="likert_scale_point_radius">5dp</dimen>
+    <dimen name="likert_scale_value_textSize">20sp</dimen>
+    <dimen name="likert_scale_value_box_padding_vertical">5dp</dimen>
+    <dimen name="likert_scale_value_box_padding_horizontal">8dp</dimen>
+    <dimen name="likert_scale_value_box_spacing">20dp</dimen>
+    <dimen name="likert_scale_value_indicator_radius">8dp</dimen>
+    <dimen name="likert_scale_line_stroke_width">1dp</dimen>
+
+    <dimen name="likert_scale_number_spacing">15dp</dimen>
+    <dimen name="likert_scale_number_textSize">12sp</dimen>
+    <dimen name="likert_scale_label_textSize">12sp</dimen>
+    <dimen name="likert_scale_label_spacing">5dp</dimen>
+</resources>

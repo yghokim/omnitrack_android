@@ -9,6 +9,7 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import kr.ac.snu.hcil.android.common.events.Event
+import kr.ac.snu.hcil.android.common.view.button.ColorSelectionButton
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.di.global.ColorPalette
 import javax.inject.Inject

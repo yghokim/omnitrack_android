@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.omnitrack.views.rating
 
 import android.content.Context
 import android.text.Spannable
@@ -11,7 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import kr.ac.snu.hcil.android.common.view.inflateContent
-import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.views.R
 
 /**
  * Created by younghokim on 2017. 4. 15..

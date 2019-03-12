@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common.dependency
+package kr.ac.snu.hcil.omnitrack.views.dependency
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity

@@ -292,6 +292,8 @@ dependencies {
     implementation project(':omnitrack_core')
     implementation project(':omnitrack_core_types')
     implementation project(':omnitrack_core_dependencyresolver')
+    implementation project(':omnitrack_views')
+
 
     implementation project(':material_dialog_core')
     implementation project(':material_about')

@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.omnitrack.views.rating
 
 import android.content.Context
 import android.graphics.*
@@ -13,8 +13,8 @@ import androidx.core.content.ContextCompat
 import kr.ac.snu.hcil.android.common.dipSize
 import kr.ac.snu.hcil.android.common.events.Event
 import kr.ac.snu.hcil.android.common.nearestInt
-import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.types.Fraction
+import kr.ac.snu.hcil.omnitrack.views.R
 import kotlin.properties.Delegates
 
 /**

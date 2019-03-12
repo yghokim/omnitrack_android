@@ -24,9 +24,9 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
-import kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyControlView
-import kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyControlViewModel
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.views.dependency.DependencyControlView
+import kr.ac.snu.hcil.omnitrack.views.dependency.DependencyControlViewModel
 import mehdi.sakout.fancybuttons.FancyButton
 import org.jetbrains.anko.dip
 import javax.inject.Inject

@@ -10,7 +10,7 @@
         android:layout_width="27dp"
         android:layout_height="27dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginRight="2dp"
+        android:layout_marginEnd="2dp"
         android:tint="@color/starGold"
         app:srcCompat="@drawable/symbol_star_full" />
 

@@ -389,10 +389,6 @@
         &lt;br>&lt;br>리스트에 &lt;b>%1$s&lt;/b> 앱이 없거나 이미 최적화가 켜져 있다면, 기기를 재부팅하고 다시 확인해 보세요.
     </string>
 
-    <string name="msg_checking">체크하는 중…</string>
-
-    <string name="msg_mandatory">필수사항</string>
-    <string name="msg_optional">선택사항</string>
     <string name="msg_format_service_activate_button">OmniTrack에서 %1$s 활성화</string>
     <string name="msg_pref_category_language">언어</string>
     <string name="msg_pref_follow_device_language">기기 설정과 동일한 언어 사용</string>

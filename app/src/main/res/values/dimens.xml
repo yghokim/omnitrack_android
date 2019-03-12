@@ -63,18 +63,6 @@
     <dimen name="number_unit_size">20sp</dimen>
     <dimen name="number_unit_size_small">16sp</dimen>
 
-    <dimen name="likert_scale_point_radius">5dp</dimen>
-    <dimen name="likert_scale_value_textSize">20sp</dimen>
-    <dimen name="likert_scale_value_box_padding_vertical">5dp</dimen>
-    <dimen name="likert_scale_value_box_padding_horizontal">8dp</dimen>
-    <dimen name="likert_scale_value_box_spacing">20dp</dimen>
-    <dimen name="likert_scale_value_indicator_radius">8dp</dimen>
-    <dimen name="likert_scale_line_stroke_width">1dp</dimen>
-
-    <dimen name="likert_scale_number_spacing">15dp</dimen>
-    <dimen name="likert_scale_number_textSize">12sp</dimen>
-    <dimen name="likert_scale_label_textSize">12sp</dimen>
-    <dimen name="likert_scale_label_spacing">5dp</dimen>
 
     <dimen name="audio_recorder_circle_inset">6dp</dimen>
     <dimen name="audio_recorder_progressbar_height_recorder">47dp</dimen>

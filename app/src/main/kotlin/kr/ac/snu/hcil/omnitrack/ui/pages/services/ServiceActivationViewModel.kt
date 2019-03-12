@@ -7,7 +7,7 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
-import kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyControlViewModel
+import kr.ac.snu.hcil.omnitrack.views.dependency.DependencyControlViewModel
 
 /**
  * Created by younghokim on 2017. 5. 25..

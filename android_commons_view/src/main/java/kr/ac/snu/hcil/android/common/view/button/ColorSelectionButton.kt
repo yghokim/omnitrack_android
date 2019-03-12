@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.android.common.view.button
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -11,7 +11,7 @@ import android.util.AttributeSet
 import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.res.ResourcesCompat
-import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.android.common.view.R
 
 class ColorSelectionButton : AppCompatButton, ValueAnimator.AnimatorUpdateListener {
 

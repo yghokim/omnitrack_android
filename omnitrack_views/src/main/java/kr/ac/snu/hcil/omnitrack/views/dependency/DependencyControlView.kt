@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common.dependency
+package kr.ac.snu.hcil.omnitrack.views.dependency
 
 import android.content.Context
 import android.graphics.PorterDuff
@@ -12,7 +12,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.android.common.view.getActivity
 import kr.ac.snu.hcil.android.common.view.inflateContent
-import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.views.R
 import mehdi.sakout.fancybuttons.FancyButton
 
 /**
