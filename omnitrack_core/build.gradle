@@ -10,6 +10,7 @@ android {
     }
     lintOptions {
         checkReleaseBuilds false
+        disable 'MissingTranslation'
     }
 
     compileOptions {

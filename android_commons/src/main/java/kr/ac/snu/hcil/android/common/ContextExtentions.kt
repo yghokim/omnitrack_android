@@ -17,9 +17,15 @@ fun Context.versionName(): String {
     return pInfo.versionName
 }
 
+
 fun Context.versionCode(): Long {
     val pInfo = packageManager.getPackageInfo(packageName, 0)
-    return if (Build.VERSION.SDK_INT >= 28) pInfo.longVersionCode else pInfo.versionCode.toLong()
+    return if (Build.VERSION.SDK_INT >= 28) {
+        pInfo.longVersionCode
+    } else {
+        @Suppress("DEPRECATION")
+        pInfo.versionCode.toLong()
+    }
 }
 
 @TargetApi(23)

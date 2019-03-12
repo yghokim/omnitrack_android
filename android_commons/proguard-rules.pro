@@ -43,3 +43,5 @@
 # Don't note duplicate definition (Legacy Apche Http Client)
 -dontnote android.net.http.*
 -dontnote org.apache.http.**
+
+-dontwarn org.apache.log4j.**

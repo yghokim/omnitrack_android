@@ -25,7 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                tools:src="@drawable/service_thumb_up" />
+                tools:src="@drawable/service_thumb_fitbit" />
 
             <TextView
                 android:id="@+id/ui_name"

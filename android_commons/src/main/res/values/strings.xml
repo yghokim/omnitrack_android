@@ -1,6 +1,4 @@
 <resources>
-    <string name="app_name">Android Commons</string>
-
     <string name="msg_ok">OK</string>
     <string name="msg_apply">Apply</string>
     <string name="msg_cancel">Cancel</string>

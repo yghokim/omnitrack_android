@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.android.common.net
 import android.util.Base64
 import okhttp3.MediaType
 import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-09-01.
@@ -33,10 +34,12 @@ object AuthConstants {
     val CONTENT_TYPE_JSON = MediaType.parse("application/json; charset=utf-8")
 
 
-    val DATE_TIME_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-    val DATE_TIME_FORMAT_WITHOUT_TIMEZONE = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+    val DATE_TIME_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ROOT)
+
+    //TODO revise this to reflect timezone.
+    val DATE_TIME_FORMAT_WITHOUT_TIMEZONE = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ROOT)
 
 
-    val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd")
-    val TIME_FORMAT = SimpleDateFormat("HH:mm:ss")
+    val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
+    val TIME_FORMAT = SimpleDateFormat("HH:mm:ss", Locale.ROOT)
 }

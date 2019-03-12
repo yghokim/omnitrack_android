@@ -8,12 +8,12 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTRatingAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.types.Fraction
 import kr.ac.snu.hcil.omnitrack.core.types.RatingOptions
-import kr.ac.snu.hcil.omnitrack.ui.components.common.StarRatingSlider
-import kr.ac.snu.hcil.omnitrack.ui.components.common.StarScoreView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.LikertScaleInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.StarRatingInputView
+import kr.ac.snu.hcil.omnitrack.views.rating.StarRatingSlider
+import kr.ac.snu.hcil.omnitrack.views.rating.StarScoreView
 
 class RatingViewFactory(helper: OTRatingAttributeHelper) : AttributeViewFactory<OTRatingAttributeHelper>(helper) {
 

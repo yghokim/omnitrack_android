@@ -32,6 +32,7 @@
             android:showSilent="true"
             android:title="@string/msg_pref_reminder_noti_rington_title" />
 
+        <!--suppress AndroidElementNotAllowed -->
         <kr.ac.snu.hcil.android.common.view.preference.ColorPreference
             app:iconSpaceReserved="false"
             android:defaultValue="@color/colorPrimary"

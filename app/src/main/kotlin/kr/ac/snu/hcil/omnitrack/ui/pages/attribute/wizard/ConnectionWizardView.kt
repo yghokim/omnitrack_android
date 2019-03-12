@@ -30,8 +30,8 @@ class ConnectionWizardView : WizardView {
         get() = pendingConnection
 
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
     init {
     }

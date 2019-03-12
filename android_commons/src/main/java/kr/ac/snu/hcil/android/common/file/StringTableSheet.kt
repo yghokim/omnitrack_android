@@ -26,7 +26,7 @@ class StringTableSheet {
     }
 
     fun storeCsvToStream(outputStream: OutputStream) {
-        val csvWriter = CSVWriter(outputStream.writer(Charsets.UTF_8), ',', '"')
+        val csvWriter = CSVWriter(outputStream.writer(Charsets.UTF_8))
 
         csvWriter.writeNext(columns.toTypedArray())
         csvWriter.writeAll(rows.map { it.toTypedArray() })
@@ -40,7 +40,7 @@ class StringTableSheet {
         val workbook = Workbook.createWorkbook(outputStream, workbookSettings)
         val tableSheet = workbook.createSheet("table", 0)
 
-        val headerFormat = WritableCellFormat(WritableFont(WritableFont.ARIAL, WritableFont.DEFAULT_POINT_SIZE, WritableFont.BOLD, false))
+        val headerFormat = WritableCellFormat(WritableFont(WritableFont.ARIAL, WritableFont.DEFAULT_POINT_SIZE))
         headerFormat.wrap = false
         headerFormat.setBackground(Colour.GREY_25_PERCENT)
 
@@ -50,7 +50,7 @@ class StringTableSheet {
             tableSheet.addCell(cell)
         }
 
-        val normalCellFormat = WritableCellFormat(WritableFont(WritableFont.ARIAL, WritableFont.DEFAULT_POINT_SIZE, WritableFont.NO_BOLD, false))
+        val normalCellFormat = WritableCellFormat(WritableFont(WritableFont.ARIAL, WritableFont.DEFAULT_POINT_SIZE))
         normalCellFormat.wrap = true
 
         for (row in rows.withIndex()) {

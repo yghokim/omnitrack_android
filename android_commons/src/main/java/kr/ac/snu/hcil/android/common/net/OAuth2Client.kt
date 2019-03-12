@@ -57,8 +57,8 @@ class OAuth2Client(val context: Context, val config: OAuth2Config) {
             fun restore(pref: SharedPreferences, prefix: String): Credential? {
                 if (pref.contains(prefix + '_' + AuthConstants.PARAM_ACCESS_TOKEN)) {
                     return Credential(
-                            pref.getString(prefix + '_' + AuthConstants.PARAM_ACCESS_TOKEN, ""),
-                            pref.getString(prefix + '_' + AuthConstants.PARAM_REFRESH_TOKEN, ""),
+                            pref.getString(prefix + '_' + AuthConstants.PARAM_ACCESS_TOKEN, "")!!,
+                            pref.getString(prefix + '_' + AuthConstants.PARAM_REFRESH_TOKEN, "")!!,
                             pref.getInt(prefix + '_' + AuthConstants.PARAM_EXPIRES_IN, 0)
                     )
                 } else return null

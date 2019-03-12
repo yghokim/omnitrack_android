@@ -26,10 +26,6 @@ object TimeHelper {
         Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
     }
 
-
-    val DAY_OF_WEEK_FULL_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEEE", Locale.getDefault()) }
-    val DAY_OF_WEEK_SHORT_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEE", Locale.getDefault()) }
-
     val FORMAT_ISO_8601: SimpleDateFormat by lazy {
         SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ROOT)
     }
@@ -145,7 +141,7 @@ object TimeHelper {
             if (yesterdayCal.getYear() == cal.getYear() && yesterdayCal.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR)) {
                 return context.resources.getString(R.string.msg_yesterday)
             } else {
-                return SimpleDateFormat(context.resources.getString(R.string.msg_simple_date_format)).format(cal.time)
+                return SimpleDateFormat(context.resources.getString(R.string.msg_simple_date_format), Locale.getDefault()).format(cal.time)
             }
         }
     }
@@ -231,14 +227,6 @@ object TimeHelper {
     fun getDaysLeftToClosestDayOfWeek(pivot: Calendar, dayOfWeek: Int): Int {
 
         return (dayOfWeek + 7 - pivot.getDayOfWeek()) % 7
-    }
-
-    fun getDayOfWeekName(date: Date, length: Length): CharSequence {
-        return when (length) {
-            TimeHelper.Length.FULL -> DAY_OF_WEEK_FULL_FORMAT.format(date)
-            TimeHelper.Length.SHORT -> DAY_OF_WEEK_SHORT_FORMAT.format(date)
-            TimeHelper.Length.SHORTEST -> DAY_OF_WEEK_SHORT_FORMAT.format(date)
-        }
     }
 
     fun getDayOfWeekBooleanInFlag(dayOfWeek: Int, flags: Int): Boolean {

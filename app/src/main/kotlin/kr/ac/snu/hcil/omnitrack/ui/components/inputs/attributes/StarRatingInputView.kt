@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.types.Fraction
-import kr.ac.snu.hcil.omnitrack.ui.components.common.StarRatingSlider
+import kr.ac.snu.hcil.omnitrack.views.rating.StarRatingSlider
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
