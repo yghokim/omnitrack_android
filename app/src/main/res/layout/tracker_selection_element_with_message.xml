@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/button_height_small"
         android:text="Already contains one field connected"
-        android:textColor="@color/colorRed.Light"
+        android:textColor="@color/colorRed_Light"
         android:textSize="13sp"
         android:textStyle="italic" />
 </LinearLayout>

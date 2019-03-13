@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:text="@string/msg_trigger_data_service_not_activated"
-        android:textColor="@color/colorRed.Light"
+        android:textColor="@color/colorRed_Light"
         android:textSize="12sp"
         android:textStyle="bold"
         android:visibility="visible"

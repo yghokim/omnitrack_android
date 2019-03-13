@@ -13,7 +13,7 @@
         android:layout_marginRight="12dp"
         android:text="@string/msg_trigger_time_config_type" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
+    <kr.ac.snu.hcil.android.common.view.container.ExtendedSpinner
         android:id="@+id/ui_value"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

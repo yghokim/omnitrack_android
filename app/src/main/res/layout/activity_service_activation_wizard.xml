@@ -129,7 +129,7 @@
             app:drawableTint="@android:color/white"
             app:fb_defaultColor="@android:color/transparent"
             app:fb_disabledColor="@android:color/transparent"
-            app:fb_focusColor="@color/colorPointed.Light"
+            app:fb_focusColor="@color/colorPointed_Light"
             app:fb_iconResource="@drawable/link"
             app:fb_text="Activate Fitbit in OmniTrack"
             app:fb_textColor="@android:color/white"

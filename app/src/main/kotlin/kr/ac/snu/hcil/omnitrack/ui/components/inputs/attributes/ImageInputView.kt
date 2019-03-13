@@ -15,13 +15,13 @@ import gun0912.tedbottompicker.TedBottomPicker
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
+import kr.ac.snu.hcil.android.common.view.dialog.CameraPickDialogFragment
 import kr.ac.snu.hcil.android.common.view.getActivity
+import kr.ac.snu.hcil.android.common.view.image.ImagePicker
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.core.types.OTServerFile
-import kr.ac.snu.hcil.omnitrack.ui.components.common.ImagePicker
-import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CameraPickDialogFragment
 import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
 
@@ -35,11 +35,6 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
         const val REQUEST_CODE_GALLERY = 4
 
         const val IMAGE_MAX_PIXELS = 720 * 1280
-
-        val eventIntentFilter: IntentFilter by lazy {
-            IntentFilter(CameraPickDialogFragment.EXTRA_ACTION_PHOTO_TAKEN)
-        }
-
     }
 
     @Inject
@@ -91,7 +86,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
             override fun onReceive(context: Context, intent: Intent) {
                 println("receiver image dialog event")
                 when (intent.action) {
-                    CameraPickDialogFragment.EXTRA_ACTION_PHOTO_TAKEN -> {
+                    CameraPickDialogFragment.getActionName(context) -> {
                         val requestKey = intent.getStringExtra(CameraPickDialogFragment.EXTRA_REQUEST_KEY)
                         if (requestKey != null) {
                             if (requestKey == this@ImageInputView.boundAttributeObjectId) {
@@ -164,7 +159,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        LocalBroadcastManager.getInstance(context).registerReceiver(eventReceiver, eventIntentFilter)
+        LocalBroadcastManager.getInstance(context).registerReceiver(eventReceiver, IntentFilter(CameraPickDialogFragment.getActionName(context)))
     }
 
     override fun onDetachedFromWindow() {

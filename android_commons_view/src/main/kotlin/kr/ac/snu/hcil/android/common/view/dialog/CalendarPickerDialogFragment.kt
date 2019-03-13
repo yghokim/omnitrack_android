@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.dialogs
+package kr.ac.snu.hcil.android.common.view.dialog
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -8,7 +8,7 @@ import android.widget.CalendarView
 import android.widget.DatePicker
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.android.common.view.R
 import java.util.*
 
 /**
@@ -96,13 +96,11 @@ class CalendarPickerDialogFragment : DialogFragment() {
             val calendarView = CalendarView(requireActivity())
             calendarView.setDate(cal.timeInMillis, false, true)
 
-            calendarView.setOnDateChangeListener(object : CalendarView.OnDateChangeListener {
-                override fun onSelectedDayChange(p0: CalendarView, p1: Int, p2: Int, p3: Int) {
-                    year = p1
-                    month = p2
-                    day = p3
-                }
-            })
+            calendarView.setOnDateChangeListener { p0, p1, p2, p3 ->
+                year = p1
+                month = p2
+                day = p3
+            }
             dialogBuilder
                     .setTitle(resources.getString(R.string.msg_pick_date))
                     .setView(calendarView)

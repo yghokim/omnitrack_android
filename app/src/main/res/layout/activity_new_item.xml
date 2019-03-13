@@ -31,7 +31,7 @@
             <include layout="@layout/common_toolbar_with_buttons" />
         </androidx.appcompat.widget.Toolbar>
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
+        <kr.ac.snu.hcil.android.common.view.indicator.LoadingIndicatorBar
             android:id="@+id/ui_loading_indicator"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -54,7 +54,7 @@
         android:layout_gravity="center_horizontal|bottom"
         android:layout_margin="24dp"
         android:layout_marginBottom="8dp"
-        app:cardBackgroundColor="@color/colorAccent.Light"
+        app:cardBackgroundColor="@color/colorAccent_Light"
         app:cardElevation="12dp"
         app:cardPreventCornerOverlap="true"
         app:layout_dodgeInsetEdges="bottom">
@@ -76,7 +76,7 @@
             app:fb_borderColor="#2fffffff"
             app:fb_borderWidth="2dp"
             app:fb_defaultColor="@color/transparent"
-            app:fb_focusColor="@color/colorAccent.Light"
+            app:fb_focusColor="@color/colorAccent_Light"
             app:fb_textColor="#FFF" />
     </androidx.cardview.widget.CardView>
 

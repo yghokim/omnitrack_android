@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.android.common.view.image
 
 import android.animation.LayoutTransition
 import android.content.Context
@@ -15,11 +15,10 @@ import androidx.core.content.FileProvider
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.component_image_picker.view.*
 import kr.ac.snu.hcil.android.common.events.Event
+import kr.ac.snu.hcil.android.common.view.R
 import kr.ac.snu.hcil.android.common.view.applyTint
+import kr.ac.snu.hcil.android.common.view.dialog.CameraPickDialogFragment
 import kr.ac.snu.hcil.android.common.view.inflateContent
-import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CameraPickDialogFragment
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -151,7 +150,7 @@ class ImagePicker : ConstraintLayout, View.OnClickListener {
 
 
     fun createCacheImageFileUri(context: Context): Uri {
-        return FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", createCacheImageFile(context))
+        return FileProvider.getUriForFile(context, "${context.packageName}.provider", createCacheImageFile(context))
     }
 
 }

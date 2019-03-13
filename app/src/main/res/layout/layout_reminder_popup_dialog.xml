@@ -82,7 +82,7 @@
                 style="@style/HorizontalSeparator.NoVerticalMargin"
                 android:layout_width="0dp"
                 android:layout_marginTop="12dp"
-                android:background="@color/separator.Light"
+                android:background="@color/separator_Light"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/ui_content" />
@@ -95,7 +95,7 @@
                 android:minHeight="@dimen/button_height_normal"
                 android:text="Skip"
                 android:textAllCaps="false"
-                android:textColor="@color/colorRed.Light"
+                android:textColor="@color/colorRed_Light"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@+id/ui_button_snooze"
                 app:layout_constraintTop_toBottomOf="@+id/ui_button_separator_horizontal" />
@@ -103,7 +103,7 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="0dp"
-                android:background="@color/separator.Light"
+                android:background="@color/separator_Light"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toRightOf="@+id/ui_button_skip"
                 app:layout_constraintTop_toTopOf="@+id/ui_button_skip" />

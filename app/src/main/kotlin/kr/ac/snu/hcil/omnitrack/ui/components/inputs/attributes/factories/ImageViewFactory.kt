@@ -4,12 +4,12 @@ import android.content.Context
 import android.view.View
 import com.squareup.picasso.Picasso
 import io.reactivex.Single
+import kr.ac.snu.hcil.android.common.view.image.PlaceHolderImageView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTImageAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.types.OTServerFile
-import kr.ac.snu.hcil.omnitrack.ui.components.common.PlaceHolderImageView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView

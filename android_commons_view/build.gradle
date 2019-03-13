@@ -41,12 +41,16 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$rootProject.ext.androidx_appcompat_version"
     implementation "androidx.transition:transition:$rootProject.ext.android_support_version"
     implementation "androidx.recyclerview:recyclerview:$rootProject.ext.android_support_version"
+    implementation "androidx.constraintlayout:constraintlayout:$rootProject.ext.androidx_constraintlayout_version"
     implementation "androidx.viewpager:viewpager:$rootProject.ext.android_support_version"
 
     implementation "androidx.vectordrawable:vectordrawable:1.0.1"
     implementation "androidx.vectordrawable:vectordrawable-animated:$rootProject.ext.android_support_version"
     implementation "androidx.preference:preference:1.1.0-alpha03"
     implementation "androidx.core:core-ktx:1.0.1"
+
+    implementation "com.google.android.material:material:$rootProject.ext.android_support_version"
+    implementation "com.squareup.picasso:picasso:$rootProject.ext.picasso_version"
 
     implementation "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttp_version"
 
@@ -57,6 +61,8 @@ dependencies {
     implementation project(':fancybuttons')
 
     implementation 'com.larswerkman:lobsterpicker:1.0.1'
+    implementation 'com.otaliastudios:cameraview:1.6.1'
+    implementation 'com.google.android:flexbox:1.1.0'
 }
 
 repositories{

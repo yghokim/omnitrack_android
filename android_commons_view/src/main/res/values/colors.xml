@@ -2,9 +2,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <color name="colorPointed" tools:override="true">#FFFF00</color>
     <color name="colorRed" tools:override="true">#FF0000</color>
-    <color name="colorRed.Light" tools:override="true">#FFaaaa</color>
+    <color name="colorRed_Light" tools:override="true">#FFaaaa</color>
 
     <color name="colorPrimary" tools:override="true">#ff00ff</color>
+    <color name="colorSecondary">#afafef</color>
+
+    <color name="transparent">#00FFFFFF</color>
 
     <color name="editTextLine" tools:override="true">#575757</color>
 
@@ -12,4 +15,12 @@
 
     <color name="textColorLight" tools:override="true">#a0a0a0</color>
     <color name="textColorDark" tools:override="true">#575757</color>
+
+    <color name="editTextFormBackground">#f3f5f5</color>
+
+    <color name="dark_Transparent">#af000000</color>
+    <color name="colorAccent">#ff00ff</color>
+    <color name="colorPointed_Light">#ff00ff</color>
+
+
 </resources>

@@ -28,6 +28,10 @@ fun Context.versionCode(): Long {
     }
 }
 
+fun Context.getActionPrefix(): String {
+    return "${this.packageName}.action"
+}
+
 @TargetApi(23)
 fun isInDozeMode(context: Context): Boolean {
     return (context.getSystemService(Context.POWER_SERVICE) as PowerManager).isDeviceIdleMode

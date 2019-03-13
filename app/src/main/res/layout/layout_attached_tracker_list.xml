@@ -34,7 +34,7 @@
             android:layout_marginLeft="6dp"
             android:padding="2dp"
             android:text="@string/msg_no_trackers_are_assigned"
-            android:textColor="@color/colorRed.Light"
+            android:textColor="@color/colorRed_Light"
             android:textSize="14sp" />
     </FrameLayout>
 </LinearLayout>

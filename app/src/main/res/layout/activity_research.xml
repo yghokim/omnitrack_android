@@ -35,7 +35,7 @@
             app:tabIndicatorHeight="3dp"
             app:tabTextAppearance="@style/TabTextStyle" />
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
+        <kr.ac.snu.hcil.android.common.view.indicator.LoadingIndicatorBar
             android:id="@+id/ui_loading_indicator"
             android:layout_width="match_parent"
             android:layout_height="0dp" />

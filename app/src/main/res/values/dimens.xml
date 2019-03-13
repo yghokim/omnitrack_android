@@ -76,10 +76,6 @@
     <dimen name="home_sidebar_width">250dp</dimen>
     <dimen name="home_sidebar_profile_photo_width">65dp</dimen>
 
-    <dimen name="loading_indicator_bar_height">40dp</dimen>
-
-    <dimen name="image_placeholder_loading_indicator_size">35dp</dimen>
-
     <dimen name="item_input_attribute_list_bottom_padding_on_new_mode">80dp</dimen>
 
 </resources>

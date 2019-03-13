@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.android.common.view.image
 
 import android.content.Context
 import android.graphics.Color
@@ -13,10 +13,11 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import com.github.ybq.android.spinkit.SpinKitView
 import com.github.ybq.android.spinkit.style.Circle
+import kr.ac.snu.hcil.android.common.dipSize
+import kr.ac.snu.hcil.android.common.view.R
 import kr.ac.snu.hcil.android.common.view.applyTint
-import kr.ac.snu.hcil.omnitrack.R
-import org.jetbrains.anko.dip
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.roundToInt
 
 /**
  * Created by younghokim on 2017. 3. 12..
@@ -66,7 +67,7 @@ open class PlaceHolderImageView : FrameLayout {
                         loadingIndicator.visibility = View.GONE
                         errorRetryButton?.visibility = View.GONE
                         imageView.setImageResource(0)
-                        this.minimumHeight = dip(40)
+                        this.minimumHeight = dipSize(context, 40).roundToInt()
                         this.background = emptyBackground
                     }
                 }
@@ -96,7 +97,7 @@ open class PlaceHolderImageView : FrameLayout {
     init {
         setBackgroundColor(ContextCompat.getColor(context, R.color.editTextFormBackground))
 
-        val padding = dip(8)
+        val padding = dipSize(context, 8).roundToInt()
         setPadding(padding, padding, padding, padding)
 
         imageView = ImageView(context)
@@ -114,7 +115,7 @@ open class PlaceHolderImageView : FrameLayout {
                 context.resources.getDimensionPixelSize(R.dimen.image_placeholder_loading_indicator_size),
                 context.resources.getDimensionPixelSize(R.dimen.image_placeholder_loading_indicator_size))
         lp.gravity = Gravity.CENTER
-        val indicatorMargin = dip(8)
+        val indicatorMargin = dipSize(context, 8).roundToInt()
         lp.setMargins(indicatorMargin, indicatorMargin, indicatorMargin, indicatorMargin)
         loadingIndicator.layoutParams = lp
 
@@ -128,7 +129,7 @@ open class PlaceHolderImageView : FrameLayout {
 
             button.setSupportAllCaps(false)
             button.setTextColor(ContextCompat.getColor(context, R.color.colorRed_Light))
-            button.compoundDrawablePadding = dip(8)
+            button.compoundDrawablePadding = dipSize(context, 8).roundToInt()
             button.background = ContextCompat.getDrawable(context, R.drawable.transparent_button_background)
 
             button.setCompoundDrawablesRelativeWithIntrinsicBounds(applyTint(ContextCompat.getDrawable(context, R.drawable.error_dark)!!, ContextCompat.getColor(context, R.color.colorRed)), null, null, null)

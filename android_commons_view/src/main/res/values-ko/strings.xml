@@ -3,4 +3,8 @@
     <string name="msg_ok">확인</string>
     <string name="msg_yes">예</string>
     <string name="msg_no">아니오</string>
+
+    <string name="msg_pick_date">날짜를 선택하세요</string>
+
+    <string name="msg_spinner_tap_to_select">탭해서 고르기</string>
 </resources>

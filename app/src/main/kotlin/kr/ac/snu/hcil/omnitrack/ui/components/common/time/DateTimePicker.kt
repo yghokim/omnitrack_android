@@ -9,12 +9,12 @@ import kr.ac.snu.hcil.android.common.events.Event
 import kr.ac.snu.hcil.android.common.time.getAmPm
 import kr.ac.snu.hcil.android.common.time.getHour
 import kr.ac.snu.hcil.android.common.time.getMinute
+import kr.ac.snu.hcil.android.common.view.dialog.CalendarPickerDialogFragment
 import kr.ac.snu.hcil.android.common.view.getActivity
 import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.types.TimePoint
 import kr.ac.snu.hcil.omnitrack.ui.components.common.INumericUpDown
-import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CalendarPickerDialogFragment
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*

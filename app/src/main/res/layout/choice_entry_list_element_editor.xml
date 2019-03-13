@@ -38,7 +38,7 @@
         android:layout_alignParentEnd="true"
         android:padding="12dp"
         android:scaleType="fitCenter"
-        android:tint="@color/colorRed.Light"
+        android:tint="@color/colorRed_Light"
         app:srcCompat="@drawable/rounded_minus" />
 
 </RelativeLayout>

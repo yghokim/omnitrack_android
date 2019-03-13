@@ -35,7 +35,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/msg_cancel"
-            android:textColor="@color/colorRed.Light" />
+            android:textColor="@color/colorRed_Light" />
 
         <Button
             android:id="@+id/ui_button_previous"
@@ -44,7 +44,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/msg_cancel"
-            android:textColor="@color/colorRed.Light"
+            android:textColor="@color/colorRed_Light"
             android:visibility="gone" />
 
 

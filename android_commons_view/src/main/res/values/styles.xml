@@ -5,4 +5,21 @@
         <item name="android:textColor">@color/colorPointed</item>
         <item name="android:textSize">22.5sp</item>
     </style>
+
+    <style name="whitePlusButtonStyle">
+        <item name="android:background">@drawable/round_button_background</item>
+        <item name="android:padding">14dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="srcCompat">@drawable/plus</item>
+        <item name="android:tint">@color/buttonIconColorDark</item>
+    </style>
+
+
+    <style name="CameraViewOverlayButtonStyle" parent="Base.Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/button_background_capsule_dark_transparent</item>
+        <item name="android:textColor">#FFF</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">15dp</item>
+        <item name="android:drawablePadding">4dp</item>
+    </style>
 </resources>

@@ -9,7 +9,7 @@
             <solid android:color="@color/transparent" />
             <stroke
                 android:width="0.6dp"
-                android:color="@color/separator.Light" />
+                android:color="@color/separator_Light" />
         </shape>
     </item>
 

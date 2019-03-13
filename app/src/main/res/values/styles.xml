@@ -193,14 +193,6 @@
 
     </style>
 
-    <style name="whitePlusButtonStyle">
-        <item name="android:background">@drawable/round_button_background</item>
-        <item name="android:padding">14dp</item>
-        <item name="android:scaleType">fitCenter</item>
-        <item name="srcCompat">@drawable/plus</item>
-        <item name="android:tint">@color/buttonIconColorDark</item>
-    </style>
-
     <style name="whiteMinusButtonStyle" parent="whitePlusButtonStyle">
         <item name="srcCompat">@drawable/minus</item>
     </style>
@@ -459,7 +451,7 @@
         <item name="fabCustomSize">@dimen/button_height_normal</item>
         <item name="srcCompat">@drawable/plus</item>
         <item name="android:scaleType">center</item>
-        <item name="rippleColor">@color/colorPointed.Light</item>
+        <item name="rippleColor">@color/colorPointed_Light</item>
     </style>
 
     <style name="ExperimentSignUpFloatingActionButtonStyle" parent="FloatingActionButtonStyle">
@@ -471,7 +463,7 @@
         <item name="srcCompat">@drawable/ic_arrow_forward_black_24dp</item>
         <item name="android:padding">0dp</item>
         <item name="android:scaleType">center</item>
-        <item name="rippleColor">@color/colorPointed.Light</item>
+        <item name="rippleColor">@color/colorPointed_Light</item>
     </style>
 
 
@@ -482,14 +474,6 @@
         <item name="android:gravity">left|center_vertical</item>
         <item name="android:background">?selectableItemBackgroundBorderless</item>
         <item name="android:textColor">@color/buttonIconColorDark</item>
-    </style>
-
-    <style name="CameraViewOverlayButtonStyle" parent="Base.Widget.AppCompat.Button.Borderless">
-        <item name="android:background">@drawable/button_background_capsule_dark_transparent</item>
-        <item name="android:textColor">#FFF</item>
-        <item name="android:paddingStart">12dp</item>
-        <item name="android:paddingEnd">15dp</item>
-        <item name="android:drawablePadding">4dp</item>
     </style>
 
     <style name="RadioButtonStyle">
@@ -512,7 +496,7 @@
         <item name="android:textSize">14sp</item>
         <item name="fb_textColor">@color/textColorLight</item>
         <item name="fb_defaultColor">@color/editTextFormBackground</item>
-        <item name="fb_focusColor">@color/colorPointed.Light</item>
+        <item name="fb_focusColor">@color/colorPointed_Light</item>
         <item name="fb_radius">8dp</item>
         <item name="android:minHeight">@dimen/button_height_small</item>
     </style>
@@ -521,7 +505,7 @@
 
         <item name="android:layout_width">@dimen/button_height_tiny</item>
         <item name="android:layout_height">@dimen/button_height_tiny</item>
-        <item name="fb_defaultColor">@color/colorAccent.Light</item>
+        <item name="fb_defaultColor">@color/colorAccent_Light</item>
         <item name="fb_radius">300dp</item>
         <item name="fb_focusColor">@color/colorRed</item>
         <item name="fb_iconPaddingLeft">0dp</item>
@@ -532,13 +516,13 @@
 
     <style name="TinyCircularFancyButtonStyle.blackAndWhite" parent="TinyCircularFancyButtonStyle">
         <item name="fb_defaultColor">@color/editTextFormBackground</item>
-        <item name="fb_focusColor">@color/colorPointed.Light</item>
+        <item name="fb_focusColor">@color/colorPointed_Light</item>
         <item name="fb_iconResource">@drawable/ic_arrow_downward_black_24dp</item>
         <item name="drawableTint">@color/textColorLight</item>
     </style>
 
     <style name="FancyButtonStyle">
-        <item name="fb_defaultColor">@color/colorPointed.Light</item>
+        <item name="fb_defaultColor">@color/colorPointed_Light</item>
         <item name="fb_focusColor">@color/colorPointed</item>
         <item name="fb_radius">6dp</item>
         <item name="android:paddingStart">12dp</item>
@@ -550,7 +534,7 @@
     </style>
 
     <style name="FancyButtonStyle.Red" parent="FancyButtonStyle">
-        <item name="fb_defaultColor">@color/colorRed.Light</item>
+        <item name="fb_defaultColor">@color/colorRed_Light</item>
         <item name="fb_focusColor">@color/colorRed</item>
     </style>
 

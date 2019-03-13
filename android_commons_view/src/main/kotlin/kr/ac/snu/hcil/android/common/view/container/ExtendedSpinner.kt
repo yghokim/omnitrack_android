@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.android.common.view.container
 
 import android.content.Context
 import android.database.DataSetObserver
@@ -13,9 +13,10 @@ import android.widget.*
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import kr.ac.snu.hcil.android.common.dipSize
 import kr.ac.snu.hcil.android.common.view.InterfaceHelper
-import kr.ac.snu.hcil.omnitrack.R
-import org.jetbrains.anko.dip
+import kr.ac.snu.hcil.android.common.view.R
+import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 
 
@@ -74,7 +75,7 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
             this.scaleType = ImageView.ScaleType.FIT_XY
             this.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
                 this.gravity = Gravity.CENTER_VERTICAL
-                this.marginStart = dip(4)
+                this.marginStart = dipSize(context, 4).roundToInt()
             }
         }
 
@@ -218,7 +219,7 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
                 lp = LinearLayout.LayoutParams(lp)
             }
 
-            val margin = dip(6)
+            val margin = dipSize(context, 6).roundToInt()
             lp.topMargin = margin
             lp.marginStart = margin
             lp.bottomMargin = margin

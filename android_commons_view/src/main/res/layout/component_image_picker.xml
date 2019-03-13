@@ -16,8 +16,7 @@
         android:scaleType="fitCenter"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:src="@drawable/service_thumb_fitbit" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_cancel"
@@ -26,10 +25,10 @@
         android:background="@drawable/button_background_color_pointed"
         android:tint="#fff"
         android:visibility="gone"
-        tools:visibility="visible"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ex" />
+        app:srcCompat="@drawable/ex"
+        tools:visibility="visible" />
 
 
     <androidx.appcompat.widget.AppCompatImageButton
@@ -38,8 +37,8 @@
         android:layout_width="@dimen/button_height_tall"
         android:layout_height="@dimen/button_height_tall"
 
-        android:layout_marginBottom="50dp"
         android:layout_marginTop="50dp"
+        android:layout_marginBottom="50dp"
         android:padding="16dp"
 
         android:tint="@color/buttonIconColorDark"
@@ -54,8 +53,8 @@
         style="@style/whitePlusButtonStyle"
         android:layout_width="@dimen/button_height_tall"
         android:layout_height="@dimen/button_height_tall"
-        android:layout_marginEnd="0dp"
         android:layout_marginStart="@dimen/button_height_tall"
+        android:layout_marginEnd="0dp"
 
         android:padding="16dp"
         android:tint="@color/buttonIconColorDark"

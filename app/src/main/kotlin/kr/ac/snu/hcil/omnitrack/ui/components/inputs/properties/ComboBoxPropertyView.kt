@@ -3,8 +3,8 @@ package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.SpinnerAdapter
+import kr.ac.snu.hcil.android.common.view.container.ExtendedSpinner
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
 
 /**
  * Created by younghokim on 16. 8. 31..

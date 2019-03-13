@@ -1,7 +1,8 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.dialogs
+package kr.ac.snu.hcil.android.common.view.dialog
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -16,10 +17,10 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.DialogFragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.otaliastudios.cameraview.*
+import kr.ac.snu.hcil.android.common.getActionPrefix
+import kr.ac.snu.hcil.android.common.view.R
 import kr.ac.snu.hcil.android.common.view.applyTint
-import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
+import kr.ac.snu.hcil.android.common.view.indicator.LoadingIndicatorBar
 
 /**
  * Created by Young-Ho Kim on 2017-03-07.
@@ -30,9 +31,14 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
 
         const val EXTRA_REQUEST_KEY = "req"
         const val EXTRA_IMAGE_DATA = "image"
-        const val EXTRA_ACTION_PHOTO_TAKEN = "${OTApp.PREFIX_ACTION}.CAMERA_PHOTO_TAKEN"
+
+        const val SUFFIX_ACTION_PHOTO_TAKEN = "CAMERA_PHOTO_TAKEN"
 
         const val EXTRA_IMAGE_MAX_AREA = "max_area"
+
+        fun getActionName(context: Context): String {
+            return "${context.getActionPrefix()}.$SUFFIX_ACTION_PHOTO_TAKEN"
+        }
 
         fun getInstance(requestKey: String, maxImageArea: Int?): CameraPickDialogFragment {
             val fragment = CameraPickDialogFragment()
@@ -97,6 +103,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
         cancelButton.setOnClickListener(this)
 
         loadingIndicator = view.findViewById(R.id.ui_loading_indicator)
+        loadingIndicator.setStateWithoutAnimation(false)
         loadingIndicator.setMessage(R.string.msg_indicator_message_processing)
     }
 
@@ -164,7 +171,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
             if (jpeg != null) {
                 arguments?.getString(EXTRA_REQUEST_KEY)?.let {
                     LocalBroadcastManager.getInstance(context!!)
-                            .sendBroadcast(Intent(EXTRA_ACTION_PHOTO_TAKEN).putExtra(EXTRA_IMAGE_DATA, jpeg).putExtra(EXTRA_REQUEST_KEY, it))
+                            .sendBroadcast(Intent(getActionName(requireContext())).putExtra(EXTRA_IMAGE_DATA, jpeg).putExtra(EXTRA_REQUEST_KEY, it))
                 }
                 dismiss()
             }

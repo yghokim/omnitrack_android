@@ -38,7 +38,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="8dp"
         android:background="@null"
-        android:tint="@color/colorRed.Light"
+        android:tint="@color/colorRed_Light"
         android:visibility="invisible"
         app:srcCompat="@drawable/error_dark" />
 </LinearLayout>

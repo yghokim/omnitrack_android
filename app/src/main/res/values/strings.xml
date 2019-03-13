@@ -161,8 +161,6 @@
 
     <string name="msg_charts">Charts</string>
 
-    <string name="msg_pick_date">Pick date</string>
-
     <string name="msg_pick_time">Pick time</string>
 
     <string name="msg_pick_date_and_time">Pick date and time</string>
@@ -276,7 +274,6 @@
     <string name="msg_attach">connect</string>
     <string name="msg_service_activating">Activating…</string>
 
-    <string name="msg_spinner_tap_to_select">Tap to select</string>
 
     <string name="sign_in_with_google">Sign in with Google</string>
 
@@ -317,15 +314,9 @@
     <string name="msg_purge_cache">Clear cached media files that are alread synchronized</string>
     <string name="msg_remove_all_the_items_permanently">Remove all the items permanently</string>
     <string name="msg_no_cache">No cache</string>
-    <string name="msg_tab_to_take_a_photo">Tab to take a photo</string>
-    <string name="msg_turn_to_selfie">Turn to Selfie</string>
-    <string name="msg_turn_to_rear">Turn to Rear-cam</string>
-
-    <string name="msg_camera_input_header">Take a Snapshot</string>
 
     <string name="msg_indicator_message_item_autocomplete">Loading field values…</string>
 
-    <string name="msg_indicator_message_processing">Processing…</string>
     <string name="msg_export_to_file_tracker">Export items to file..</string>
     <string name="msg_desc_export_to_file_tracker">Store the items of the tracker to table</string>
     <string name="msg_export_success_notification_message">Exported %1$s logs successfully.</string>

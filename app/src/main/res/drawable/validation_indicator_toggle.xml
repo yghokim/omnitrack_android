@@ -1,7 +1,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_activated="false">
         <shape android:shape="oval">
-            <solid android:color="@color/colorRed.Light" />
+            <solid android:color="@color/colorRed_Light" />
         </shape>
     </item>
     <item android:state_activated="true">

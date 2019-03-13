@@ -32,7 +32,7 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="14dp"
             android:layout_height="14dp"
-            android:tint="@color/colorPointed.Light"
+            android:tint="@color/colorPointed_Light"
             app:srcCompat="@drawable/icon_plask" />
 
         <TextView
@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:textColor="@color/colorPointed.Light"
+            android:textColor="@color/colorPointed_Light"
             android:textSize="12sp"
             android:textStyle="bold"
             tools:text="Productivity Diary Study" />
@@ -101,7 +101,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:background="@null"
-            android:tint="@color/colorRed.Light"
+            android:tint="@color/colorRed_Light"
             app:layout_flexShrink="0"
             app:srcCompat="@drawable/error_dark" />
     </com.google.android.flexbox.FlexboxLayout>

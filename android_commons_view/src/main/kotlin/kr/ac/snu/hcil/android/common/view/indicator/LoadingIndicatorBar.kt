@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.android.common.view.indicator
 
 import android.animation.Animator
 import android.animation.ValueAnimator
@@ -10,8 +10,8 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.annotation.StringRes
 import com.github.ybq.android.spinkit.SpinKitView
+import kr.ac.snu.hcil.android.common.view.R
 import kr.ac.snu.hcil.android.common.view.inflateContent
-import kr.ac.snu.hcil.omnitrack.R
 
 /**
  * Created by younghokim on 2017. 3. 8..
@@ -118,6 +118,20 @@ class LoadingIndicatorBar : FrameLayout {
                 }
 
             })
+        }
+    }
+
+    fun setStateWithoutAnimation(shown: Boolean) {
+        showAnimator.cancel()
+        dismissAnimator.cancel()
+        if (shown) {
+            visibility = View.VISIBLE
+            layoutParams?.height = expandedHeight
+            isIndicatorShown = true
+        } else {
+            visibility = View.INVISIBLE
+            layoutParams?.height = 0
+            isIndicatorShown = false
         }
     }
 
