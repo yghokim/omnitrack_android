@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.views.rating
 
 import android.content.Context
 import android.graphics.*
+import android.os.Build
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
@@ -224,7 +225,13 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
 
 
     private fun makeMultilineStaticLayout(text: String, paint: TextPaint, maxWidth: Int, align: Layout.Alignment): StaticLayout {
-        return StaticLayout(text, paint, maxWidth, align, 1f, 1f, false)
+        return if (Build.VERSION.SDK_INT >= 23)
+            StaticLayout.Builder.obtain(text, 0, text.length, paint, maxWidth)
+                    .setAlignment(align)
+                    .setLineSpacing(1f, 1f)
+                    .setIncludePad(false)
+                    .build()
+        else StaticLayout(text, paint, maxWidth, align, 1f, 1f, false)
     }
 
     private fun textHeight(text: String, paint: Paint): Int {

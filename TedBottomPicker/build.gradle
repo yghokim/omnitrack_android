@@ -36,7 +36,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     implementation "androidx.appcompat:appcompat:$rootProject.ext.androidx_appcompat_version"
     implementation "com.google.android.material:material:$rootProject.ext.android_support_version"
-    implementation "androidx.annotation:annotation:$rootProject.ext.android_support_version"
+    implementation "androidx.annotation:annotation:$rootProject.ext.androidx_annotation_version"
     implementation "com.squareup.picasso:picasso:$rootProject.ext.picasso_version"
 }
 

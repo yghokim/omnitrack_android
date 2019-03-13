@@ -18,8 +18,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import dagger.Lazy
 import dagger.internal.Factory
-import io.ashdavies.rx.rxtasks.toCompletable
-import io.ashdavies.rx.rxtasks.toSingle
 import io.reactivex.Completable
 import io.reactivex.Completable.defer
 import io.reactivex.Maybe
@@ -38,6 +36,8 @@ import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneralAuth
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
+import kr.ac.snu.hcil.omnitrack.core.toCompletable
+import kr.ac.snu.hcil.omnitrack.core.toSingle
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignUpActivity
 import org.jetbrains.anko.runOnUiThread
