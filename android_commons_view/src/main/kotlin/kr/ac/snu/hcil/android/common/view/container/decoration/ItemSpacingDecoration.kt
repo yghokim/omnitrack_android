@@ -1,3 +1,5 @@
+package kr.ac.snu.hcil.android.common.view.container.decoration
+
 import android.content.Context
 import android.graphics.Rect
 import android.view.View

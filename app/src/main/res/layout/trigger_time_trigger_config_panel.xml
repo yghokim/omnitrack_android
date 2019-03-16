@@ -72,7 +72,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ui_checkbox_interval_use_timespan">
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourRangePicker
+        <kr.ac.snu.hcil.omnitrack.views.time.HourRangePicker
             android:id="@+id/ui_trigger_interval_timespan_picker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -102,7 +102,7 @@
         app:layout_constraintTop_toBottomOf="@id/ui_interval_group_config_bottom_separator" />
 
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.time.DateTimePicker
+    <kr.ac.snu.hcil.omnitrack.views.time.DateTimePicker
         android:id="@+id/ui_time_picker"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -160,14 +160,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ui_ema_use_sampling_range">
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourRangePicker
+        <kr.ac.snu.hcil.omnitrack.views.time.HourRangePicker
             android:id="@+id/ui_ema_range_picker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone" />
     </FrameLayout>
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.time.ShortDurationPicker
+    <kr.ac.snu.hcil.omnitrack.views.time.ShortDurationPicker
         android:id="@+id/ui_ema_minimum_interval_picker"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -205,7 +205,7 @@
         app:constraint_referenced_ids="ui_day_of_week_selector,ui_checkbox_range_specify_end,ui_button_end_date_wrapper"
         tools:visibility="visible" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.time.DayOfWeekSelector
+    <kr.ac.snu.hcil.omnitrack.views.time.DayOfWeekSelector
         android:id="@+id/ui_day_of_week_selector"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

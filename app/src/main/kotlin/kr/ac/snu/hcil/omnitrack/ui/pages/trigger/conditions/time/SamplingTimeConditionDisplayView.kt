@@ -8,7 +8,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.android.synthetic.main.trigger_display_time_ema.view.*
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourRangePicker
+import kr.ac.snu.hcil.omnitrack.views.time.HourRangePicker
 import java.util.*
 
 class SamplingTimeConditionDisplayView : ConstraintLayout {

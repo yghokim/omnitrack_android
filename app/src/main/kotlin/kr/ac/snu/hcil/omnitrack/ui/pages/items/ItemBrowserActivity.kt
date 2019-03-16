@@ -34,7 +34,9 @@ import kr.ac.snu.hcil.android.common.view.container.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.android.common.view.container.ExtendedSpinner
 import kr.ac.snu.hcil.android.common.view.container.FallbackRecyclerView
 import kr.ac.snu.hcil.android.common.view.container.adapter.RecyclerViewMenuAdapter
+import kr.ac.snu.hcil.android.common.view.container.decoration.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.android.common.view.container.decoration.TopBottomHorizontalImageDividerItemDecoration
+import kr.ac.snu.hcil.android.common.view.dialog.DismissingBottomSheetDialogFragment
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -48,12 +50,10 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
-import kr.ac.snu.hcil.omnitrack.ui.IActivityLifeCycle
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
-import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactoryManager
+import kr.ac.snu.hcil.omnitrack.views.IActivityLifeCycle
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.verticalMargin
 import java.text.SimpleDateFormat

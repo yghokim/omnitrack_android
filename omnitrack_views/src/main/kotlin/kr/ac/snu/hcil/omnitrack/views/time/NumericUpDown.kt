@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.omnitrack.views.time
 
 import android.annotation.TargetApi
 import android.content.Context
@@ -11,7 +11,7 @@ import androidx.annotation.PluralsRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import kr.ac.snu.hcil.android.common.events.Event
 import kr.ac.snu.hcil.android.common.view.inflateContent
-import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.views.R
 
 /**
  * Created by Young-Ho Kim on 2016-07-25.

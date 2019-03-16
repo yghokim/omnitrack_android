@@ -20,12 +20,12 @@ import io.reactivex.Completable
 import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.android.common.dipSize
 import kr.ac.snu.hcil.android.common.view.DialogHelper
+import kr.ac.snu.hcil.android.common.view.container.decoration.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.MeasureFactoryAdapter
 import javax.inject.Inject
 import kotlin.math.roundToInt

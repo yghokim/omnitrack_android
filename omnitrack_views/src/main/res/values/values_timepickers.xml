@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="hourPickerHourStyle">
+        <item name="android:textSize">@dimen/number_digit_size</item>
+        <item name="android:textColor">@color/colorSecondary</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="TimeRangePickerSubButtonStyle">
+        <item name="android:textSize">14sp</item>
+        <item name="fb_textColor">@color/textColorLight</item>
+        <item name="fb_defaultColor">@color/editTextFormBackground</item>
+        <item name="fb_focusColor">@color/colorPointed_Light</item>
+        <item name="fb_radius">8dp</item>
+        <item name="android:minHeight">@dimen/button_height_small</item>
+    </style>
+
+
+    <style name="dayOfWeekSelectorLetterAppearance">
+        <item name="fontPath">fonts/Roboto-Light.ttf</item>
+        <item name="android:textSize">27sp</item>
+    </style>
+
+    <style name="dayOfWeekSelectorLetterAppearance.Unselected" parent="dayOfWeekSelectorLetterAppearance">
+        <item name="android:textColor">@color/textColorMid</item>
+    </style>
+
+    <style name="dayOfWeekSelectorLetterAppearance.Selected" parent="dayOfWeekSelectorLetterAppearance">
+        <item name="android:textColor">#FFF</item>
+        <item name="android:fontFamily">sans-serif-normal</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="NumberPickerStyleImmersive">
+        <item name="np_selectedTextColor">@color/colorPointed</item>
+        <item name="android:textColor">@color/textColorLight</item>
+        <item name="np_dividerThickness">1dp</item>
+        <item name="np_wheelItemCount">5</item>
+        <item name="np_dividerColor">@color/textColorLightLight</item>
+        <item name="np_selectedTextSize">25sp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="np_textColor">@color/textColorMidLight</item>
+        <item name="np_typeface">fonts/Roboto-Thin.ttf</item>
+        <item name="np_wrapSelectorWheel">true</item>
+    </style>
+
+
+    <dimen name="time_range_picker_button_height">50dp</dimen>
+    <dimen name="time_range_picker_bullet_size">20dp</dimen>
+    <dimen name="time_range_picker_bullet_vertical_margin">15dp</dimen>
+    <dimen name="time_range_picker_indicator_marginRight">8dp</dimen>
+
+    <style name="timeRangePickerButtonStyle" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_height">@dimen/time_range_picker_button_height</item>
+        <item name="android:background">@drawable/white_rect_button_background</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/buttonIconColorDark</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+
+    </style>
+
+    <style name="timeRangePickerBulletStyle">
+        <item name="android:layout_width">@dimen/time_range_picker_bullet_size</item>
+        <item name="android:layout_height">@dimen/time_range_picker_bullet_size</item>
+        <item name="android:background">@drawable/process_bullet</item>
+        <item name="android:layout_marginRight">@dimen/time_range_picker_indicator_marginRight
+        </item>
+    </style>
+
+</resources>

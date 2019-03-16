@@ -398,12 +398,6 @@
     <string name="msg_format_confirm_remove_trigger">이 %1$s를 삭제하시겠습니까?</string>
     <string name="msg_use_validation_script">Use Validation Script</string>
 
-    <string name="time_range_picker_30_mins">+ 30분</string>
-    <string name="time_range_picker_1_hour">+ 1시간</string>
-
-    <string name="time_range_picker_1_day">+ 1일</string>
-    <string name="time_range_picker_1_week">+ 1주</string>
-    <string name="msg_time_range_picker_to_now">현재시각</string>
     <string name="msg_title_research">리서치</string>
     <string name="msg_empty_experiments">실험 참가내역이 없습니다.</string>
     <string name="msg_empty_invitations">참가 가능한 공개 실험이 없습니다.</string>

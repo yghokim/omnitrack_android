@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui
+package kr.ac.snu.hcil.omnitrack.views
 
 import android.os.Bundle
 

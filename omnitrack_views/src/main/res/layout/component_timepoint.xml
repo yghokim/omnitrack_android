@@ -23,11 +23,10 @@
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
+    <kr.ac.snu.hcil.omnitrack.views.time.NumericUpDown
         android:id="@+id/ui_left_picker"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -50,7 +49,7 @@
         app:layout_constraintTop_toTopOf="@+id/ui_left_picker"
         app:srcCompat="@drawable/time_digit_separator" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
+    <kr.ac.snu.hcil.omnitrack.views.time.NumericUpDown
         android:id="@+id/ui_middle_picker"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -73,7 +72,7 @@
         app:layout_constraintTop_toTopOf="@+id/ui_left_picker"
         app:srcCompat="@drawable/time_digit_separator" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
+    <kr.ac.snu.hcil.omnitrack.views.time.NumericUpDown
         android:id="@+id/ui_right_picker"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

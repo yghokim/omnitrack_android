@@ -6,7 +6,7 @@
     <string name="time_am">AM</string>
     <string name="time_pm">PM</string>
 
-    <string name="dateformat_dow_and_year">EEEE, yyyy</string>
+    <string name="dateformat_dow_and_year" translatable="false">EEEE, yyyy</string>
 
 
     <string name="dateformat_ymd">MMM d, EEE, yyyy</string>
@@ -73,9 +73,37 @@
     <string name="granularity_month">Month</string>
     <string name="granularity_year">Year</string>
 
+
+    <string name="time_range_picker_30_mins">+ 30 mins</string>
+    <string name="time_range_picker_1_hour">+ 1 hour</string>
+    <string name="time_range_picker_1_day">+ 1 day</string>
+    <string name="time_range_picker_1_week">+ 1 week</string>
+    <string name="msg_time_range_picker_to_now">To Now</string>
+
+
     <string-array name="am_pm">
         <item>AM</item>
         <item>PM</item>
+    </string-array>
+
+    <string-array name="days_of_week_short">
+        <item>@string/sunday_short</item>
+        <item>@string/monday_short</item>
+        <item>@string/tuesday_short</item>
+        <item>@string/wednesday_short</item>
+        <item>@string/thursday_short</item>
+        <item>@string/friday_short</item>
+        <item>@string/saturday_short</item>
+    </string-array>
+
+    <string-array name="days_of_week_oneletter">
+        <item>@string/sunday_oneletter</item>
+        <item>@string/monday_oneletter</item>
+        <item>@string/tuesday_oneletter</item>
+        <item>@string/wednesday_oneletter</item>
+        <item>@string/thursday_oneletter</item>
+        <item>@string/friday_oneletter</item>
+        <item>@string/saturday_oneletter</item>
     </string-array>
 
 

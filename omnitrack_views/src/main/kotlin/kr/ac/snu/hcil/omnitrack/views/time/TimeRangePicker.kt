@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common.time
+package kr.ac.snu.hcil.omnitrack.views.time
 
 import android.app.Dialog
 import android.content.Context
@@ -14,8 +14,8 @@ import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 import kr.ac.snu.hcil.android.common.view.getActivity
 import kr.ac.snu.hcil.android.common.view.inflateContent
-import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.types.TimeSpan
+import kr.ac.snu.hcil.omnitrack.views.R
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
@@ -207,7 +207,7 @@ class TimeRangePicker : ConstraintLayout, View.OnClickListener {
                     //date picking
 
 
-                    val dialog = DatePickerDialog.newInstance({
+                    DatePickerDialog.newInstance({
                         view, year, monthOfYear, dayOfMonth ->
                         cal.set(Calendar.YEAR, year)
                         cal.set(Calendar.MONTH, monthOfYear)

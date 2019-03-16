@@ -27,7 +27,7 @@
         android:layout_marginLeft="-8dp"
         />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.time.ShortDurationPicker
+    <kr.ac.snu.hcil.omnitrack.views.time.ShortDurationPicker
         android:id="@+id/ui_expiry_duration_picker"
         android:text="@string/msg_reminder_expiry_time"
         android:layout_width="match_parent"

@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.export
 
-import ItemSpacingDecoration
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +16,7 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_package_export.*
 import kotlinx.android.synthetic.main.tracker_for_package_list_element.view.*
 import kr.ac.snu.hcil.android.common.events.IEventListener
+import kr.ac.snu.hcil.android.common.view.container.decoration.ItemSpacingDecoration
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO

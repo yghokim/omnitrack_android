@@ -4,12 +4,12 @@ import android.content.Context
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeSpanAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.ui.components.common.time.TimeRangePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimeRangePickerInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
+import kr.ac.snu.hcil.omnitrack.views.time.TimeRangePicker
 
 class TimeSpanViewFactory(helper: OTTimeSpanAttributeHelper) : AttributeViewFactory<OTTimeSpanAttributeHelper>(helper) {
     override fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int {

@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.android.common.view.dialog
 
 import android.annotation.SuppressLint
 import android.app.Dialog

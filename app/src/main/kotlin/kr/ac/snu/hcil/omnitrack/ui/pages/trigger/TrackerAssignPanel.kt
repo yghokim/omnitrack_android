@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
-import ItemSpacingDecoration
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -17,6 +16,7 @@ import io.reactivex.subjects.BehaviorSubject
 import io.realm.Realm
 import kotlinx.android.synthetic.main.layout_attached_tracker_list_element_removable.view.*
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
+import kr.ac.snu.hcil.android.common.view.container.decoration.ItemSpacingDecoration
 import kr.ac.snu.hcil.android.common.view.getActivity
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R

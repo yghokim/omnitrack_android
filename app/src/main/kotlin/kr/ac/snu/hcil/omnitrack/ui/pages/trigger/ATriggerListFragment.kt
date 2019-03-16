@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
-import ItemSpacingDecoration
 import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Intent
@@ -35,6 +34,7 @@ import kotlinx.android.synthetic.main.trigger_list_element.view.*
 import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.android.common.view.InterfaceHelper
+import kr.ac.snu.hcil.android.common.view.container.decoration.ItemSpacingDecoration
 import kr.ac.snu.hcil.android.common.view.container.decoration.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp

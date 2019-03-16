@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.omnitrack.views.time
 
 import kr.ac.snu.hcil.android.common.events.Event
 

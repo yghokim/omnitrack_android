@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common.time
+package kr.ac.snu.hcil.omnitrack.views.time
 
 import android.content.Context
 import android.text.Editable
@@ -6,10 +6,10 @@ import android.text.TextWatcher
 import android.util.AttributeSet
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import kotlinx.android.synthetic.main.component_property_duration_picker.view.*
+import kotlinx.android.synthetic.main.component_short_duration_picker.view.*
 import kr.ac.snu.hcil.android.common.events.Event
 import kr.ac.snu.hcil.android.common.view.inflateContent
-import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.views.R
 
 class ShortDurationPicker : ConstraintLayout {
 
@@ -63,7 +63,7 @@ class ShortDurationPicker : ConstraintLayout {
     }
 
     init {
-        inflateContent(R.layout.component_property_duration_picker, true)
+        inflateContent(R.layout.component_short_duration_picker, true)
 
         ui_unit_spinner.setItems(resources.getString(R.string.time_duration_hour_full), resources.getString(R.string.time_duration_minute_full), resources.getString(R.string.time_duration_second_full))
 
@@ -110,7 +110,7 @@ class ShortDurationPicker : ConstraintLayout {
                 durationSeconds = b.getInteger(R.styleable.ShortDurationPicker_rawDurationSeconds, 0)
             } else {
                 if (b.hasValue(R.styleable.ShortDurationPicker_durationUnit)) {
-                    when (b.getString(R.styleable.ShortDurationPicker_durationUnit).toLowerCase()) {
+                    when (b.getString(R.styleable.ShortDurationPicker_durationUnit)?.toLowerCase()) {
                         "hour", "hours", "hr", "hrs" -> {
                             ui_unit_spinner.selectedIndex = UNIT_HOUR
                         }

@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common.time
+package kr.ac.snu.hcil.omnitrack.views.time
 
 import android.content.Context
 import android.os.Parcel
@@ -14,7 +14,7 @@ import kr.ac.snu.hcil.android.common.time.getHour
 import kr.ac.snu.hcil.android.common.time.getMinute
 import kr.ac.snu.hcil.android.common.time.setHourOfDay
 import kr.ac.snu.hcil.android.common.view.inflateContent
-import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.views.R
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kr.ac.snu.hcil.android.common.time.TimeHelper
+import kr.ac.snu.hcil.android.common.view.container.decoration.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -22,7 +23,6 @@ import kr.ac.snu.hcil.omnitrack.core.visualization.INativeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.IWebBasedChartModel
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
-import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.IChartView
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.NativeChartView
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.WebBasedChartView

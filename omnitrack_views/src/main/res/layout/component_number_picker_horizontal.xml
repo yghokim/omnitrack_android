@@ -33,15 +33,15 @@
         style="@style/hourPickerHourStyle"
         android:layout_width="0dp"
         android:layout_height="@dimen/button_height_normal"
-        android:layout_marginEnd="10dp"
         android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_weight="1"
         android:fontFamily="sans-serif-light"
         android:gravity="center"
-        android:minWidth="80dp"
-        android:textAlignment="center"
         android:inputType="number"
         android:maxLines="1"
+        android:minWidth="80dp"
+        android:textAlignment="center"
         android:textSize="20sp"
         app:layout_constraintLeft_toRightOf="@id/ui_button_minus" />
 

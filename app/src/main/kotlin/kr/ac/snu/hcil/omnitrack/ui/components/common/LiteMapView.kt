@@ -14,7 +14,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.component_lite_mapview.view.*
 import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.IActivityLifeCycle
+import kr.ac.snu.hcil.omnitrack.views.IActivityLifeCycle
 
 /**
  * Created by younghokim on 2017-11-29.

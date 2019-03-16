@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.omnitrack.views.time
 
 import android.content.Context
 import android.os.Parcel
@@ -13,8 +13,8 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import kr.ac.snu.hcil.android.common.events.Event
-import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.common.INumericUpDown.Companion.FAST_CHANGE_INTERVAL
+import kr.ac.snu.hcil.omnitrack.views.R
+import kr.ac.snu.hcil.omnitrack.views.time.INumericUpDown.Companion.FAST_CHANGE_INTERVAL
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils
 import java.util.*
 import kotlin.properties.Delegates

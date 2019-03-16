@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.decorations
+package kr.ac.snu.hcil.android.common.view.container.decoration
 
 import android.content.Context
 import android.graphics.Canvas

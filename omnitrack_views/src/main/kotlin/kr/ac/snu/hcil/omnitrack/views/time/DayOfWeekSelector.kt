@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common.time
+package kr.ac.snu.hcil.omnitrack.views.time
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -16,7 +16,7 @@ import kr.ac.snu.hcil.android.common.BitwiseOperationHelper
 import kr.ac.snu.hcil.android.common.dipSize
 import kr.ac.snu.hcil.android.common.events.Event
 import kr.ac.snu.hcil.android.common.view.InterfaceHelper
-import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.views.R
 
 /**
  * Created by Young-Ho on 8/25/2016.

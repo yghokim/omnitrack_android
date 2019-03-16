@@ -4,12 +4,12 @@ import android.content.Context
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DateTimePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
+import kr.ac.snu.hcil.omnitrack.views.time.DateTimePicker
 
 class TimeViewFactory(helper: OTTimeAttributeHelper) : AttributeViewFactory<OTTimeAttributeHelper>(helper) {
     override fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int {

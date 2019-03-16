@@ -2,17 +2,17 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:background="@color/frontalBackground"
-    tools:padding="@dimen/activity_horizontal_margin"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    tools:background="@color/frontalBackground"
+    tools:padding="@dimen/activity_horizontal_margin"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <View
         android:id="@+id/ui_process_bullet_from"
         style="@style/timeRangePickerBulletStyle"
-        android:layout_marginBottom="0dp"
         android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
         app:layout_constraintBottom_toBottomOf="@+id/ui_button_from"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="@+id/ui_button_from" />
@@ -20,22 +20,22 @@
     <View
         android:id="@+id/ui_process_bullet_to"
         style="@style/timeRangePickerBulletStyle"
-        android:layout_marginBottom="0dp"
         android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
         app:layout_constraintBottom_toBottomOf="@+id/ui_button_to"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="@+id/ui_button_to"
         app:layout_constraintVertical_bias="0.5" />
 
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.ProcessArrowIndicator
+    <kr.ac.snu.hcil.omnitrack.views.time.ProcessArrowIndicator
         android:id="@+id/view"
         android:layout_width="15dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/ui_process_bullet_to"
         app:layout_constraintLeft_toLeftOf="@+id/ui_process_bullet_to"
         app:layout_constraintRight_toRightOf="@+id/ui_process_bullet_to"
@@ -74,8 +74,8 @@
     <kr.ac.snu.hcil.android.common.view.tint.TintFancyButton
         android:id="@+id/ui_button_down"
         style="@style/TinyCircularFancyButtonStyle.blackAndWhite"
-        android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toStartOf="@id/ui_button_up"
         app:layout_constraintTop_toBottomOf="@+id/ui_button_from" />
 
@@ -93,10 +93,10 @@
         android:id="@+id/ui_button_to"
         style="@style/timeRangePickerButtonStyle"
         android:layout_width="0dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="0dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toRightOf="@+id/ui_process_bullet_to"
         app:layout_constraintRight_toRightOf="parent"

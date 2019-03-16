@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.bottomsheet_handle_extracted_package.view.*
 import kr.ac.snu.hcil.android.common.file.FileHelper
 import kr.ac.snu.hcil.android.common.view.container.adapter.RecyclerViewMenuAdapter
+import kr.ac.snu.hcil.android.common.view.dialog.DismissingBottomSheetDialogFragment
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
 import java.text.SimpleDateFormat
 import java.util.*
 

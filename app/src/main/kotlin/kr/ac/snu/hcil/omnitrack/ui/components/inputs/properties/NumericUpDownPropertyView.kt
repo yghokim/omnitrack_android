@@ -3,8 +3,8 @@ package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 import android.content.Context
 import android.util.AttributeSet
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.common.INumericUpDown
-import kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
+import kr.ac.snu.hcil.omnitrack.views.time.INumericUpDown
+import kr.ac.snu.hcil.omnitrack.views.time.NumericUpDown
 
 /**
  * Created by younghokim on 16. 8. 31..

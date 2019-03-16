@@ -14,8 +14,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kr.ac.snu.hcil.android.common.events.Event
+import kr.ac.snu.hcil.android.common.view.container.decoration.BetweenSpacingItemDecoration
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.decorations.BetweenSpacingItemDecoration
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -74,7 +74,7 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
 
         layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
 
-        addItemDecoration(BetweenSpacingItemDecoration(RecyclerView.HORIZONTAL, resources.getDimensionPixelOffset(R.dimen.selection_view_button_spacing)))
+        addItemDecoration(BetweenSpacingItemDecoration(HORIZONTAL, resources.getDimensionPixelOffset(R.dimen.selection_view_button_spacing)))
 
         adapter = Adapter()
 

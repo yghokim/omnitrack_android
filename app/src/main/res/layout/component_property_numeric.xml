@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1">
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
+        <kr.ac.snu.hcil.omnitrack.views.time.NumericUpDown
             android:id="@+id/ui_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
