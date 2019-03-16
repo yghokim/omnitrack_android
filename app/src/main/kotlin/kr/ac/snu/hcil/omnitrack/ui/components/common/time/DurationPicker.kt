@@ -19,8 +19,8 @@ import kr.ac.snu.hcil.android.common.events.Event
 import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.android.common.view.getActivity
 import kr.ac.snu.hcil.android.common.view.inflateContent
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
-import kr.ac.snu.hcil.omnitrack.views.R
 
 /**
  * Created by younghokim on 16. 8. 23..

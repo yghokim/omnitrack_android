@@ -129,7 +129,7 @@ class DataDrivenTriggerCheckReceiver : BroadcastReceiver() {
                                     val valueRequests = entries.map { entry ->
                                         val factory = externalServiceManager.get().getMeasureFactoryByCode(entry.factoryCode!!)!!
                                         val measure = factory.makeMeasure(entry.serializedMeasure!!)
-                                        measure.getValueRequest(null, timeQueryTypeAdapter.get().fromJson(entry.serializedTimeQuery)).firstOrError().map {
+                                        measure.getValueRequest(null, timeQueryTypeAdapter.get().fromJson(entry.serializedTimeQuery)).map {
                                             Pair(entry, it)
                                         }.subscribeOn(Schedulers.io())
                                     }

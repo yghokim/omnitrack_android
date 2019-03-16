@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.connection
 import android.content.Context
 import android.text.Html
 import com.google.gson.stream.JsonReader
-import io.reactivex.Flowable
+import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.INameDescriptionResourceProvider
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
@@ -66,7 +66,7 @@ abstract class OTMeasureFactory(val context: Context, val factoryTypeName: Strin
 
         val factoryCode: String get() = this.factory.typeCode
 
-        abstract fun getValueRequest(builder: OTItemBuilderWrapperBase?, query: OTTimeRangeQuery?): Flowable<Nullable<out Any>>
+        abstract fun getValueRequest(builder: OTItemBuilderWrapperBase?, query: OTTimeRangeQuery?): Single<Nullable<out Any>>
 
         fun <T : OTMeasureFactory> getFactory(): T {
             @Suppress("UNCHECKED_CAST")
@@ -77,9 +77,9 @@ abstract class OTMeasureFactory(val context: Context, val factoryTypeName: Strin
     abstract class OTRangeQueriedMeasure(factory: OTMeasureFactory) : OTMeasure(factory) {
 
 
-        abstract fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>>
+        abstract fun getValueRequest(start: Long, end: Long): Single<Nullable<out Any>>
 
-        override fun getValueRequest(builder: OTItemBuilderWrapperBase?, query: OTTimeRangeQuery?): Flowable<Nullable<out Any>> {
+        override fun getValueRequest(builder: OTItemBuilderWrapperBase?, query: OTTimeRangeQuery?): Single<Nullable<out Any>> {
             val range = query!!.getRange(builder)
             return getValueRequest(range.first, range.second)
         }

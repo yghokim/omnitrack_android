@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
 import android.content.Context
 import com.google.gson.stream.JsonReader
-import io.reactivex.Flowable
+import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -55,13 +55,13 @@ class MisfitSleepMeasureFactory(context: Context, service: MisfitService) : OTSe
 
     class MisfitSleepMeasure(factory: MisfitSleepMeasureFactory) : OTRangeQueriedMeasure(factory) {
 
-        override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
+        override fun getValueRequest(start: Long, end: Long): Single<Nullable<out Any>> {
             val service = getFactory<MisfitSleepMeasureFactory>().getService<MisfitService>()
-            return Flowable.defer {
+            return Single.defer {
                 val token = service.getStoredAccessToken()
                 if (token != null) {
-                    return@defer service.api.getLatestSleepOnDayRequest(token, Date(start), Date(end - 20)).toFlowable() as Flowable<Nullable<out Any>>
-                } else return@defer Flowable.error<Nullable<out Any>>(Exception("no token"))
+                    return@defer service.api.getLatestSleepOnDayRequest(token, Date(start), Date(end - 20))
+                } else return@defer Single.error<Nullable<out Any>>(Exception("no token"))
             }
         }
 

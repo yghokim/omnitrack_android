@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
 import android.content.Context
 import com.google.gson.stream.JsonReader
-import io.reactivex.Flowable
+import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -66,10 +66,10 @@ class FitbitHeartRateMeasureFactory(context: Context, service: FitbitService) : 
             }
         }
 
-        override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
+        override fun getValueRequest(start: Long, end: Long): Single<Nullable<out Any>> {
             val urls = FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_HEART_RATE, start, end)
             println(urls)
-            return getFactory<FitbitHeartRateMeasureFactory>().getService<FitbitService>().getRequest(converter, *urls).toFlowable() as Flowable<Nullable<out Any>>
+            return getFactory<FitbitHeartRateMeasureFactory>().getService<FitbitService>().getRequest(converter, *urls) as Single<Nullable<out Any>>
         }
 
         override fun equals(other: Any?): Boolean {

@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
 import android.content.Context
 import com.google.gson.stream.JsonReader
-import io.reactivex.Flowable
+import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.net.OAuth2Client
 import kr.ac.snu.hcil.android.common.time.TimeHelper
@@ -83,17 +83,17 @@ class FitbitDistanceMeasureFactory(context: Context, parentService: FitbitServic
 
         }
 
-        override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
+        override fun getValueRequest(start: Long, end: Long): Single<Nullable<out Any>> {
 
             return if (TimeHelper.isSameDay(start, end - 10)) {
                 getFactory<FitbitDistanceMeasureFactory>().getService<FitbitService>().getRequest(
                         dailyConverter,
-                        FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SUMMARY, Date(start))).toFlowable()
-                        as Flowable<Nullable<out Any>>
+                        FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SUMMARY, Date(start)))
+                        as Single<Nullable<out Any>>
             } else
             //TODO: Can be optimized by querying summary data of middle days.
-                getFactory<FitbitDistanceMeasureFactory>().getService<FitbitService>().getRequest(intraDayConverter, *FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_DISTANCE, start, end)).toFlowable()
-                        as Flowable<Nullable<out Any>>
+                getFactory<FitbitDistanceMeasureFactory>().getService<FitbitService>().getRequest(intraDayConverter, *FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_DISTANCE, start, end))
+                        as Single<Nullable<out Any>>
         }
 
         override fun equals(other: Any?): Boolean {

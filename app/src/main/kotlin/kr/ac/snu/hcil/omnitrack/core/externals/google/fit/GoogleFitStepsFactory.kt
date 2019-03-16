@@ -9,7 +9,7 @@ import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.fitness.request.DataReadRequest
 import com.google.gson.stream.JsonReader
-import io.reactivex.Flowable
+import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -69,13 +69,13 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
 
     class Measure(factory: GoogleFitStepsFactory) : OTRangeQueriedMeasure(factory) {
 
-        override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
+        override fun getValueRequest(start: Long, end: Long): Single<Nullable<out Any>> {
             println("Requested Google Fit Step Measure")
             OTApp.logger.writeSystemLog("Start Google Fit step measure", "GoogleFitStepsFactory")
             val service = getFactory<GoogleFitStepsFactory>().getService<GoogleFitService>()
             return if (service.state == OTExternalService.ServiceState.ACTIVATED) {
-                service.getConnectedClient().toFlowable().flatMap<Nullable<out Any>> { client ->
-                    Flowable.defer {
+                service.getConnectedClient().flatMap<Nullable<out Any>> { client ->
+                    Single.defer {
 
                         //make a DataSource to designate to use the same step count as Google Fit app.
                         val source = DataSource.Builder()
@@ -105,13 +105,13 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
                             }
                         }
 
-                        return@defer Flowable.just(Nullable(steps))
+                        return@defer Single.just(Nullable(steps))
                     }.subscribeOn(Schedulers.io())
                 }
             } else {
 
                 OTApp.logger.writeSystemLog("Google Fit Service is not activated.", "GoogleFitStepsFactory")
-                Flowable.error<Nullable<out Any>>(Exception("Service is not activated."))
+                Single.error<Nullable<out Any>>(Exception("Service is not activated."))
             }
         }
 

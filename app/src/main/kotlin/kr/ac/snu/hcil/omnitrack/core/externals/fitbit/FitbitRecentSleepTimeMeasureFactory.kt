@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
 import android.content.Context
 import com.google.gson.stream.JsonReader
-import io.reactivex.Flowable
+import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.net.AuthConstants
 import kr.ac.snu.hcil.android.common.net.OAuth2Client
@@ -84,13 +84,13 @@ class FitbitRecentSleepTimeMeasureFactory(context: Context, service: FitbitServi
 
         }
 
-        override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
+        override fun getValueRequest(start: Long, end: Long): Single<Nullable<out Any>> {
             val uri = HttpUrl.parse(FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SLEEP, Date(start)))!!.newBuilder()
                     .addQueryParameter("isMainSleep", "true")
                     .build()
             return getFactory<FitbitRecentSleepTimeMeasureFactory>().getService<FitbitService>().getRequest(
                     converter,
-                    uri.toString()).toFlowable() as Flowable<Nullable<out Any>>
+                    uri.toString()) as Single<Nullable<out Any>>
         }
 
         override fun equals(other: Any?): Boolean {

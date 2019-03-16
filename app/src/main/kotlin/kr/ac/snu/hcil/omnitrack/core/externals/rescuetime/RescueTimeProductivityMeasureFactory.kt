@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 
 import android.content.Context
 import com.google.gson.stream.JsonReader
-import io.reactivex.Flowable
+import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -80,9 +80,9 @@ class RescueTimeProductivityMeasureFactory(context: Context, service: RescueTime
     class ProductivityMeasure(factory: RescueTimeProductivityMeasureFactory) : OTRangeQueriedMeasure(factory) {
 
 
-        override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
+        override fun getValueRequest(start: Long, end: Long): Single<Nullable<out Any>> {
             val factory = getFactory<RescueTimeProductivityMeasureFactory>()
-            return factory.getService<RescueTimeService>().getSummaryRequest(Date(start), Date(end - 1), factory.productivityCalculator).toFlowable() as Flowable<Nullable<out Any>>
+            return factory.getService<RescueTimeService>().getSummaryRequest(Date(start), Date(end - 1), factory.productivityCalculator) as Single<Nullable<out Any>>
         }
 
         override fun equals(other: Any?): Boolean {

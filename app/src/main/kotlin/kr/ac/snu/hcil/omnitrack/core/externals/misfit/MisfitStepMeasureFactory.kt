@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
 import android.content.Context
 import com.google.gson.stream.JsonReader
-import io.reactivex.Flowable
+import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -57,14 +57,14 @@ class MisfitStepMeasureFactory(context: Context, service: MisfitService) : OTSer
 
     class MisfitStepMeasure(factory: MisfitStepMeasureFactory) : OTRangeQueriedMeasure(factory) {
 
-        override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
-            return Flowable.defer {
+        override fun getValueRequest(start: Long, end: Long): Single<Nullable<out Any>> {
+            return Single.defer {
                 val service = getFactory<MisfitStepMeasureFactory>().getService<MisfitService>()
                 val token = service.getStoredAccessToken()
                 if (token != null) {
-                    return@defer service.api.getStepsOnDayRequest(token, Date(start), Date(end - 1)).toFlowable() as Flowable<Nullable<out Any>>
+                    return@defer service.api.getStepsOnDayRequest(token, Date(start), Date(end - 1))
                 } else {
-                    return@defer Flowable.error<Nullable<out Any>>(Exception("no token"))
+                    return@defer Single.error<Nullable<out Any>>(Exception("no token"))
                 }
             }
         }

@@ -8,6 +8,7 @@ import com.google.gson.stream.JsonWriter
 import dagger.Lazy
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
+import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.TextHelper
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
@@ -99,12 +100,12 @@ class OTConnection {
     var rangedQuery: OTTimeRangeQuery? = null
 
 
-    fun getRequestedValue(builder: OTItemBuilderWrapperBase): Flowable<Nullable<out Any>> {
-        return Flowable.defer {
+    fun getRequestedValue(builder: OTItemBuilderWrapperBase): Single<Nullable<out Any>> {
+        return Single.defer {
             if (source != null) {
                 return@defer source!!.getValueRequest(builder, rangedQuery)
             } else {
-                return@defer Flowable.error<Nullable<out Any>>(Exception("Connection source is not designated."))
+                return@defer Single.error<Nullable<out Any>>(Exception("Connection source is not designated."))
             }
         }
     }
