@@ -73,6 +73,8 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
         this.suspendReadjustWorker.set(suspend)
     }
 
+    fun isAlarmRegistered(context: Context): Boolean = makePendingIntent(context, PendingIntent.FLAG_NO_CREATE) != null
+
     private fun matchCondition(condition: OTDataDrivenTriggerCondition, measureEntry: OTTriggerMeasureEntry): Boolean {
         val conditionMeasure = condition.measure
         if (conditionMeasure == null) {
@@ -115,7 +117,7 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
 
     fun reAdjustWorker(realm: Realm) {
         if (!suspendReadjustWorker.get()) {
-            OTApp.logger.writeSystemLog("readjust worker", TAG)
+            OTApp.logger.writeSystemLog("readjust worker: currently alarm active in system: ${isAlarmRegistered(context)}", TAG)
             val numMeasures = realm.where(OTTriggerMeasureEntry::class.java)
                     .equalTo(FIELD_IS_ACTIVE, true).count()
             if (numMeasures > 0L) {
@@ -126,15 +128,17 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
                 //turn off worker
                 OTApp.logger.writeSystemLog("No measures are active. cancel the alarm", TAG)
                 preferences.get().edit().remove(PREF_KEY_NEXT_CHECK_TIME_ELAPSED).apply()
-                context.alarmManager.cancel(makePendingIntent(context))
+                val pendingIntent = makePendingIntent(context)
+                context.alarmManager.cancel(pendingIntent)
+                pendingIntent?.cancel()
             }
         }
     }
 
 
-    private fun makePendingIntent(context: Context): PendingIntent {
+    private fun makePendingIntent(context: Context, overrideFlag: Int? = null): PendingIntent? {
         val receiverIntent = DataDrivenTriggerCheckReceiver.makeIntent(context)
-        return PendingIntent.getBroadcast(context, REQUEST_CODE, receiverIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        return PendingIntent.getBroadcast(context, REQUEST_CODE, receiverIntent, overrideFlag ?: PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     fun activateOnSystem() {
@@ -144,7 +148,6 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
                 PeriodicWorkRequestBuilder<InactiveMeasureEntryClearanceWorker>(
                         1, TimeUnit.DAYS
                 )
-                        .setBackoffCriteria(BackoffPolicy.LINEAR, 5, TimeUnit.SECONDS)
                         .setConstraints(Constraints.Builder()
                                 .apply {
                                     if (Build.VERSION.SDK_INT >= 23)
@@ -178,7 +181,7 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
         preferences.get().edit().putLong(PREF_KEY_NEXT_CHECK_TIME_ELAPSED, nextTime).apply()
         AlarmManagerCompat.setExactAndAllowWhileIdle(context.alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 nextTime,
-                makePendingIntent(context))
+                makePendingIntent(context)!!)
     }
 
     fun getNextCheckTimeElapsed(): Long? {

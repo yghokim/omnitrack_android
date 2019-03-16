@@ -9,6 +9,7 @@ import androidx.work.WorkManager
 import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
@@ -34,7 +35,7 @@ class RebootReceiver : BroadcastReceiver() {
     protected lateinit var eventLogger: Lazy<IEventLogger>
 
     override fun onReceive(context: Context, intent: Intent) {
-        println("OMNITRACK: reboot receiver called - ${intent.action}")
+        OTApp.logger.writeSystemLog("OMNITRACK: reboot receiver called - ${intent.action}", "RebootReceiver")
 
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
 

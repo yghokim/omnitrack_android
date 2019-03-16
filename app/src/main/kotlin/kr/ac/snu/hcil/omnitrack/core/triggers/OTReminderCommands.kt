@@ -451,6 +451,7 @@ class OTReminderCommands(val context: Context) {
                 intent.action = OTApp.BROADCAST_ACTION_REMINDER_AUTO_EXPIRY_ALARM
                 val alarmIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT)
                 context.alarmManager.cancel(alarmIntent)
+                alarmIntent.cancel()
             }
         }
     }
