@@ -41,6 +41,7 @@ import kr.ac.snu.hcil.omnitrack.core.toSingle
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignUpActivity
 import org.jetbrains.anko.runOnUiThread
+import rx_activity_result2.Result
 import rx_activity_result2.RxActivityResult
 import java.util.concurrent.CancellationException
 import javax.inject.Inject
@@ -63,6 +64,7 @@ class OTAuthManager @Inject constructor(
 
     companion object {
         const val LOG_TAG = "OMNITRACK Auth Manager"
+        const val GOOGLE_SIGN_IN_REQUEST_CODE = 9428
     }
     enum class SignedInLevel {
         NONE, CACHED, AUTHORIZED
@@ -185,12 +187,6 @@ class OTAuthManager @Inject constructor(
 
     }
 
-    fun refreshCredentialWithFallbackSignIn(activity: AppCompatActivity): Single<Boolean> {
-        return refreshCredentialSilently(false).toSingle { true }.onErrorResumeNext {
-            return@onErrorResumeNext startSignInProcess(activity)
-        }
-    }
-
     fun getAuthStateRefreshObservable(): Observable<SignedInLevel> {
         return Observable.create { subscriber ->
             val listener = FirebaseAuth.AuthStateListener { auth ->
@@ -205,88 +201,86 @@ class OTAuthManager @Inject constructor(
         }
     }
 
-    fun startSignInProcess(activity: AppCompatActivity): Single<Boolean> {
+    fun makeSignIntent(): Intent {
+        return Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient)
+    }
+
+    fun handleSignInProcessResult(activityResult: Result<AppCompatActivity>): Single<Boolean> {
         return Single.defer {
-            println("OMNITRACK start sign in activity")
-            val signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient)
-            return@defer RxActivityResult.on(activity).startIntent(signInIntent).singleOrError().doOnError { clearUserInfo() }.doOnSuccess { if (it.resultCode() == 0) clearUserInfo() }.flatMap { activityResult ->
+            val result = Auth.GoogleSignInApi.getSignInResultFromIntent(activityResult.data())
+            if (result.isSuccess) {
+                //Signed in successfully.
+                println("signed in google account: ${result.signInAccount}")
+                firebaseAuthWithGoogle(result.signInAccount!!)
 
-                val result = Auth.GoogleSignInApi.getSignInResultFromIntent(activityResult.data())
-                if (result.isSuccess) {
-                    //Signed in successfully.
-                    println("signed in google account: ${result.signInAccount}")
-                    firebaseAuthWithGoogle(result.signInAccount!!)
-
-                            .flatMap { authResult ->
-                                println("Signed in through Google account. try to push device info to server...")
-                                OTDeviceInfo.makeDeviceInfo(context)
-                            }
-                            .flatMap { deviceInfo ->
-                                if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
-                                    synchronizationServerController.get()
-                                            .checkExperimentParticipationStatus(BuildConfig.DEFAULT_EXPERIMENT_ID)
-                                            .flatMap { isInExperiment ->
-                                                if (!isInExperiment) {
-                                                    synchronizationServerController.get().getExperimentConsentInfo(BuildConfig.DEFAULT_EXPERIMENT_ID)
-                                                            .flatMap {
-                                                                if (BuildConfig.DEFAULT_INVITATION_CODE != null && (!it.receiveConsentInApp || (it.consent == null && it.demographicFormSchema == null))) {
-                                                                    Single.just(Pair<String, JsonObject?>(BuildConfig.DEFAULT_INVITATION_CODE, null))
-                                                                } else RxActivityResult.on(activity)
-                                                                        .startIntent(ExperimentSignUpActivity.makeIntent(activity, BuildConfig.DEFAULT_INVITATION_CODE == null, if (it.receiveConsentInApp) it.consent else null, if (it.receiveConsentInApp) it.demographicFormSchema else null))
-                                                                        .firstOrError()
-                                                                        .map { result ->
-                                                                            if (result.resultCode() != Activity.RESULT_OK) {
-                                                                                throw CancellationException()
-                                                                            } else {
-                                                                                Pair<String, JsonObject?>(
-                                                                                        BuildConfig.DEFAULT_INVITATION_CODE
-                                                                                                ?: result.data().getStringExtra(ExperimentSignUpActivity.INVITATION_CODE),
-                                                                                        result.data().getStringExtra(ExperimentSignUpActivity.DEMOGRAPHIC_SCHEMA)?.let { serializedSchema ->
-                                                                                            gson.fromJson(serializedSchema, JsonObject::class.java)
-                                                                                        })
-                                                                            }
+                        .flatMap { authResult ->
+                            println("Signed in through Google account. try to push device info to server...")
+                            OTDeviceInfo.makeDeviceInfo(context)
+                        }
+                        .flatMap { deviceInfo ->
+                            if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
+                                synchronizationServerController.get()
+                                        .checkExperimentParticipationStatus(BuildConfig.DEFAULT_EXPERIMENT_ID)
+                                        .flatMap { isInExperiment ->
+                                            if (!isInExperiment) {
+                                                synchronizationServerController.get().getExperimentConsentInfo(BuildConfig.DEFAULT_EXPERIMENT_ID)
+                                                        .flatMap {
+                                                            if (BuildConfig.DEFAULT_INVITATION_CODE != null && (!it.receiveConsentInApp || (it.consent == null && it.demographicFormSchema == null))) {
+                                                                Single.just(Pair<String, JsonObject?>(BuildConfig.DEFAULT_INVITATION_CODE, null))
+                                                            } else RxActivityResult.on(activityResult.targetUI())
+                                                                    .startIntent(ExperimentSignUpActivity.makeIntent(activityResult.targetUI(), BuildConfig.DEFAULT_INVITATION_CODE == null, if (it.receiveConsentInApp) it.consent else null, if (it.receiveConsentInApp) it.demographicFormSchema else null))
+                                                                    .firstOrError()
+                                                                    .map { result ->
+                                                                        if (result.resultCode() != Activity.RESULT_OK) {
+                                                                            throw CancellationException()
+                                                                        } else {
+                                                                            Pair<String, JsonObject?>(
+                                                                                    BuildConfig.DEFAULT_INVITATION_CODE
+                                                                                            ?: result.data().getStringExtra(ExperimentSignUpActivity.INVITATION_CODE),
+                                                                                    result.data().getStringExtra(ExperimentSignUpActivity.DEMOGRAPHIC_SCHEMA)?.let { serializedSchema ->
+                                                                                        gson.fromJson(serializedSchema, JsonObject::class.java)
+                                                                                    })
                                                                         }
-                                                            }.flatMap {
-                                                                synchronizationServerController.get().authenticate(deviceInfo, it.first, it.second)
-                                                            }
-                                                } else synchronizationServerController.get().authenticate(deviceInfo, null, null)
-                                            }
-                                } else {
-                                    //Pure experiment-free authentication
-                                    synchronizationServerController.get().authenticate(deviceInfo, null, null)
-                                }
+                                                                    }
+                                                        }.flatMap {
+                                                            synchronizationServerController.get().authenticate(deviceInfo, it.first, it.second)
+                                                        }
+                                            } else synchronizationServerController.get().authenticate(deviceInfo, null, null)
+                                        }
+                            } else {
+                                //Pure experiment-free authentication
+                                synchronizationServerController.get().authenticate(deviceInfo, null, null)
                             }
-                            .flatMap { authenticationResult ->
-                                handleAuthenticationResult(authenticationResult)
+                        }
+                        .flatMap { authenticationResult ->
+                            handleAuthenticationResult(authenticationResult)
+                        }
+                        .doOnSuccess { success ->
+                            if (success) {
+                                activityResult.targetUI().applicationContext.runOnUiThread { notifySignedIn() }
+                                triggerSystemManager.get().checkInAllToSystem(userId!!)
                             }
-                            .doOnSuccess { success ->
-                                if (success) {
-                                    activity.applicationContext.runOnUiThread { notifySignedIn() }
-                                    triggerSystemManager.get().checkInAllToSystem(userId!!)
-                                }
-                            }.doOnError { ex ->
-                                ex.printStackTrace()
-                                firebaseAuth.signOut()
-                                Auth.GoogleSignInApi.signOut(mGoogleApiClient)
-                            }
-                } else if (result.status.isCanceled || result.status.statusCode == 12501) {
-                    throw CancellationException(result.status.statusMessage)
-                } else {
-                    println("Google sign in failed")
-                    eventLogger.get().logExceptionEvent("GoogleSignInError",
-                            Exception(result.status.statusMessage),
-                            Thread.currentThread()) { json ->
-                        json.addProperty("statusCode", result.status.statusCode)
-                        json.addProperty("isInterrupted", result.status.isInterrupted)
-                        json.addProperty("isCanceled", result.status.isCanceled)
-                        json.addProperty("hasResolution", result.status.hasResolution())
-                    }
-                    return@flatMap Single.error<Boolean>(Exception("Google login process was failed. status code: ${result.status.statusCode}, message: ${result.status.statusMessage}"))
+                        }.doOnError { ex ->
+                            ex.printStackTrace()
+                            firebaseAuth.signOut()
+                            Auth.GoogleSignInApi.signOut(mGoogleApiClient)
+                        }
+            } else if (result.status.isCanceled || result.status.statusCode == 12501) {
+                throw CancellationException(result.status.statusMessage)
+            } else {
+                println("Google sign in failed")
+                eventLogger.get().logExceptionEvent("GoogleSignInError",
+                        Exception(result.status.statusMessage),
+                        Thread.currentThread()) { json ->
+                    json.addProperty("statusCode", result.status.statusCode)
+                    json.addProperty("isInterrupted", result.status.isInterrupted)
+                    json.addProperty("isCanceled", result.status.isCanceled)
+                    json.addProperty("hasResolution", result.status.hasResolution())
                 }
+                return@defer Single.error<Boolean>(Exception("Google login process was failed. status code: ${result.status.statusCode}, message: ${result.status.statusMessage}"))
             }
         }
     }
-
 
     fun handleAuthenticationResult(result: ISynchronizationServerSideAPI.AuthenticationResult): Single<Boolean> {
         return Single.defer {

@@ -11,7 +11,7 @@
         <attr name="tintDrawableEndCompat" format="integer" />
 
         <!-- Blending mode used to apply the button tint. -->
-        <attr name="drawableTintMode">
+        <attr name="tintDrawableTintMode">
             <!-- The tint is drawn on top of the drawable.
                  [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
             <enum name="src_over" value="3" />

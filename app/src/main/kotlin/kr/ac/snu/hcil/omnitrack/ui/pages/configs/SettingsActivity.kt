@@ -174,8 +174,7 @@ class SettingsActivity : AppCompatActivity() {
                     return@setOnPreferenceClickListener true
                 }
 
-                val generalCategory = findPreference(PREF_CATEGORY_GENERAL) as PreferenceCategory
-                generalCategory.addPreference(this.ignoreBatteryOptimizationPreference)
+                findPreference<PreferenceCategory>(PREF_CATEGORY_GENERAL)?.addPreference(this.ignoreBatteryOptimizationPreference)
             }
 
             findPreference<Preference>(PREF_REMINDER_NOTI_RINGTONE)?.run {
@@ -200,7 +199,7 @@ class SettingsActivity : AppCompatActivity() {
                     preferenceManager.sharedPreferences.edit {
                         putString(PREF_REMINDER_NOTI_RINGTONE, ringtone.toString())
                     }
-                    findPreference<Preference>(PREF_REMINDER_NOTI_RINGTONE).summary = RingtoneManager.getRingtone(requireContext(), ringtone).getTitle(requireContext())
+                    findPreference<Preference>(PREF_REMINDER_NOTI_RINGTONE)?.summary = RingtoneManager.getRingtone(requireContext(), ringtone).getTitle(requireContext())
 
                 }
             } else {
@@ -226,8 +225,8 @@ class SettingsActivity : AppCompatActivity() {
 
         override fun onDestroy() {
             super.onDestroy()
-            findPreference<Preference>(PREF_REMINDER_NOTI_RINGTONE).onPreferenceChangeListener = null
-            findPreference<ListPreference>(LocaleHelper.PREF_KEY_SELECTED_LANGUAGE).onPreferenceChangeListener = null
+            findPreference<Preference>(PREF_REMINDER_NOTI_RINGTONE)?.onPreferenceChangeListener = null
+            findPreference<ListPreference>(LocaleHelper.PREF_KEY_SELECTED_LANGUAGE)?.onPreferenceChangeListener = null
             creationSubscriptions.clear()
         }
 
@@ -330,7 +329,7 @@ class SettingsActivity : AppCompatActivity() {
 
                 PREF_REMINDER_NOTI_RINGTONE -> {
                     println("ringtone was changed to ${sharedPreferences.getString(PREF_REMINDER_NOTI_RINGTONE, "")}")
-                    findPreference<Preference>(key).summary = getCurrentReminderNotificationRingtoneName()
+                    findPreference<Preference>(key)?.summary = getCurrentReminderNotificationRingtoneName()
                 }
 
                 LocaleHelper.PREF_USE_DEVICE_DEFAULT, LocaleHelper.PREF_KEY_SELECTED_LANGUAGE -> {

@@ -180,7 +180,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
                     serverConnectionChecker.get().andThen(
                             Single.defer {
                                 if (authManager.isUserSignedIn()) {
-                                    authManager.refreshCredentialWithFallbackSignIn(this)
+                                    authManager.refreshCredentialSilently(false).toSingle { true }
                                             .observeOn(AndroidSchedulers.mainThread())
                                             .doOnSuccess { ok ->
                                                 if (ok) {

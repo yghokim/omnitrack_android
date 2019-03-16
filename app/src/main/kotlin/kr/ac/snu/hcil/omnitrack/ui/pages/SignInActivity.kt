@@ -1,24 +1,19 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages
 
-import android.Manifest
 import android.app.AlertDialog
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.google.android.gms.common.GoogleApiAvailability
-import com.tbruyelle.rxpermissions2.RxPermissions
 import dagger.Lazy
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_sign_in.*
 import kr.ac.snu.hcil.android.common.net.NetworkNotConnectedException
-import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -28,6 +23,7 @@ import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.di.global.ServerResponsive
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
+import rx_activity_result2.Result
 import java.util.concurrent.CancellationException
 import javax.inject.Inject
 import javax.inject.Provider
@@ -45,6 +41,108 @@ class SignInActivity : AppCompatActivity() {
 
     private val creationSubscription = CompositeDisposable()
 
+    private fun startSignIn() {
+        startActivityForResult(authManager.makeSignIntent(), OTAuthManager.GOOGLE_SIGN_IN_REQUEST_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == OTAuthManager.GOOGLE_SIGN_IN_REQUEST_CODE) {
+            creationSubscription.add(
+                    authManager.handleSignInProcessResult(Result<AppCompatActivity>(this, requestCode, resultCode, data))
+                            .doOnSuccess {
+                                if (it) {
+                                    this@SignInActivity.runOnUiThread {
+                                        Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_succeeded)), Toast.LENGTH_LONG).show()
+                                    }
+                                } else {
+                                    Log.d(LOG_TAG, String.format("User sign-in with Google canceled."))
+                                    this@SignInActivity.runOnUiThread {
+                                        Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_canceled)), Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
+                            .subscribe({ approved ->
+                                if (approved) {
+                                    goHomeActivity()
+                                } else {
+                                    toIdleMode()
+                                }
+                            }, { e ->
+                                e.printStackTrace()
+                                if (e is CancellationException) {
+                                    Log.d(LOG_TAG, String.format("User sign-in with Google canceled."))
+                                    this@SignInActivity.runOnUiThread {
+                                        Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_canceled)), Toast.LENGTH_LONG).show()
+                                    }
+
+                                } else {
+                                    val errorDialogBuilder = AlertDialog.Builder(this@SignInActivity)
+                                    errorDialogBuilder.setTitle("Sign-In Error")
+                                    errorDialogBuilder.setMessage(
+                                            String.format("Sign-in Process failed.\n%s", e.message))
+                                    errorDialogBuilder.setNeutralButton("Ok", null)
+                                    errorDialogBuilder.show()
+                                    eventLogger.get().logExceptionEvent("SignInFailure", e, Thread.currentThread())
+                                }
+                                toIdleMode()
+                            }
+                            )
+            )
+        }
+    }
+
+    /*
+    creationSubscription.add(
+                        checkServerConnection.get().andThen(authManager.startSignInProcess(this))
+                                .doOnSuccess {
+                                    if (it) {
+                                        this@SignInActivity.runOnUiThread {
+                                            Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_succeeded)), Toast.LENGTH_LONG).show()
+                                        }
+                                    } else {
+                                        Log.d(LOG_TAG, String.format("User sign-in with Google canceled."))
+                                        this@SignInActivity.runOnUiThread {
+                                            Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_canceled)), Toast.LENGTH_LONG).show()
+                                        }
+                                    }
+                                }
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe({ approved ->
+                                    if (approved) {
+                                        goHomeActivity()
+                                    } else {
+                                        toIdleMode()
+                                    }
+                                }, { e ->
+                                    e.printStackTrace()
+                                    if (e is NetworkNotConnectedException) {
+                                        val noticeDialogBuilder = AlertDialog.Builder(this@SignInActivity)
+                                        noticeDialogBuilder
+                                                .setTitle(BuildConfig.APP_NAME)
+                                                .setMessage("The app server does not respond. Try again later.")
+                                                .setNeutralButton("Ok", null)
+                                                .show()
+                                    } else if (e is CancellationException) {
+                                        Log.d(LOG_TAG, String.format("User sign-in with Google canceled."))
+                                        this@SignInActivity.runOnUiThread {
+                                            Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_canceled)), Toast.LENGTH_LONG).show()
+                                        }
+
+                                    } else {
+                                        val errorDialogBuilder = AlertDialog.Builder(this@SignInActivity)
+                                        errorDialogBuilder.setTitle("Sign-In Error")
+                                        errorDialogBuilder.setMessage(
+                                                String.format("Sign-in Process failed.\n%s", e.message))
+                                        errorDialogBuilder.setNeutralButton("Ok", null)
+                                        errorDialogBuilder.show()
+                                        eventLogger.get().logExceptionEvent("SignInFailure", e, Thread.currentThread())
+                                    }
+                                    toIdleMode()
+                                }
+                                )
+                )*/
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as OTAndroidApp).applicationComponent.inject(this)
@@ -60,82 +158,24 @@ class SignInActivity : AppCompatActivity() {
             ui_login_group_switcher.visibility = View.VISIBLE
             g_login_button.setOnClickListener(View.OnClickListener { view ->
                 toBusyMode()
-                val thisActivity = this@SignInActivity
-
-                if (ContextCompat.checkSelfPermission(thisActivity,
-                                Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
-
-                    DialogHelper.makeYesNoDialogBuilder(this, getString(R.string.msg_contacts_permission_required),
-                            getString(R.string.msg_contacts_permission_rationale),
-                            yesLabel = R.string.msg_allow_permission, noLabel = R.string.msg_cancel, onYes = {
-                        val permissions = RxPermissions(this)
-                        permissions.request(Manifest.permission.GET_ACCOUNTS)
-                                .subscribe { granted ->
-                                    if (granted) {
-                                        this.findViewById<View>(kr.ac.snu.hcil.omnitrack.R.id.g_login_button).callOnClick()
-                                    } else {
-                                        Toast.makeText(this, getString(R.string.msg_contacts_permission_denied_message), Toast.LENGTH_LONG).show()
-                                        toIdleMode()
+                creationSubscription.add(
+                        checkServerConnection.get()
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe({
+                                    startSignIn()
+                                }, { e ->
+                                    e.printStackTrace()
+                                    if (e is NetworkNotConnectedException) {
+                                        val noticeDialogBuilder = AlertDialog.Builder(this@SignInActivity)
+                                        noticeDialogBuilder
+                                                .setTitle(BuildConfig.APP_NAME)
+                                                .setMessage("The app server does not respond. Try again later.")
+                                                .setNeutralButton("Ok", null)
+                                                .show()
                                     }
-                                }
-                    }, onNo = {
-                        toIdleMode()
-                    }, onCancel = {
-                        toIdleMode()
-                    }, cancelable = false).show()
-                    return@OnClickListener
-                } else {
-                    creationSubscription.add(
-
-                            checkServerConnection.get().andThen(authManager.startSignInProcess(this))
-                                    .doOnSuccess {
-                                        if (it) {
-                                            this@SignInActivity.runOnUiThread {
-                                                Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_succeeded)), Toast.LENGTH_LONG).show()
-                                            }
-                                        } else {
-                                            Log.d(LOG_TAG, String.format("User sign-in with Google canceled."))
-                                            this@SignInActivity.runOnUiThread {
-                                                Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_canceled)), Toast.LENGTH_LONG).show()
-                                            }
-                                        }
-                                    }
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe({ approved ->
-                                        if (approved) {
-                                            goHomeActivity()
-                                        } else {
-                                            toIdleMode()
-                                        }
-                                    }, { e ->
-                                        e.printStackTrace()
-                                        if (e is NetworkNotConnectedException) {
-                                            val noticeDialogBuilder = AlertDialog.Builder(this@SignInActivity)
-                                            noticeDialogBuilder
-                                                    .setTitle(BuildConfig.APP_NAME)
-                                                    .setMessage("The app server does not respond. Try again later.")
-                                                    .setNeutralButton("Ok", null)
-                                                    .show()
-                                        } else if (e is CancellationException) {
-                                            Log.d(LOG_TAG, String.format("User sign-in with Google canceled."))
-                                            this@SignInActivity.runOnUiThread {
-                                                Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_canceled)), Toast.LENGTH_LONG).show()
-                                            }
-
-                                        } else {
-                                            val errorDialogBuilder = AlertDialog.Builder(this@SignInActivity)
-                                            errorDialogBuilder.setTitle("Sign-In Error")
-                                            errorDialogBuilder.setMessage(
-                                                    String.format("Sign-in Process failed.\n%s", e.message))
-                                            errorDialogBuilder.setNeutralButton("Ok", null)
-                                            errorDialogBuilder.show()
-                                            eventLogger.get().logExceptionEvent("SignInFailure", e, Thread.currentThread())
-                                        }
-                                        toIdleMode()
-                                    }
-                                    )
-                    )
-                }
+                                    toIdleMode()
+                                })
+                )
             })
         }
 
