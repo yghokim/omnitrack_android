@@ -245,7 +245,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     implementation "androidx.appcompat:appcompat:$rootProject.ext.androidx_appcompat_version"
-    implementation "androidx.recyclerview:recyclerview:$rootProject.ext.android_support_version"
+    implementation "androidx.recyclerview:recyclerview:$rootProject.ext.androidx_recyclerview_version"
     implementation "androidx.cardview:cardview:$rootProject.ext.android_support_version"
     implementation "androidx.preference:preference:$rootProject.ext.androidx_preference_version"
     implementation "androidx.core:core-ktx:1.0.1"

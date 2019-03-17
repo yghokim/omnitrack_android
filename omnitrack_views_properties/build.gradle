@@ -39,7 +39,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     implementation "androidx.appcompat:appcompat:$rootProject.ext.androidx_appcompat_version"
-    implementation "androidx.recyclerview:recyclerview:$rootProject.ext.android_support_version"
+    implementation "androidx.recyclerview:recyclerview:$rootProject.ext.androidx_recyclerview_version"
     implementation "androidx.constraintlayout:constraintlayout:$rootProject.ext.androidx_constraintlayout_version"
 
     implementation project(':android_commons')

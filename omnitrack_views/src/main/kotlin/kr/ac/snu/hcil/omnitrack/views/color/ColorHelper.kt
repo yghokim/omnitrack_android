@@ -1,9 +1,10 @@
-package kr.ac.snu.hcil.omnitrack.views
+package kr.ac.snu.hcil.omnitrack.views.color
 
 import android.content.Context
 import android.graphics.Color
+import kr.ac.snu.hcil.omnitrack.views.R
 
-object DesignHelper {
+object ColorHelper {
 
     private var trackerPalette: IntArray? = null
 

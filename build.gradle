@@ -42,6 +42,7 @@ buildscript {
     ext.androidx_preference_version = "1.1.0-alpha04"
     ext.androidx_material_version = "1.1.0-alpha04"
     ext.androidx_annotation_version = '1.1.0-alpha01'
+    ext.androidx_recyclerview_version = '1.1.0-alpha03'
     ext.android_support_version = '1.0.0'
     ext.dagger_version = '2.16'
     ext.gson_version = '2.8.5'

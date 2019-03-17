@@ -10,7 +10,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import kr.ac.snu.hcil.android.common.events.Event
 import kr.ac.snu.hcil.android.common.view.button.ColorSelectionButton
-import kr.ac.snu.hcil.omnitrack.views.DesignHelper
 
 /**
  * Created by Young-Ho Kim on 2016-07-19
@@ -33,7 +32,7 @@ class ColorPaletteView : ConstraintLayout, View.OnClickListener {
     var buttons = ArrayList<ColorSelectionButton>()
 
     fun initialize(context: Context) {
-        colorPalette = DesignHelper.getTrackerColorPalette(context)
+        colorPalette = ColorHelper.getTrackerColorPalette(context)
         refreshUI()
     }
 

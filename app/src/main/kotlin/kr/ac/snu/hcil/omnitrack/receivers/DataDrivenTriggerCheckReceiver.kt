@@ -97,7 +97,9 @@ class DataDrivenTriggerCheckReceiver : BroadcastReceiver() {
 
         private fun fetchUnmanagedMeasures(): List<OTTriggerMeasureEntry>? {
             val realm = realmFactory.get()
-            val entryQuery = realm.where(OTTriggerMeasureEntry::class.java)
+            val entryQuery = realm
+                    .where(OTTriggerMeasureEntry::class.java)
+                    .equalTo(OTDataDrivenTriggerManager.FIELD_IS_ACTIVE, true)
             return if (entryQuery.count() > 0) {
                 val list = realm.copyFromRealm(entryQuery.findAll(), 3)
                 realm.close()
