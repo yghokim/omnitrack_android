@@ -6,7 +6,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin">
 
-    <kr.ac.snu.hcil.android.common.view.container.ExtendedSpinner
+    <kr.ac.snu.hcil.android.common.view.choice.ExtendedSpinner
         android:id="@+id/ui_comparison_method"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

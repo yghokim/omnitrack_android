@@ -30,9 +30,9 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactoryManager
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
+import kr.ac.snu.hcil.omnitrack.views.properties.APropertyView
+import kr.ac.snu.hcil.omnitrack.views.properties.ShortTextPropertyView
 import java.util.*
 import javax.inject.Inject
 

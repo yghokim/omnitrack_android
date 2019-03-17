@@ -12,11 +12,6 @@
 
     <dimen name="home_sliding_menu_right_region">120dp</dimen>
 
-    <dimen name="property_left_padding">5dp</dimen>
-    <dimen name="property_right_padding">5dp</dimen>
-    <dimen name="property_top_padding">12dp</dimen>
-    <dimen name="property_bottom_padding">16dp</dimen>
-
     <dimen name="list_element_vertical_space">7dp</dimen>
 
     <dimen name="color_selection_button_size">36dp</dimen>
@@ -24,17 +19,9 @@
     <dimen name="appbar_padding_top">0dp</dimen>
     <dimen name="text_margin">16dp</dimen>
 
-    <dimen name="selection_view_button_padding_left">17dp</dimen>
-    <dimen name="selection_view_button_padding_right">17dp</dimen>
-    <dimen name="selection_view_button_padding_top">10dp</dimen>
-    <dimen name="selection_view_button_padding_bottom">10dp</dimen>
-    <dimen name="selection_view_button_text_size">16dp</dimen>
 
     <dimen name="choice_indicator_size">25dp</dimen>
     <dimen name="choice_indicator_spacing">8dp</dimen>
-
-
-    <dimen name="selection_view_button_spacing">2dp</dimen>
 
     <dimen name="star_rating_item_list_view_unit_size">25dp</dimen>
 

@@ -10,9 +10,9 @@ import kr.ac.snu.hcil.android.common.events.IEventListener
 import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.NumericUpDownPropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
+import kr.ac.snu.hcil.omnitrack.views.properties.ComboBoxPropertyView
+import kr.ac.snu.hcil.omnitrack.views.properties.NumericUpDownPropertyView
+import kr.ac.snu.hcil.omnitrack.views.properties.SelectionPropertyView
 
 /**
  * Created by younghokim on 16. 8. 31..

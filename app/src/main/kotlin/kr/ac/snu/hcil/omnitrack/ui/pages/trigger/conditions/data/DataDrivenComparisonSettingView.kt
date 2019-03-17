@@ -13,7 +13,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import kr.ac.snu.hcil.android.common.events.Event
-import kr.ac.snu.hcil.android.common.view.container.ExtendedSpinner
+import kr.ac.snu.hcil.android.common.view.choice.ExtendedSpinner
 import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.android.common.view.text.EnterHideKeyboardEditorActionListener
 import kr.ac.snu.hcil.omnitrack.R

@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">OmniTrack Property Views</string>
+
+    <string name="property_number_style_unit_position">Unit Position</string>
+    <string name="property_number_style_unit">Unit Text</string>
+    <string name="property_number_style_unit_pluralize">Pluralize Unit</string>
+    <string name="property_number_style_fraction_part">Show Fractional Part</string>
+    <string name="property_number_style_fraction_part_count">Digits of Fraction</string>
+
+    <string name="property_number_style_commas">Show Commas</string>
+
+
+    <string name="property_rating_options_display_type">Input Type</string>
+    <string name="property_rating_options_star_levels">Number of Stars</string>
+    <string name="property_rating_options_leftmost_value">Leftmost value</string>
+    <string name="property_rating_options_rightmost_value">Rightmost value</string>
+
+    <string name="property_rating_options_group_labels">Labels</string>
+
+    <string name="property_rating_options_leftmost_label">Leftmost label</string>
+    <string name="property_rating_options_middle_label">Middle label</string>
+    <string name="property_rating_options_rightmost_label">Rightmost label</string>
+
+
+    <string name="property_rating_options_allow_fractional">Allow fractional scoring</string>
+
+
+    <string name="property_choice_add_new_entry">Add New Entry</string>
+</resources>

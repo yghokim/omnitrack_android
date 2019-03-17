@@ -11,4 +11,7 @@
 
 
     <string name="msg_spinner_tap_to_select">Tap to select</string>
+
+    <string name="property_choice_type_in_entry_text">Type in entry text</string>
+
 </resources>

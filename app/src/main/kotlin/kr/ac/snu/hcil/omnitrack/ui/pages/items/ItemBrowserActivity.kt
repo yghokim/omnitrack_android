@@ -30,8 +30,8 @@ import kr.ac.snu.hcil.android.common.time.getDayOfMonth
 import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.android.common.view.InterfaceHelper
+import kr.ac.snu.hcil.android.common.view.choice.ExtendedSpinner
 import kr.ac.snu.hcil.android.common.view.container.DragItemTouchHelperCallback
-import kr.ac.snu.hcil.android.common.view.container.ExtendedSpinner
 import kr.ac.snu.hcil.android.common.view.container.FallbackRecyclerView
 import kr.ac.snu.hcil.android.common.view.container.adapter.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.android.common.view.container.decoration.HorizontalDividerItemDecoration

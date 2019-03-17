@@ -6,14 +6,14 @@
     android:orientation="vertical"
     android:paddingTop="7dp">
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
+    <kr.ac.snu.hcil.omnitrack.views.properties.ComboBoxPropertyView
         android:id="@+id/ui_pivot_selection"
         style="@style/propertyGroupElement"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/msg_connection_wizard_time_query_pivot_time" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
+    <kr.ac.snu.hcil.omnitrack.views.properties.SelectionPropertyView
         android:id="@+id/ui_bin_size"
         style="@style/propertyGroupElement"
         android:layout_width="match_parent"
@@ -23,7 +23,7 @@
 
         android:text="@string/msg_connection_wizard_time_query_scope" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.NumericUpDownPropertyView
+    <kr.ac.snu.hcil.omnitrack.views.properties.NumericUpDownPropertyView
         android:id="@+id/ui_bin_offset"
         style="@style/propertyGroupElement"
         android:layout_width="match_parent"

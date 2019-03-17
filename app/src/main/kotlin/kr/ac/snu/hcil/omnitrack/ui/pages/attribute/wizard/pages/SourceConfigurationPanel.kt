@@ -15,7 +15,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
+import kr.ac.snu.hcil.omnitrack.views.properties.ComboBoxPropertyView
 
 /**
  * Created by Young-Ho Kim on 2016-09-30.

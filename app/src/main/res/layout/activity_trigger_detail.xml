@@ -49,7 +49,7 @@
             android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+            <kr.ac.snu.hcil.omnitrack.views.properties.BooleanPropertyView
                 android:id="@+id/ui_use_script_property_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

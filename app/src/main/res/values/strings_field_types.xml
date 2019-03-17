@@ -46,28 +46,6 @@
     <string name="type_audio_record_name">Audio Note</string>
     <string name="type_audio_record_desc">record the audio with a microphone</string>
 
-    <string name="property_number_style_unit_position">Unit Position</string>
-    <string name="property_number_style_unit">Unit Text</string>
-    <string name="property_number_style_unit_pluralize">Pluralize Unit</string>
-    <string name="property_number_style_fraction_part">Show Fractional Part</string>
-    <string name="property_number_style_fraction_part_count">Digits of Fraction</string>
-
-    <string name="property_number_style_commas">Show Commas</string>
-
-    <string name="property_rating_options_display_type">Input Type</string>
-    <string name="property_rating_options_star_levels">Number of Stars</string>
-    <string name="property_rating_options_leftmost_value">Leftmost value</string>
-    <string name="property_rating_options_rightmost_value">Rightmost value</string>
-
-    <string name="property_rating_options_group_labels">Labels</string>
-
-    <string name="property_rating_options_leftmost_label">Leftmost label</string>
-    <string name="property_rating_options_middle_label">Middle label</string>
-    <string name="property_rating_options_rightmost_label">Rightmost label</string>
-
-
-    <string name="property_rating_options_allow_fractional">Allow fractional scoring</string>
-
     <string name="property_location_msg_adjust_pin">Adjust location to center</string>
 
     <string name="property_time_granularity">Time Granularity</string>
@@ -80,9 +58,6 @@
 
     <string name="property_choice_allow_multiple_selections">Allow Multiple Selections</string>
     <string name="property_choice_entries">Entries</string>
-    <string name="property_choice_add_new_entry">Add New Entry</string>
-    <string name="property_choice_type_in_entry_text">Type in entry text</string>
-
 
     <string name="property_time_format_granularity_day">MMM dd, yyyy</string>
     <string name="property_time_format_granularity_minute">MMM dd, yyyy hh:mm a</string>

@@ -33,7 +33,7 @@
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:text="@string/msg_basic_information" />
 
-                <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ModalTextPropertyView
+                <kr.ac.snu.hcil.omnitrack.views.properties.ModalTextPropertyView
                     android:id="@+id/nameProperty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:text="@string/msg_name" />
 
-                <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
+                <kr.ac.snu.hcil.omnitrack.views.properties.ColorPalettePropertyView
                     android:id="@+id/colorProperty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
                     android:layout_marginRight="@dimen/activity_horizontal_margin"
                     android:background="@color/separator_Light" />
 
-                <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ToggleDrawablePropertyView
+                <kr.ac.snu.hcil.omnitrack.views.properties.ToggleDrawablePropertyView
                     android:id="@+id/isOnShortcutProperty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
                     android:text="@string/msg_show_on_shortcut"
                     app:srcCompat="@drawable/bookmarked_toggle" />
 
-                <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SpinnerPropertyView
+                <kr.ac.snu.hcil.omnitrack.views.properties.SpinnerPropertyView
                     android:id="@+id/assignedExperimentProperty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

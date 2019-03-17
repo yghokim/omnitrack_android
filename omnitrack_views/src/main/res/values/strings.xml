@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">OmniTrack Views</string>
+    <string name="app_name" translatable="false">OmniTrack Views</string>
 
     <!--dependency resolver views-->
     <string name="msg_checking">Checking…</string>

@@ -23,10 +23,10 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.ConditionConfigurationPanelImpl
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.IConditionConfigurationView
+import kr.ac.snu.hcil.omnitrack.views.properties.BooleanPropertyView
+import kr.ac.snu.hcil.omnitrack.views.properties.ComboBoxPropertyView
 import kr.ac.snu.hcil.omnitrack.views.time.DateTimePicker
 import kr.ac.snu.hcil.omnitrack.views.time.DayOfWeekSelector
 import kr.ac.snu.hcil.omnitrack.views.time.HourRangePicker

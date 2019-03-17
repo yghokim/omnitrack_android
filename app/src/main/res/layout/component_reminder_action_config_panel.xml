@@ -10,7 +10,7 @@
     android:paddingStart="@dimen/activity_horizontal_margin"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ModalTextPropertyView
+    <kr.ac.snu.hcil.omnitrack.views.properties.ModalTextPropertyView
         android:id="@+id/ui_reminder_message_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

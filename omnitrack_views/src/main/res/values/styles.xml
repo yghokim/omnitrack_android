@@ -49,4 +49,36 @@
         <item name="drawableTint">@color/textColorLight</item>
     </style>
 
+    <style name="ShortTextFormStyle">
+        <item name="android:background">@drawable/text_field_singleline</item>
+        <item name="android:imeOptions">actionDone</item>
+        <item name="android:inputType">textShortMessage</item>
+
+
+        <item name="android:textSize">17sp</item>
+        <item name="android:textColor">@color/textColorMid</item>
+
+        <item name="android:maxLines">1</item>
+        <item name="android:lines">1</item>
+
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingLeft">6dp</item>
+        <item name="android:paddingRight">6dp</item>
+        <item name="android:selectAllOnFocus">true</item>
+    </style>
+
+
+    <style name="linearLayoutWithHorizontalDivider">
+        <item name="android:divider">@drawable/horizontal_divider_light</item>
+        <item name="android:dividerPadding">@dimen/activity_horizontal_margin</item>
+        <item name="android:showDividers">middle</item>
+    </style>
+
+    <style name="linearLayoutWithHorizontalDivider.Light.Nomargin" parent="linearLayoutWithHorizontalDivider">
+        <item name="android:divider">@drawable/bottom_separator_thin</item>
+        <item name="android:dividerPadding">0dp</item>
+    </style>
+
+
 </resources>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ui_drag_handle"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/button_height_normal"
+        android:layout_marginEnd="5dp"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:paddingEnd="7dp"
+        android:tint="@color/textColorLight"
+        app:srcCompat="@drawable/icon_drag_handle" />
+
+    <EditText
+        android:id="@+id/ui_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/ui_button_remove"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/ui_button_remove"
+        android:layout_toEndOf="@+id/ui_drag_handle"
+        android:background="@drawable/text_field_singleline"
+        android:hint="@string/property_choice_type_in_entry_text"
+        android:inputType="text|textShortMessage"
+        android:selectAllOnFocus="true"
+        android:textColor="@color/inputTextColor"
+        android:textColorHint="@color/textColorLight" />
+
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/ui_button_remove"
+        style="@style/Base.Widget.AppCompat.Button.Borderless"
+        android:layout_width="@dimen/button_height_normal"
+        android:layout_height="@dimen/button_height_normal"
+        android:layout_alignParentEnd="true"
+        android:padding="12dp"
+        android:scaleType="fitCenter"
+        android:tint="@color/colorRed_Light"
+        app:srcCompat="@drawable/rounded_minus" />
+
+</RelativeLayout>

@@ -116,7 +116,7 @@
                     android:background="@color/frontalBackground"
                     app:layout_constraintTop_toBottomOf="@id/guideline_appbar">
 
-                    <kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
+                    <kr.ac.snu.hcil.android.common.view.choice.SelectionView
                         android:id="@+id/ui_scope_selection"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="propertyElementStyle">
+        <item name="android:paddingTop">@dimen/property_top_padding</item>
+        <item name="android:paddingBottom">@dimen/property_bottom_padding</item>
+    </style>
+</resources>

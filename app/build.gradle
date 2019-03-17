@@ -290,6 +290,8 @@ dependencies {
     implementation project(':omnitrack_core_types')
     implementation project(':omnitrack_core_dependencyresolver')
     implementation project(':omnitrack_views')
+    implementation project(':omnitrack_views_properties')
+
 
 
     implementation project(':material_dialog_core')
@@ -299,6 +301,7 @@ dependencies {
     implementation project(':AppUpdater:appupdater')
     implementation project(':android_commons')
     implementation project(':android_commons_view')
+
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "com.google.code.gson:gson:$rootProject.ext.gson_version"

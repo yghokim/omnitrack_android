@@ -44,7 +44,6 @@ import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.services.messaging.OTFirebaseMessagingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.common.ColorPaletteView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioItemListView
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactoryManager
@@ -153,7 +152,6 @@ interface ApplicationComponent {
     fun inject(service: OTShortcutPanelWidgetUpdateService)
     fun inject(provider: OTShortcutPanelWidgetProvider)
 
-    fun inject(view: ColorPaletteView)
     fun inject(drawer: MultiLineChartDrawer)
 
     fun inject(panel: DataDrivenTriggerConfigurationPanel)

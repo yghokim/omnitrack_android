@@ -7,8 +7,8 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimeRangePickerInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
+import kr.ac.snu.hcil.omnitrack.views.properties.APropertyView
+import kr.ac.snu.hcil.omnitrack.views.properties.SelectionPropertyView
 import kr.ac.snu.hcil.omnitrack.views.time.TimeRangePicker
 
 class TimeSpanViewFactory(helper: OTTimeSpanAttributeHelper) : AttributeViewFactory<OTTimeSpanAttributeHelper>(helper) {

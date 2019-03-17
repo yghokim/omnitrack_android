@@ -13,6 +13,13 @@
 
     <dimen name="drag_linear_layout_shadow_offset">12dp</dimen>
 
-
     <dimen name="image_placeholder_loading_indicator_size">35dp</dimen>
+
+    <dimen name="selection_view_button_padding_left">17dp</dimen>
+    <dimen name="selection_view_button_padding_right">17dp</dimen>
+    <dimen name="selection_view_button_padding_top">10dp</dimen>
+    <dimen name="selection_view_button_padding_bottom">10dp</dimen>
+    <dimen name="selection_view_button_text_size">16dp</dimen>
+    <dimen name="selection_view_button_spacing">2dp</dimen>
+
 </resources>

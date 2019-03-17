@@ -7,4 +7,6 @@
     <string name="msg_pick_date">날짜를 선택하세요</string>
 
     <string name="msg_spinner_tap_to_select">탭해서 고르기</string>
+
+    <string name="property_choice_type_in_entry_text">항목 입력</string>
 </resources>

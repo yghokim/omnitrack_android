@@ -48,27 +48,6 @@
     <string name="type_audio_record_desc">record the audio with a microphone</string>
 
 
-    <string name="property_number_style_unit_position">단위 위치</string>
-    <string name="property_number_style_unit">단위</string>
-    <string name="property_number_style_unit_pluralize">단위 복수화(영어 전용)</string>
-    <string name="property_number_style_fraction_part">소숫점 영역 표시</string>
-    <string name="property_number_style_fraction_part_count">소숫점 아래 표시 자리</string>
-
-    <string name="property_number_style_commas">콤마 표시</string>
-
-    <string name="property_rating_options_display_type">입력 방식</string>
-    <string name="property_rating_options_star_levels">별 갯수</string>
-    <string name="property_rating_options_leftmost_value">최저점</string>
-    <string name="property_rating_options_rightmost_value">최고점</string>
-
-    <string name="property_rating_options_group_labels">레이블</string>
-
-    <string name="property_rating_options_leftmost_label">최저점 레이블</string>
-    <string name="property_rating_options_middle_label">중간 레이블</string>
-    <string name="property_rating_options_rightmost_label">최고점 레이블</string>
-
-    <string name="property_rating_options_allow_fractional">소숫점/별 반개 허용</string>
-
     <string name="property_location_msg_adjust_pin">원하는 장소를 핀 끝으로 이동하세요</string>
 
     <string name="property_time_granularity">시간 최소단위</string>
@@ -86,8 +65,6 @@
 
     <string name="property_choice_allow_multiple_selections">복수선택 허용</string>
     <string name="property_choice_entries">선택지 리스트</string>
-    <string name="property_choice_add_new_entry">항목 추가</string>
-    <string name="property_choice_type_in_entry_text">항목 입력</string>
 
     <string name="msg_intrinsic_location">현재 위치로 자동입력</string>
     <string name="msg_intrinsic_number">0으로 채우기</string>

@@ -8,7 +8,7 @@
     android:background="@drawable/bottom_separator_light"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
+    <kr.ac.snu.hcil.omnitrack.views.properties.ComboBoxPropertyView
         android:id="@+id/ui_time_trigger_type"
         style="@style/propertyGroupSinglelineStyle"
         android:layout_width="0dp"
@@ -124,7 +124,7 @@
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="ui_ema_count,ui_ema_use_sampling_range,ui_ema_range_wrapper,ui_ema_minimum_interval_picker,ui_ema_group_config_bottom_separator" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.NumericUpDownPropertyView
+    <kr.ac.snu.hcil.omnitrack.views.properties.NumericUpDownPropertyView
         android:id="@+id/ui_ema_count"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -186,7 +186,7 @@
         app:layout_constraintTop_toBottomOf="@id/ui_ema_minimum_interval_picker" />
 
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+    <kr.ac.snu.hcil.omnitrack.views.properties.BooleanPropertyView
         android:id="@+id/ui_is_repeated"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

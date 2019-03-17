@@ -5,7 +5,7 @@
     android:background="@drawable/bottom_separator_light"
     android:orientation="vertical">
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
+    <kr.ac.snu.hcil.omnitrack.views.properties.ComboBoxPropertyView
         android:id="@+id/ui_event_trigger_measure_selection"
         style="@style/propertyGroupSinglelineStyle"
         android:layout_width="match_parent"

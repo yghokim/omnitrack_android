@@ -10,8 +10,8 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.PropertyViewFactory
+import kr.ac.snu.hcil.omnitrack.views.properties.APropertyView
+import kr.ac.snu.hcil.omnitrack.views.properties.PropertyViewFactory
 import java.util.*
 
 abstract class AttributeViewFactory<HelperType : OTAttributeHelper>(protected val helper: HelperType) {
