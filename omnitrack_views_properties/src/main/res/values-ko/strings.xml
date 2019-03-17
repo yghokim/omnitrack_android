@@ -21,6 +21,4 @@
     <string name="property_rating_options_rightmost_label">최고점 레이블</string>
 
     <string name="property_rating_options_allow_fractional">소숫점/별 반개 허용</string>
-
-    <string name="property_choice_add_new_entry">항목 추가</string>
 </resources>

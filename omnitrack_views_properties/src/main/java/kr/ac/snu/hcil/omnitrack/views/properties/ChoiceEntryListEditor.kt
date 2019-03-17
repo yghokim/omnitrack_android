@@ -14,6 +14,7 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.android.common.containers.UniqueStringEntryList
 import kr.ac.snu.hcil.android.common.view.container.DragItemTouchHelperCallback
 import java.util.*
@@ -38,7 +39,6 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
     private val touchHelper: ItemTouchHelper
 
     private val listeners = ArrayList<IListEditedListener>()
-
 
     /*
     var entries: Array<Entry>
@@ -96,9 +96,27 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
     override fun onClick(p0: View?) {
         if (p0 === newEntryButton) {
             //add new entry
-            entryList.appendNewEntry()
-            entryListAdapter.notifyItemInserted(entryList.size - 1)
-            notifyListEdited()
+
+            MaterialDialog.Builder(context)
+                    .title(R.string.choice_add_new_entry)
+                    .input(resources.getString(R.string.choice_add_new_entry_hint), null, false) { dialog, input ->
+                        val inputString = input.toString()
+                        if (entryList.checkNewTextAddable(inputString)) {
+                            entryList.appendNewEntry(inputString)
+                            entryListAdapter.notifyItemInserted(entryList.size - 1)
+                            notifyListEdited()
+                            dialog.dismiss()
+                        } else {
+                            dialog.inputEditText?.error = resources.getString(R.string.choice_add_new_entry_error_duplicate)
+                        }
+                    }
+                    .inputRangeRes(1, 30, R.color.colorRed)
+                    .autoDismiss(false).cancelable(true)
+                    .positiveColorRes(R.color.colorPointed)
+                    .positiveText(R.string.msg_add)
+                    .show()
+
+            //
         }
     }
 

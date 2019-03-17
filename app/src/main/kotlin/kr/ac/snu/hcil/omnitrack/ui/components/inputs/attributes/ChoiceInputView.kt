@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -69,17 +68,20 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     private val newRowTextDialogBuilder: MaterialDialog.Builder by lazy {
         MaterialDialog.Builder(this.context)
-                .title(R.string.msg_append_new_row)
+                .title(R.string.choice_add_new_entry)
                 .inputType(InputType.TYPE_CLASS_TEXT)
                 .setSyncWithKeyboard(true)
                 .inputRangeRes(1, 30, R.color.colorRed)
                 .cancelable(true)
-                .negativeText(R.string.msg_cancel)
-                .input(R.string.msg_insert_new_choice_entry, 0, false) { dialog, text ->
-                    if (entries.find { it.text == text } == null) {
+                .autoDismiss(false)
+                .positiveText(R.string.msg_add)
+                .input(R.string.choice_add_new_entry_hint, 0, false) { dialog, text ->
+                    val inputString = text.toString()
+                    if (entries.none { it.text.equals(inputString) }) {
                         appendNewRow(text)
+                        dialog.dismiss()
                     } else {
-                        Toast.makeText(context, R.string.msg_duplicate_choice_entry, Toast.LENGTH_LONG).show()
+                        dialog.inputEditText?.error = resources.getString(R.string.choice_add_new_entry_error_duplicate)
                     }
                 }
     }
@@ -209,7 +211,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
         if (visible) {
             if (appendNewRowButton == null) {
                 val newButton = TintFancyButton(context)
-                newButton.text = context.getString(R.string.msg_append_new_row)
+                newButton.text = context.getString(R.string.choice_add_new_entry)
                 newButton.backgroundColorResource = android.R.color.transparent
                 newButton.setPaddingLeft(0)
                 newButton.setFocusBackgroundColor(ContextCompat.getColor(context, R.color.colorSecondary))

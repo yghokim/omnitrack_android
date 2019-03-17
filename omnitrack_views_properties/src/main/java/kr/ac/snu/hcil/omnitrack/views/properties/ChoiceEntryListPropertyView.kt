@@ -53,5 +53,4 @@ class ChoiceEntryListPropertyView(context: Context, attrs: AttributeSet?) : APro
         }
     }
 
-
 }

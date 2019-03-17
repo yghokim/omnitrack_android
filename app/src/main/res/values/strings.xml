@@ -603,8 +603,6 @@
     <string name="msg_app_update_update_button">Download</string>
     <string name="msg_none">None</string>
     <string name="msg_allow_appending_from_view">Allow Adding Entries in Form</string>
-    <string name="msg_append_new_row">Add New</string>
-    <string name="msg_duplicate_choice_entry">Duplicate choice entry</string>
     <string name="msg_synchronized">Synchronized</string>
     <string name="msg_not_synchronized">To be synchronized</string>
     <string name="msg_sampling_range">Sampling Range</string>

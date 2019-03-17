@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="msg_add">추가</string>
+
     <!--dependency resolver views-->
     <string name="msg_checking">체크하는 중…</string>
     <string name="msg_mandatory">필수사항</string>
     <string name="msg_optional">선택사항</string>
+
+
+    <string name="choice_add_new_entry">항목 추가</string>
+    <string name="choice_add_new_entry_hint">새 선택지를 입력하세요.</string>
+    <string name="choice_add_new_entry_error_duplicate">중복된 항목입니다.</string>
 </resources>

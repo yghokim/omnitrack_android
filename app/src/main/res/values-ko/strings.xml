@@ -416,8 +416,6 @@
     <string name="msg_app_update_update_button">다운로드</string>
     <string name="msg_none">없음</string>
     <string name="msg_allow_appending_from_view">입력 폼에서 선택항목 추가 허용</string>
-    <string name="msg_append_new_row">항목 추가</string>
-    <string name="msg_duplicate_choice_entry">중복된 항목 텍스트입니다.</string>
     <string name="msg_synchronized">동기화됨</string>
     <string name="msg_not_synchronized">동기화 대기중</string>
     <string name="msg_sampling_range">샘플링 범위</string>

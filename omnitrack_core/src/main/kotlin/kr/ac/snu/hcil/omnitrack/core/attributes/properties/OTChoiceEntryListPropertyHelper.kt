@@ -18,7 +18,7 @@ class OTChoiceEntryListPropertyHelper(val context: Context) : OTPropertyHelper<U
 
     override fun parseValue(serialized: String): UniqueStringEntryList {
         try {
-            return UniqueStringEntryList.parser.fromJson(serialized, UniqueStringEntryList::class.java)
+            return UniqueStringEntryList.fromJson(serialized)
         } catch (e: Exception) {
             println("UniqueStringEntryList parse error")
             println(e)

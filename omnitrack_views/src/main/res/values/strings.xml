@@ -1,8 +1,15 @@
 <resources>
     <string name="app_name" translatable="false">OmniTrack Views</string>
 
+    <string name="msg_add">Add</string>
+
     <!--dependency resolver views-->
     <string name="msg_checking">Checking…</string>
     <string name="msg_mandatory">Mandatory</string>
     <string name="msg_optional">Optional</string>
+
+
+    <string name="choice_add_new_entry">Add New Entry</string>
+    <string name="choice_add_new_entry_hint">Insert new entry</string>
+    <string name="choice_add_new_entry_error_duplicate">Duplicate entry text</string>
 </resources>

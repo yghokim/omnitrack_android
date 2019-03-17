@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.android.common.containers
 
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
@@ -16,8 +15,17 @@ import java.util.*
 class UniqueStringEntryList : IStringSerializable {
 
     companion object {
-        val parser: Gson by lazy {
-            GsonBuilder().registerTypeAdapter(UniqueStringEntryList::class.java, UniqueStringEntryListTypeAdapter()).create()
+
+        internal val adapter: UniqueStringEntryListTypeAdapter by lazy {
+            UniqueStringEntryListTypeAdapter()
+        }
+
+        fun toJson(instance: UniqueStringEntryList): String {
+            return adapter.toJson(instance)
+        }
+
+        fun fromJson(jsonString: String): UniqueStringEntryList {
+            return adapter.fromJson(jsonString)
         }
     }
 
@@ -162,7 +170,7 @@ class UniqueStringEntryList : IStringSerializable {
 
     override fun getSerializedString(): String {
         //return Gson().toJson(SerializationParcel(increment, list.toTypedArray()))
-        return parser.toJson(this)
+        return toJson(this)
     }
 
 
@@ -192,6 +200,14 @@ class UniqueStringEntryList : IStringSerializable {
     }
 
     val size: Int get() = list.size
+
+    fun isUniquenessValid(): Boolean {
+        return list.map { it.text }.toSet().count() == list.count()
+    }
+
+    fun checkNewTextAddable(newText: String): Boolean {
+        return list.none { it.text.equals(newText) }
+    }
 
     fun appendNewEntry(text: String = ""): Int {
         val newId = getNewId()
