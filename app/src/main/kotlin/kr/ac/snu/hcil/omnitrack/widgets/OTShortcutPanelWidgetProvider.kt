@@ -75,12 +75,15 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
                     return
                 }
             }
-            realm.close()
 
             when (intent.getStringExtra(EXTRA_CLICK_COMMAND)) {
                 CLICK_COMMAND_ROW -> {
                     if (trackerId != null) {
-                        context.startActivity(NewItemActivity.makeNewItemPageIntent(trackerId, context).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
+                        if (trackerDao?.makeAttributesQuery(false, false)?.count() == 0L) {
+                            context.startService(OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, trackerId))
+                        } else {
+                            context.startActivity(NewItemActivity.makeNewItemPageIntent(trackerId, context).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
+                        }
                     }
                 }
 
@@ -90,6 +93,8 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
                     }
                 }
             }
+
+            realm.close()
         }
     }
 

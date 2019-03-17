@@ -104,6 +104,8 @@ class OTShortcutPanelManager @Inject constructor(
 
                 element.setTextViewText(R.id.ui_name, trackers[i].name)
 
+                val fieldCount = trackers[i].makeAttributesQuery(false, false).count()
+
                 if (trackers[i].isInstantLoggingAvailable()) {
 
                     element.setViewVisibility(R.id.ui_button_instant, View.VISIBLE)
@@ -118,13 +120,19 @@ class OTShortcutPanelManager @Inject constructor(
 
                     val instantLoggingIntent = PendingIntent.getService(context, i, OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, trackers[i].objectId!!), PendingIntent.FLAG_UPDATE_CURRENT)
                     element.setOnClickPendingIntent(R.id.ui_button_instant, instantLoggingIntent)
+
+                    if (fieldCount == 0L) {
+                        element.setOnClickPendingIntent(R.id.group, instantLoggingIntent)
+                    }
+
                 } else {
                     element.setViewVisibility(R.id.ui_button_instant, View.GONE)
                 }
 
-                val openItemActivityIntent = PendingIntent.getActivity(context, i, NewItemActivity.makeNewItemPageIntent(trackers[i].objectId!!, context), PendingIntent.FLAG_UPDATE_CURRENT)
-
-                element.setOnClickPendingIntent(R.id.group, openItemActivityIntent)
+                if (fieldCount > 0) {
+                    val openItemActivityIntent = PendingIntent.getActivity(context, i, NewItemActivity.makeNewItemPageIntent(trackers[i].objectId!!, context), PendingIntent.FLAG_UPDATE_CURRENT)
+                    element.setOnClickPendingIntent(R.id.group, openItemActivityIntent)
+                }
             }
 
             rv.addView(R.id.container, element)
