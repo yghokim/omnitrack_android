@@ -612,4 +612,7 @@
     <string name="msg_confirm_remove_appended_entry">Remove the appended entry?</string>
     <string name="msg_hide_field">Hide Field</string>
 
+
+    <string name="msg_attribute_detail_properties_invalid">Please check that all property inputs are valid.</string>
+
 </resources>

@@ -427,6 +427,9 @@
     <string name="msg_confirm_remove_appended_entry">선택지를 삭제하시겠습니까?</string>
     <string name="msg_hide_field">필드 감추기</string>
 
+
+    <string name="msg_attribute_detail_properties_invalid">일부 속성 설정을 다시 한번 확인해 주세요.</string>
+
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>
         <item>documentary|리뷰/일기 등을 기록하기 위해서</item>

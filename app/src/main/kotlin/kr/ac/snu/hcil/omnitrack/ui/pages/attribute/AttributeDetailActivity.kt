@@ -10,6 +10,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProviders
 import com.github.salomonbrys.kotson.set
 import com.jaredrummler.materialspinner.MaterialSpinner
@@ -99,9 +100,9 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
 
         nameProperty.valueChanged += { sender, value ->
-            if (nameProperty.validate()) {
+            //if (nameProperty.validate()) {
                 viewModel.name = value
-            }
+            //}
 
             nameProperty.showEditedOnTitle = viewModel.isNameDirty
         }
@@ -226,12 +227,12 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                             //propView.value = attr.getPropertyValue(entry.first)
                             propView.valueChanged += { sender, value ->
                                 if (sender is APropertyView<*>) {
-                                    if (sender.validate()) {
+                                    //if (sender.validate()) {
                                         viewModel.setPropertyValue(entry.first, value)
                                         if (originalViewModelValue != null) {
                                             sender.compareAndShowEditedAny(originalViewModelValue)
                                         }
-                                    }
+                                    //}
                                 }
                             }
 
@@ -267,7 +268,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                             ui_recyclerview_with_fallback.setBackgroundResource(R.drawable.expanded_view_inner_shadow)
                         }
                     } catch (ex: Exception) {
-
+                        ex.printStackTrace()
                     }
                 }
         )
@@ -311,16 +312,17 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     }
 
     private fun askChangeAndFinish(backInsteadOfFinish: Boolean = false) {
-        DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
+        DialogHelper.makeYesNoDialogBuilder(this, BuildConfig.APP_NAME,
                 String.format(getString(R.string.msg_format_confirm_apply_change), getString(R.string.msg_text_field)),
                 yesLabel = R.string.msg_save,
                 noLabel = R.string.msg_do_not_save,
                 onYes = {
-                    saveChanges()
-                    if (backInsteadOfFinish)
-                        super.onBackPressed()
-                    else {
-                        finish()
+                    if (saveChanges()) {
+                        if (backInsteadOfFinish)
+                            super.onBackPressed()
+                        else {
+                            finish()
+                        }
                     }
                 }, onNo = {
             if (backInsteadOfFinish)
@@ -334,8 +336,9 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     }
 
     override fun onToolbarRightButtonClicked() {
-        saveChanges()
-        finish()
+        if (saveChanges()) {
+            finish()
+        }
     }
 
     /*
@@ -375,17 +378,29 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         return false
     }*/
 
-    private fun saveChanges() {
-        val dirtySignature = viewModel.makeDirtySignature()
-        viewModel.applyChanges()
-        viewModel.attributeDAO?.let {
-            if (dirtySignature != null) {
-                eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_EDIT, viewModel.attributeDAO?.localId
-                        ?: "", viewModel.attributeDAO?.trackerId) { content ->
-                    content[IEventLogger.CONTENT_KEY_NEWVALUE] = dirtySignature
+    private fun isAllSettingsValid(): Boolean {
+        return propertyViewList.none { !(it.second as APropertyView<out Any>).validate() } && nameProperty.validate()
+    }
+
+    private fun saveChanges(): Boolean {
+        if (isAllSettingsValid()) {
+            val dirtySignature = viewModel.makeDirtySignature()
+            viewModel.applyChanges()
+            viewModel.attributeDAO?.let {
+                if (dirtySignature != null) {
+                    eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_EDIT, viewModel.attributeDAO?.localId
+                            ?: "", viewModel.attributeDAO?.trackerId) { content ->
+                        content[IEventLogger.CONTENT_KEY_NEWVALUE] = dirtySignature
+                    }
                 }
+                setResult(Activity.RESULT_OK, Intent().putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, serializationManager.get().serializeAttribute(it)))
             }
-            setResult(Activity.RESULT_OK, Intent().putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, serializationManager.get().serializeAttribute(it)))
+            return true
+        } else {
+            runOnUiThread {
+                Toast.makeText(this, R.string.msg_attribute_detail_properties_invalid, Toast.LENGTH_SHORT).show()
+            }
+            return false
         }
     }
 

@@ -28,6 +28,8 @@ class ChoiceEntryListPropertyView(context: Context, attrs: AttributeSet?) : APro
         useIntrinsicPadding = true
 
         valueView.addListEditedListener(this)
+
+        addNewValidator("Not all the entries are unique each other.", { entryList -> entryList.isUniquenessValid() })
     }
 
     override fun onContentEdited(editor: ChoiceEntryListEditor) {
