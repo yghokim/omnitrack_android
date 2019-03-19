@@ -136,12 +136,13 @@ class OAuth2Client(val context: Context, val config: OAuth2Config) {
                             .build()
                     try {
                         val response = OkHttpClient().newCall(request).execute()
-                        if (response.code() == 200) {
-                            return@defer Completable.complete()
-                        } else {
-                            println("result code is not 200. sign out failed.")
-                            println(response.message())
-                            return@defer Completable.error(IllegalStateException(response.message()))
+                        when (response.code()) {
+                            200 -> return@defer Completable.complete()
+                            else -> {
+                                println("result code is not 200. sign out failed.")
+                                println(response.message())
+                                return@defer Completable.error(IllegalStateException(response.message()))
+                            }
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()

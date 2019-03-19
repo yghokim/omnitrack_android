@@ -46,6 +46,7 @@ abstract class OAuth2BasedExternalService(context: Context, preferences: SharedP
                     println("$identifier OAuth2 sign out failed.")
                 }.doOnComplete {
                     println("$identifier OAuth2 signed out.")
+                }.doOnTerminate {
                     credential = null
                 }.subscribeOn(Schedulers.io())
             } else return@defer Completable.complete()
