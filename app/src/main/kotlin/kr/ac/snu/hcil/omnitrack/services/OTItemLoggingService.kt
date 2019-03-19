@@ -9,6 +9,7 @@ import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
@@ -123,15 +124,17 @@ class OTItemLoggingService : WakefulService(TAG) {
                                     pushedItemDao = item
                                     dbManager.saveItemObservable(item, true, null, realm)
                                 }.doOnSubscribe {
-                                    this@OTItemLoggingService.runOnUiThread {
-                                        OTTaskNotificationManager
-                                                .setTaskProgressNotification(this, NOTIFICATION_TAG,
-                                                        notificationId,
-                                                        "Logging...",
-                                                        "Logging $trackerName...",
-                                                        OTTaskNotificationManager.PROGRESS_INDETERMINATE,
-                                                        null
-                                                )
+                                    if (notify) {
+                                        this@OTItemLoggingService.runOnUiThread {
+                                            OTTaskNotificationManager
+                                                    .setTaskProgressNotification(this, NOTIFICATION_TAG,
+                                                            notificationId,
+                                                            getString(R.string.msg_trigger_notification_title_logging),
+                                                            String.format(getString(R.string.msg_trigger_notification_format_logging), trackerName),
+                                                            OTTaskNotificationManager.PROGRESS_INDETERMINATE,
+                                                            null
+                                                    )
+                                        }
                                     }
                                 }.doOnSuccess { (result, itemId) ->
                                     if (result != BackendDbManager.SAVE_RESULT_FAIL) {

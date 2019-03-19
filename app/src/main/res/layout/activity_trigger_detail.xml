@@ -83,6 +83,14 @@
                 android:layout_width="match_parent"
                 android:orientation="vertical" />
 
+            <kr.ac.snu.hcil.omnitrack.views.properties.BooleanPropertyView
+                android:id="@+id/ui_logging_config_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/activity_horizontal_margin"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:text="@string/msg_trigger_config_send_notification_on_logging" />
+
             <ViewStub
                 android:id="@+id/ui_tracker_assign_panel_stub"
                 android:layout_width="match_parent"

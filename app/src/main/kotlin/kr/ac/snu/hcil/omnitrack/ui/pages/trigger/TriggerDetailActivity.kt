@@ -20,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
+import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTBackgroundLoggingTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.IConditionConfigurationView
@@ -121,6 +122,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                     if (interfaceOptions.defaultActionType == OTTriggerDAO.ACTION_TYPE_REMIND) {
                         //if remind, show reminder durationSeconds
                         ui_reminder_config_view.visibility = View.VISIBLE
+                        ui_logging_config_view.visibility = View.GONE
 
                         val currentAction = viewModel.actionInstance.value as? OTReminderAction
                         if (currentAction != null) {
@@ -144,6 +146,20 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
 
                     } else {
                         ui_reminder_config_view.visibility = View.GONE
+                        ui_logging_config_view.visibility = View.VISIBLE
+
+                        val currentAction = viewModel.actionInstance.value as? OTBackgroundLoggingTriggerAction
+                        if (currentAction != null) {
+                            ui_logging_config_view.value = currentAction.notify
+                        }
+
+                        creationSubscriptions.add(ui_logging_config_view.valueChanged.observable
+                                .subscribe { (sender, notify) ->
+                                    val currentAction = viewModel.actionInstance.value as? OTBackgroundLoggingTriggerAction
+                                    if (currentAction != null && currentAction.notify != notify) {
+                                        viewModel.actionInstance.onNext((currentAction.clone() as OTBackgroundLoggingTriggerAction).apply { this.notify = notify })
+                                    }
+                                })
                     }
                 }
         )

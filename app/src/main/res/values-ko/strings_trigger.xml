@@ -55,5 +55,8 @@
     <string name="msg_trigger_data_recent_measure">최근 측정값</string>
     <string name="msg_trigger_data_recent_measure_no_value">측정되지 않음</string>
     <string name="msg_trigger_data_service_not_activated">서비스가 활성화되지 않음</string>
+    <string name="msg_trigger_config_send_notification_on_logging">기록시 알림 보내기</string>
+    <string name="msg_trigger_notification_title_logging">기록중…</string>
+    <string name="msg_trigger_notification_format_logging">%1$s 아이템 작성중</string>
 
 </resources>

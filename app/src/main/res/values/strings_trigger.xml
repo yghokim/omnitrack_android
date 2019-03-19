@@ -53,6 +53,9 @@
     <string name="msg_trigger_data_recent_measure">Recent Measure</string>
     <string name="msg_trigger_data_recent_measure_no_value">No measured history</string>
     <string name="msg_trigger_data_service_not_activated">Service not activated</string>
+    <string name="msg_trigger_config_send_notification_on_logging">Send notification on logging</string>
+    <string name="msg_trigger_notification_title_logging">Logging…</string>
+    <string name="msg_trigger_notification_format_logging">Logging %1$s item</string>
 
 
 </resources>
