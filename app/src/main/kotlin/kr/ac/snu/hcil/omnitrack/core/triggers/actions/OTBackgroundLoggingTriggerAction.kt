@@ -50,7 +50,6 @@ class OTBackgroundLoggingTriggerAction : OTTriggerAction() {
 
     var notify: Boolean = true
 
-    //TODO toss metadata to item creation logic
     override fun performAction(trigger: OTTriggerDAO, triggerTime: Long, metadata: JsonObject, context: Context): Completable {
         return Completable.defer {
             if (trigger.liveTrackerCount > 0) {
@@ -59,6 +58,7 @@ class OTBackgroundLoggingTriggerAction : OTTriggerAction() {
                                 .makeLoggingIntent(context.applicationContext,
                                         ItemLoggingSource.Trigger,
                                         notify,
+                                        metadata,
                                         *trigger.liveTrackerIds)
                 )
             }

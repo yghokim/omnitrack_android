@@ -80,7 +80,7 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
                 CLICK_COMMAND_ROW -> {
                     if (trackerId != null) {
                         if (trackerDao?.makeAttributesQuery(false, false)?.count() == 0L) {
-                            context.startService(OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, trackerId))
+                            context.startService(OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, null, trackerId))
                         } else {
                             context.startActivity(NewItemActivity.makeNewItemPageIntent(trackerId, context).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
                         }
@@ -89,7 +89,7 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
 
                 CLICK_COMMAND_INSTANT_LOGGING -> {
                     if (trackerId != null) {
-                        context.startService(OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, trackerId))
+                        context.startService(OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, null, trackerId))
                     }
                 }
             }

@@ -2,6 +2,9 @@ package kr.ac.snu.hcil.omnitrack.services
 
 import android.content.Context
 import android.content.Intent
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import dagger.Lazy
 import dagger.internal.Factory
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -16,6 +19,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -44,12 +48,13 @@ class OTItemLoggingService : WakefulService(TAG) {
         private const val NOTIFICATION_TAG = "${BuildConfig.APPLICATION_ID}.notification.tag.ITEM_LOGGING_SERVICE"
         private val notificationIdSeed = AtomicInteger(0)
 
-        fun makeLoggingIntent(context: Context, loggingSource: ItemLoggingSource, notify: Boolean, vararg trackerIds: String): Intent {
+        fun makeLoggingIntent(context: Context, loggingSource: ItemLoggingSource, notify: Boolean, metadata: JsonObject?, vararg trackerIds: String): Intent {
             return Intent(context, OTItemLoggingService::class.java).apply {
                 this.action = ACTION_LOG
                 this.putExtra(INTENT_EXTRA_LOGGING_SOURCE, loggingSource.name)
                 this.putExtra(INTENT_EXTRA_NOTIFY, notify)
                 this.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER_ARRAY, trackerIds)
+                this.putExtra(OTApp.INTENT_EXTRA_METADATA, metadata?.toString())
             }
         }
 
@@ -65,6 +70,9 @@ class OTItemLoggingService : WakefulService(TAG) {
 
     @field:[Inject Backend]
     lateinit var realmProvider: Factory<Realm>
+
+    @field:[Inject ForGeneric]
+    lateinit var genericGson: Lazy<Gson>
 
     @Inject
     lateinit var dbManager: BackendDbManager
@@ -100,6 +108,11 @@ class OTItemLoggingService : WakefulService(TAG) {
         realm = realmProvider.get()
         val trackerIds = intent.getStringArrayExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER_ARRAY)
         val loggingSource = ItemLoggingSource.valueOf(intent.getStringExtra(INTENT_EXTRA_LOGGING_SOURCE))
+        val metadata = if (intent.hasExtra(OTApp.INTENT_EXTRA_METADATA)) {
+            genericGson.get().fromJson(intent.getStringExtra(OTApp.INTENT_EXTRA_METADATA), JsonObject::class.java)
+        } else {
+            null
+        }
         val notify = intent.getBooleanExtra(INTENT_EXTRA_NOTIFY, true)
         if (trackerIds?.size ?: 0 >= 1) // intent contains one or more trackers
         {
@@ -119,8 +132,7 @@ class OTItemLoggingService : WakefulService(TAG) {
 
                         wrapper.makeAutoCompleteObservable(realmProvider, applyToBuilder = true)
                                 .ignoreElements().toSingleDefault(trackerId).flatMap {
-                                    //TODO put metadata
-                                    val item = wrapper.saveToItem(null, loggingSource, null)
+                                    val item = wrapper.saveToItem(null, loggingSource, metadata)
                                     pushedItemDao = item
                                     dbManager.saveItemObservable(item, true, null, realm)
                                 }.doOnSubscribe {

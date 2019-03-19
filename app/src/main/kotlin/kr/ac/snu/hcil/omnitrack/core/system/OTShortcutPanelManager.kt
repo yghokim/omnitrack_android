@@ -118,7 +118,7 @@ class OTShortcutPanelManager @Inject constructor(
                     element.setImageViewBitmap(R.id.ui_button_instant, VectorIconHelper.getConvertedBitmap(context, R.drawable.instant_add))
 
 
-                    val instantLoggingIntent = PendingIntent.getService(context, i, OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, trackers[i].objectId!!), PendingIntent.FLAG_UPDATE_CURRENT)
+                    val instantLoggingIntent = PendingIntent.getService(context, i, OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, null, trackers[i].objectId!!), PendingIntent.FLAG_UPDATE_CURRENT)
                     element.setOnClickPendingIntent(R.id.ui_button_instant, instantLoggingIntent)
 
                     if (fieldCount == 0L) {
