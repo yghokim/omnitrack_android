@@ -9,7 +9,7 @@ import javax.inject.Singleton
 /**
  * Created by younghokim on 2017. 12. 19..
  */
-@Module(includes = [DesignModule::class])
+@Module()
 class SerializationModule {
     @Provides
     @Singleton

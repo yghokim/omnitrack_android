@@ -21,7 +21,7 @@ import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
-import kr.ac.snu.hcil.omnitrack.core.di.global.ColorPalette
+import kr.ac.snu.hcil.omnitrack.views.color.ColorHelper
 import org.jetbrains.anko.padding
 import java.util.*
 import javax.inject.Inject
@@ -46,9 +46,6 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
 
     @field:[Inject Backend]
     lateinit var realmProvider: Factory<Realm>
-
-    @field:[Inject ColorPalette]
-    lateinit var colorPalette: IntArray
 
     @Inject
     protected lateinit var dbManager: Lazy<BackendDbManager>
@@ -172,7 +169,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
             trackerDao.userId = authManager.userId
             trackerDao.name = name
             trackerDao.isBookmarked = false
-            trackerDao.color = colorPalette[0]
+            trackerDao.color = ColorHelper.getTrackerColorPalette(parent.context)[0]
         }
     }
 

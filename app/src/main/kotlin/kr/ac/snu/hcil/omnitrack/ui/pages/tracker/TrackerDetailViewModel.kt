@@ -30,7 +30,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.database.models.research.OTExperimentDAO
 import kr.ac.snu.hcil.omnitrack.core.database.typeadapters.ServerCompatibleTypeAdapter
-import kr.ac.snu.hcil.omnitrack.core.di.global.ColorPalette
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForTracker
 import kr.ac.snu.hcil.omnitrack.core.di.global.Research
 import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
@@ -41,6 +40,7 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionAsObservable
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
+import kr.ac.snu.hcil.omnitrack.views.color.ColorHelper
 import org.jetbrains.anko.collections.forEachWithIndex
 import java.util.*
 import javax.inject.Inject
@@ -75,9 +75,6 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     @field:[Inject Research]
     protected lateinit var researchRealmFactory: Factory<Realm>
-
-    @field:[Inject ColorPalette]
-    protected lateinit var colorPalette: IntArray
 
     private lateinit var researchRealm: Realm
 
@@ -196,7 +193,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     override fun onInject(app: OTAndroidApp) {
         app.applicationComponent.inject(this)
-        colorObservable = BehaviorSubject.createDefault<Int>(colorPalette[0])
+        colorObservable = BehaviorSubject.createDefault<Int>(ColorHelper.getTrackerColorPalette(getApplication())[0])
         researchRealm = researchRealmFactory.get()
     }
 

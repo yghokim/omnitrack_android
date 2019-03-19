@@ -6,7 +6,6 @@ import android.graphics.Paint
 import androidx.core.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.di.global.ColorPalette
 import kr.ac.snu.hcil.omnitrack.core.visualization.CompoundAttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.Axis
@@ -14,16 +13,13 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.Legend
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.DataEncodedDrawingList
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.PolyLineElement
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.NumericScale
+import kr.ac.snu.hcil.omnitrack.views.color.ColorHelper
 import java.util.*
-import javax.inject.Inject
 
 /**
  * Created by Young-Ho Kim on 2016-09-08.
  */
 class MultiLineChartDrawer(context: Context) : ATimelineChartDrawer(context) {
-
-    @field:[Inject ColorPalette]
-    protected lateinit var colorPalette: IntArray
 
     override val aspectRatio: Float = 1.7f
     val verticalAxis = Axis(context, Axis.Pivot.LEFT)
@@ -85,6 +81,7 @@ class MultiLineChartDrawer(context: Context) : ATimelineChartDrawer(context) {
 
             if (model is CompoundAttributeChartModel) {
                 legend.entries.clear()
+                val colorPalette = ColorHelper.getTrackerColorPalette(context)
                 for (attr in (model as CompoundAttributeChartModel).attributes.withIndex()) {
                     legend.entries.add(
                             Pair(attr.value.name, colorPalette[attr.index % colorPalette.size])
@@ -154,7 +151,7 @@ class MultiLineChartDrawer(context: Context) : ATimelineChartDrawer(context) {
 
     fun refreshPolyLine(datum: IndexedValue<ILineChartOnTime.TimeSeriesTrendData>, element: PolyLineElement<ILineChartOnTime.TimeSeriesTrendData>) {
 
-        println("coord of line")
+        val colorPalette = ColorHelper.getTrackerColorPalette(context)
         element.color = colorPalette[datum.index % colorPalette.size]
         element.fitNumPoints(datum.value.points.count())
         for (point in datum.value.points.withIndex()) {

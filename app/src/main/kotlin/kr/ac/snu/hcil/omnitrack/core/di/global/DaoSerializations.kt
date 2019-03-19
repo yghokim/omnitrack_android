@@ -48,16 +48,14 @@ class DaoSerializationModule {
     @Singleton
     @ForTracker
     fun provideTrackerAdapter(@ForAttribute attributeTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTAttributeDAO>>,
-                              @ForGeneric gson: Lazy<Gson>,
-                              @ColorPalette colorPalette: IntArray): ServerCompatibleTypeAdapter<OTTrackerDAO> = TrackerTypeAdapter(false, attributeTypeAdapter, gson, colorPalette)
+                              @ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTTrackerDAO> = TrackerTypeAdapter(false, attributeTypeAdapter, gson)
 
 
     @Provides
     @Singleton
     @ForServerTracker
     fun provideServerTrackerAdapter(@ForServerAttribute attributeTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTAttributeDAO>>,
-                                    @ForGeneric gson: Lazy<Gson>,
-                                    @ColorPalette colorPalette: IntArray): ServerCompatibleTypeAdapter<OTTrackerDAO> = TrackerTypeAdapter(true, attributeTypeAdapter, gson, colorPalette)
+                                    @ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTTrackerDAO> = TrackerTypeAdapter(true, attributeTypeAdapter, gson)
 
     @Provides
     @Singleton

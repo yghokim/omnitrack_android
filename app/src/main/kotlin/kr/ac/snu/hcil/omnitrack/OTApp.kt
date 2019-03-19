@@ -151,10 +151,6 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         ApplicationModule(this)
     }
 
-    private val designModule: DesignModule by lazy {
-        DesignModule()
-    }
-
     private val externalServiceModule: ExternalServiceModule by lazy {
         ExternalServiceModule()
     }
@@ -220,7 +216,6 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
                 .usageLoggingModule(usageLoggingModule)
                 .uIHelperModule(uiHelperModule)
                 .scheduledJobModule(scheduledJobModule)
-                .designModule(designModule)
                 .externalServiceModule(externalServiceModule)
                 .serializationModule(serializationModule)
                 .systemIdentifierFactoryModule(systemIdentifierFactoryModule)

@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.database.typeadapters
 
+import android.graphics.Color
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
@@ -19,7 +20,7 @@ import java.util.*
 /**
  * Created by younghokim on 2017. 11. 3..
  */
-class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTAttributeDAO>>, val gson: Lazy<Gson>, val palette: IntArray) : ServerCompatibleTypeAdapter<OTTrackerDAO>(isServerMode) {
+class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTAttributeDAO>>, val gson: Lazy<Gson>) : ServerCompatibleTypeAdapter<OTTrackerDAO>(isServerMode) {
 
     override fun read(reader: JsonReader, isServerMode: Boolean): OTTrackerDAO {
         val dao = OTTrackerDAO()
@@ -124,7 +125,7 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
                 BackendDbManager.FIELD_SYNCHRONIZED_AT -> applyTo.synchronizedAt = json.getLongCompat(key)
                 BackendDbManager.FIELD_NAME -> applyTo.name = json.getStringCompat(key) ?: ""
                 BackendDbManager.FIELD_REDIRECT_URL -> applyTo.redirectUrl = json.getStringCompat(key)
-                "color" -> applyTo.color = json.getIntCompat(key) ?: palette[0]
+                "color" -> applyTo.color = json.getIntCompat(key) ?: Color.CYAN
                 "isBookmarked" -> applyTo.isBookmarked = json.getBooleanCompat(key) ?: false
                 "lockedProperties"->applyTo.serializedLockedPropertyInfo = json[key]?.toString() ?: "null"
                 "flags" -> {

@@ -98,7 +98,6 @@ import javax.inject.Singleton
     ScheduledJobModule::class,
     UIHelperModule::class,
     SerializationModule::class,
-    DesignModule::class,
     ExternalServiceModule::class,
     SystemIdentifierFactoryModule::class,
 
