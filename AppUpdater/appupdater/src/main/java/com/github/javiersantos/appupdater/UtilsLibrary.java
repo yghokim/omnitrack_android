@@ -1,6 +1,5 @@
 package com.github.javiersantos.appupdater;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -282,7 +281,7 @@ class UtilsLibrary {
         return intent;
     }
 
-    static void goToUpdate(Context context, UpdateFrom updateFrom, URL url, String appId, int iconResId) {
+    static void goToUpdate(Context context, URL url, String appId, int iconResId) {
         /*
         Intent intent = intentToUpdate(context, updateFrom, url);
 
@@ -306,7 +305,7 @@ class UtilsLibrary {
     }
 
     static void goToUpdate(Context context, UpdateFrom updateFrom, URL url) {
-        goToUpdate(context, updateFrom, url, "", R.drawable.ic_stat_name);
+        goToUpdate(context, url, "", R.drawable.ic_stat_name);
     }
 
     static Boolean isAbleToShow(Integer successfulChecks, Integer showEvery) {

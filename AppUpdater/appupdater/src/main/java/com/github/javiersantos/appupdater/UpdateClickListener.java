@@ -40,7 +40,7 @@ public class UpdateClickListener implements DialogInterface.OnClickListener {
                                    @Override
                                    public void accept(Boolean granted) {
                                        if (granted) {
-                                           UtilsLibrary.goToUpdate(context, updateFrom, apk, appId, iconResId);
+                                           UtilsLibrary.goToUpdate(context, apk, appId, iconResId);
                                        }
                                    }
                                }

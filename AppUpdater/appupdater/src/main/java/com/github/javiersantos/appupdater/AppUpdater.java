@@ -335,6 +335,10 @@ public class AppUpdater implements IAppUpdater {
         return this;
     }
 
+    public void goToUpdate(@NonNull Update update) {
+        UtilsLibrary.goToUpdate(context, update.getUrlToDownload(), appId, iconResId);
+    }
+
     @Override
     public void start() {
         latestAppVersion = new UtilsAsync.LatestAppVersion(context, false, updateFrom, gitHub, xmlOrJsonUrl, new LibraryListener() {

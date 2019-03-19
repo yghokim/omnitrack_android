@@ -71,7 +71,6 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         const val INTENT_EXTRA_ITEMBUILDER = "itemBuilderId"
 
         const val BROADCAST_ACTION_NEW_VERSION_DETECTED = "$PREFIX_ACTION.NEW_VERSION_DETECTED"
-        const val INTENT_EXTRA_LATEST_VERSION_NAME = "latest_version"
 
         const val BROADCAST_ACTION_USER_SIGNED_IN = "$PREFIX_ACTION.USER_SIGNED_IN"
         const val BROADCAST_ACTION_USER_SIGNED_OUT = "$PREFIX_ACTION.USER_SIGNED_OUT"

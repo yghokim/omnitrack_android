@@ -44,5 +44,7 @@ object OTAppVersionCheckManager {
         return AppUpdaterUtils(context)
                 .setUpdateFrom(UpdateFrom.JSON)
                 .setUpdateJSON(updateInfoUrl)
+                .setAppIcon(R.drawable.icon_simple)
+                .setAppId(BuildConfig.APPLICATION_ID)
     }
 }

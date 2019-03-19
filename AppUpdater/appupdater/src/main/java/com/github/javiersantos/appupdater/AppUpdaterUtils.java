@@ -7,6 +7,7 @@ import com.github.javiersantos.appupdater.enums.UpdateFrom;
 import com.github.javiersantos.appupdater.objects.GitHub;
 import com.github.javiersantos.appupdater.objects.Update;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 
 public class AppUpdaterUtils {
@@ -17,6 +18,11 @@ public class AppUpdaterUtils {
     private GitHub gitHub;
     private String xmlOrJSONUrl;
     private UtilsAsync.LatestAppVersion latestAppVersion;
+
+    private @DrawableRes
+    int appIconId;
+    private String appId;
+
 
     public interface UpdateListener {
         /**
@@ -122,6 +128,20 @@ public class AppUpdaterUtils {
     public AppUpdaterUtils withListener(UpdateListener updateListener) {
         this.updateListener = updateListener;
         return this;
+    }
+
+    public AppUpdaterUtils setAppIcon(@DrawableRes int resId) {
+        this.appIconId = resId;
+        return this;
+    }
+
+    public AppUpdaterUtils setAppId(@NonNull String appId) {
+        this.appId = appId;
+        return this;
+    }
+
+    public void goToUpdate(@NonNull Update update) {
+        UtilsLibrary.goToUpdate(context, update.getUrlToDownload(), appId, appIconId);
     }
 
     /**
