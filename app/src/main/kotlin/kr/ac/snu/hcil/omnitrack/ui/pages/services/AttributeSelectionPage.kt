@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.bindView
@@ -60,6 +59,8 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
     lateinit var trackerId: String
     private lateinit var currentMeasureFactory: OTMeasureFactory
 
+    var attributeCreationEnabled = true
+
     var attributeDAO: OTAttributeDAO? = null
 
     private val subscriptions = CompositeDisposable()
@@ -75,9 +76,10 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
     override fun onEnter() {
         trackerId = parent.trackerDao.objectId!!
         currentMeasureFactory = parent.currentMeasureFactory
-        val dao = dbManager.get().getTrackerQueryWithId(trackerId, realmProvider.get()).findFirstAsync()
+        val trackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realmProvider.get()).findFirstAsync()
         subscriptions.add(
-            dao.asFlowable<OTTrackerDAO>().filter { it.isValid && it.isLoaded }.subscribe { snapshot ->
+                trackerDao.asFlowable<OTTrackerDAO>().filter { it.isValid && it.isLoaded }.subscribe { snapshot ->
+                    attributeCreationEnabled = !snapshot.isAddNewAttributeLocked()
                 val validAttributes = snapshot.attributes.filter { !it.isHidden && !it.isInTrashcan && !it.isVisibilityLocked() }
                 attributes.clear()
                 attributes.addAll(validAttributes)
@@ -120,14 +122,19 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            if (position >= 1) {
-                (holder as AttributeListViewHolder).bind(attributes[position - 1])
+            if (position >= 1 || !attributeCreationEnabled) {
+                (holder as AttributeListViewHolder).bind(attributes[position - indexShift])
             }
         }
 
-        override fun getItemCount(): Int = attributes.size + 1
+        private val indexShift: Int
+            get() {
+                return if (attributeCreationEnabled) 1 else 0
+            }
 
-        override fun getItemViewType(position: Int): Int = if (position == 0) 0 else 1
+        override fun getItemCount(): Int = attributes.size + indexShift
+
+        override fun getItemViewType(position: Int): Int = if (position == 0 && attributeCreationEnabled) 0 else 1
 
     }
 

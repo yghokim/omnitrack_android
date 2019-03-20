@@ -6,12 +6,10 @@ import io.reactivex.subjects.PublishSubject
 import io.realm.OrderedCollectionChangeSet
 import io.realm.OrderedRealmCollectionChangeListener
 import io.realm.RealmResults
-import io.realm.Sort
 import kr.ac.snu.hcil.android.common.move
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
@@ -53,7 +51,6 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
     override fun onUserAttached(newUserId: String) {
         super.onUserAttached(newUserId)
         trackerQueryResults = dbManager.get().makeTrackersOfUserVisibleQuery(newUserId, realm)
-                .sort(arrayOf("position", BackendDbManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
                 .findAllAsync()
 
         trackerQueryResults?.addChangeListener(this)

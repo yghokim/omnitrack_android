@@ -102,20 +102,23 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            if (position >= 1 || BuildConfig.DISABLE_TRACKER_CREATION != true) {
+            if (position >= 1 || BuildConfig.DISABLE_TRACKER_CREATION == true) {
                 (holder as TrackerListViewHolder).run {
-                    holder.bind(trackers[position - 1])
+                    holder.bind(trackers[position - indexShift])
                 }
             }
         }
 
-        override fun getItemCount(): Int{
-            return if(BuildConfig.DISABLE_TRACKER_CREATION == true){
-                trackers.size
-            }else trackers.size + 1
-        }
+        override fun getItemCount(): Int = trackers.size + indexShift
 
-        override fun getItemViewType(position: Int): Int = if (position == 0 && BuildConfig.DISABLE_TRACKER_CREATION != true) 0 else 1
+        private val indexShift: Int
+            get() {
+                return if (BuildConfig.DISABLE_TRACKER_CREATION == true) 0 else 1
+            }
+
+        override fun getItemViewType(position: Int): Int = if (position == 0) {
+            if (BuildConfig.DISABLE_TRACKER_CREATION != true) 0 else 1
+        } else 1
 
     }
 
