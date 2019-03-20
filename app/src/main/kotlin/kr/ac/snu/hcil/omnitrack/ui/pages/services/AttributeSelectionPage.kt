@@ -30,7 +30,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
-import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import org.jetbrains.anko.padding
 import java.util.*
 import javax.inject.Inject
@@ -70,28 +69,30 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
     }
 
     override fun onLeave() {
+        attributes.clear()
         subscriptions.clear()
     }
 
     override fun onEnter() {
         trackerId = parent.trackerDao.objectId!!
         currentMeasureFactory = parent.currentMeasureFactory
-        val trackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realmProvider.get()).findFirstAsync()
-        subscriptions.add(
-                trackerDao.asFlowable<OTTrackerDAO>().filter { it.isValid && it.isLoaded }.subscribe { snapshot ->
-                    attributeCreationEnabled = !snapshot.isAddNewAttributeLocked()
-                val validAttributes = snapshot.attributes.filter { !it.isHidden && !it.isInTrashcan && !it.isVisibilityLocked() }
-                attributes.clear()
-                attributes.addAll(validAttributes)
-                //attributes.removeAll { !currentMeasureFactory.isAttachableTo(it) || it.isEditingLocked() }
-                attributeListView?.adapter?.notifyDataSetChanged()
-            }
-        )
-    }
-
-    private fun refreshAttributeList() {
-        attributes.clear()
-        onEnter()
+        if (parent.trackerDao.isManaged) {
+            val trackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realmProvider.get()).findFirstAsync()
+            subscriptions.add(
+                    trackerDao.asFlowable<OTTrackerDAO>().filter { it.isValid && it.isLoaded }.subscribe { snapshot ->
+                        attributeCreationEnabled = !snapshot.isAddNewAttributeLocked()
+                        val validAttributes = snapshot.attributes.filter { !it.isHidden && !it.isInTrashcan && !it.isVisibilityLocked() }
+                        attributes.clear()
+                        attributes.addAll(validAttributes)
+                        //attributes.removeAll { !currentMeasureFactory.isAttachableTo(it) || it.isEditingLocked() }
+                        attributeListView?.adapter?.notifyDataSetChanged()
+                    }
+            )
+        } else {
+            attributes.clear()
+            attributeCreationEnabled = !parent.trackerDao.isAddNewAttributeLocked()
+            attributeListView?.adapter?.notifyDataSetChanged()
+        }
     }
 
     override fun makeViewInstance(context: Context): View {
@@ -151,8 +152,9 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
             newAttributeNameDialog.input(null, preset.name, false) {
                 _, input ->
                 val realm = realmProvider.get()
-                addNewAttribute(input.toString(), currentTypeId, realm, preset.processor)
-                refreshAttributeList()
+                createNewAttribute(input.toString(), currentTypeId, realm, preset.processor)
+                requestGoNextPage(ServiceWizardView.PAGE_QUERY_RANGE_SELECTION)
+
             }.show()
         }
     }
@@ -285,7 +287,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
         )
     }
 
-    fun addNewAttribute(name: String, type: Int, realm: Realm, processor: ((OTAttributeDAO, Realm) -> OTAttributeDAO)? = null) {
+    fun createNewAttribute(name: String, type: Int, realm: Realm, processor: ((OTAttributeDAO, Realm) -> OTAttributeDAO)? = null) {
         val trackerDao = parent.trackerDao
         val newDao = OTAttributeDAO()
         newDao.objectId = UUID.randomUUID().toString()
@@ -296,8 +298,8 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
         processor?.invoke(newDao, realm)
         newDao.localId = attributeManager.makeNewAttributeLocalId(newDao.userCreatedAt)
         newDao.trackerId = trackerDao.objectId
-        realm.executeTransactionIfNotIn {
-            trackerDao.attributes.add(newDao)
-        }
+
+
+        this@AttributeSelectionPage.attributeDAO = newDao
     }
 }

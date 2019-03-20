@@ -70,10 +70,6 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
         trackerListView?.adapter?.notifyDataSetChanged()
     }
 
-    private fun refreshTrackerList() {
-        onEnter()
-    }
-
     override fun makeViewInstance(context: Context): View {
         trackerListView = TrackerListView(context)
         return trackerListView!!
@@ -132,8 +128,8 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
             val trackerDefaultName = parent.context.getString(R.string.msg_new_tracker_prefix)
             newTrackerNameDialog.input(null, trackerDefaultName, false) {
                 _, text ->
-                addNewTracker(text.toString())
-                refreshTrackerList()
+                createNewTracker(text.toString())
+                requestGoNextPage(ServiceWizardView.PAGE_ATTRIBUTE_SELECTION)
             }.show()
         }
     }
@@ -171,15 +167,14 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
                 .negativeText(R.string.msg_cancel)
     }
 
-    private fun addNewTracker(name: String) {
-        val realm = realmProvider.get()
-        realm.executeTransaction {
-            val trackerDao = realm.createObject(OTTrackerDAO::class.java, UUID.randomUUID().toString())
-            trackerDao.userId = authManager.userId
-            trackerDao.name = name
-            trackerDao.isBookmarked = false
-            trackerDao.color = ColorHelper.getTrackerColorPalette(parent.context)[0]
-        }
+    private fun createNewTracker(name: String) {
+        val trackerDao = OTTrackerDAO()
+        trackerDao.objectId = UUID.randomUUID().toString()
+        trackerDao.userId = authManager.userId
+        trackerDao.name = name
+        trackerDao.isBookmarked = false
+        trackerDao.color = ColorHelper.getTrackerColorPalette(parent.context)[0]
+        this.selectedTrackerDAO = trackerDao
     }
 
 }
