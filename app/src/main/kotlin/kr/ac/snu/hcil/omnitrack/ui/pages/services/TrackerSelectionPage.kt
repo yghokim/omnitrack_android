@@ -15,6 +15,7 @@ import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.android.common.view.wizard.AWizardPage
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
@@ -39,7 +40,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
     override val canGoNext: Boolean = true
     override val getTitleResourceId: Int = R.string.msg_service_wizard_title_tracker_selection
 
-    private var trackers: List<OTTrackerDAO> = ArrayList()
+    private val trackers = ArrayList<OTTrackerDAO>()
     private var trackerListView: RecyclerView? = null
 
     lateinit var selectedTrackerDAO: OTTrackerDAO
@@ -63,7 +64,8 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
     override fun onEnter() {
         val userId = authManager.userId!!
         val realm = realmProvider.get()
-        trackers = dbManager.get().makeTrackersOfUserVisibleQuery(userId, realm).findAll().filter { !it.isEditingLocked() }
+        trackers.clear()
+        trackers.addAll(dbManager.get().makeTrackersOfUserVisibleQuery(userId, realm).findAll().filter { !it.isEditingLocked() })
         realm.close()
         trackerListView?.adapter?.notifyDataSetChanged()
     }
@@ -100,16 +102,20 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            if (position >= 1) {
+            if (position >= 1 || BuildConfig.DISABLE_TRACKER_CREATION != true) {
                 (holder as TrackerListViewHolder).run {
                     holder.bind(trackers[position - 1])
                 }
             }
         }
 
-        override fun getItemCount(): Int = trackers.size + 1
+        override fun getItemCount(): Int{
+            return if(BuildConfig.DISABLE_TRACKER_CREATION == true){
+                trackers.size
+            }else trackers.size + 1
+        }
 
-        override fun getItemViewType(position: Int): Int = if (position == 0) 0 else 1
+        override fun getItemViewType(position: Int): Int = if (position == 0 && BuildConfig.DISABLE_TRACKER_CREATION != true) 0 else 1
 
     }
 

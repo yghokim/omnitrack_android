@@ -611,6 +611,13 @@
     <string name="msg_confirm_remove_appended_entry">Remove the appended entry?</string>
     <string name="msg_hide_field">Hide Field</string>
 
+    <string name="msg_service_wizard_format_already_attached_measure">%1$s is already attached.</string>
+    <string name="msg_service_wizard_already_attached_measure">Another measure is already attached.</string>
+    <string name="msg_service_wizard_no_attachable_field">Not an attachable type.</string>
+    <string name="msg_service_wizard_non_modifiable_field">You cannot modify this field.</string>
+
+
+
 
     <string name="msg_attribute_detail_properties_invalid">Please check that all property inputs are valid.</string>
 

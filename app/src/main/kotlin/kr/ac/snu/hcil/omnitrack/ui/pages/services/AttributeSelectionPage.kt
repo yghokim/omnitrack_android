@@ -6,13 +6,16 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import dagger.Lazy
 import dagger.internal.Factory
+import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.android.common.view.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
@@ -59,25 +62,29 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
 
     var attributeDAO: OTAttributeDAO? = null
 
-    init {
-        val component = (parent.context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
+    private val subscriptions = CompositeDisposable()
 
+    init {
+        (parent.context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
     override fun onLeave() {
+        subscriptions.clear()
     }
 
     override fun onEnter() {
         trackerId = parent.trackerDao.objectId!!
         currentMeasureFactory = parent.currentMeasureFactory
         val dao = dbManager.get().getTrackerQueryWithId(trackerId, realmProvider.get()).findFirstAsync()
-        dao.asFlowable<OTTrackerDAO>().filter { it.isValid && it.isLoaded }.subscribe { snapshot ->
-            val validAttributes = snapshot.attributes.filter { !it.isHidden && !it.isInTrashcan }
-            attributes.clear()
-            attributes.addAll(validAttributes)
-            attributes.removeAll { !currentMeasureFactory.isAttachableTo(it) }
-            attributeListView?.adapter?.notifyDataSetChanged()
-        }
+        subscriptions.add(
+            dao.asFlowable<OTTrackerDAO>().filter { it.isValid && it.isLoaded }.subscribe { snapshot ->
+                val validAttributes = snapshot.attributes.filter { !it.isHidden && !it.isInTrashcan && !it.isVisibilityLocked() }
+                attributes.clear()
+                attributes.addAll(validAttributes)
+                //attributes.removeAll { !currentMeasureFactory.isAttachableTo(it) || it.isEditingLocked() }
+                attributeListView?.adapter?.notifyDataSetChanged()
+            }
+        )
     }
 
     private fun refreshAttributeList() {
@@ -144,26 +151,65 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
     }
 
     private inner class AttributeListViewHolder(parent: ViewGroup?) :
-            RecyclerView.ViewHolder(LayoutInflater.from(parent?.context).inflate(R.layout.simple_icon_and_text, parent, false)), View.OnClickListener {
+            RecyclerView.ViewHolder(LayoutInflater.from(parent?.context).inflate(R.layout.simple_icon_description_optional_description, parent, false)), View.OnClickListener {
+
+        var isAvailable: Boolean = true
+
+        val iconView: ImageView by bindView(R.id.icon)
+        val nameView: TextView by bindView(R.id.name)
+        val descriptionView: TextView by bindView(R.id.description)
 
         init {
             itemView.setOnClickListener(this)
         }
 
-        val icon: AppCompatImageView = itemView.findViewById(R.id.ui_attribute_type)
-        val textView: TextView = itemView.findViewById(R.id.text)
         lateinit var attributeDao: OTAttributeDAO
 
         override fun onClick(view: View?) {
-            this@AttributeSelectionPage.attributeDAO = attributeDao
-            requestGoNextPage(ServiceWizardView.PAGE_QUERY_RANGE_SELECTION)
+            if(isAvailable) {
+                this@AttributeSelectionPage.attributeDAO = attributeDao
+                requestGoNextPage(ServiceWizardView.PAGE_QUERY_RANGE_SELECTION)
+            }
         }
 
         fun bind(attributeDao: OTAttributeDAO) {
             val helper = attributeManager.get(attributeDao.type)
-            icon.setImageResource(helper.getTypeSmallIconResourceId(attributeDao))
+            iconView.setImageResource(helper.getTypeSmallIconResourceId(attributeDao))
+            nameView.text = attributeDao.name
             this.attributeDao = attributeDao
-            textView.text = attributeDao.name
+
+            if(!parent.currentMeasureFactory.isAttachableTo(attributeDao)){
+                descriptionView.visibility = View.VISIBLE
+                descriptionView.setText(R.string.msg_service_wizard_no_attachable_field)
+                isAvailable = false
+            } else if(attributeDao.isEditingLocked()){
+                descriptionView.visibility = View.VISIBLE
+                descriptionView.setText(R.string.msg_service_wizard_non_modifiable_field)
+                isAvailable = false
+            }
+            else {
+                val connection = attributeDao.getParsedConnection(parent.context)
+                if (connection != null) {
+                    descriptionView.visibility = View.VISIBLE
+                    descriptionView.text = connection.source?.getFactory<OTMeasureFactory>()?.getCategoryName()?.let {
+                        String.format(parent.resources.getString(R.string.msg_service_wizard_format_already_attached_measure), it)
+                    }
+                            ?: parent.resources.getString(R.string.msg_service_wizard_already_attached_measure)
+
+                    isAvailable = false
+                } else {
+                    descriptionView.visibility = View.GONE
+                    isAvailable = true
+                }
+            }
+
+            if(isAvailable){
+                itemView.isEnabled = true
+                itemView.alpha = 1f
+            }else{
+                itemView.isEnabled = false
+                itemView.alpha = 0.3f
+            }
         }
     }
 

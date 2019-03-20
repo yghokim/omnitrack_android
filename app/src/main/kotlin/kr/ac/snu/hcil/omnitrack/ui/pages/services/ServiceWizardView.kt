@@ -41,7 +41,6 @@ class ServiceWizardView: WizardView {
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
         currentMeasureFactory = measureFactory
         connection.source = measureFactory.makeMeasure()
-        Log.i("Omnitrack", measureFactory.javaClass.name)
         setAdapter(Adapter(context))
     }
 
