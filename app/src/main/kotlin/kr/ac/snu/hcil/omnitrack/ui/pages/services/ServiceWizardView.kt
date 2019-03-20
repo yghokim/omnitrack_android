@@ -77,10 +77,11 @@ class ServiceWizardView: WizardView {
         (adapter.getPageAt(PAGE_QUERY_RANGE_SELECTION) as QueryRangeSelectionPage).applyConfiguration(connection)
         val realm = realmProvider.get()
         realm.executeTransactionIfNotIn {
+
+            attributeDAO?.serializedConnection = connection.getSerializedString(context)
             if (attributeDAO?.isManaged == false) {
                 trackerDao.attributes.add(attributeDAO)
             }
-            attributeDAO?.serializedConnection = connection.getSerializedString(context)
 
             trackerDao.synchronizedAt = null
             if (!trackerDao.isManaged) {

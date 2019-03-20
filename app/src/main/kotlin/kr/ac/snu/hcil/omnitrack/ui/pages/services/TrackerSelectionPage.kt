@@ -22,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.views.color.ColorHelper
 import org.jetbrains.anko.padding
 import java.util.*
@@ -174,6 +175,12 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
         trackerDao.name = name
         trackerDao.isBookmarked = false
         trackerDao.color = ColorHelper.getTrackerColorPalette(parent.context)[0]
+
+        if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
+            trackerDao.experimentIdInFlags = BuildConfig.DEFAULT_EXPERIMENT_ID
+            trackerDao.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(BuildConfig.DEFAULT_EXPERIMENT_ID).build()
+        }
+
         this.selectedTrackerDAO = trackerDao
     }
 
