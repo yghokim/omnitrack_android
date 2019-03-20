@@ -427,6 +427,16 @@
     <string name="msg_hide_field">필드 감추기</string>
 
 
+    <string name="msg_service_wizard_title_tracker_selection">트래커를 선택하세요</string>
+    <string name="msg_service_wizard_title_field_selection">필드를 선택하세요</string>
+    <string name="msg_service_wizard_title_query_range_selection">쿼리 시간을 설정하세요</string>
+
+    <string name="msg_service_wizard_format_already_attached_measure">이미 %1$s 연동중</string>
+    <string name="msg_service_wizard_already_attached_measure">이미 다른 연동이 설정되어 있음</string>
+    <string name="msg_service_wizard_no_attachable_field">연동할 수 없는 데이터 타입</string>
+    <string name="msg_service_wizard_non_modifiable_field">수정할 수 없는 필드입니다.</string>
+
+
     <string name="msg_attribute_detail_properties_invalid">일부 속성 설정을 다시 한번 확인해 주세요.</string>
 
     <string-array name="purpose_entries">

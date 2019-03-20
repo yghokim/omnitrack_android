@@ -146,7 +146,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         super.onUserAttached(newUserId)
         trackersRealmResults?.removeAllChangeListeners()
         clearTrackerViewModelList()
-        trackersRealmResults = dbManager.get().makeTrackersOfUserVisibleQuery(newUserId, realm).sort(arrayOf("position", BackendDbManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING)).findAllAsync()
+        trackersRealmResults = dbManager.get().makeTrackersOfUserVisibleQuery(newUserId, realm).findAllAsync()
         trackersRealmResults?.addChangeListener(this)
 
         shortcutPanelManager.get().registerShortcutRefreshSubscription(newUserId, TAG)

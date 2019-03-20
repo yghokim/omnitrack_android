@@ -106,12 +106,16 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
         }
     }
 
+    protected open fun onComplete() {
+
+    }
+
     fun complete() {
         val currentPage = adapter.getPageAt(viewPager.currentItem)
         currentPage.onLeave()
         onLeavePage(currentPage, viewPager.currentItem)
         pagePositionHistory.clear()
-
+        onComplete()
         listener?.onComplete(this)
     }
 

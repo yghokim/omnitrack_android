@@ -15,12 +15,14 @@ import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.android.common.view.wizard.AWizardPage
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.views.color.ColorHelper
 import org.jetbrains.anko.padding
 import java.util.*
@@ -39,7 +41,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
     override val canGoNext: Boolean = true
     override val getTitleResourceId: Int = R.string.msg_service_wizard_title_tracker_selection
 
-    private var trackers: List<OTTrackerDAO> = ArrayList()
+    private val trackers = ArrayList<OTTrackerDAO>()
     private var trackerListView: RecyclerView? = null
 
     lateinit var selectedTrackerDAO: OTTrackerDAO
@@ -63,13 +65,10 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
     override fun onEnter() {
         val userId = authManager.userId!!
         val realm = realmProvider.get()
-        trackers = dbManager.get().makeTrackersOfUserVisibleQuery(userId, realm).findAll().filter { !it.isEditingLocked() }
+        trackers.clear()
+        trackers.addAll(dbManager.get().makeTrackersOfUserVisibleQuery(userId, realm).findAll().filter { !it.isEditingLocked() })
         realm.close()
         trackerListView?.adapter?.notifyDataSetChanged()
-    }
-
-    private fun refreshTrackerList() {
-        onEnter()
     }
 
     override fun makeViewInstance(context: Context): View {
@@ -100,16 +99,23 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            if (position >= 1) {
+            if (position >= 1 || BuildConfig.DISABLE_TRACKER_CREATION == true) {
                 (holder as TrackerListViewHolder).run {
-                    holder.bind(trackers[position - 1])
+                    holder.bind(trackers[position - indexShift])
                 }
             }
         }
 
-        override fun getItemCount(): Int = trackers.size + 1
+        override fun getItemCount(): Int = trackers.size + indexShift
 
-        override fun getItemViewType(position: Int): Int = if (position == 0) 0 else 1
+        private val indexShift: Int
+            get() {
+                return if (BuildConfig.DISABLE_TRACKER_CREATION == true) 0 else 1
+            }
+
+        override fun getItemViewType(position: Int): Int = if (position == 0) {
+            if (BuildConfig.DISABLE_TRACKER_CREATION != true) 0 else 1
+        } else 1
 
     }
 
@@ -123,8 +129,8 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
             val trackerDefaultName = parent.context.getString(R.string.msg_new_tracker_prefix)
             newTrackerNameDialog.input(null, trackerDefaultName, false) {
                 _, text ->
-                addNewTracker(text.toString())
-                refreshTrackerList()
+                createNewTracker(text.toString())
+                requestGoNextPage(ServiceWizardView.PAGE_ATTRIBUTE_SELECTION)
             }.show()
         }
     }
@@ -162,15 +168,20 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
                 .negativeText(R.string.msg_cancel)
     }
 
-    private fun addNewTracker(name: String) {
-        val realm = realmProvider.get()
-        realm.executeTransaction {
-            val trackerDao = realm.createObject(OTTrackerDAO::class.java, UUID.randomUUID().toString())
-            trackerDao.userId = authManager.userId
-            trackerDao.name = name
-            trackerDao.isBookmarked = false
-            trackerDao.color = ColorHelper.getTrackerColorPalette(parent.context)[0]
+    private fun createNewTracker(name: String) {
+        val trackerDao = OTTrackerDAO()
+        trackerDao.objectId = UUID.randomUUID().toString()
+        trackerDao.userId = authManager.userId
+        trackerDao.name = name
+        trackerDao.isBookmarked = false
+        trackerDao.color = ColorHelper.getTrackerColorPalette(parent.context)[0]
+
+        if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
+            trackerDao.experimentIdInFlags = BuildConfig.DEFAULT_EXPERIMENT_ID
+            trackerDao.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(BuildConfig.DEFAULT_EXPERIMENT_ID).build()
         }
+
+        this.selectedTrackerDAO = trackerDao
     }
 
 }

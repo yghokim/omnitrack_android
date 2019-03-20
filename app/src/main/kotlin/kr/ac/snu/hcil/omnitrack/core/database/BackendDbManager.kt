@@ -285,6 +285,7 @@ class BackendDbManager @Inject constructor(
         return realm.where(OTTrackerDAO::class.java)
                 .equalTo(FIELD_REMOVED_BOOLEAN, false)
                 .equalTo(FIELD_USER_ID, userId)
+                .sort(arrayOf(BackendDbManager.FIELD_POSITION, BackendDbManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
                 .run {
                     filterVisibleInAppFlag(branchCheckDefaultExperimentId(this))
                 }
