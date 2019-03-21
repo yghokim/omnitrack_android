@@ -98,7 +98,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val context: Context) 
                 Observable.merge(attributes.mapIndexed { i, attr: OTAttributeDAO ->
                     val attrLocalId = attr.localId
                     val connection = attr.getParsedConnection(context)
-                    if (connection != null && connection.isAvailableToRequestValue()) {
+                    if (connection != null && connection.isAvailableToRequestValue(attr)) {
                         //Connection
                         connection.getRequestedValue(this).flatMap { data ->
                             if (data.datum == null) {

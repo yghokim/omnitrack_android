@@ -7,7 +7,6 @@ import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import java.util.*
@@ -19,20 +18,10 @@ class MisfitStepMeasureFactory(context: Context, service: MisfitService) : OTSer
 
     override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 
-    override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
-        return CONFIGURATOR_STEP_ATTRIBUTE
-    }
-
-    override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
-
-    override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
-        return attribute.type == OTAttributeManager.TYPE_NUMBER
-    }
-
     override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
 
     override val isRangedQueryAvailable: Boolean = true
-    override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Day
+    override val minimumGranularity: OTTimeRangeQuery.Granularity? = OTTimeRangeQuery.Granularity.Day
     override val isDemandingUserInput: Boolean = false
 
     override fun makeMeasure(): OTMeasure {

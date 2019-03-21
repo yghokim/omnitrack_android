@@ -7,7 +7,6 @@ import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
@@ -19,14 +18,10 @@ class FitbitHeartRateMeasureFactory(context: Context, service: FitbitService) : 
 
     override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 
-    override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
-        return attribute.type == OTAttributeManager.TYPE_NUMBER
-    }
-
     override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
 
     override val isRangedQueryAvailable: Boolean = true
-    override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Hour
+    override val minimumGranularity: OTTimeRangeQuery.Granularity? = OTTimeRangeQuery.Granularity.Hour
     override val isDemandingUserInput: Boolean = false
 
     override fun makeMeasure(): OTMeasure {
@@ -44,11 +39,6 @@ class FitbitHeartRateMeasureFactory(context: Context, service: FitbitService) : 
     override fun serializeMeasure(measure: OTMeasure): String {
         return "{}"
     }
-
-    override val exampleAttributeType: Int
-        get() = OTAttributeManager.TYPE_NUMBER
-
-    override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator = OTServiceMeasureFactory.CONFIGURATOR_FOR_HEART_RATE_ATTRIBUTE
 
     override val nameResourceId: Int = R.string.measure_fitbit_heart_rate_name
     override val descResourceId: Int = R.string.measure_fitbit_heart_rate_desc

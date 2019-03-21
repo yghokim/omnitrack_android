@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.typeadapters.*
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
+import kr.ac.snu.hcil.omnitrack.core.system.OTMeasureFactoryManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -77,8 +78,8 @@ class DaoSerializationModule {
 
     @Provides
     @Singleton
-    fun provideConnectionTypeAdapter(serviceManager: OTExternalServiceManager, timeQueryRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>): OTConnection.ConnectionTypeAdapter {
-        return OTConnection.ConnectionTypeAdapter(serviceManager, timeQueryRangeQueryTypeAdapter)
+    fun provideConnectionTypeAdapter(measureFactoryManager: OTMeasureFactoryManager, timeQueryRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>): OTConnection.ConnectionTypeAdapter {
+        return OTConnection.ConnectionTypeAdapter(measureFactoryManager, timeQueryRangeQueryTypeAdapter)
     }
 
     @Provides

@@ -57,5 +57,14 @@
     <string name="msg_trigger_notification_title_logging">Logging…</string>
     <string name="msg_trigger_notification_format_logging">Logging %1$s item</string>
 
+    <string name="msg_trigger_data_measure_time_name">Condition-Met Time</string>
+    <string name="msg_trigger_data_measure_time_description">The time when a data-driven condition was met</string>
+
+    <string name="msg_trigger_data_measure_value_name">Condition-Met Value</string>
+    <string name="msg_trigger_data_measure_value_description">The measured value that was first measured when a data-driven condition was met</string>
+    <string name="msg_trigger_data_measure_category">Data-driven Triggers/Reminders</string>
+    <string name="msg_no_trigger_or_reminders_are_assigned">No triggers or reminders are attached to this tracker.</string>
+    <string name="msg_trigger_data_measure_error_no_data_driven">One or more data-driven triggers/reminders must be attached to the tracker.</string>
+
 
 </resources>

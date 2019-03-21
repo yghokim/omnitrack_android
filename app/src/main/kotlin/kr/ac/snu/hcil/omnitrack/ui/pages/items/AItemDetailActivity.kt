@@ -415,7 +415,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
                 )
 
 
-                connectionIndicatorStubProxy.onBind(attributeViewModel.attributeDAO.getParsedConnection(this@AItemDetailActivity))
+                connectionIndicatorStubProxy.onBind(attributeViewModel.attributeDAO, attributeViewModel.attributeDAO.getParsedConnection(this@AItemDetailActivity))
 
                 internalSubscriptions.add(
                         attributeViewModel.stateObservable.observeOn(AndroidSchedulers.mainThread()).subscribe { state ->

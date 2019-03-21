@@ -57,6 +57,10 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
         const val FIELD_MEASURED_VALUE = "measuredValue"
         const val FIELD_SERIALIZED_TIME_QUERY = "serializedTimeQuery"
         const val FIELD_IS_ACTIVE = "isActive"
+
+        const val METADATA_KEY_TIMESTAMP = "measured_timestamp"
+        const val METADATA_KEY_VALUE = "measured_value"
+        const val METADATA_KEY_FACTORY_CODE = "measure_code"
     }
 
     private var suspendReadjustWorker = AtomicBoolean(false)

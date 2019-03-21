@@ -206,6 +206,10 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         ResearchModule()
     }
 
+    private val measureModule: MeasureModule by lazy {
+        MeasureModule()
+    }
+
 
     override val applicationComponent: ApplicationComponent by lazy {
         DaggerApplicationComponent.builder()
@@ -217,6 +221,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
                 .scheduledJobModule(scheduledJobModule)
                 .externalServiceModule(externalServiceModule)
                 .serializationModule(serializationModule)
+                .measureModule(measureModule)
                 .systemIdentifierFactoryModule(systemIdentifierFactoryModule)
                 .backendDatabaseModule(backendDatabaseModule)
                 .daoSerializationModule(daoSerializationModule)

@@ -112,9 +112,9 @@ class DataDrivenTriggerCheckReceiver : BroadcastReceiver() {
 
         private fun makeReminderDeliverable(measure: OTMeasureFactory.OTMeasure, measuredValue: Double, timestamp: Long): JsonObject {
             return jsonObject(
-                    "measure_code" to measure.getFactory<OTServiceMeasureFactory>().typeCode,
-                    "measured_value" to measuredValue,
-                    "measured_timestamp" to timestamp)
+                    OTDataDrivenTriggerManager.METADATA_KEY_FACTORY_CODE to measure.getFactory<OTServiceMeasureFactory>().typeCode,
+                    OTDataDrivenTriggerManager.METADATA_KEY_VALUE to measuredValue,
+                    OTDataDrivenTriggerManager.METADATA_KEY_TIMESTAMP to timestamp)
         }
 
         override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
