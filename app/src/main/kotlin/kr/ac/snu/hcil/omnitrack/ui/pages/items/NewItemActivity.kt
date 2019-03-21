@@ -65,9 +65,7 @@ class NewItemActivity : AItemDetailActivity<NewItemCreationViewModel>(NewItemCre
     override fun initViewModel(viewModel: NewItemCreationViewModel, savedInstanceState: Bundle?) {
         val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
 
-        val metadata: JsonObject = if (savedInstanceState != null && savedInstanceState.containsKey(AItemDetailActivity.KEY_METADATA)) {
-            genericGson.get().fromJson(savedInstanceState.getString(AItemDetailActivity.KEY_METADATA)!!, JsonObject::class.java)
-        } else {
+        val metadata: JsonObject? = if (savedInstanceState == null) {
             val payloadMetadataJson = intent.getStringExtra(OTApp.INTENT_EXTRA_METADATA)
             if (payloadMetadataJson != null) {
                 val m = genericGson.get().fromJson(payloadMetadataJson, JsonObject::class.java)
@@ -89,17 +87,14 @@ class NewItemActivity : AItemDetailActivity<NewItemCreationViewModel>(NewItemCre
                     m
                 } else jsonObject("pairedToReminder" to false)
             }
-        }
+        } else null
+
 
         if (savedInstanceState == null) {
-            metadata.addProperty("screenAccessedAt", System.currentTimeMillis())
+            metadata?.addProperty("screenAccessedAt", System.currentTimeMillis())
         }
 
         viewModel.init(trackerId, metadata, savedInstanceState)
-    }
-
-    init {
-        println("intialized")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -139,16 +134,19 @@ class NewItemActivity : AItemDetailActivity<NewItemCreationViewModel>(NewItemCre
             }
 
             if (resultCode == Activity.RESULT_OK) {
-                viewModel.metadataForItem.removeAll(
-                        viewModel.metadataForItem.keys().filter { it.startsWith("returned::") }
-                )
+                viewModel.modifyMetadata { metadata ->
+                    metadata.removeAll(
+                            metadata.keys().filter { it.startsWith("returned::") }
+                    )
 
-                if (data?.hasExtra(WebServiceLoginActivity.EXTRA_RETURNED_PARAMETERS) == true) {
-                    val returnedParameters = data.getBundleExtra(WebServiceLoginActivity.EXTRA_RETURNED_PARAMETERS)
-                    for (key in returnedParameters.keySet()) {
-                        viewModel.metadataForItem.set(key, returnedParameters.getString(key))
+                    if (data?.hasExtra(WebServiceLoginActivity.EXTRA_RETURNED_PARAMETERS) == true) {
+                        val returnedParameters = data.getBundleExtra(WebServiceLoginActivity.EXTRA_RETURNED_PARAMETERS)
+                        for (key in returnedParameters.keySet()) {
+                            metadata.set(key, returnedParameters.getString(key))
+                        }
                     }
                 }
+
             }
 
             (viewModel as? NewItemCreationViewModel)?.setResultOfRedirectedPage(redirectionStatus)
@@ -195,11 +193,13 @@ class NewItemActivity : AItemDetailActivity<NewItemCreationViewModel>(NewItemCre
                     .appendQueryParameter("userId", authManager.userId)
                     .appendQueryParameter("itemId", (viewModel as? NewItemCreationViewModel)?.generateNewItemId())
                     .run {
-                        viewModel.metadataForItem.forEach { key, value ->
-                            try {
-                                this.appendQueryParameter(key, value.asString)
-                            } catch (ex: Exception) {
-                                this.appendQueryParameter(key, value.toString())
+                        viewModel.modifyMetadata { metadata ->
+                            metadata.forEach { key, value ->
+                                try {
+                                    this.appendQueryParameter(key, value.asString)
+                                } catch (ex: Exception) {
+                                    this.appendQueryParameter(key, value.toString())
+                                }
                             }
                         }
                         this

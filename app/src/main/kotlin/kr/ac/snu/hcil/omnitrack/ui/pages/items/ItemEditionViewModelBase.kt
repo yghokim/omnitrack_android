@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import android.app.Application
 import android.os.Bundle
-import com.google.gson.JsonObject
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -30,9 +29,6 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
     @Inject
     protected lateinit var syncManager: OTSyncManager
-
-    lateinit var metadataForItem: JsonObject
-        protected set
 
     lateinit var trackerDao: OTTrackerDAO
         protected set

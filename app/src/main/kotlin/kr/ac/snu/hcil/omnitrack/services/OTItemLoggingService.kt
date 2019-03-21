@@ -122,6 +122,7 @@ class OTItemLoggingService : WakefulService(TAG) {
                     if (trackerDao != null) {
                         val unManagedTrackerDao = realm.copyFromRealm(trackerDao)
                         val builder = OTItemBuilderDAO()
+                        builder.serializedMetadata = metadata?.toString()
                         builder.holderType = OTItemBuilderDAO.HOLDER_TYPE_SERVICE
                         builder.tracker = unManagedTrackerDao
                         val wrapper = OTItemBuilderWrapperBase(builder, this)
@@ -132,7 +133,7 @@ class OTItemLoggingService : WakefulService(TAG) {
 
                         wrapper.makeAutoCompleteObservable(realmProvider, applyToBuilder = true)
                                 .ignoreElements().toSingleDefault(trackerId).flatMap {
-                                    val item = wrapper.saveToItem(null, loggingSource, metadata)
+                                    val item = wrapper.saveToItem(null, loggingSource)
                                     pushedItemDao = item
                                     dbManager.saveItemObservable(item, true, null, realm)
                                 }.doOnSubscribe {

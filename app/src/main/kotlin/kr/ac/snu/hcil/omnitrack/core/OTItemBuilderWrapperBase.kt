@@ -2,7 +2,9 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Context
 import android.util.Log
+import com.google.gson.Gson
 import com.google.gson.JsonObject
+import dagger.Lazy
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -15,7 +17,10 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTItemBuilderDAO
+import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
+import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
+import javax.inject.Inject
 import javax.inject.Provider
 
 /**
@@ -31,7 +36,14 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val context: Context) 
         fun onAttributeStateChanged(attributeLocalId: String, state: EAttributeValueState)
     }
 
+    @field:[Inject ForGeneric]
+    lateinit var gson: Lazy<Gson>
+
     val keys: Set<String> by lazy { dao.data.asSequence().mapNotNull { it.attributeLocalId }.toSet() }
+
+    init {
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
+    }
 
     fun getValueInformationOf(attributeLocalId: String): AnyValueWithTimestamp? {
         return this.dao.data.find { it.attributeLocalId == attributeLocalId }?.let {
@@ -42,7 +54,16 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val context: Context) 
         }
     }
 
-    fun saveToItem(itemDao: OTItemDAO?, loggingSource: ItemLoggingSource?, metadata: JsonObject?): OTItemDAO {
+    @Synchronized
+    inline fun modifyMetadata(realm: Realm, crossinline handler: (metadata: JsonObject) -> Unit) {
+        realm.executeTransactionIfNotIn {
+            val obj = gson.get().fromJson(dao.serializedMetadata, JsonObject::class.java)
+            handler.invoke(obj)
+            dao.serializedMetadata = obj.toString()
+        }
+    }
+
+    fun saveToItem(itemDao: OTItemDAO?, loggingSource: ItemLoggingSource?): OTItemDAO {
         val itemDaoToSave = itemDao ?: OTItemDAO()
         if (itemDao == null) {
             val app = (context.applicationContext as OTAndroidApp)
@@ -61,7 +82,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val context: Context) 
             }
         }
 
-        itemDaoToSave.serializedMetadata = metadata?.toString()
+        itemDaoToSave.serializedMetadata = dao.serializedMetadata
 
         return itemDaoToSave
     }

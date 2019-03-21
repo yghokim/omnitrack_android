@@ -68,10 +68,8 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         }
     }
 
-    fun init(trackerId: String, metadata: JsonObject, savedInstanceState: Bundle?) {
+    fun init(trackerId: String, metadata: JsonObject?, savedInstanceState: Bundle?) {
         if (init(trackerId)) {
-
-            metadataForItem = metadata
 
             if (!trackerDao.redirectUrl.isNullOrBlank()) {
                 redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(RedirectedPageStatus.NotVisited)
@@ -94,11 +92,14 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
                     val newBuilderDao = realm.createObject(OTItemBuilderDAO::class.java, newBuilderId)
                     newBuilderDao.tracker = trackerDao
                     newBuilderDao.holderType = OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM
+                    newBuilderDao.serializedMetadata = metadata?.toString()
                     this.itemBuilderDao = realm.copyFromRealm(newBuilderDao)
                 }
             } else {
                 this.itemBuilderDao = realm.copyFromRealm(storedBuilderDao)
             }
+
+            println("metadata: ${this.itemBuilderDao.serializedMetadata}")
 
             this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao, getApplication())
 
@@ -159,12 +160,15 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         }
     }
 
+    fun modifyMetadata(handler: (metadata: JsonObject) -> Unit) {
+        builderWrapper.modifyMetadata(realm, handler)
+    }
+
     override fun applyEditingToDatabase(): Maybe<String> {
         if (isValid) {
             return isBusyObservable.filter { !it }.firstOrError().flatMapMaybe {
                 refreshDaoValues()
-                println(metadataForItem)
-                val item = builderWrapper.saveToItem(null, ItemLoggingSource.Manual, metadataForItem)
+                val item = builderWrapper.saveToItem(null, ItemLoggingSource.Manual)
                 item.objectId = reservedNewItemId
 
                 return@flatMapMaybe Maybe.fromSingle<String>(dbManager.get().saveItemObservable(item, false, null, realm).map { it.second })

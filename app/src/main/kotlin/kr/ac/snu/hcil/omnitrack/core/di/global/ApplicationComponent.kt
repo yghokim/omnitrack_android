@@ -13,6 +13,7 @@ import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.analytics.OTUsageLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -144,6 +145,8 @@ interface ApplicationComponent {
 
     fun manager(): DaoSerializationManager
     fun dataDrivenConditionTypeAdapter(): OTDataDrivenTriggerCondition.ConditionTypeAdapter
+
+    fun inject(wrapper: OTItemBuilderWrapperBase)
 
     fun inject(service: OTFirebaseMessagingService)
 
