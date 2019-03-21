@@ -13,6 +13,7 @@ import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.analytics.OTUsageLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -32,6 +33,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataDrivenTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
+import kr.ac.snu.hcil.omnitrack.core.triggers.measures.OTItemMetadataMeasureFactoryLogicImpl
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
 import kr.ac.snu.hcil.omnitrack.core.workers.*
 import kr.ac.snu.hcil.omnitrack.receivers.DataDrivenTriggerCheckReceiver
@@ -100,7 +102,7 @@ import javax.inject.Singleton
     SerializationModule::class,
     ExternalServiceModule::class,
     SystemIdentifierFactoryModule::class,
-
+    MeasureModule::class,
     AuthModule::class,
     DaoSerializationModule::class,
     SynchronizationModule::class,
@@ -144,6 +146,8 @@ interface ApplicationComponent {
 
     fun manager(): DaoSerializationManager
     fun dataDrivenConditionTypeAdapter(): OTDataDrivenTriggerCondition.ConditionTypeAdapter
+
+    fun inject(wrapper: OTItemBuilderWrapperBase)
 
     fun inject(service: OTFirebaseMessagingService)
 
@@ -298,4 +302,6 @@ interface ApplicationComponent {
 
     fun inject(worker: OTDataDrivenTriggerManager.InactiveMeasureEntryClearanceWorker)
     fun inject(viewModel: DataDrivenConditionViewModel)
+
+    fun inject(impl: OTItemMetadataMeasureFactoryLogicImpl)
 }

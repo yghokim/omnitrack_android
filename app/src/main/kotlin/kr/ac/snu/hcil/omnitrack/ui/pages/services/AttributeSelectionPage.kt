@@ -187,7 +187,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
             nameView.text = attributeDao.name
             this.attributeDao = attributeDao
 
-            if(!parent.currentMeasureFactory.isAttachableTo(attributeDao)){
+            if (parent.currentMeasureFactory.getAttributeType() != attributeDao.type) {
                 descriptionView.visibility = View.VISIBLE
                 descriptionView.setText(R.string.msg_service_wizard_no_attachable_field)
                 isAvailable = false

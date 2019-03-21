@@ -9,7 +9,6 @@ import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
@@ -22,20 +21,10 @@ class FitbitStepCountMeasureFactory(context: Context, parentService: FitbitServi
 
     override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 
-    override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
-        return CONFIGURATOR_STEP_ATTRIBUTE
-    }
-
-    override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
-
-    override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
-        return attribute.type == OTAttributeManager.TYPE_NUMBER
-    }
-
     override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
 
     override val isRangedQueryAvailable: Boolean = true
-    override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Hour
+    override val minimumGranularity: OTTimeRangeQuery.Granularity? = OTTimeRangeQuery.Granularity.Hour
     override val isDemandingUserInput: Boolean = false
 
     override fun makeMeasure(): OTMeasure {

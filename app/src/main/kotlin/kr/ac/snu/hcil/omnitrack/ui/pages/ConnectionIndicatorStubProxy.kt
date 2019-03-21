@@ -9,6 +9,7 @@ import androidx.core.content.res.ResourcesCompat
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import java.util.*
 
 /**
@@ -37,7 +38,7 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : View.OnAttac
         connectionIndicatorView?.visibility = visibility
     }
 
-    fun onBind(connection: OTConnection?) {
+    fun onBind(attribute: OTAttributeDAO, connection: OTConnection?) {
         println("Bind connection")
         if (connection != null) {
             val connectionSource = connection.source
@@ -57,7 +58,7 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : View.OnAttac
                 connectionInvalidMessages = ArrayList()
             }
             connectionInvalidMessages?.clear()
-            if (connection.isAvailableToRequestValue(connectionInvalidMessages)) {
+            if (connection.isAvailableToRequestValue(attribute, connectionInvalidMessages)) {
                 connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorPointed, null))
                 connectionIndicatorErrorMark?.visibility = View.GONE
                 connectionIndicatorLinkIconView?.setImageResource(R.drawable.link)

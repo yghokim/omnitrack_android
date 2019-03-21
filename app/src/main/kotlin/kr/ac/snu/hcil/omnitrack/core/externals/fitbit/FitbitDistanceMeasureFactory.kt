@@ -9,7 +9,6 @@ import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
@@ -20,20 +19,10 @@ import java.util.*
  */
 class FitbitDistanceMeasureFactory(context: Context, parentService: FitbitService) : OTServiceMeasureFactory(context, parentService, "dist") {
 
-    override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
-        return CONFIGURATOR_DISTANCE_ATTRIBUTE
-    }
-
-    override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
-
-    override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
-        return attribute.type == OTAttributeManager.TYPE_NUMBER
-    }
-
     override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
 
     override val isRangedQueryAvailable: Boolean = true
-    override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Minute
+    override val minimumGranularity: OTTimeRangeQuery.Granularity? = OTTimeRangeQuery.Granularity.Minute
     override val isDemandingUserInput: Boolean = false
 
     override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_FLOAT

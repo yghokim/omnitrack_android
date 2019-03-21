@@ -4,7 +4,6 @@ import android.app.Application
 import android.os.Bundle
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import io.reactivex.Maybe
 import kr.ac.snu.hcil.android.common.containers.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -25,9 +24,6 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
             val itemDao = dbManager.get().makeSingleItemQuery(itemId, realm).findFirst()
             if (itemDao != null) {
                 originalUnmanagedItemDao = realm.copyFromRealm(itemDao)
-                this.metadataForItem = originalUnmanagedItemDao.serializedMetadata?.let {
-                    this.getApplication<OTApp>().applicationComponent.genericGson().fromJson(it, JsonObject::class.java)
-                } ?: JsonObject()
 
                 subscriptions.add(
                         itemDao.asFlowable<OTItemDAO>().subscribe { dao ->

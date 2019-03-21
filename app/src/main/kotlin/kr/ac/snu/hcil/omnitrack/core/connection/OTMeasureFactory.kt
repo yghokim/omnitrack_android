@@ -14,22 +14,15 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
  */
 abstract class OTMeasureFactory(val context: Context, val factoryTypeName: String) : INameDescriptionResourceProvider {
 
-    interface IExampleAttributeConfigurator {
-        fun configureExampleAttribute(attr: OTAttributeDAO): Boolean
-    }
-
-
     abstract val typeCode: String
 
     open val requiredPermissions: Array<String> = arrayOf()
-
-    abstract fun isAttachableTo(attribute: OTAttributeDAO): Boolean
 
     abstract fun getAttributeType(): Int
 
     abstract val isRangedQueryAvailable: Boolean
     abstract val isDemandingUserInput: Boolean
-    abstract val minimumGranularity: OTTimeRangeQuery.Granularity
+    abstract val minimumGranularity: OTTimeRangeQuery.Granularity?
 
     /*** Typename in TypeStringSerializer
      *
@@ -52,15 +45,13 @@ abstract class OTMeasureFactory(val context: Context, val factoryTypeName: Strin
         }
     }
 
+    abstract fun isAvailableToRequestValue(attribute: OTAttributeDAO, invalidMessages: MutableList<CharSequence>? = null): Boolean
 
     abstract fun getCategoryName(): String
 
     protected open fun onMakeFormattedName(): String {
         return "<b>${context.resources.getString(nameResourceId)}</b>"
     }
-
-    protected abstract val exampleAttributeType: Int
-    protected abstract fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator
 
     abstract class OTMeasure(private val factory: OTMeasureFactory) {
 

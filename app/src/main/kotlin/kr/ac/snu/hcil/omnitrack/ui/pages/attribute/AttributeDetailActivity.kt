@@ -28,7 +28,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
+import kr.ac.snu.hcil.omnitrack.core.system.OTMeasureFactoryManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactoryManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
@@ -60,7 +60,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     lateinit var serializationManager: Lazy<DaoSerializationManager>
 
     @Inject
-    lateinit var externalServiceManager: OTExternalServiceManager
+    lateinit var measureFactoryManager: OTMeasureFactoryManager
 
     private lateinit var viewModel: AttributeDetailViewModel
 
@@ -245,9 +245,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
                         val dao = viewModel.makeFrontalChangesToDao()
                         if (dao != null) {
-                            if (externalServiceManager.getFilteredMeasureFactories {
-                                        it.isAttachableTo(dao)
-                                    }.isEmpty()) {
+                            if (measureFactoryManager.getAttachableMeasureFactories(dao).isEmpty()) {
                                 ui_connection_group.visibility = View.GONE
                             } else {
                                 ui_connection_group.visibility = View.VISIBLE

@@ -16,7 +16,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
+import kr.ac.snu.hcil.omnitrack.core.system.OTMeasureFactoryManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
 import org.jetbrains.anko.dip
 import javax.inject.Inject
@@ -27,7 +27,7 @@ import javax.inject.Inject
 class SourceSelectionPage(override val parent: ConnectionWizardView, val attribute: OTAttributeDAO) : AWizardPage(parent) {
 
     @Inject
-    protected lateinit var externalServiceManager: OTExternalServiceManager
+    protected lateinit var measureFactoryManager: OTMeasureFactoryManager
 
     override val getTitleResourceId: Int = R.string.msg_connection_wizard_title_source_selection
 
@@ -42,9 +42,7 @@ class SourceSelectionPage(override val parent: ConnectionWizardView, val attribu
     init {
         (parent.context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
 
-        sources = externalServiceManager.getFilteredMeasureFactories {
-            it.isAttachableTo(attribute)
-        }.map {
+        sources = measureFactoryManager.getAttachableMeasureFactories(attribute).map {
             MeasureFactoryInformation(it)
         }
     }
@@ -63,7 +61,11 @@ class SourceSelectionPage(override val parent: ConnectionWizardView, val attribu
 
     private fun onSourceSelected(information: SourceInformation) {
         selectedInformation = information
-        requestGoNextPage(ConnectionWizardView.PAGE_INDEX_CONFIGURATION)
+        if (information.getSource().getFactory<OTMeasureFactory>().isRangedQueryAvailable) {
+            requestGoNextPage(ConnectionWizardView.PAGE_INDEX_CONFIGURATION)
+        } else {
+            parent.complete()
+        }
     }
 
     inner class PageView : RecyclerView {

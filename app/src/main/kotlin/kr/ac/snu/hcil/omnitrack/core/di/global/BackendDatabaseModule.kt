@@ -29,7 +29,7 @@ class BackendDatabaseModule {
         return RealmConfiguration.Builder()
                 .name("backend.db")
                 .modules(BackendRealmModule())
-                .schemaVersion(6)
+                .schemaVersion(7)
                 .migration(BackendRealmMigration())
                 .build()
     }

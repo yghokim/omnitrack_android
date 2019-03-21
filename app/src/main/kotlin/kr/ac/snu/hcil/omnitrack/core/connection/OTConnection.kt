@@ -14,16 +14,17 @@ import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.system.OTMeasureFactoryManager
 
 /**
  * Created by Young-Ho Kim on 2016-08-11.
  */
 class OTConnection {
 
-    class ConnectionTypeAdapter(val externalServiceManager: OTExternalServiceManager, val timeRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>) : TypeAdapter<OTConnection>() {
+    class ConnectionTypeAdapter(val measureFactoryManager: OTMeasureFactoryManager, val timeRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>) : TypeAdapter<OTConnection>() {
         override fun read(reader: JsonReader): OTConnection {
             val connection = OTConnection()
             reader.beginObject()
@@ -33,7 +34,7 @@ class OTConnection {
                     "factory" -> {
                         reader.beginArray()
                         val factoryCode = reader.nextString()
-                        val factory = externalServiceManager.getMeasureFactoryByCode(typeCode = factoryCode)
+                        val factory = measureFactoryManager.getMeasureFactoryByCode(typeCode = factoryCode)
                         if (factory == null) {
                             println("$factoryCode is not supported in System.")
                             reader.skipValue()
@@ -125,23 +126,10 @@ class OTConnection {
         return adapter.toJson(this)
     }
 
-    fun isAvailableToRequestValue(invalidMessages: MutableList<CharSequence>? = null): Boolean {
+    fun isAvailableToRequestValue(attribute: OTAttributeDAO, invalidMessages: MutableList<CharSequence>? = null): Boolean {
         val source = source
         if (source != null) {
-            if (source.getFactory<OTMeasureFactory>() is OTServiceMeasureFactory) {
-                val service = source.getFactory<OTServiceMeasureFactory>().parentService
-                if (service.state == OTExternalService.ServiceState.ACTIVATED) {
-                    return true
-                } else {
-                    invalidMessages?.add(TextHelper.fromHtml(String.format(
-                            "<font color=\"blue\">${source.getFactory<OTServiceMeasureFactory>().context.resources.getString(R.string.msg_service_is_not_activated_format)}</font>",
-                            source.getFactory<OTServiceMeasureFactory>().context.resources.getString(service.nameResourceId))))
-                    return false
-                }
-            } else {
-                //TODO check trigger or reminder status
-                return true
-            }
+            return source.getFactory<OTMeasureFactory>().isAvailableToRequestValue(attribute, invalidMessages)
         } else {
             invalidMessages?.add(TextHelper.fromHtml(
                     "<font color=\"blue\">This field is connected to the service that is not supported in this version of the app.</font>"

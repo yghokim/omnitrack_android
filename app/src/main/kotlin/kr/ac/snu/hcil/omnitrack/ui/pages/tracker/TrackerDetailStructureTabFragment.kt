@@ -588,7 +588,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
                 viewHolderSubscriptions.add(
                         attributeViewModel.connectionObservable.subscribe { connection ->
-                            connectionIndicatorStubProxy.onBind(connection.datum)
+                            connectionIndicatorStubProxy.onBind(attributeViewModel.attributeDAO, connection.datum)
                         }
                 )
 

@@ -122,6 +122,13 @@ class BackendRealmMigration : RealmMigration {
 
             oldVersionPointer++
         }
+
+        if (oldVersionPointer == 6L) {
+            schema.get("OTItemBuilderDAO")?.addField(BackendDbManager.FIELD_METADATA_SERIALIZED, String::class.java)
+                    ?.transform {
+                        it.setNull(BackendDbManager.FIELD_METADATA_SERIALIZED)
+                    }
+        }
     }
 
     override fun hashCode(): Int {

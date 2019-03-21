@@ -29,6 +29,8 @@ open class OTItemBuilderDAO : RealmObject() {
 
     var data = RealmList<OTItemBuilderFieldValueEntry>()
 
+    var serializedMetadata: String? = null
+
     fun setValue(attributeLocalId: String, value: AnyValueWithTimestamp?) {
         val match = data.find { it.attributeLocalId == attributeLocalId }
         if (match != null) {

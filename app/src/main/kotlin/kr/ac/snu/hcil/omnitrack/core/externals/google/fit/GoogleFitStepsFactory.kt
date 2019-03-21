@@ -16,7 +16,6 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import java.util.concurrent.TimeUnit
@@ -27,15 +26,10 @@ import java.util.concurrent.TimeUnit
 
 class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : GoogleFitService.GoogleFitMeasureFactory(context, service, "step") {
 
-    override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
-        return CONFIGURATOR_STEP_ATTRIBUTE
-    }
-
     override val dataTypeName = TypeStringSerializationHelper.TYPENAME_INT
-    override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
 
     override val isRangedQueryAvailable: Boolean = true
-    override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Millis
+    override val minimumGranularity: OTTimeRangeQuery.Granularity? = OTTimeRangeQuery.Granularity.Millis
     override val isDemandingUserInput: Boolean = false
 
     override val nameResourceId: Int = R.string.measure_steps_name
@@ -44,10 +38,6 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
 
     override val usedAPI: Api<out Api.ApiOptions.NotRequiredOptions> = Fitness.HISTORY_API
     override val usedScope: Scope = Fitness.SCOPE_ACTIVITY_READ
-
-    override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
-        return attribute.type == OTAttributeManager.TYPE_NUMBER
-    }
 
     override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
 

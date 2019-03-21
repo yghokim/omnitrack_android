@@ -51,7 +51,6 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
     companion object {
 
         const val KEY_ITEM_SAVED = "itemSaved"
-        const val KEY_METADATA = "metadata"
 
         const val REQUEST_CODE_REDIRECT_SURVEY = 23153
     }
@@ -90,7 +89,6 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
     override fun onSaveInstanceState(outState: Bundle) {
 
         outState.putBoolean(KEY_ITEM_SAVED, itemSaved)
-        outState.putString(KEY_METADATA, viewModel.metadataForItem.toString())
 
         super.onSaveInstanceState(outState)
 
@@ -417,7 +415,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
                 )
 
 
-                connectionIndicatorStubProxy.onBind(attributeViewModel.attributeDAO.getParsedConnection(this@AItemDetailActivity))
+                connectionIndicatorStubProxy.onBind(attributeViewModel.attributeDAO, attributeViewModel.attributeDAO.getParsedConnection(this@AItemDetailActivity))
 
                 internalSubscriptions.add(
                         attributeViewModel.stateObservable.observeOn(AndroidSchedulers.mainThread()).subscribe { state ->

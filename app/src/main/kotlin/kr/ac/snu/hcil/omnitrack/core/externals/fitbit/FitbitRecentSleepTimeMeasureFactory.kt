@@ -9,7 +9,6 @@ import kr.ac.snu.hcil.android.common.net.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.core.types.TimeSpan
@@ -21,23 +20,14 @@ import java.util.*
  * Created by younghokim on 16. 9. 3..
  */
 class FitbitRecentSleepTimeMeasureFactory(context: Context, service: FitbitService) : OTServiceMeasureFactory(context, service, "slp") {
-    override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
-        return CONFIGURATOR_FOR_TIMESPAN_ATTRIBUTE
-    }
-
-    override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
-        return attribute.type == OTAttributeManager.TYPE_TIMESPAN
-    }
 
     override fun getAttributeType() = OTAttributeManager.TYPE_TIMESPAN
 
     override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
     override val isRangedQueryAvailable: Boolean = true
-    override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Hour
+    override val minimumGranularity: OTTimeRangeQuery.Granularity? = OTTimeRangeQuery.Granularity.Hour
     override val isDemandingUserInput: Boolean = false
 
-
-    override val exampleAttributeType: Int = OTAttributeManager.TYPE_TIMESPAN
 
     override fun makeMeasure(): OTMeasure {
         return FitbitRecentSleepTimeMeasure(this)
