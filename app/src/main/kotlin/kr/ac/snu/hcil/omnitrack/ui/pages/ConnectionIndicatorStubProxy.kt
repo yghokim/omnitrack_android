@@ -6,16 +6,18 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.res.ResourcesCompat
+import io.reactivex.disposables.Disposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
-import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-11-04.
  */
 class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : View.OnAttachStateChangeListener {
+
+    private var connectionAvailabilitySubscription: Disposable? = null
 
     private val connectionIndicatorStub: ViewStub
     private var connectionIndicator: View? = null
@@ -23,7 +25,6 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : View.OnAttac
     private var connectionIndicatorLinkIconView: AppCompatImageView? = null
     private var connectionIndicatorSourceNameView: TextView? = null
     private var connectionIndicatorErrorMark: View? = null
-    private var connectionInvalidMessages: ArrayList<CharSequence>? = null
 
     init {
         connectionIndicatorStub = parent.findViewById(stubId)
@@ -54,9 +55,7 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : View.OnAttac
                 setVisibility(View.VISIBLE)
             }
 
-            if (connectionInvalidMessages == null) {
-                connectionInvalidMessages = ArrayList()
-            }
+            /*
             connectionInvalidMessages?.clear()
             if (connection.isAvailableToRequestValue(attribute, connectionInvalidMessages)) {
                 connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorPointed, null))
@@ -67,6 +66,27 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : View.OnAttac
                 }
             } else {
                 turnOnInvalidMode()
+            }*/
+            if (connectionAvailabilitySubscription?.isDisposed == false) {
+                connectionAvailabilitySubscription?.dispose()
+            }
+
+            connectionAvailabilitySubscription = connection.makeAvailabilityCheckObservable(attribute).subscribe { (valid, invalidMessages) ->
+                if (valid) {
+                    connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorPointed, null))
+                    connectionIndicatorErrorMark?.visibility = View.GONE
+                    connectionIndicatorLinkIconView?.setImageResource(R.drawable.link)
+                    if (connectionIndicatorErrorMark != null) {
+                        TooltipCompat.setTooltipText(connectionIndicatorErrorMark!!, null)
+                    }
+                } else {
+                    connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorRed_Light, null))
+                    connectionIndicatorErrorMark?.visibility = View.VISIBLE
+                    connectionIndicatorLinkIconView?.setImageResource(R.drawable.unlink_dark)
+
+                    if (connectionIndicatorErrorMark != null)
+                        TooltipCompat.setTooltipText(connectionIndicatorErrorMark!!, invalidMessages?.joinToString("\n"))
+                }
             }
 
             if (connectionSource != null) {
@@ -82,22 +102,12 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : View.OnAttac
 
     }
 
-    private fun turnOnInvalidMode() {
-        connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorRed_Light, null))
-        connectionIndicatorErrorMark?.visibility = View.VISIBLE
-        connectionIndicatorLinkIconView?.setImageResource(R.drawable.unlink_dark)
-
-        if (connectionIndicatorErrorMark != null)
-            TooltipCompat.setTooltipText(connectionIndicatorErrorMark!!, connectionInvalidMessages?.joinToString("\n"))
-    }
-
     override fun onViewDetachedFromWindow(v: View?) {
-        //tooltipView?.remove()
+        if (connectionAvailabilitySubscription?.isDisposed == false) {
+            connectionAvailabilitySubscription?.dispose()
+        }
     }
 
     override fun onViewAttachedToWindow(v: View?) {
-
     }
-
-
 }

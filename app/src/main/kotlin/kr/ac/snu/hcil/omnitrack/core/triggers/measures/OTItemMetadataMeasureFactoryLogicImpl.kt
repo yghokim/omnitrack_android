@@ -27,16 +27,18 @@ abstract class OTItemMetadataMeasureFactoryLogicImpl(protected val context: Cont
     protected abstract fun checkAvailability(tracker: OTTrackerDAO, invalidMessages: MutableList<CharSequence>?): Boolean
 
     fun isAvailableToRequestValue(attribute: OTAttributeDAO, invalidMessages: MutableList<CharSequence>? = null): Boolean {
-        val realm = realmProvider.get()
         val trackerId = attribute.trackerId
         if (trackerId != null) {
+            val realm = realmProvider.get()
             val tracker = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirst()
             if (tracker != null) {
+                realm.close()
                 return checkAvailability(tracker, invalidMessages)
             } else {
                 invalidMessages?.add(
                         context.getString(R.string.msg_no_trigger_or_reminders_are_assigned)
                 )
+                realm.close()
                 return false
             }
         } else return true //Attribute is being created. So skip the checking.

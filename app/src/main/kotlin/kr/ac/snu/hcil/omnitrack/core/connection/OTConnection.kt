@@ -6,17 +6,13 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.TextHelper
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
-import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
-import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.system.OTMeasureFactoryManager
 
 /**
@@ -126,6 +122,18 @@ class OTConnection {
         return adapter.toJson(this)
     }
 
+
+    fun makeAvailabilityCheckObservable(attribute: OTAttributeDAO): Observable<Pair<Boolean, List<CharSequence>?>> {
+        val source = source
+        if (source != null) {
+            return source.getFactory<OTMeasureFactory>().makeAvailabilityCheckObservable(attribute)
+        } else {
+            return Observable.just(Pair(false, listOf(TextHelper.fromHtml(
+                    "<font color=\"blue\">This field is connected to the service that is not supported in this version of the app.</font>"
+            ).toString())))
+        }
+    }
+
     fun isAvailableToRequestValue(attribute: OTAttributeDAO, invalidMessages: MutableList<CharSequence>? = null): Boolean {
         val source = source
         if (source != null) {
@@ -136,24 +144,6 @@ class OTConnection {
             ))
             return false
         }
-    }
-
-    fun makeValidationStateObservable(context: Context): Flowable<Pair<Boolean, CharSequence?>> {
-        return source?.let { source ->
-            Flowable.defer {
-                if (source.getFactory<OTMeasureFactory>() is OTServiceMeasureFactory) {
-                    val service = source.getFactory<OTServiceMeasureFactory>().parentService
-                    service.onStateChanged.map { state ->
-                        when (state) {
-                            OTExternalService.ServiceState.ACTIVATED -> Pair(true, null)
-                            else -> Pair<Boolean, CharSequence?>(false, TextHelper.fromHtml(String.format(
-                                    "<font color=\"blue\">${context.resources.getString(R.string.msg_service_is_not_activated_format)}</font>",
-                                    context.resources.getString(service.nameResourceId))))
-                        }
-                    }.toFlowable(BackpressureStrategy.LATEST)
-                } else Flowable.just(Pair(true, null)) //TODO check trigger or reminder status
-            }
-        } ?: Flowable.just(Pair<Boolean, CharSequence?>(false, null))
     }
 
 }

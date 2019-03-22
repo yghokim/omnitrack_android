@@ -239,7 +239,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         val trackerItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQuery(trackerDao.objectId, null, null, realm).findAllAsync()
         val todayItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQueryOfTheDay(trackerDao.objectId, realm).findAllAsync()
 
-        private val currentAttributeValidationResultDict = Hashtable<String, Pair<Boolean, CharSequence?>>()
+        private val currentAttributeValidationResultDict = Hashtable<String, Pair<Boolean, List<CharSequence>?>>()
 
         private val subscriptions = CompositeDisposable()
 
@@ -258,10 +258,10 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                 //validation
                 currentAttributeValidationResultDict.clear()
                 subscriptions.add(
-                        Flowable.merge(
+                        Observable.merge(
                                 snapshot.map {
-                                    (it.getParsedConnection(context)?.makeValidationStateObservable(context)
-                                            ?: Flowable.just(Pair<Boolean, CharSequence?>(true, null))).map { validationResult ->
+                                    (it.getParsedConnection(context)?.makeAvailabilityCheckObservable(it)
+                                            ?: Observable.just(Pair<Boolean, List<CharSequence>?>(true, null))).map { validationResult ->
                                         Pair(it.localId, validationResult)
                                     }
                                 }
@@ -276,6 +276,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                                 //collect invalidation messages
                                 val messages = attributesResult.filter { currentAttributeValidationResultDict[it.localId]?.first == false }
                                         .mapNotNull { currentAttributeValidationResultDict[it.localId]?.second }
+                                        .flatten()
 
                                 if (validationResult.value?.first != false) {
                                     validationResult.onNext(Pair(false, messages))

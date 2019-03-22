@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.connection
 import android.content.Context
 import android.text.Html
 import com.google.gson.stream.JsonReader
+import io.reactivex.Observable
 import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.INameDescriptionResourceProvider
 import kr.ac.snu.hcil.android.common.containers.Nullable
@@ -45,6 +46,7 @@ abstract class OTMeasureFactory(val context: Context, val factoryTypeName: Strin
         }
     }
 
+    abstract fun makeAvailabilityCheckObservable(attribute: OTAttributeDAO): Observable<Pair<Boolean, List<CharSequence>?>>
     abstract fun isAvailableToRequestValue(attribute: OTAttributeDAO, invalidMessages: MutableList<CharSequence>? = null): Boolean
 
     abstract fun getCategoryName(): String
