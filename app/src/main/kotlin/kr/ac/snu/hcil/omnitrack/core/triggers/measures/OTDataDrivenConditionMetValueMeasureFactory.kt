@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.triggers.measures
 import android.content.Context
 import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
+import io.reactivex.Observable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTItemMetadataMeasureFactory
@@ -48,4 +49,7 @@ class OTDataDrivenConditionMetValueMeasureFactory(context: Context) : OTItemMeta
     override val nameResourceId: Int = R.string.msg_trigger_data_measure_value_name
     override val descResourceId: Int = R.string.msg_trigger_data_measure_value_description
 
+    override fun makeAvailabilityCheckObservable(attribute: OTAttributeDAO): Observable<Pair<Boolean, List<CharSequence>?>> {
+        return logicImpl.makeAvailabilityCheckObservable(attribute)
+    }
 }
