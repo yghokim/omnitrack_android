@@ -42,7 +42,7 @@ class ScheduledJobModule {
     @Singleton
     @ServerSyncOneShot
     fun providesImmediateServerSyncRequest(): OneTimeWorkRequest {
-        return OneTimeWorkRequestBuilder<OTSynchronizationWorker>()
+        return OneTimeWorkRequest.Builder(OTSynchronizationWorker::class.java)
                 .setConstraints(networkConstraints)
                 .setInitialDelay(1, TimeUnit.SECONDS)
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
@@ -68,7 +68,7 @@ class ScheduledJobModule {
     @Singleton
     @BinaryStorageServer
     fun provideBinaryUploadRequest(): OneTimeWorkRequest {
-        return OneTimeWorkRequestBuilder<OTBinaryUploadWorker>()
+        return OneTimeWorkRequest.Builder(OTBinaryUploadWorker::class.java)
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
                 .setConstraints(networkConstraints)
                 .addTag(OTBinaryUploadWorker.TAG)
@@ -80,9 +80,9 @@ class ScheduledJobModule {
     @UsageLogger
     fun providesUsageLogUploadRequest(): OneTimeWorkRequest {
 
-        return OneTimeWorkRequestBuilder<OTUsageLogUploadWorker>()
-                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
-                .setInitialDelay(5, TimeUnit.SECONDS)
+        return OneTimeWorkRequest.Builder(OTUsageLogUploadWorker::class.java)
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, OneTimeWorkRequest.DEFAULT_BACKOFF_DELAY_MILLIS, TimeUnit.SECONDS)
+                .setInitialDelay(3, TimeUnit.SECONDS)
                 .setConstraints(networkConstraints)
                 .addTag(OTUsageLogUploadWorker.TAG)
                 .build()
@@ -95,7 +95,7 @@ class ScheduledJobModule {
         return object : Factory<OneTimeWorkRequest.Builder> {
             override fun get(): OneTimeWorkRequest.Builder {
 
-                return OneTimeWorkRequestBuilder<OTInformationUploadWorker>()
+                return OneTimeWorkRequest.Builder(OTInformationUploadWorker::class.java)
                         .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
                         .setConstraints(networkConstraints)
             }
@@ -115,7 +115,7 @@ class ScheduledJobModule {
     @Singleton
     @VersionCheck
     fun providesVersionCheckRequest(): OneTimeWorkRequest {
-        return OneTimeWorkRequestBuilder<OTVersionCheckWorker>()
+        return OneTimeWorkRequest.Builder(OTVersionCheckWorker::class.java)
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
                 .setConstraints(networkConstraints)
                 .build()
@@ -136,7 +136,7 @@ class ScheduledJobModule {
     @Singleton
     @ResearchSync
     fun provideResearchSyncRequest(): OneTimeWorkRequest {
-        return OneTimeWorkRequestBuilder<OTResearchSynchronizationWorker>()
+        return OneTimeWorkRequest.Builder(OTResearchSynchronizationWorker::class.java)
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
                 .setConstraints(networkConstraints)
                 .build()

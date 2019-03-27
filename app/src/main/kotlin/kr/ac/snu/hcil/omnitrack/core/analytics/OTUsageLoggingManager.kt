@@ -13,6 +13,7 @@ import kr.ac.snu.hcil.android.common.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.android.common.versionCode
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_CHANGE_ATTRIBUTE
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.NAME_CHANGE_ITEM
@@ -69,15 +70,16 @@ class OTUsageLoggingManager(val app: OTAndroidApp, val context: Context) : IEven
 
         if (Looper.myLooper() == Looper.getMainLooper()) {
             realm.executeTransactionAsync(transaction, {
-                WorkManager.getInstance().enqueueUniqueWork(OTUsageLogUploadWorker.TAG, ExistingWorkPolicy.KEEP, uploadRequestProvider.get())
+                WorkManager.getInstance().enqueueUniqueWork(OTUsageLogUploadWorker.TAG, ExistingWorkPolicy.REPLACE, uploadRequestProvider.get())
                 realm.close()
             }, { ex ->
                 println("UsageLog save transaction was failed:")
                 ex.printStackTrace()
+                OTApp.logger.writeSystemLog(ex.getStackTraceString(), "UsageLogger")
             })
         } else {
             realm.executeTransaction(transaction)
-            WorkManager.getInstance().enqueueUniqueWork(OTUsageLogUploadWorker.TAG, ExistingWorkPolicy.KEEP, uploadRequestProvider.get())
+            WorkManager.getInstance().enqueueUniqueWork(OTUsageLogUploadWorker.TAG, ExistingWorkPolicy.REPLACE, uploadRequestProvider.get())
             realm.close()
         }
     }

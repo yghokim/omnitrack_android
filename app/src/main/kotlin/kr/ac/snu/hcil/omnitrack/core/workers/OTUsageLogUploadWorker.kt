@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.workers
 import android.content.Context
 import android.util.Log
 import androidx.work.RxWorker
+import androidx.work.Worker
 import androidx.work.WorkerParameters
 import dagger.Lazy
 import dagger.internal.Factory
@@ -22,12 +23,12 @@ import javax.inject.Inject
 /**
  * Created by younghokim on 2017. 11. 28..
  */
-class OTUsageLogUploadWorker(private val context: Context, workerParams: WorkerParameters) : RxWorker(context, workerParams) {
+
+class OTUsageLogUploadWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
 
     companion object {
         const val TAG = "OTUsageLogUploadWorker"
     }
-
 
     @field:[Inject UsageLogger]
     lateinit var realmFactory: Factory<Realm>
@@ -35,49 +36,35 @@ class OTUsageLogUploadWorker(private val context: Context, workerParams: WorkerP
     @Inject
     lateinit var usageLogUploadApi: Lazy<IUsageLogUploadAPI>
 
-    private val realmScheduler = Schedulers.from(Executors.newSingleThreadExecutor())
-
     init {
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
 
-    override fun getBackgroundScheduler(): Scheduler {
-        return realmScheduler
-    }
+    override fun doWork(): Result {
+        val realm = realmFactory.get()
 
-    override fun createWork(): Single<Result> {
-        var realm: Realm
-        return Single.defer {
-            realm = realmFactory.get()
-            val pendingUsageLogCount = realm.where(UsageLog::class.java).equalTo("isSynchronized", false).count()
-            if (pendingUsageLogCount == 0L) {
-                println("No usage logs are pending. finish the job.")
-                OTApp.logger.writeSystemLog("No usage logs are pending.", TAG)
-                Single.just(Result.success()).observeOn(realmScheduler).doFinally { realm.close() }
-            } else {
-                return@defer Single.defer {
-                    val serializedUsageLogs = realm.where(UsageLog::class.java).sort("timestamp").findAll()
-                            .map { log ->
-                                UsageLog.typeAdapter.toJson(log)
-                            }
-                    OTApp.logger.writeSystemLog("Try uploading the usage logs. count: ${serializedUsageLogs.size}, average JSON length: ${serializedUsageLogs.asSequence().map { it.length }.average()} bytes", TAG)
+        val pendingUsageLogCount = realm.where(UsageLog::class.java).equalTo("isSynchronized", false).count()
+        if (pendingUsageLogCount == 0L) {
+            println("No usage logs are pending. finish the job.")
+            OTApp.logger.writeSystemLog("No usage logs are pending.", TAG)
+            realm.close()
+            return Result.success()
+        }else{
+            val serializedUsageLogs = realm.where(UsageLog::class.java).sort("timestamp").findAll()
+                    .map { log ->
+                        UsageLog.typeAdapter.toJson(log)
+                    }
+            OTApp.logger.writeSystemLog("Try uploading the usage logs. count: ${serializedUsageLogs.size}, average JSON length: ${serializedUsageLogs.asSequence().map { it.length }.average()} bytes", TAG)
 
-                    usageLogUploadApi.get().uploadLocalUsageLogs(serializedUsageLogs)
-                            .observeOn(realmScheduler)
-                            .doOnSuccess { storedIds ->
-                                realm.executeTransaction {
-                                    realm.where(UsageLog::class.java).`in`("id", storedIds.toTypedArray())
-                                            .findAll().deleteAllFromRealm()
-                                }
-                            }.flatMap { createWork() }.onErrorReturn { error ->
-                                error.printStackTrace()
-                                println("every logs were not uploaded well. retry next time.")
-                                OTApp.logger.writeSystemLog("Failed to upload the usage logs.\n${Log.getStackTraceString(error)}", TAG)
-                                Result.retry()
-                            }
-                }.observeOn(realmScheduler).doFinally { realm.close() }
+            if(!isStopped) {
+                val storedIds = usageLogUploadApi.get().uploadLocalUsageLogs(serializedUsageLogs).blockingGet()
+                realm.executeTransaction {
+                    realm.where(UsageLog::class.java).`in`("id", storedIds.toTypedArray())
+                            .findAll().deleteAllFromRealm()
+                }
             }
+            realm.close()
+            return if(isStopped) Result.success() else doWork()
         }
     }
-
 }

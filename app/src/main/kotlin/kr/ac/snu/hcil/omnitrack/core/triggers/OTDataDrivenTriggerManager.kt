@@ -149,7 +149,7 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
 
         WorkManager.getInstance().enqueueUniquePeriodicWork(
                 "CLEAR_INACTIVE_ENTRIES", ExistingPeriodicWorkPolicy.REPLACE,
-                PeriodicWorkRequestBuilder<InactiveMeasureEntryClearanceWorker>(
+                PeriodicWorkRequest.Builder(InactiveMeasureEntryClearanceWorker::class.java,
                         1, TimeUnit.DAYS
                 )
                         .setConstraints(Constraints.Builder()

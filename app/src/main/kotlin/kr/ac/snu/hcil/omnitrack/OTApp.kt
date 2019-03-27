@@ -24,6 +24,7 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
+import org.jetbrains.anko.getStackTraceString
 import org.jetbrains.anko.telephonyManager
 import rx_activity_result2.RxActivityResult
 import java.nio.charset.Charset
@@ -279,6 +280,8 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
                 applicationComponent.getEventLogger()
                         .logExceptionEvent("Uncaught", throwable, thread)
                 println("logged the uncaught exception.")
+                logger.writeSystemLog("Uncaught Error:", "OTApp")
+                logger.writeSystemLog(throwable.getStackTraceString(), "OTApp")
             } finally {
                 systemDefaultUncaughtExceptionHandler.uncaughtException(thread, throwable)
             }

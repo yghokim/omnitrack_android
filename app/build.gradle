@@ -263,14 +263,14 @@ dependencies {
     implementation 'com.google.android.gms:play-services-fitness:16.0.1'
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
 
-    implementation 'com.google.firebase:firebase-core:16.0.7'
+    implementation 'com.google.firebase:firebase-core:16.0.8'
     implementation 'com.google.firebase:firebase-auth:16.2.0'
-    implementation 'com.google.firebase:firebase-messaging:17.4.0'
+    implementation 'com.google.firebase:firebase-messaging:17.5.0'
 
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
-    def work_version = "1.0.0"
-    implementation "android.arch.work:work-runtime-ktx:$work_version"
-    implementation "android.arch.work:work-rxjava2:$work_version"
+    def work_version = "2.0.0"
+    implementation "androidx.work:work-runtime:$work_version"
+    implementation "androidx.work:work-rxjava2:$work_version"
 
     // use -ktx for Kotlin
     kapt "android.arch.lifecycle:compiler:1.1.1"

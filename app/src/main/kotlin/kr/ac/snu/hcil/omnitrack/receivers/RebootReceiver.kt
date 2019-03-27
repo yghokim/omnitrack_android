@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
-import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.BuildConfig
@@ -48,7 +48,7 @@ class RebootReceiver : BroadcastReceiver() {
 
         triggerManager.onSystemRebooted()
 
-        WorkManager.getInstance().enqueue(OneTimeWorkRequestBuilder<OTReminderService.SystemRebootWorker>()
+        WorkManager.getInstance().enqueue(OneTimeWorkRequest.Builder(OTReminderService.SystemRebootWorker::class.java)
                 .build())
 
         shortcutPanelManager.refreshNotificationShortcutViewsObservable(context).timeout(2, TimeUnit.SECONDS).doAfterTerminate {
