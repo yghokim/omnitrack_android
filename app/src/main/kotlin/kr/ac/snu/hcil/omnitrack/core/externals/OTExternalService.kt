@@ -87,7 +87,7 @@ abstract class OTExternalService(val context: Context, val preferences: SharedPr
         _dependencyList += onRegisterDependencies()
     }
 
-    internal abstract fun isSupportedInSystem(): Boolean
+    internal abstract fun isSupportedInSystem(serviceManager: OTExternalServiceManager): Boolean
 
     protected abstract fun onRegisterMeasureFactories(): Array<OTServiceMeasureFactory>
 

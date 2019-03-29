@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.content.Context
 import android.content.SharedPreferences
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitService
 import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
 import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitService
@@ -29,7 +30,7 @@ class OTExternalServiceManager constructor(
                         RescueTimeService(context, preferences)
                         //,MicrosoftBandService
                         //,MiBandService
-                ).filter { service -> service.isSupportedInSystem() }.toTypedArray()
+                ).filter { service -> service.isSupportedInSystem(this) }.toTypedArray()
 
         for (service in list) {
             service.initialize()
@@ -62,5 +63,21 @@ class OTExternalServiceManager constructor(
         if (availableServices.isNotEmpty())
             return factoryCodeDict[typeCode]
         else return null
+    }
+
+    fun registerApiKey(key: String, value: String) {
+        preferences.edit().putString(key, value).apply()
+    }
+
+    fun removeApiKey(key: String) {
+        preferences.edit().remove(key).apply()
+    }
+
+    fun getApiKey(key: String): String? {
+        return if (preferences.contains(key)) {
+            preferences.getString(key, null)
+        } else {
+            BuildConfig.apiKeyTable.get(key)
+        }
     }
 }

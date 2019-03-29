@@ -3,11 +3,12 @@ package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 import android.content.Context
 import android.content.SharedPreferences
 import kr.ac.snu.hcil.android.common.net.OAuth2Client
-import kr.ac.snu.hcil.omnitrack.BuildConfig
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OAuth2BasedExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 
 /**
@@ -22,10 +23,13 @@ class FitbitService(context: Context, pref: SharedPreferences) : OAuth2BasedExte
         const val AUTHORIZATION_URL = "https://www.fitbit.com/oauth2/authorize"
         const val TOKEN_REQUEST_URL = "https://api.fitbit.com/oauth2/token"
         const val REVOKE_URL = "https://api.fitbit.com/oauth2/revoke"
+
+        const val KEY_CLIENT_ID = "FITBIT_CLIENT_ID"
+        const val KEY_CLIENT_SECRET = "FITBIT_CLIENT_SECRET"
     }
 
-    override fun isSupportedInSystem(): Boolean {
-        return BuildConfig.FITBIT_CLIENT_ID != null && BuildConfig.FITBIT_CLIENT_SECRET != null
+    override fun isSupportedInSystem(serviceManager: OTExternalServiceManager): Boolean {
+        return !serviceManager.getApiKey(KEY_CLIENT_ID).isNullOrBlank() && !serviceManager.getApiKey(KEY_CLIENT_SECRET).isNullOrBlank()
     }
 
 
@@ -56,9 +60,10 @@ class FitbitService(context: Context, pref: SharedPreferences) : OAuth2BasedExte
     }
 
     override fun makeNewAuth2Client(): OAuth2Client {
+        val manager = (context.applicationContext as OTAndroidApp).applicationComponent.getServiceManager().get()
         val config = OAuth2Client.OAuth2Config()
-        config.clientId = BuildConfig.FITBIT_CLIENT_ID
-        config.clientSecret = BuildConfig.FITBIT_CLIENT_SECRET
+        config.clientId = manager.getApiKey(KEY_CLIENT_ID)!!
+        config.clientSecret = manager.getApiKey(KEY_CLIENT_SECRET)!!
         config.scope = DEFAULT_SCOPES
         config.authorizationUrl = AUTHORIZATION_URL
         config.tokenRequestUrl = TOKEN_REQUEST_URL

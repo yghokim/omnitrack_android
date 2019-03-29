@@ -5,18 +5,18 @@ import groovy.json.JsonSlurper
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProps = new Properties()
-keystoreProps.load(new FileInputStream(keystorePropertiesFile))
+if(keystorePropertiesFile.exists()){
+    keystoreProps.load(new FileInputStream(keystorePropertiesFile))
+}
 
 //check unset keystore properties
-["GOOGLE_MAPS_API_KEY",
- "FITBIT_CLIENT_ID", "FITBIT_CLIENT_SECRET",
- "MISFIT_APP_KEY", "MISFIT_APP_SECRET",
- "RESCUETIME_CLIENT_ID", "RESCUETIME_CLIENT_SECRET", "RESCUETIME_REDIRECT_URI"].forEach {
+/*
+["GOOGLE_MAPS_API_KEY"].forEach {
     key ->
         if (!keystoreProps.containsKey(key)) {
             keystoreProps.setProperty(key, "null")
         }
-}
+}*/
 
 //load google-services.json
 File googleServicesFile = rootProject.file("google-services.json")
