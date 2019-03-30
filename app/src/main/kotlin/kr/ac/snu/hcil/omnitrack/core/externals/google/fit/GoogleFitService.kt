@@ -28,6 +28,10 @@ import java.util.*
  */
 class GoogleFitService(context: Context, pref: SharedPreferences) : OTExternalService(context, pref, "GoogleFitService", 19) {
 
+    override val requiredApiKeyNames: Array<String> by lazy {
+        emptyArray<String>()
+    }
+
     override fun isSupportedInSystem(serviceManager: OTExternalServiceManager): Boolean {
         return true
     }

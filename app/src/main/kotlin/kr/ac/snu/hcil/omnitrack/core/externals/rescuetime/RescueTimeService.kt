@@ -39,6 +39,8 @@ class RescueTimeService(context: Context, pref: SharedPreferences) : OAuth2Based
 
     }
 
+    override val requiredApiKeyNames: Array<String> by lazy { arrayOf(KEY_CLIENT_ID, KEY_CLIENT_SECRET, KEY_REDIRECT_URI) }
+
     override fun isSupportedInSystem(serviceManager: OTExternalServiceManager): Boolean {
         return !serviceManager.getApiKey(KEY_CLIENT_ID).isNullOrBlank() && !serviceManager.getApiKey(KEY_CLIENT_SECRET).isNullOrBlank() && !serviceManager.getApiKey(KEY_REDIRECT_URI).isNullOrBlank()
     }

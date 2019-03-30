@@ -32,7 +32,7 @@ static def fallbackUrl(String url){
 }
 
 static def makePropertyHashTableString(Properties properties){
-    def infix = new StringBuilder()
+    StringBuilder infix = new StringBuilder("")
 
     for(prop in properties){
         infix.append("put(\"${prop.key}\", ${prop.value}); ")
@@ -216,6 +216,12 @@ android {
                 buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "\"$buildConfigJson.defaultExperimentId\""
             } else {
                 buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "null"
+            }
+
+            if(buildConfigJson.enableDynamicApiKeyModification == true){
+                buildType.buildConfigField 'boolean', 'ENABLE_DYNAMIC_API_KEY_MODIFICATION', "true"
+            }else{
+                buildType.buildConfigField 'boolean', 'ENABLE_DYNAMIC_API_KEY_MODIFICATION', "false"
             }
 
     }

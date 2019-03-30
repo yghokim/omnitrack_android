@@ -1,5 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.services
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.transition.TransitionManager
@@ -12,6 +16,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -42,6 +48,8 @@ class ServiceListFragment : OTFragment() {
 
     private lateinit var adapter: Adapter
 
+    private val serviceList = ArrayList<OTExternalService>()
+
     private val activateColor: Int by lazy { ContextCompat.getColor(requireContext(), R.color.colorPointed) }
 
     private val deactivateColor: Int by lazy { ContextCompat.getColor(requireContext(), R.color.colorRed_Light) }
@@ -52,9 +60,26 @@ class ServiceListFragment : OTFragment() {
         DialogHelper.makeSimpleAlertBuilder(requireContext(), requireContext().resources.getString(R.string.msg_external_service_activation_requires_internet))
     }
 
+    private val apiKeyChangedBroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == OTExternalServiceManager.BROADCAST_ACTION_SERVICE_API_KEYS_CHANGED) {
+                val newServiceList = externalServiceManager.availableServices
+                val diff = DiffUtil.calculateDiff(OTExternalService.ServiceListDiffCallback(serviceList, newServiceList))
+                serviceList.clear()
+                serviceList.addAll(externalServiceManager.availableServices)
+                diff.dispatchUpdatesTo(adapter)
+            }
+        }
+    }
+
+    private val apiKeyChangedIntentFilter: IntentFilter by lazy {
+        IntentFilter(OTExternalServiceManager.BROADCAST_ACTION_SERVICE_API_KEYS_CHANGED)
+    }
+
     override fun onInject(app: OTAndroidApp) {
         app.applicationComponent.inject(this)
     }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_home_services, container, false)
@@ -68,8 +93,23 @@ class ServiceListFragment : OTFragment() {
 
         listView.adapter = adapter
 
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(apiKeyChangedBroadcastReceiver, apiKeyChangedIntentFilter)
+
         return rootView
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(apiKeyChangedBroadcastReceiver)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        this.serviceList.clear()
+        this.serviceList.addAll(externalServiceManager.availableServices)
+    }
+
+
 
     /*
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -109,11 +149,11 @@ class ServiceListFragment : OTFragment() {
         }
 
         override fun getItemCount(): Int {
-            return externalServiceManager.availableServices.size
+            return serviceList.size
         }
 
         private fun getService(position: Int): OTExternalService {
-            return externalServiceManager.availableServices[position]
+            return serviceList[position]
         }
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

@@ -309,4 +309,6 @@ interface ApplicationComponent {
     fun inject(impl: OTItemMetadataMeasureFactoryLogicImpl)
 
     fun inject(misfitApi: MisfitApi)
+
+    fun inject(activity: ApiKeySettingsActivity)
 }

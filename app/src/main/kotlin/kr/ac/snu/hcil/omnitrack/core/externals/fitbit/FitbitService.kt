@@ -28,6 +28,10 @@ class FitbitService(context: Context, pref: SharedPreferences) : OAuth2BasedExte
         const val KEY_CLIENT_SECRET = "FITBIT_CLIENT_SECRET"
     }
 
+    override val requiredApiKeyNames: Array<String> by lazy {
+        arrayOf(KEY_CLIENT_ID, KEY_CLIENT_SECRET)
+    }
+
     override fun isSupportedInSystem(serviceManager: OTExternalServiceManager): Boolean {
         return !serviceManager.getApiKey(KEY_CLIENT_ID).isNullOrBlank() && !serviceManager.getApiKey(KEY_CLIENT_SECRET).isNullOrBlank()
     }

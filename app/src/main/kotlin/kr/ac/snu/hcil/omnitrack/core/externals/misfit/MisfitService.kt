@@ -25,6 +25,8 @@ class MisfitService(context: Context, pref: SharedPreferences) : OTExternalServi
         const val KEY_APP_SECRET = "MISFIT_APP_SECRET"
     }
 
+    override val requiredApiKeyNames: Array<String> by lazy { arrayOf(KEY_APP_KEY, KEY_APP_SECRET) }
+
     val api: MisfitApi by lazy {
         MisfitApi(context)
     }
