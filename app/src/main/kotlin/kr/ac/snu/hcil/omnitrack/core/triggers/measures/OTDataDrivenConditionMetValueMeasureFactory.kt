@@ -25,7 +25,7 @@ class OTDataDrivenConditionMetValueMeasureFactory(context: Context) : OTItemMeta
     }
 
     override fun extractValueFromMetadata(metadata: JsonObject): Any? {
-        return metadata.get(OTDataDrivenTriggerManager.METADATA_KEY_VALUE).asBigDecimal
+        return metadata.get(OTDataDrivenTriggerManager.METADATA_KEY_VALUE)?.asBigDecimal
     }
 
     override fun makeMeasure(): OTMeasure {
