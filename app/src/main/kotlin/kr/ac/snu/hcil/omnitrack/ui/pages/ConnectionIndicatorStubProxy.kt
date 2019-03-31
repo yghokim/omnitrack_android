@@ -9,7 +9,6 @@ import androidx.core.content.res.ResourcesCompat
 import io.reactivex.disposables.Disposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 
 /**
@@ -90,7 +89,7 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : View.OnAttac
             }
 
             if (connectionSource != null) {
-                connectionIndicatorSourceNameView?.text = connectionSource.getFactory<OTMeasureFactory>().getFormattedName()
+                connectionIndicatorSourceNameView?.text = connectionSource.getFormattedName()
             } else {
                 // Unsupported source
                 connectionIndicatorSourceNameView?.setText(R.string.msg_unsupported_connection)

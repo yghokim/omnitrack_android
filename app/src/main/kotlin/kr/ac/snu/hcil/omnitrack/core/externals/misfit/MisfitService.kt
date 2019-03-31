@@ -6,11 +6,11 @@ import androidx.fragment.app.FragmentActivity
 import io.reactivex.Completable
 import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.TextHelper
-import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 
 /**
@@ -20,14 +20,19 @@ class MisfitService(context: Context, pref: SharedPreferences) : OTExternalServi
 
     companion object {
         const val PREFERENCE_ACCESS_TOKEN = "misfit_access_token"
+
+        const val KEY_APP_KEY = "MISFIT_APP_KEY"
+        const val KEY_APP_SECRET = "MISFIT_APP_SECRET"
     }
+
+    override val requiredApiKeyNames: Array<String> by lazy { arrayOf(KEY_APP_KEY, KEY_APP_SECRET) }
 
     val api: MisfitApi by lazy {
         MisfitApi(context)
     }
 
-    override fun isSupportedInSystem(): Boolean {
-        return BuildConfig.MISFIT_APP_KEY != null && BuildConfig.MISFIT_APP_SECRET != null
+    override fun isSupportedInSystem(serviceManager: OTExternalServiceManager): Boolean {
+        return !serviceManager.getApiKey(KEY_APP_KEY).isNullOrBlank() && !serviceManager.getApiKey(KEY_APP_SECRET).isNullOrBlank()
     }
 
     override fun onRegisterMeasureFactories(): Array<OTServiceMeasureFactory> {

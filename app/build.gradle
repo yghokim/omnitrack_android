@@ -31,6 +31,16 @@ static def fallbackUrl(String url){
     }
 }
 
+static def makePropertyHashTableString(Properties properties){
+    StringBuilder infix = new StringBuilder("")
+
+    for(prop in properties){
+        infix.append("put(\"${prop.key}\", ${prop.value}); ")
+    }
+
+    return "new java.util.Hashtable<String, String>(){{${infix.toString()}}}"
+}
+
 android {
 
     if (
@@ -161,11 +171,10 @@ android {
             buildType.buildConfigField 'String', 'OMNITRACK_SYNCHRONIZATION_SERVER_URL', "\"${fallbackUrl(buildConfigJson.synchronizationServerUrl)}\""
             buildType.buildConfigField 'String', 'OMNITRACK_MEDIA_STORAGE_SERVER_URL', "\"${fallbackUrl(buildConfigJson.mediaStorageUrl)}\""
 
-            keystoreProperties.keySet().forEach {
-                buildType.buildConfigField 'String', it.toString(), keystoreProperties.getProperty(it)
-            }
+            buildType.buildConfigField 'java.util.Hashtable<String, String>', 'apiKeyTable', makePropertyHashTableString(keystoreProperties)
 
             //type-specific properties
+            /*
             File variantKeystorePropertiesFile = rootProject.file("keystore.${buildType.name}.properties")
             if (variantKeystorePropertiesFile.exists()) {
                 def variantKeystoreProperties = new Properties()
@@ -173,7 +182,7 @@ android {
                 variantKeystoreProperties.keySet().forEach {
                     buildType.buildConfigField 'String', it.toString(), variantKeystoreProperties.getProperty(it)
                 }
-            }
+            }*/
 
             def googleServiceClient = googleServices.client.find {
                 println("Find matching service client with package name - ${finalApplicationId}")
@@ -207,6 +216,12 @@ android {
                 buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "\"$buildConfigJson.defaultExperimentId\""
             } else {
                 buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "null"
+            }
+
+            if(buildConfigJson.enableDynamicApiKeyModification == true){
+                buildType.buildConfigField 'boolean', 'ENABLE_DYNAMIC_API_KEY_MODIFICATION', "true"
+            }else{
+                buildType.buildConfigField 'boolean', 'ENABLE_DYNAMIC_API_KEY_MODIFICATION', "false"
             }
 
     }

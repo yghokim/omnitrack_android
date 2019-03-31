@@ -26,6 +26,8 @@ import kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions.RealmLaz
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
+import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitApi
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
@@ -134,6 +136,7 @@ interface ApplicationComponent {
     @FirebaseInstanceIdToken
     fun getFirebaseInstanceIdToken(): Single<String>
 
+    fun getServiceManager(): Lazy<OTExternalServiceManager>
 
     fun getTriggerSystemManager(): Lazy<OTTriggerSystemManager>
 
@@ -304,4 +307,8 @@ interface ApplicationComponent {
     fun inject(viewModel: DataDrivenConditionViewModel)
 
     fun inject(impl: OTItemMetadataMeasureFactoryLogicImpl)
+
+    fun inject(misfitApi: MisfitApi)
+
+    fun inject(activity: ApiKeySettingsActivity)
 }

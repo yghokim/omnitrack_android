@@ -4,15 +4,17 @@ import android.accounts.NetworkErrorException
 import android.app.Activity
 import android.content.Context
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
+import dagger.Lazy
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.net.AuthConstants
 import kr.ac.snu.hcil.android.common.net.WebServiceLoginActivity
-import kr.ac.snu.hcil.omnitrack.BuildConfig
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.types.TimeSpan
 import okhttp3.FormBody
 import okhttp3.HttpUrl
@@ -21,6 +23,7 @@ import okhttp3.Request
 import org.json.JSONObject
 import rx_activity_result2.RxActivityResult
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho Kim on 2016-09-01.
@@ -41,6 +44,13 @@ class MisfitApi(val context: Context) {
 
     }
 
+    @Inject
+    lateinit var serviceManager: Lazy<OTExternalServiceManager>
+
+    init {
+        (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
+    }
+
     fun makeUriBuilderRoot(): HttpUrl.Builder {
         return HttpUrl.Builder().scheme("https").host(URL_ROOT)
     }
@@ -51,7 +61,7 @@ class MisfitApi(val context: Context) {
     fun authorize(activity: Activity): Single<String> {
 
         val uri = makeUriBuilderRoot().addPathSegments(SUBURL_LOGIN)
-                .addQueryParameter(AuthConstants.PARAM_CLIENT_ID, BuildConfig.MISFIT_APP_KEY)
+                .addQueryParameter(AuthConstants.PARAM_CLIENT_ID, serviceManager.get().getApiKey(MisfitService.KEY_APP_KEY))
                 .addQueryParameter(AuthConstants.PARAM_RESPONSE_TYPE, AuthConstants.VALUE_RESPONSE_TYPE_CODE)
                 .addQueryParameter(AuthConstants.PARAM_REDIRECT_URI, AuthConstants.VALUE_REDIRECT_URI)
                 .addQueryParameter(AuthConstants.PARAM_SCOPE, "tracking,sleeps")
@@ -146,8 +156,8 @@ class MisfitApi(val context: Context) {
             val uri = makeUriBuilderRoot().addPathSegments(SUBURL_EXCHANGE).build()
             val requestBody = FormBody.Builder()
                     .add(AuthConstants.PARAM_CODE, requestCode)
-                    .add(AuthConstants.PARAM_CLIENT_ID, BuildConfig.MISFIT_APP_KEY)
-                    .add(AuthConstants.PARAM_CLIENT_SECRET, BuildConfig.MISFIT_APP_SECRET)
+                    .add(AuthConstants.PARAM_CLIENT_ID, serviceManager.get().getApiKey(MisfitService.KEY_APP_KEY)!!)
+                    .add(AuthConstants.PARAM_CLIENT_SECRET, serviceManager.get().getApiKey(MisfitService.KEY_APP_SECRET)!!)
                     .add(AuthConstants.PARAM_GRANT_TYPE, "authorization_code")
                     .add(AuthConstants.PARAM_REDIRECT_URI, AuthConstants.VALUE_REDIRECT_URI)
                     .build()

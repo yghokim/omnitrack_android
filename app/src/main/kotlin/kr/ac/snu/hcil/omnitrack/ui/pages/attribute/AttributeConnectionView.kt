@@ -14,7 +14,6 @@ import kr.ac.snu.hcil.android.common.events.Event
 import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 
 /**
@@ -63,7 +62,7 @@ class AttributeConnectionView : LinearLayout, View.OnClickListener {
         if (source == null) {
             sourceView.setText(R.string.msg_unsupported_connection)
         } else {
-            sourceView.text = source.getFactory<OTMeasureFactory>().getFormattedName()
+            sourceView.text = source.getFormattedName()
         }
 
         if (connection?.isRangedQueryAvailable == true) {

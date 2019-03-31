@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DiffUtil
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -21,6 +22,24 @@ import java.util.*
  */
 abstract class OTExternalService(val context: Context, val preferences: SharedPreferences, val identifier: String, val minimumSDK: Int) : INameDescriptionResourceProvider {
 
+    open class ServiceListDiffCallback(val oldList: List<OTExternalService>, val newList: List<OTExternalService>) : DiffUtil.Callback() {
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition] == newList[newItemPosition]
+        }
+
+        override fun getOldListSize(): Int {
+            return oldList.size
+        }
+
+        override fun getNewListSize(): Int {
+            return newList.size
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].identifier == newList[newItemPosition].identifier
+        }
+
+    }
 
     enum class ServiceState {
         DEACTIVATED, ACTIVATING, ACTIVATED
@@ -58,6 +77,8 @@ abstract class OTExternalService(val context: Context, val preferences: SharedPr
 
     val onStateChanged: BehaviorSubject<ServiceState> = BehaviorSubject.create<ServiceState>().apply { onNext(ServiceState.DEACTIVATED) }
 
+    private var initialized = false
+
     init {
         state = if (getIsActivatedFlag(identifier) == true) {
             ServiceState.ACTIVATED
@@ -75,19 +96,24 @@ abstract class OTExternalService(val context: Context, val preferences: SharedPr
     }
 
     internal fun initialize() {
-        _measureFactories += onRegisterMeasureFactories()
+        if (!initialized) {
+            _measureFactories += onRegisterMeasureFactories()
 
-        val permissions = getRequiredPermissionsRecursive()
-        if (permissions.isNotEmpty()) {
-            _dependencyList.add(
-                    PermissionDependencyResolver(*permissions)
-            )
+            val permissions = getRequiredPermissionsRecursive()
+            if (permissions.isNotEmpty()) {
+                _dependencyList.add(
+                        PermissionDependencyResolver(*permissions)
+                )
+            }
+
+            _dependencyList += onRegisterDependencies()
+            initialized = true
         }
-
-        _dependencyList += onRegisterDependencies()
     }
 
-    internal abstract fun isSupportedInSystem(): Boolean
+    internal abstract val requiredApiKeyNames: Array<String>
+
+    internal abstract fun isSupportedInSystem(serviceManager: OTExternalServiceManager): Boolean
 
     protected abstract fun onRegisterMeasureFactories(): Array<OTServiceMeasureFactory>
 

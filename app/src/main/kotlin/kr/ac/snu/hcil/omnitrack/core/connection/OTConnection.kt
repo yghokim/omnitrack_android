@@ -1,6 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.connection
 
 import android.content.Context
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
@@ -20,7 +22,7 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTMeasureFactoryManager
  */
 class OTConnection {
 
-    class ConnectionTypeAdapter(val measureFactoryManager: OTMeasureFactoryManager, val timeRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>) : TypeAdapter<OTConnection>() {
+    class ConnectionTypeAdapter(val measureFactoryManager: OTMeasureFactoryManager, val timeRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>, val gson: Lazy<Gson>) : TypeAdapter<OTConnection>() {
         override fun read(reader: JsonReader): OTConnection {
             val connection = OTConnection()
             reader.beginObject()
@@ -33,13 +35,16 @@ class OTConnection {
                         val factory = measureFactoryManager.getMeasureFactoryByCode(typeCode = factoryCode)
                         if (factory == null) {
                             println("$factoryCode is not supported in System.")
-                            reader.skipValue()
+
+                            connection.source = measureFactoryManager.serviceManager.unSupportedDummyMeasureFactory.makeMeasure(factoryCode, gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString())
                         } else {
                             connection.source = factory.makeMeasure(reader)
-                            if (reader.peek() != JsonToken.NAME || reader.peek() != JsonToken.END_ARRAY) {
-                                reader.skipValue()
-                            }
                         }
+
+                        while (reader.peek() != JsonToken.END_ARRAY) {
+                            reader.skipValue()
+                        }
+
                         reader.endArray()
                     }
 

@@ -57,7 +57,11 @@ abstract class OTMeasureFactory(val context: Context, val factoryTypeName: Strin
 
     abstract class OTMeasure(private val factory: OTMeasureFactory) {
 
-        val factoryCode: String get() = this.factory.typeCode
+        open val factoryCode: String get() = this.factory.typeCode
+
+        open fun getFormattedName(): CharSequence {
+            return factory.getFormattedName()
+        }
 
         abstract fun getValueRequest(builder: OTItemBuilderWrapperBase?, query: OTTimeRangeQuery?): Single<Nullable<out Any>>
 
@@ -68,7 +72,6 @@ abstract class OTMeasureFactory(val context: Context, val factoryTypeName: Strin
     }
 
     abstract class OTRangeQueriedMeasure(factory: OTMeasureFactory) : OTMeasure(factory) {
-
 
         abstract fun getValueRequest(start: Long, end: Long): Single<Nullable<out Any>>
 

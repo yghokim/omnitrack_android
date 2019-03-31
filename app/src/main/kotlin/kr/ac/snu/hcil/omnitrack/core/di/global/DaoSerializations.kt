@@ -78,14 +78,14 @@ class DaoSerializationModule {
 
     @Provides
     @Singleton
-    fun provideConnectionTypeAdapter(measureFactoryManager: OTMeasureFactoryManager, timeQueryRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>): OTConnection.ConnectionTypeAdapter {
-        return OTConnection.ConnectionTypeAdapter(measureFactoryManager, timeQueryRangeQueryTypeAdapter)
+    fun provideConnectionTypeAdapter(measureFactoryManager: OTMeasureFactoryManager, timeQueryRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>, @ForGeneric gson: Lazy<Gson>): OTConnection.ConnectionTypeAdapter {
+        return OTConnection.ConnectionTypeAdapter(measureFactoryManager, timeQueryRangeQueryTypeAdapter, gson)
     }
 
     @Provides
     @Singleton
-    fun provideDataDrivenConnectionTypeAdapter(serviceManager: OTExternalServiceManager, timeQueryRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>): OTDataDrivenTriggerCondition.ConditionTypeAdapter {
-        return OTDataDrivenTriggerCondition.ConditionTypeAdapter(serviceManager, timeQueryRangeQueryTypeAdapter)
+    fun provideDataDrivenConnectionTypeAdapter(serviceManager: OTExternalServiceManager, timeQueryRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>, @ForGeneric gson: Lazy<Gson>): OTDataDrivenTriggerCondition.ConditionTypeAdapter {
+        return OTDataDrivenTriggerCondition.ConditionTypeAdapter(serviceManager, timeQueryRangeQueryTypeAdapter, gson)
     }
 
 }

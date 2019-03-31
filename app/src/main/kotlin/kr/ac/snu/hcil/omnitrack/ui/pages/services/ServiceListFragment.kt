@@ -1,5 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.services
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.transition.TransitionManager
@@ -12,6 +15,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -21,6 +26,7 @@ import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.android.common.dipSize
 import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.android.common.view.container.decoration.HorizontalDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -42,6 +48,8 @@ class ServiceListFragment : OTFragment() {
 
     private lateinit var adapter: Adapter
 
+    private val serviceList = ArrayList<OTExternalService>()
+
     private val activateColor: Int by lazy { ContextCompat.getColor(requireContext(), R.color.colorPointed) }
 
     private val deactivateColor: Int by lazy { ContextCompat.getColor(requireContext(), R.color.colorRed_Light) }
@@ -52,9 +60,22 @@ class ServiceListFragment : OTFragment() {
         DialogHelper.makeSimpleAlertBuilder(requireContext(), requireContext().resources.getString(R.string.msg_external_service_activation_requires_internet))
     }
 
+    private val apiKeyChangedBroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == OTExternalServiceManager.BROADCAST_ACTION_SERVICE_API_KEYS_CHANGED) {
+                val newServiceList = externalServiceManager.availableServices
+                val diff = DiffUtil.calculateDiff(OTExternalService.ServiceListDiffCallback(serviceList, newServiceList))
+                serviceList.clear()
+                serviceList.addAll(externalServiceManager.availableServices)
+                diff.dispatchUpdatesTo(adapter)
+            }
+        }
+    }
+
     override fun onInject(app: OTAndroidApp) {
         app.applicationComponent.inject(this)
     }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_home_services, container, false)
@@ -68,8 +89,27 @@ class ServiceListFragment : OTFragment() {
 
         listView.adapter = adapter
 
+        if (BuildConfig.ENABLE_DYNAMIC_API_KEY_MODIFICATION == true) {
+            LocalBroadcastManager.getInstance(requireContext()).registerReceiver(apiKeyChangedBroadcastReceiver, OTExternalServiceManager.apiKeyChangedIntentFilter)
+        }
+
         return rootView
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (BuildConfig.ENABLE_DYNAMIC_API_KEY_MODIFICATION == true) {
+            LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(apiKeyChangedBroadcastReceiver)
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        this.serviceList.clear()
+        this.serviceList.addAll(externalServiceManager.availableServices)
+    }
+
+
 
     /*
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -109,11 +149,11 @@ class ServiceListFragment : OTFragment() {
         }
 
         override fun getItemCount(): Int {
-            return externalServiceManager.availableServices.size
+            return serviceList.size
         }
 
         private fun getService(position: Int): OTExternalService {
-            return externalServiceManager.availableServices[position]
+            return serviceList[position]
         }
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

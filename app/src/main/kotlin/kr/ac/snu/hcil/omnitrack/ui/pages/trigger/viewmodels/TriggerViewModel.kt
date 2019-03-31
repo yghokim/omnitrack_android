@@ -16,6 +16,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
+import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.OTTriggerViewFactory
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionAsObservable
 import java.util.*
@@ -88,7 +89,17 @@ open class TriggerViewModel(val context: Context, val dao: OTTriggerDAO, val rea
         currentConditionViewModel?.afterTriggerFired(triggerTime)
     }
 
-    private fun applyDaoToFront() {
+    fun refreshCondition() {
+        if (triggerCondition.value is OTDataDrivenTriggerCondition) {
+            dao.invalidateConditionCache()
+            val newCondition = dao.condition
+            if (newCondition != null) {
+                triggerCondition.onNext(newCondition)
+            }
+        }
+    }
+
+    fun applyDaoToFront() {
         dao.initialize(true)
         triggerActionType.onNext(dao.actionType)
         dao.action?.let { triggerAction.onNext(it) }

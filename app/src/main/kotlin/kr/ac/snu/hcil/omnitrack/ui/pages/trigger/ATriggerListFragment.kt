@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.app.Activity
 import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -42,6 +43,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
@@ -77,6 +79,18 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         object : TriggerFireBroadcastReceiver() {
             override fun onTriggerFired(triggerId: String, triggerTime: Long) {
                 currentTriggerViewModelList.find { it.dao.objectId == triggerId }?.onFired(triggerTime)
+            }
+        }
+    }
+
+    private val serviceApiKeyChangedBroadcastReceiver: BroadcastReceiver by lazy {
+        object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (intent.action == OTExternalServiceManager.BROADCAST_ACTION_SERVICE_API_KEYS_CHANGED) {
+                    currentTriggerViewModelList.forEach {
+                        it.refreshCondition()
+                    }
+                }
             }
         }
     }
@@ -188,6 +202,20 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(triggerFireBroadcastReceiver)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (BuildConfig.ENABLE_DYNAMIC_API_KEY_MODIFICATION == true) {
+            LocalBroadcastManager.getInstance(requireContext()).registerReceiver(serviceApiKeyChangedBroadcastReceiver, OTExternalServiceManager.apiKeyChangedIntentFilter)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (BuildConfig.ENABLE_DYNAMIC_API_KEY_MODIFICATION == true) {
+            LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(serviceApiKeyChangedBroadcastReceiver)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -232,6 +260,11 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             holder.onDetach()
         }
 
+        override fun onViewAttachedToWindow(holder: TriggerViewHolder) {
+            super.onViewAttachedToWindow(holder)
+            holder.onAttach()
+        }
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TriggerViewHolder {
             return when (viewType) {
                 VIEWTYPE_GHOST -> {
@@ -270,7 +303,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
         private var currentHeaderView: View? = null
 
-        private var attachedViewModel: TriggerViewModel? = null
+        internal var attachedViewModel: TriggerViewModel? = null
 
         private var attachedTrackerListView: View? = null
 
@@ -349,6 +382,22 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             subscriptions.clear()
         }
 
+        fun onAttach() {
+            val viewModel = attachedViewModel
+            val headerView = currentHeaderView
+            if (viewModel != null && headerView != null) {
+                bind(viewModel)
+                viewModel.getConditionViewModel()?.let {
+                    val conditionType = viewModel.triggerConditionType.value
+                    if (conditionType != null) {
+                        OTTriggerViewFactory.getConditionViewProvider(conditionType)?.connectViewModelToDisplayView(
+                                it, headerView, subscriptions
+                        )
+                    }
+                }
+            }
+        }
+
         fun bind(triggerViewModel: TriggerViewModel) {
             subscriptions.clear()
             this.attachedViewModel = triggerViewModel
@@ -422,7 +471,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                     triggerViewModel.triggerCondition.subscribe { condition ->
                         println("condition changed")
                         triggerViewModel.triggerConditionType.value?.let { conditionType ->
-                            val displayView = OTTriggerViewFactory.getConditionViewProvider(conditionType)?.getTriggerDisplayView(currentHeaderView, triggerViewModel.dao, requireActivity())
+                            val displayView = OTTriggerViewFactory.getConditionViewProvider(conditionType)?.getTriggerDisplayView(currentHeaderView, triggerViewModel.dao, requireContext())
                             if (displayView != null) {
                                 refreshHeaderView(displayView)
                             } else {

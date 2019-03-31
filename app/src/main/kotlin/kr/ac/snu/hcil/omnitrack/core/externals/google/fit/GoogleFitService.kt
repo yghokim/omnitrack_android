@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import rx_activity_result2.RxActivityResult
 import java.util.*
@@ -27,7 +28,11 @@ import java.util.*
  */
 class GoogleFitService(context: Context, pref: SharedPreferences) : OTExternalService(context, pref, "GoogleFitService", 19) {
 
-    override fun isSupportedInSystem(): Boolean {
+    override val requiredApiKeyNames: Array<String> by lazy {
+        emptyArray<String>()
+    }
+
+    override fun isSupportedInSystem(serviceManager: OTExternalServiceManager): Boolean {
         return true
     }
 

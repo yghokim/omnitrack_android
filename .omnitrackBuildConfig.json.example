@@ -9,6 +9,7 @@
   "disableExternalEntities": false,
   "disableTrackerCreation": false,
   "disableTriggerCreation": false,
+  "enableDynamicApiKeyModification": false,
 
   "signing": {
     "releaseKeystoreLocation": null,
