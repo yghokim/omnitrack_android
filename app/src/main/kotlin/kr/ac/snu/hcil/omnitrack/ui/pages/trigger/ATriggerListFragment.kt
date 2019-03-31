@@ -262,9 +262,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
         override fun onViewAttachedToWindow(holder: TriggerViewHolder) {
             super.onViewAttachedToWindow(holder)
-            if (holder.attachedViewModel != null) {
-                holder.bind(holder.attachedViewModel!!)
-            }
+            holder.onAttach()
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TriggerViewHolder {
@@ -382,6 +380,22 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
         fun onDetach() {
             subscriptions.clear()
+        }
+
+        fun onAttach() {
+            val viewModel = attachedViewModel
+            val headerView = currentHeaderView
+            if (viewModel != null && headerView != null) {
+                bind(viewModel)
+                viewModel.getConditionViewModel()?.let {
+                    val conditionType = viewModel.triggerConditionType.value
+                    if (conditionType != null) {
+                        OTTriggerViewFactory.getConditionViewProvider(conditionType)?.connectViewModelToDisplayView(
+                                it, headerView, subscriptions
+                        )
+                    }
+                }
+            }
         }
 
         fun bind(triggerViewModel: TriggerViewModel) {
