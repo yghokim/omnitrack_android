@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.triggers.conditions
 
 import android.content.Context
 import com.github.salomonbrys.kotson.toJson
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
@@ -28,14 +29,14 @@ class OTDataDrivenTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TY
         Drop("<", "drop", R.drawable.icon_threshold_down)
     }
 
-    class ConditionTypeAdapter(val externalServiceManager: OTExternalServiceManager, val timeRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>) : TypeAdapter<OTDataDrivenTriggerCondition>() {
+    class ConditionTypeAdapter(val externalServiceManager: OTExternalServiceManager, val timeRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>, val gson: Lazy<Gson>) : TypeAdapter<OTDataDrivenTriggerCondition>() {
         override fun write(out: JsonWriter, value: OTDataDrivenTriggerCondition) {
             out.beginObject()
             out.name("factory")
             value.measure?.let {
                 out.beginArray()
                         .value(it.factoryCode)
-                        .value(it.getFactory<OTMeasureFactory>().serializeMeasure(it))
+                        .jsonValue(it.getFactory<OTMeasureFactory>().serializeMeasure(it))
                         .endArray()
             } ?: out.nullValue()
 
@@ -70,13 +71,15 @@ class OTDataDrivenTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TY
                             val factory = externalServiceManager.getMeasureFactoryByCode(typeCode = factoryCode)
                             if (factory == null) {
                                 println("$factoryCode is not supported in System.")
-                                reader.skipValue()
+                                condition.measure = externalServiceManager.unSupportedDummyMeasureFactory.makeMeasure(factoryCode, gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString())
                             } else {
                                 condition.measure = factory.makeMeasure(reader)
-                                if (reader.peek() != JsonToken.NAME || reader.peek() != JsonToken.END_ARRAY) {
-                                    reader.skipValue()
-                                }
                             }
+
+                            while (reader.peek() != JsonToken.END_ARRAY) {
+                                reader.skipValue()
+                            }
+
                             reader.endArray()
                         }
                     }
@@ -140,7 +143,7 @@ class OTDataDrivenTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TY
     }
 
     override fun makeInformationText(): CharSequence {
-        return "Actuated when [${measure?.getFactory<OTMeasureFactory>()?.getFormattedName()}] [${comparison}] ${threshold}"
+        return "Actuated when [${measure?.getFormattedName()}] [${comparison}] ${threshold}"
     }
 
     override fun equals(other: Any?): Boolean {

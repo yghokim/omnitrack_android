@@ -44,7 +44,7 @@ class DataDrivenTriggerDisplayView : ConstraintLayout {
         inflater.inflate(R.layout.trigger_display_data_driven, this, true)
     }
 
-    fun setMeasureFactory(factory: OTMeasureFactory?) {
+    fun setMeasure(factory: OTMeasureFactory.OTMeasure?) {
         measureNameView.visibility = View.VISIBLE
         measureNameView.text = factory?.getFormattedName()
     }

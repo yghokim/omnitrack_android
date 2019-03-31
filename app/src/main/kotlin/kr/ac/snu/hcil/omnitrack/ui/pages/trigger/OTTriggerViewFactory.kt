@@ -108,7 +108,7 @@ object OTTriggerViewFactory {
                     val displayView = if (original is DataDrivenTriggerDisplayView) original else DataDrivenTriggerDisplayView(uiContext)
                     val condition = trigger.condition
                     if (condition != null && condition is OTDataDrivenTriggerCondition) {
-                        displayView.setMeasureFactory(condition.measure?.getFactory())
+                        displayView.setMeasure(condition.measure)
                         displayView.setComparison(condition.comparison)
                         displayView.setThreshold(condition.threshold)
                     } else {

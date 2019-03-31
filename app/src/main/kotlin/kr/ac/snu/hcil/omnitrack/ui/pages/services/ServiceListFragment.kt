@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.services
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.transition.TransitionManager
@@ -27,6 +26,7 @@ import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.android.common.dipSize
 import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.android.common.view.container.decoration.HorizontalDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -72,10 +72,6 @@ class ServiceListFragment : OTFragment() {
         }
     }
 
-    private val apiKeyChangedIntentFilter: IntentFilter by lazy {
-        IntentFilter(OTExternalServiceManager.BROADCAST_ACTION_SERVICE_API_KEYS_CHANGED)
-    }
-
     override fun onInject(app: OTAndroidApp) {
         app.applicationComponent.inject(this)
     }
@@ -93,14 +89,18 @@ class ServiceListFragment : OTFragment() {
 
         listView.adapter = adapter
 
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(apiKeyChangedBroadcastReceiver, apiKeyChangedIntentFilter)
+        if (BuildConfig.ENABLE_DYNAMIC_API_KEY_MODIFICATION == true) {
+            LocalBroadcastManager.getInstance(requireContext()).registerReceiver(apiKeyChangedBroadcastReceiver, OTExternalServiceManager.apiKeyChangedIntentFilter)
+        }
 
         return rootView
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(apiKeyChangedBroadcastReceiver)
+        if (BuildConfig.ENABLE_DYNAMIC_API_KEY_MODIFICATION == true) {
+            LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(apiKeyChangedBroadcastReceiver)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

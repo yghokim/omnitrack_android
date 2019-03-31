@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kr.ac.snu.hcil.omnitrack.BuildConfig
@@ -19,6 +20,10 @@ class OTExternalServiceManager constructor(
 
     companion object {
         const val BROADCAST_ACTION_SERVICE_API_KEYS_CHANGED = "${BuildConfig.APPLICATION_ID}.action.service_api_keys_changed"
+
+        val apiKeyChangedIntentFilter: IntentFilter by lazy {
+            IntentFilter(BROADCAST_ACTION_SERVICE_API_KEYS_CHANGED)
+        }
     }
 
     init {
@@ -60,6 +65,14 @@ class OTExternalServiceManager constructor(
 
             return availableServicesCache
         }
+
+    val unSupportedDummyService: OTUnSupportedDummyService by lazy {
+        OTUnSupportedDummyService(context, preferences)
+    }
+
+    val unSupportedDummyMeasureFactory: OTUnSupportedDummyService.OTUnSupportedDummyMeasureFactory by lazy {
+        OTUnSupportedDummyService.OTUnSupportedDummyMeasureFactory(context, unSupportedDummyService)
+    }
 
     fun findServiceByIdentifier(identifier: String): OTExternalService? {
         return availableServices.find { it.identifier == identifier }

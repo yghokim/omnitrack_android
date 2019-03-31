@@ -20,6 +20,7 @@ import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
@@ -142,7 +143,8 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
 
     private fun makePendingIntent(context: Context, overrideFlag: Int? = null): PendingIntent? {
         val receiverIntent = DataDrivenTriggerCheckReceiver.makeIntent(context)
-        return PendingIntent.getBroadcast(context, REQUEST_CODE, receiverIntent, overrideFlag ?: PendingIntent.FLAG_UPDATE_CURRENT)
+        return PendingIntent.getBroadcast(context, REQUEST_CODE, receiverIntent, overrideFlag
+                ?: PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     fun activateOnSystem() {
@@ -198,26 +200,23 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
         val condition = trigger.condition as OTDataDrivenTriggerCondition
         val measure = condition.measure
         if (measure != null) {
-            val factory = externalServiceManager.get().getMeasureFactoryByCode(measure.factoryCode)
-            if (factory != null) {
-                realm.executeTransactionIfNotIn {
-                    val matchedMeasureEntry = it.where(OTTriggerMeasureEntry::class.java).equalTo(FIELD_FACTORY_CODE, measure.factoryCode).findAll().find {
-                        matchCondition(condition, it)
+            realm.executeTransactionIfNotIn {
+                val matchedMeasureEntry = it.where(OTTriggerMeasureEntry::class.java).equalTo(FIELD_FACTORY_CODE, measure.factoryCode).findAll().find {
+                    matchCondition(condition, it)
+                }
+                if (matchedMeasureEntry != null) {
+                    if (!matchedMeasureEntry.triggers.contains(trigger)) {
+                        matchedMeasureEntry.triggers.add(trigger)
+                        matchedMeasureEntry.isActive = true
                     }
-                    if (matchedMeasureEntry != null) {
-                        if (!matchedMeasureEntry.triggers.contains(trigger)) {
-                            matchedMeasureEntry.triggers.add(trigger)
-                            matchedMeasureEntry.isActive = true
-                        }
-                    } else {
-                        //create new one.
-                        val newMeasureEntry = realm.createObject(OTTriggerMeasureEntry::class.java, measureEntryIdGenerator.getNewUniqueLong())
-                        newMeasureEntry.triggers.add(trigger)
-                        newMeasureEntry.factoryCode = measure.factoryCode
-                        newMeasureEntry.serializedMeasure = factory.serializeMeasure(measure)
-                        newMeasureEntry.serializedTimeQuery = timeQueryTypeAdapter.get().toJson(condition.timeQuery)
-                        newMeasureEntry.isActive = true
-                    }
+                } else {
+                    //create new one.
+                    val newMeasureEntry = realm.createObject(OTTriggerMeasureEntry::class.java, measureEntryIdGenerator.getNewUniqueLong())
+                    newMeasureEntry.triggers.add(trigger)
+                    newMeasureEntry.factoryCode = measure.factoryCode
+                    newMeasureEntry.serializedMeasure = measure.getFactory<OTMeasureFactory>().serializeMeasure(measure)
+                    newMeasureEntry.serializedTimeQuery = timeQueryTypeAdapter.get().toJson(condition.timeQuery)
+                    newMeasureEntry.isActive = true
                 }
             }
         }
@@ -292,13 +291,15 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
                         } else {
                             //find match
                             val condition = trigger.condition as OTDataDrivenTriggerCondition
-                            return@map Nullable(realm.where(OTTriggerMeasureEntry::class.java)
-                                    .equalTo(FIELD_FACTORY_CODE, condition.measure!!.factoryCode)
-                                    .equalTo(FIELD_IS_ACTIVE, true)
-                                    .findAll()
-                                    .find {
-                                        matchCondition(condition, it)
-                                    })
+                            if (condition.measure != null) {
+                                return@map Nullable(realm.where(OTTriggerMeasureEntry::class.java)
+                                        .equalTo(FIELD_FACTORY_CODE, condition.measure!!.factoryCode)
+                                        .equalTo(FIELD_IS_ACTIVE, true)
+                                        .findAll()
+                                        .find {
+                                            matchCondition(condition, it)
+                                        })
+                            } else return@map Nullable(null)
                             /*.findAllAsync().asFlowable()
                             .filter {
                                 it.isLoaded && it.isValid

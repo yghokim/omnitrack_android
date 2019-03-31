@@ -11,8 +11,10 @@ import android.widget.TextView
 import io.reactivex.Observable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.externals.OTUnSupportedDummyService
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
@@ -26,21 +28,56 @@ import javax.inject.Inject
  */
 class DataDrivenTriggerConfigurationPanel : FrameLayout, IConditionConfigurationView {
 
+    abstract class AServiceFactoryData {
+        abstract val typeCode: String
+        abstract fun makeMeasure(): OTMeasureFactory.OTMeasure
+        abstract fun getCategoryName(context: Context): CharSequence
+        abstract fun getName(context: Context): CharSequence
+
+    }
+
+    class AvailableServiceFactoryData(val serviceMeasureFactory: OTServiceMeasureFactory) : AServiceFactoryData() {
+        override fun getCategoryName(context: Context): CharSequence {
+            return serviceMeasureFactory.getCategoryName()
+        }
+
+        override fun getName(context: Context): CharSequence {
+            return context.getString(serviceMeasureFactory.nameResourceId)
+        }
+
+        override val typeCode: String = serviceMeasureFactory.typeCode
+
+        override fun makeMeasure(): OTMeasureFactory.OTMeasure {
+            return serviceMeasureFactory.makeMeasure()
+        }
+    }
+
+    class UnSupportedServiceFactoryData(val dummyMeasure: OTUnSupportedDummyService.DummyMeasure) : AServiceFactoryData() {
+        override fun getName(context: Context): CharSequence {
+            return "Unsupported Service"
+        }
+
+        override fun getCategoryName(context: Context): CharSequence {
+            return dummyMeasure.originalFactoryCode
+        }
+
+        override val typeCode: String = dummyMeasure.originalFactoryCode
+
+        override fun makeMeasure(): OTMeasureFactory.OTMeasure {
+            return dummyMeasure
+        }
+
+    }
+
     @Inject
     lateinit var externalServiceManager: OTExternalServiceManager
 
-    var selectedMeasureFactory: OTServiceMeasureFactory?
+    val selectedMeasureFactory: AServiceFactoryData?
         get() {
-            return availableMeasures[measureSelectionView.value]
-        }
-        set(value) {
-            val pos = if (value != null) availableMeasures.indexOfFirst { it.typeCode == value.typeCode } else -1
-            if (pos != -1) {
-                measureSelectionView.value = pos
-            }
+            return measureSelectionView.adapter?.getItem(measureSelectionView.value) as AServiceFactoryData
         }
 
-    val availableMeasures: List<OTServiceMeasureFactory>
+    val availableMeasures: List<AServiceFactoryData>
 
     private val measureSelectionView: ComboBoxPropertyView
 
@@ -64,14 +101,14 @@ class DataDrivenTriggerConfigurationPanel : FrameLayout, IConditionConfiguration
 
         availableMeasures = externalServiceManager.getFilteredMeasureFactories {
             !it.isDemandingUserInput && TypeStringSerializationHelper.isNumeric(it.dataTypeName)
-        }
+        }.map { AvailableServiceFactoryData(it) }
 
         measureSelectionView = findViewById(R.id.ui_event_trigger_measure_selection)
-        measureSelectionView.adapter = MeasureSpinnerAdapter()
+        measureSelectionView.adapter = MeasureSpinnerAdapter(availableMeasures)
 
         measureSelectionView.valueChanged += { sender, selectedFactoryIndex ->
-            val factory = availableMeasures[selectedFactoryIndex]
-            impl.currentCondition?.measure = factory.makeMeasure()
+            val factory = selectedMeasureFactory
+            impl.currentCondition?.measure = factory?.makeMeasure()
             impl.notifyConditionChanged()
         }
 
@@ -91,12 +128,21 @@ class DataDrivenTriggerConfigurationPanel : FrameLayout, IConditionConfiguration
     override fun applyCondition(condition: ATriggerCondition) {
         var shouldNotifyChanges = false
         impl.applyConditionAndGetChanged(condition) { newCondition ->
-            if (newCondition.measure == null) {
+            val newConditionMeasure = newCondition.measure
+            if (newConditionMeasure == null) {
                 impl.currentCondition?.measure = selectedMeasureFactory?.makeMeasure()
                 (condition as OTDataDrivenTriggerCondition).measure = impl.currentCondition?.measure
                 shouldNotifyChanges = true
             } else {
-                selectedMeasureFactory = newCondition.measure!!.getFactory()
+                if (newConditionMeasure is OTUnSupportedDummyService.DummyMeasure) {
+                    //if unsupported measure, add a temporary choice entry
+                    measureSelectionView.adapter = MeasureSpinnerAdapter(availableMeasures + arrayOf(UnSupportedServiceFactoryData(newConditionMeasure)))
+                    measureSelectionView.value = availableMeasures.size
+                } else {
+                    measureSelectionView.adapter = MeasureSpinnerAdapter(availableMeasures)
+                    val measureFactory = newConditionMeasure.getFactory<OTServiceMeasureFactory>()
+                    measureSelectionView.value = availableMeasures.indexOfFirst { it.typeCode == measureFactory.typeCode }
+                }
             }
 
             comparisonSettingView.comparison = newCondition.comparison
@@ -108,7 +154,7 @@ class DataDrivenTriggerConfigurationPanel : FrameLayout, IConditionConfiguration
         }
     }
 
-    inner class MeasureSpinnerAdapter : ArrayAdapter<OTServiceMeasureFactory>(context, R.layout.simple_list_element_category_name, availableMeasures) {
+    inner class MeasureSpinnerAdapter(list: List<AServiceFactoryData>) : ArrayAdapter<AServiceFactoryData>(context, R.layout.simple_list_element_category_name, list) {
 
         init {
 
@@ -142,9 +188,11 @@ class DataDrivenTriggerConfigurationPanel : FrameLayout, IConditionConfiguration
         private val titleView: TextView = view.findViewById(R.id.category)
         private val categoryView: TextView = view.findViewById(R.id.title)
 
-        fun bind(factory: OTServiceMeasureFactory) {
-            categoryView.text = factory.getCategoryName()
-            titleView.setText(factory.nameResourceId)
+        fun bind(factory: AServiceFactoryData) {
+
+            categoryView.text = factory.getCategoryName(context)
+            titleView.text = factory.getName(context)
+
         }
     }
 }

@@ -220,6 +220,10 @@ open class OTTriggerDAO : RealmObject() {
                 ?: false
     }
 
+    fun invalidateConditionCache() {
+        _condition = null
+    }
+
     fun initialize(forceRefresh: Boolean = false) {
         if (forceRefresh) {
             _action = null

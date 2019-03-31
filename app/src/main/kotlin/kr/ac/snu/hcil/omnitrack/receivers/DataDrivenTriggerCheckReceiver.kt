@@ -129,11 +129,13 @@ class DataDrivenTriggerCheckReceiver : BroadcastReceiver() {
                             entriesGroupedByService.forEach { (service, entries) ->
                                 if (service != null && service.state == OTExternalService.ServiceState.ACTIVATED) {
                                     val valueRequests = entries.map { entry ->
-                                        val factory = externalServiceManager.get().getMeasureFactoryByCode(entry.factoryCode!!)!!
-                                        val measure = factory.makeMeasure(entry.serializedMeasure!!)
-                                        measure.getValueRequest(null, timeQueryTypeAdapter.get().fromJson(entry.serializedTimeQuery)).map {
-                                            Pair(entry, it)
-                                        }.subscribeOn(Schedulers.io())
+                                        val factory = externalServiceManager.get().getMeasureFactoryByCode(entry.factoryCode!!)
+                                        if (factory != null) {
+                                            val measure = factory.makeMeasure(entry.serializedMeasure!!)
+                                            return@map measure.getValueRequest(null, timeQueryTypeAdapter.get().fromJson(entry.serializedTimeQuery)).map {
+                                                Pair(entry, it)
+                                            }.subscribeOn(Schedulers.io())
+                                        } else return@map Single.just(Pair(entry, Nullable(null) as Nullable<out Any>))
                                     }
                                     entryCommands.addAll(valueRequests)
                                 } else {
