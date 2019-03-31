@@ -97,13 +97,15 @@
 
             <TextView
                 android:id="@+id/ui_source"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
+                android:layout_marginStart="15dp"
                 android:layout_gravity="center_vertical"
                 android:gravity="left|center_vertical"
-                android:text="Step Count | Google Fit"
-                android:textColor="@color/colorPointed" />
+                android:layout_weight="1"
+                android:lineSpacingMultiplier="1.2"
+                android:textColor="@color/colorPointed"
+                tools:text="Step Count | Very Very Very Long Service Name" />
         </TableRow>
 
         <TableRow
@@ -126,9 +128,11 @@
 
             <TextView
                 android:id="@+id/ui_query"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
                 android:layout_gravity="center_vertical"
+                android:layout_weight="1"
                 android:layout_marginBottom="12dp"
                 android:layout_marginTop="12dp"
                 android:gravity="left|center_vertical"

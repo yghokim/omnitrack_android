@@ -9,29 +9,32 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/ui_measure_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="15sp"
         android:textColor="@color/textColorMid"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toStartOf="@id/ui_service_status_indicator"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Step count | Google Fit" />
+        tools:text="Step count | Service Name" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/ui_service_status_indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/msg_trigger_data_service_not_activated"
         android:textColor="@color/colorRed_Light"
         android:textSize="12sp"
         android:textStyle="bold"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/ui_measure_name"
+        app:layout_constraintBaseline_toBaselineOf="@id/ui_measure_name"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ui_measure_name"
-        app:layout_constraintTop_toTopOf="@+id/ui_measure_name"
-
-        />
+        app:layout_constraintHorizontal_bias="0" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ui_comparison_symbol"
