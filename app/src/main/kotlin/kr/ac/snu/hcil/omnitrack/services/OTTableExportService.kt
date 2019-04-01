@@ -4,10 +4,12 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.webkit.MimeTypeMap
 import android.widget.RadioButton
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -17,6 +19,7 @@ import dagger.internal.Factory
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
+import kotlinx.android.synthetic.main.dialog_export_configuration.view.*
 import kr.ac.snu.hcil.android.common.file.StringTableSheet
 import kr.ac.snu.hcil.android.common.file.ZipUtil
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
@@ -30,8 +33,10 @@ import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
 import org.jetbrains.anko.notificationManager
+import org.jetbrains.anko.textColorResource
 import java.io.File
 import java.io.FileOutputStream
+import java.io.OutputStream
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
@@ -40,7 +45,10 @@ import javax.inject.Inject
  */
 class OTTableExportService : WakefulService(TAG) {
 
-    enum class TableFileType(val extension: String) { CSV("csv"), EXCEL("xls")
+    enum class TableFileType(val extension: String, @StringRes val titleRes: Int, val writeFunc: (table: StringTableSheet, output: OutputStream) -> Unit) {
+        CSV("csv", R.string.msg_export_type_csv, { table, output -> table.storeCsvToStream(output) }),
+        JSON("json", R.string.msg_export_type_json, { table, output -> table.storeJsonToStream(output) }),
+        /*EXCEL("xls", R.string.msg_export_type_excel, {table, output -> table.storeExcelToStream(output)}),*/
     }
 
     companion object {
@@ -80,8 +88,25 @@ class OTTableExportService : WakefulService(TAG) {
                 includeFilesCheckbox.isChecked = false
                 includeFilesCheckbox.alpha = 0.3f
             }
-            val excelRadioButton = view.findViewById<RadioButton>(R.id.ui_radio_export_type_excel)
-            val csvRadioButton = view.findViewById<RadioButton>(R.id.ui_radio_export_type_csv)
+
+            val radioGroup = view.ui_radio_group_mode
+
+            var selectedFileType: TableFileType = TableFileType.values().first()
+
+            TableFileType.values().forEachIndexed { index, tableFileType ->
+                val newButton = RadioButton(context)
+                newButton.text = "${context.resources.getString(tableFileType.titleRes)} (.${tableFileType.extension})"
+                newButton.textColorResource = R.color.textColorDark
+                newButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+                newButton.minimumHeight = context.resources.getDimensionPixelSize(R.dimen.button_height_normal)
+                radioGroup.addView(newButton)
+
+                newButton.isChecked = index == 0
+
+                newButton.setOnCheckedChangeListener { buttonView, isChecked ->
+                    if (isChecked) selectedFileType = tableFileType
+                }
+            }
 
             return MaterialDialog.Builder(context)
                     .title(context.getString(R.string.msg_configure_export))
@@ -92,11 +117,7 @@ class OTTableExportService : WakefulService(TAG) {
                     .positiveText(R.string.msg_ok)
                     .negativeText(R.string.msg_cancel)
                     .onPositive { materialDialog, dialogAction ->
-                        onConfigured.invoke(includeFilesCheckbox.isChecked, if (excelRadioButton.isChecked) {
-                            TableFileType.EXCEL
-                        } else {
-                            TableFileType.CSV
-                        })
+                        onConfigured.invoke(includeFilesCheckbox.isChecked, selectedFileType)
                     }
         }
 
@@ -245,16 +266,7 @@ class OTTableExportService : WakefulService(TAG) {
                                 val tablePath = cacheDirectory?.resolve("table.${tableType.extension}")
                                 if (tablePath != null) {
                                     val fileOutputStream = FileOutputStream(tablePath)
-                                    when (tableType) {
-                                        TableFileType.CSV -> {
-                                            table.storeCsvToStream(fileOutputStream)
-                                            fileOutputStream.close()
-                                        }
-                                        TableFileType.EXCEL -> {
-                                            table.storeExcelToStream(fileOutputStream)
-                                        }
-                                    }
-
+                                    tableType.writeFunc(table, fileOutputStream)
                                     involvedFileList?.add(tablePath.path)
                                 }
 
@@ -318,14 +330,8 @@ class OTTableExportService : WakefulService(TAG) {
                             try {
                                 println("store table itself to output")
                                 val outputStream = contentResolver.openOutputStream(exportUri)
-                                when (tableType) {
-                                    TableFileType.EXCEL -> {
-                                        table.storeExcelToStream(outputStream)
-                                    }
-                                    TableFileType.CSV -> {
-                                        table.storeCsvToStream(outputStream)
-                                        outputStream.close()
-                                    }
+                                if (outputStream != null) {
+                                    tableType.writeFunc(table, outputStream)
                                 }
                                 true
                             } catch (ex: Exception) {

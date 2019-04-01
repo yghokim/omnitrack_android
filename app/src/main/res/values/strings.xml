@@ -331,8 +331,9 @@
     <string name="msg_share_exported_file">Share exported file</string>
     <string name="msg_configure_export">Configure Export</string>
     <string name="msg_include_media_attribute_files">Include media field files</string>
-    <string name="msg_export_type_excel">Excel (.xls)</string>
-    <string name="msg_export_type_csv">CSV text (.csv)</string>
+    <string name="msg_export_type_excel">Excel</string>
+    <string name="msg_export_type_csv">CSV text</string>
+    <string name="msg_export_type_json">JSON</string>
     <string name="msg_select_country">Select country</string>
     <string name="msg_uploading_file_to_server">Uploading file to Server</string>
     <string name="msg_uploading">Uploading…</string>

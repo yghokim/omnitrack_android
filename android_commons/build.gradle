@@ -56,7 +56,7 @@ dependencies {
 
 
     implementation 'com.opencsv:opencsv:4.5'
-    implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
+    //implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
 
 
 
