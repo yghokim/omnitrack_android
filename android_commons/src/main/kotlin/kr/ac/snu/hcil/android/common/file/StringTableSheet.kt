@@ -21,10 +21,6 @@ class StringTableSheet {
     val columns: MutableList<String> = ArrayList()
     val rows: MutableList<MutableList<String?>> = ArrayList()
 
-    fun validate(): Boolean {
-        return rows.find { it.size != columns.size } == null
-    }
-
     override fun toString(): String {
         return "table with ${columns.size} columns, ${rows.size} rows."
     }

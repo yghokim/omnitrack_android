@@ -43,7 +43,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.export.PackageExportActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.research.ResearchActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ApiKeySettingsActivity
 import javax.inject.Inject
 import javax.inject.Provider
@@ -223,15 +222,16 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
         ).apply {
 
             if (BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
+                /*
                 add(
                         RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_plask, "Research", null, {
                             val intent = Intent(parentActivity, ResearchActivity::class.java)
                             parentActivity.startActivity(intent)
                         }, true)
-                )
+                )*/
 
                 add(
-                        RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_package_dark, "Export Tracking Package", null, {
+                        RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_package_dark, parentActivity.getString(R.string.msg_export_tracking_plan), null, {
                             val intent = Intent(parentActivity, PackageExportActivity::class.java)
                             parentActivity.startActivity(intent)
                         }, true)

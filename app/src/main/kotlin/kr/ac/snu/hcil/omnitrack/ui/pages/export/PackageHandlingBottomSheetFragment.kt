@@ -82,14 +82,14 @@ class PackageHandlingBottomSheetFragment : DismissingBottomSheetDialogFragment(R
         val menus = listOf(
                 RecyclerViewMenuAdapter.MenuItem(null,
                         "Save to file",
-                        "Save the package into JSON file in local storage.",
+                        "Save the plan into JSON file in local storage.",
                         {
                             val intent = FileHelper.makeSaveLocationPickIntent("omnitrack_package_${SimpleDateFormat("yyyyMMddHHmmss").format(Date())}.json")
                             startActivityForResult(intent, REQUEST_CODE_PICK_FILE_LOCATION)
                         }),
                 RecyclerViewMenuAdapter.MenuItem(null,
                         "Share..",
-                        "Share the package content in a built-in share popup.",
+                        "Share the plan.",
                         {
                             val intent = Intent(Intent.ACTION_SEND)
                                     .setType("text/plain")
@@ -99,8 +99,8 @@ class PackageHandlingBottomSheetFragment : DismissingBottomSheetDialogFragment(R
                             dismissAllowingStateLoss()
                         }),
                 RecyclerViewMenuAdapter.MenuItem(null,
-                        "Instant share to Research Kit",
-                        "Share the package content to research platform",
+                        "Instant share to Research Dashboard",
+                        "Send the plan to research dashboard",
                         {
                             if (jsonString != null) {
                                 UploadTemporaryPackageDialogFragment.makeInstance(jsonString).show(requireFragmentManager(), "InstantSharePackage")

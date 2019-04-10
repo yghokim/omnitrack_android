@@ -286,7 +286,7 @@
 
         <activity
             android:name=".ui.pages.export.PackageExportActivity"
-            android:label="Export Tracking Package"
+            android:label="@string/msg_export_tracking_plan"
             android:parentActivityName=".ui.pages.home.HomeActivity" />
 
         <activity
