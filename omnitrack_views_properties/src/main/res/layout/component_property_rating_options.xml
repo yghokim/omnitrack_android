@@ -64,7 +64,7 @@
     </LinearLayout>
 
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+    <kr.ac.snu.hcil.omnitrack.views.properties.BooleanPropertyView
         android:id="@+id/ui_allow_intermediate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

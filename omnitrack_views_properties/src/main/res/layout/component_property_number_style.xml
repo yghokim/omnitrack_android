@@ -17,19 +17,19 @@
         android:layout_height="wrap_content"
         android:text="@string/property_number_style_unit" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+    <kr.ac.snu.hcil.omnitrack.views.properties.BooleanPropertyView
         android:id="@+id/ui_pluralize"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/property_number_style_unit_pluralize" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+    <kr.ac.snu.hcil.omnitrack.views.properties.BooleanPropertyView
         android:id="@+id/ui_show_commas"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/property_number_style_commas" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+    <kr.ac.snu.hcil.omnitrack.views.properties.BooleanPropertyView
         android:id="@+id/ui_show_fraction"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
