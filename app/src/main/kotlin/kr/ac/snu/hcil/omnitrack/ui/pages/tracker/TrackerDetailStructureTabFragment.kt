@@ -92,18 +92,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 .negativeText(R.string.msg_cancel)
     }
 
-    private val newAttributePanel: FieldPresetSelectionBottomSheetFragment by lazy {
-
-        val newAttributePanel = FieldPresetSelectionBottomSheetFragment()
-        newAttributePanel.callback = object : FieldPresetSelectionBottomSheetFragment.Callback {
-            override fun onAttributePermittedToAdd(typeInfo: AttributePresetInfo) {
-                addNewAttribute(typeInfo)
-            }
-        }
-
-        newAttributePanel
-    }
-
     @Inject
     lateinit var serializationManager: Lazy<DaoSerializationManager>
 
@@ -327,6 +315,12 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         newAttributeButton = rootView.findViewById(R.id.ui_button_new_attribute)
 
         newAttributeButton.setOnClickListener {
+            val newAttributePanel = FieldPresetSelectionBottomSheetFragment()
+            newAttributePanel.callback = object : FieldPresetSelectionBottomSheetFragment.Callback {
+                override fun onAttributePermittedToAdd(typeInfo: AttributePresetInfo) {
+                    addNewAttribute(typeInfo)
+                }
+            }
             newAttributePanel.show(requireFragmentManager(), newAttributePanel.tag)
         }
 
