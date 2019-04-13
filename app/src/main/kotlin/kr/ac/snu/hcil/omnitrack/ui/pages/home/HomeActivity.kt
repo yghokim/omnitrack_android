@@ -37,8 +37,6 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
         const val INTENT_EXTRA_INITIAL_LOGIN = "${BuildConfig.APPLICATION_ID}.extra.initial_login"
     }
 
-    private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
-
     /**
      * The [ViewPager] that will host the section contents.
      */
@@ -83,7 +81,6 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
 
         if (BuildConfig.HIDE_TRIGGERS_TAB && BuildConfig.HIDE_SERVICES_TAB) {
             //only a tracker tab exists. hide tab bar.
@@ -115,7 +112,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
         mViewPager.pageMargin = resources.getDimensionPixelSize(R.dimen.viewpager_page_margin)
         mViewPager.setPageMarginDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.darkerBackground)))
         // Set up the ViewPager with the sections adapter.
-        mViewPager.adapter = mSectionsPagerAdapter
+        mViewPager.adapter = SectionsPagerAdapter(supportFragmentManager)
 
         tabLayout.setupWithViewPager(mViewPager)
 

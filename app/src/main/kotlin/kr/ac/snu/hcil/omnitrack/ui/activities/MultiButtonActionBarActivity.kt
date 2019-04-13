@@ -19,7 +19,7 @@ import kr.ac.snu.hcil.omnitrack.R
 /**
  * Created by Young-Ho Kim on 2016-07-18.
  */
-abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
+abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity(layoutId) {
 
     enum class Mode {
         OKCancel, Back, BackAndMenu, SaveCancel, ApplyCancel, None
@@ -38,8 +38,6 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(layoutId)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)

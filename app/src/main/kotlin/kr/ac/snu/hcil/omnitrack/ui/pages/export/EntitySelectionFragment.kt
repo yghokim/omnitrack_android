@@ -48,8 +48,8 @@ abstract class EntitySelectionFragment<EntityType : IReadonlyObjectId, ChildType
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.simple_layout_with_recycler_view, container, false)
 
-        rootView.ui_recyclerview_with_fallback.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        rootView.ui_recyclerview_with_fallback.adapter = adapter
+        rootView.ui_recyclerview.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        rootView.ui_recyclerview.adapter = adapter
 
         return rootView
     }

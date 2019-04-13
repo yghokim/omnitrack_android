@@ -61,7 +61,7 @@
                 android:text="@string/msg_required" />
 
             <LinearLayout
-                android:id="@+id/ui_recyclerview_with_fallback"
+                android:id="@+id/ui_recyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/expanded_view_inner_shadow"

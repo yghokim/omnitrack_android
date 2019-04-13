@@ -33,18 +33,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
+import kotlinx.android.synthetic.main.fragment_recyclerview_and_fab.*
+import kotlinx.android.synthetic.main.fragment_recyclerview_and_fab.view.*
 import kotlinx.android.synthetic.main.tracker_list_element.view.*
 import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.android.common.view.InterfaceHelper
-import kr.ac.snu.hcil.android.common.view.container.FallbackRecyclerView
+import kr.ac.snu.hcil.android.common.view.container.adapter.FallbackRecyclerAdapterObserver
 import kr.ac.snu.hcil.android.common.view.container.decoration.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
@@ -79,15 +80,7 @@ class TrackerListFragment : OTFragment() {
     @Inject
     lateinit var tutorialManager: TutorialManager
 
-    private lateinit var listView: FallbackRecyclerView
-
-    private lateinit var emptyMessageView: TextView
-
-    private lateinit var trackerListAdapter: TrackerListAdapter
-
-    private lateinit var trackerListLayoutManager: LinearLayoutManager
-
-    private lateinit var addTrackerFloatingButton: FloatingActionButton
+    private val trackerListAdapter: TrackerListAdapter = TrackerListAdapter()
 
     private lateinit var lastLoggedTimeFormat: SimpleDateFormat
 
@@ -96,6 +89,8 @@ class TrackerListFragment : OTFragment() {
     private lateinit var statHeaderColorSpan: ForegroundColorSpan
 
     private lateinit var statContentStyleSpan: StyleSpan
+
+    private var adapterObserver: FallbackRecyclerAdapterObserver? = null
 
     private var pendingNewTrackerId: String? = null
 
@@ -176,7 +171,6 @@ class TrackerListFragment : OTFragment() {
         // user.trackerAdded += onTrackerAddedHandler
         //  user.trackerRemoved += onTrackerRemovedHandler
 
-        trackerListAdapter = TrackerListAdapter()
         trackerListAdapter.currentlyExpandedIndex = savedInstanceState?.getInt(STATE_EXPANDED_TRACKER_INDEX, -1) ?: -1
     }
 
@@ -203,13 +197,11 @@ class TrackerListFragment : OTFragment() {
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_recyclerview_and_fab, container, false)
 
-        addTrackerFloatingButton = rootView.findViewById(R.id.fab)
-
         if (BuildConfig.DISABLE_TRACKER_CREATION) {
-            addTrackerFloatingButton.hide()
-            addTrackerFloatingButton.isEnabled = false
+            rootView.fab.hide()
+            rootView.fab.isEnabled = false
         } else {
-            addTrackerFloatingButton.setOnClickListener { view ->
+            rootView.fab.setOnClickListener { view ->
                 newTrackerNameDialog.input(null, viewModel.generateNewTrackerName(), false) { dialog, text ->
                     startActivityForResult(TrackerDetailActivity.makeNewTrackerIntent(text.toString(), requireContext()), REQUEST_CODE_NEW_TRACKER)
 
@@ -218,17 +210,16 @@ class TrackerListFragment : OTFragment() {
             }
         }
 
-        listView = rootView.findViewById(R.id.ui_recyclerview_with_fallback)
-        emptyMessageView = rootView.findViewById(R.id.ui_empty_list_message)
-        emptyMessageView.setText(R.string.msg_tracker_empty)
-        listView.emptyView = emptyMessageView
-        trackerListLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        listView.layoutManager = trackerListLayoutManager
+        rootView.ui_empty_list_message.setText(R.string.msg_tracker_empty)
+
+        adapterObserver = FallbackRecyclerAdapterObserver(rootView.ui_empty_list_message, trackerListAdapter)
+
+        rootView.ui_recyclerview.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
         val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(context = requireContext(), heightMultiplier = resources.getFraction(R.fraction.tracker_list_separator_height_ratio, 1, 1))
-        listView.addItemDecoration(shadowDecoration)
-        (listView.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
-        listView.adapter = trackerListAdapter
+        rootView.ui_recyclerview.addItemDecoration(shadowDecoration)
+        (rootView.ui_recyclerview.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
+        rootView.ui_recyclerview.adapter = trackerListAdapter
 
         return rootView
     }
@@ -287,14 +278,14 @@ class TrackerListFragment : OTFragment() {
                     if (pendingNewTrackerId != null) {
                         val position = currentTrackerViewModelList.indexOfFirst { it.objectId == pendingNewTrackerId }
                         if (position != -1) {
-                            listView.smoothScrollToPosition(position)
+                            view?.ui_recyclerview?.smoothScrollToPosition(position)
                         }
                         pendingNewTrackerId = null
                     }
                 }
         )
 
-        tutorialManager.checkAndShowTargetPrompt(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER, true, this.requireActivity(), addTrackerFloatingButton,
+        tutorialManager.checkAndShowTargetPrompt(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER, true, this.requireActivity(), fab,
                 R.string.msg_tutorial_add_tracker_primary,
                 R.string.msg_tutorial_add_tracker_secondary,
                 ContextCompat.getColor(requireContext(), R.color.colorPointed))
@@ -306,6 +297,12 @@ class TrackerListFragment : OTFragment() {
             viewHolder.subscriptions.clear()
         }
         trackerListAdapter.viewHolders.clear()
+
+        ui_recyclerview.adapter = null
+
+        adapterObserver?.dispose()
+        adapterObserver = null
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -502,7 +499,7 @@ class TrackerListFragment : OTFragment() {
                             ?: "OmniTrack", getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove,
                             onYes = { dialog ->
                                 viewModel.removeTracker(trackerViewModel)
-                                listView.invalidateItemDecorations()
+                                this@TrackerListFragment.view?.ui_recyclerview?.invalidateItemDecorations()
                                 eventLogger.get().logTrackerChangeEvent(IEventLogger.SUB_REMOVE, trackerViewModel.objectId)
                             }).show()
                 } else if (view === chartViewButton) {

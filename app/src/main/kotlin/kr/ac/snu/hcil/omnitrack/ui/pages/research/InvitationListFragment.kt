@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.experiment_invitation_list_element.view.*
 import kotlinx.android.synthetic.main.fragment_recyclerview_and_fab.view.*
+import kr.ac.snu.hcil.android.common.view.container.adapter.FallbackRecyclerAdapterObserver
 import kr.ac.snu.hcil.android.common.view.container.decoration.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
@@ -29,25 +30,33 @@ class InvitationListFragment : OTFragment() {
     private val currentInvitationList = ArrayList<ExperimentInvitation>()
 
     private val adapter = InvitationListAdapter()
+    private var adapterObserver: FallbackRecyclerAdapterObserver? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_recyclerview_and_fab, container, false)
 
         rootView.ui_empty_list_message.setText(R.string.msg_empty_invitations)
-        rootView.ui_recyclerview_with_fallback.emptyView = rootView.ui_empty_list_message
 
-        rootView.ui_recyclerview_with_fallback.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        this.adapterObserver = FallbackRecyclerAdapterObserver(rootView.ui_empty_list_message, this.adapter)
 
-        rootView.ui_recyclerview_with_fallback.adapter = this.adapter
+        rootView.ui_recyclerview.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+
+        rootView.ui_recyclerview.adapter = this.adapter
 
         val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(context = requireActivity(), heightMultiplier = 0.8f)
-        rootView.ui_recyclerview_with_fallback.addItemDecoration(shadowDecoration)
-        (rootView.ui_recyclerview_with_fallback.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
+        rootView.ui_recyclerview.addItemDecoration(shadowDecoration)
+        (rootView.ui_recyclerview.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
 
         rootView.fab.hide()
 
         return rootView
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        adapterObserver?.dispose()
+        adapterObserver = null
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

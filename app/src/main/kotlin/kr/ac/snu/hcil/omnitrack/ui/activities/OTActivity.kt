@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.PreferenceManager
@@ -45,11 +46,14 @@ import javax.inject.Provider
 /**
  * Created by younghokim on 2016. 11. 15..
  */
-abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val checkUpdateAvailable: Boolean = true) : AppCompatActivity() {
+abstract class OTActivity : AppCompatActivity {
     companion object {
         const val LOG_TAG = "OmniTrackActivity"
         val SIGN_OUT_BROADCAST_INTENT_FILTER = IntentFilter(OTApp.BROADCAST_ACTION_USER_SIGNED_OUT)
     }
+
+    val checkRefreshingCredential: Boolean
+    val checkUpdateAvailable: Boolean
 
     @Inject
     protected lateinit var authManager: OTAuthManager
@@ -110,6 +114,16 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         get() = signedInUserSubject
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+
+    constructor(@LayoutRes layoutId: Int, checkRefreshingCredential: Boolean = false, checkUpdateAvailable: Boolean = true) : super(layoutId) {
+        this.checkRefreshingCredential = checkRefreshingCredential
+        this.checkUpdateAvailable = checkUpdateAvailable
+    }
+
+    constructor(checkRefreshingCredential: Boolean = false, checkUpdateAvailable: Boolean = true) : super() {
+        this.checkRefreshingCredential = checkRefreshingCredential
+        this.checkUpdateAvailable = checkUpdateAvailable
+    }
 
     protected open fun onInject(app: OTAndroidApp) {
         app.applicationComponent.inject(this)

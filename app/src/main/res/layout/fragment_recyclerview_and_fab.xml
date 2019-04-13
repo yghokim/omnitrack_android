@@ -3,8 +3,8 @@
     android:layout_height="match_parent"
     android:background="@color/outerBackground">
 
-    <kr.ac.snu.hcil.android.common.view.container.FallbackRecyclerView
-        android:id="@+id/ui_recyclerview_with_fallback"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/ui_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"

@@ -76,7 +76,7 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
         newEntryButton = findViewById(R.id.ui_button_new_entry)
         newEntryButton.setOnClickListener(this)
 
-        entryListView = findViewById(R.id.ui_recyclerview_with_fallback)
+        entryListView = findViewById(R.id.ui_recyclerview)
 
         entryListView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 

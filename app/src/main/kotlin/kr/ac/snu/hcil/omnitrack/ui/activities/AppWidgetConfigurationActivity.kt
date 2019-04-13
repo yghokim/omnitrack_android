@@ -8,7 +8,7 @@ import android.os.Bundle
  * Created by Young-Ho Kim on 2017-04-05.
  */
 @SuppressLint("Registered")
-open class AppWidgetConfigurationActivity(val layoutId: Int) : OTActivity() {
+open class AppWidgetConfigurationActivity(layoutId: Int) : OTActivity(layoutId) {
 
     private var _appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
 
@@ -16,7 +16,6 @@ open class AppWidgetConfigurationActivity(val layoutId: Int) : OTActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(layoutId)
         setResult(RESULT_CANCELED)
 
         intent?.let {

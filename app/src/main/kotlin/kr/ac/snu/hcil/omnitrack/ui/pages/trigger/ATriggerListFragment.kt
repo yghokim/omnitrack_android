@@ -35,6 +35,7 @@ import kotlinx.android.synthetic.main.trigger_list_element.view.*
 import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.android.common.view.InterfaceHelper
+import kr.ac.snu.hcil.android.common.view.container.adapter.FallbackRecyclerAdapterObserver
 import kr.ac.snu.hcil.android.common.view.container.decoration.ItemSpacingDecoration
 import kr.ac.snu.hcil.android.common.view.container.decoration.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.BuildConfig
@@ -101,6 +102,8 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
     private val triggerListAdapter = TriggerListAdapter()
 
+    private var adapterObserver: FallbackRecyclerAdapterObserver? = null
+
     private val triggerTypeDialog: AlertDialog by lazy {
         NewTriggerConditionTypeSelectionDialogHelper.builder(context!!, OTTriggerInformationHelper.getActionNameResId(viewModel.defaultTriggerInterfaceOptions.defaultActionType) ?: 0, viewModel.defaultTriggerInterfaceOptions.supportedConditionTypes) { type ->
             println("trigger type selected - $type")
@@ -130,7 +133,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
     }
 
     protected open fun onViewModelMounted(viewModel: ViewModelType, savedInstanceState: Bundle?) {
-        ui_trigger_list.emptyView = ui_empty_list_message.apply {
+        ui_empty_list_message.apply {
             setText(viewModel.emptyMessageResId)
         }
 
@@ -228,8 +231,16 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         ui_trigger_list.itemAnimator = SlideInLeftAnimator(DecelerateInterpolator(2.0f))
 
         ui_trigger_list.adapter = triggerListAdapter
+        adapterObserver = FallbackRecyclerAdapterObserver(ui_empty_list_message, triggerListAdapter)
 
         setFloatingButtonColor(ContextCompat.getColor(requireContext(), R.color.colorPointed))
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        ui_trigger_list.adapter = null
+        adapterObserver?.dispose()
+        adapterObserver = null
     }
 
     fun setFloatingButtonColor(color: Int) {

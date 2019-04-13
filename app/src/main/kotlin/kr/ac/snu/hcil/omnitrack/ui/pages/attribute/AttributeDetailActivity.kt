@@ -196,7 +196,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                     println("type changed: $type")
                     try {
                         val attrHelper = attributeManager.get(type)
-                        ui_recyclerview_with_fallback.removeAllViewsInLayout()
+                        ui_recyclerview.removeAllViewsInLayout()
 
                         val layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
@@ -239,7 +239,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                             println("original view id: ${entry.second.id}, type: ${entry.second.javaClass}")
                             entry.second.id = View.generateViewId()
                             println("assigned view id: ${entry.second.id}, type: ${entry.second.javaClass}")
-                            ui_recyclerview_with_fallback.addView(entry.second, layoutParams)
+                            ui_recyclerview.addView(entry.second, layoutParams)
                         }
                         //end: refresh properties==================================================================================
 
@@ -257,13 +257,13 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
                         if (viewModel.isValid || viewModel.attributeHelper?.propertyKeys?.isEmpty() != false) {
                             //no property
-                            ui_recyclerview_with_fallback.setBackgroundResource(R.drawable.bottom_separator_light)
+                            ui_recyclerview.setBackgroundResource(R.drawable.bottom_separator_light)
                         } else if (viewModel.attributeHelper?.propertyKeys?.size == 1) {
                             //single property
-                            ui_recyclerview_with_fallback.setBackgroundResource(R.drawable.top_bottom_separator_light)
+                            ui_recyclerview.setBackgroundResource(R.drawable.top_bottom_separator_light)
                         } else {
                             //multiple properties
-                            ui_recyclerview_with_fallback.setBackgroundResource(R.drawable.expanded_view_inner_shadow)
+                            ui_recyclerview.setBackgroundResource(R.drawable.expanded_view_inner_shadow)
                         }
                     } catch (ex: Exception) {
                         ex.printStackTrace()

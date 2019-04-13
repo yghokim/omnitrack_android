@@ -13,7 +13,7 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_experiment_signup.*
 import kr.ac.snu.hcil.omnitrack.R
 
-class ExperimentSignUpActivity : AppCompatActivity() {
+class ExperimentSignUpActivity : AppCompatActivity(R.layout.activity_experiment_signup) {
     enum class ESlide {
         INVITATION_CODE_PROMPT,
         CONSENT_FORM,
@@ -53,8 +53,6 @@ class ExperimentSignUpActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(R.layout.activity_experiment_signup)
 
         val slideList = ArrayList<ESlide>()
 

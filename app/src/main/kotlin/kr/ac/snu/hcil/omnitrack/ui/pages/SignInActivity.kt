@@ -28,7 +28,7 @@ import java.util.concurrent.CancellationException
 import javax.inject.Inject
 import javax.inject.Provider
 
-class SignInActivity : AppCompatActivity() {
+class SignInActivity : AppCompatActivity(R.layout.activity_sign_in) {
 
     @Inject
     protected lateinit var authManager: OTAuthManager
@@ -146,8 +146,6 @@ class SignInActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as OTAndroidApp).applicationComponent.inject(this)
-
-        setContentView(R.layout.activity_sign_in)
 
         ui_button_settings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))

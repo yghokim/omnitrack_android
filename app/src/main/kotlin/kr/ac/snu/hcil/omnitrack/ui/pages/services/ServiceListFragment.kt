@@ -22,7 +22,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
 import io.reactivex.Completable
-import io.reactivex.disposables.SerialDisposable
+import kotlinx.android.synthetic.main.fragment_home_services.*
+import kotlinx.android.synthetic.main.fragment_home_services.view.*
 import kr.ac.snu.hcil.android.common.dipSize
 import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.android.common.view.container.decoration.HorizontalDividerItemDecoration
@@ -44,9 +45,7 @@ class ServiceListFragment : OTFragment() {
     @Inject
     protected lateinit var externalServiceManager: OTExternalServiceManager
 
-    private lateinit var listView: RecyclerView
-
-    private lateinit var adapter: Adapter
+    private val adapter = Adapter()
 
     private val serviceList = ArrayList<OTExternalService>()
 
@@ -60,14 +59,16 @@ class ServiceListFragment : OTFragment() {
         DialogHelper.makeSimpleAlertBuilder(requireContext(), requireContext().resources.getString(R.string.msg_external_service_activation_requires_internet))
     }
 
-    private val apiKeyChangedBroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == OTExternalServiceManager.BROADCAST_ACTION_SERVICE_API_KEYS_CHANGED) {
-                val newServiceList = externalServiceManager.availableServices
-                val diff = DiffUtil.calculateDiff(OTExternalService.ServiceListDiffCallback(serviceList, newServiceList))
-                serviceList.clear()
-                serviceList.addAll(externalServiceManager.availableServices)
-                diff.dispatchUpdatesTo(adapter)
+    private val apiKeyChangedBroadcastReceiver: BroadcastReceiver by lazy {
+        object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (intent.action == OTExternalServiceManager.BROADCAST_ACTION_SERVICE_API_KEYS_CHANGED) {
+                    val newServiceList = externalServiceManager.availableServices
+                    val diff = DiffUtil.calculateDiff(OTExternalService.ServiceListDiffCallback(serviceList, newServiceList))
+                    serviceList.clear()
+                    serviceList.addAll(externalServiceManager.availableServices)
+                    diff.dispatchUpdatesTo(adapter)
+                }
             }
         }
     }
@@ -80,14 +81,10 @@ class ServiceListFragment : OTFragment() {
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_home_services, container, false)
 
-        listView = rootView.findViewById(R.id.ui_recyclerview_with_fallback)
-
-        listView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        rootView.ui_recyclerview.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         //listView.addItemDecoration(HorizontalDividerItemDecoration(0, 20))
 
-        adapter = Adapter()
-
-        listView.adapter = adapter
+        rootView.ui_recyclerview.adapter = adapter
 
         if (BuildConfig.ENABLE_DYNAMIC_API_KEY_MODIFICATION == true) {
             LocalBroadcastManager.getInstance(requireContext()).registerReceiver(apiKeyChangedBroadcastReceiver, OTExternalServiceManager.apiKeyChangedIntentFilter)
@@ -101,6 +98,8 @@ class ServiceListFragment : OTFragment() {
         if (BuildConfig.ENABLE_DYNAMIC_API_KEY_MODIFICATION == true) {
             LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(apiKeyChangedBroadcastReceiver)
         }
+
+        ui_recyclerview.adapter = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -168,8 +167,6 @@ class ServiceListFragment : OTFragment() {
             val measureFactoryListView: RecyclerView
 
             val measureFactoryAdapter = MeasureFactoryAdapter(context!!)
-
-            val serviceStateSubscription = SerialDisposable()
 
             var holderState: OTExternalService.ServiceState = OTExternalService.ServiceState.DEACTIVATED
                 set(value) {
@@ -274,13 +271,10 @@ class ServiceListFragment : OTFragment() {
 
                 holderState = service.state
 
-                val serviceStateSubscription = service.onStateChanged.subscribe {
+                creationSubscriptions.add(service.onStateChanged.subscribe {
                     state ->
                     holderState = state
-                }
-
-                this.serviceStateSubscription.set(serviceStateSubscription)
-                creationSubscriptions.add(serviceStateSubscription)
+                })
             }
         }
     }

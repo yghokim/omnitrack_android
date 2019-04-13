@@ -79,7 +79,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <kr.ac.snu.hcil.android.common.view.container.FallbackRecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ui_item_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

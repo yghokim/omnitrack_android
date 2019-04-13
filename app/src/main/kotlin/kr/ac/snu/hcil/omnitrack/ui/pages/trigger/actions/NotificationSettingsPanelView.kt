@@ -104,7 +104,7 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, View.OnClickL
 
         val view = inflater.inflate(R.layout.layout_notification_level_selection_dialog, null, false)
 
-        val list: RecyclerView = view.findViewById(R.id.ui_recyclerview_with_fallback)
+        val list: RecyclerView = view.findViewById(R.id.ui_recyclerview)
         val syncToServerCheckBox: CheckBox = view.findViewById(R.id.ui_checkbox)
         list.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         list.itemAnimator?.changeDuration = 0L

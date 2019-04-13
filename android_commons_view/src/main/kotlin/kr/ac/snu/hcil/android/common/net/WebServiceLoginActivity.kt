@@ -17,7 +17,7 @@ import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.android.common.view.R
 import okhttp3.HttpUrl
 
-open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
+open class WebServiceLoginActivity : AppCompatActivity(R.layout.auth_webview_screen), View.OnClickListener {
 
     companion object {
 
@@ -44,7 +44,6 @@ open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.auth_webview_screen)
 
         cancelButton.setOnClickListener(this)
 

@@ -32,7 +32,7 @@ import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 import kr.ac.snu.hcil.android.common.view.choice.ExtendedSpinner
 import kr.ac.snu.hcil.android.common.view.container.DragItemTouchHelperCallback
-import kr.ac.snu.hcil.android.common.view.container.FallbackRecyclerView
+import kr.ac.snu.hcil.android.common.view.container.adapter.FallbackRecyclerAdapterObserver
 import kr.ac.snu.hcil.android.common.view.container.adapter.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.android.common.view.container.decoration.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.android.common.view.container.decoration.TopBottomHorizontalImageDividerItemDecoration
@@ -86,7 +86,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     private val items = ArrayList<ItemListViewModel.ItemViewModel>()
 
-    private val itemListView: FallbackRecyclerView by bindView(R.id.ui_item_list)
+    private val itemListView: RecyclerView by bindView(R.id.ui_item_list)
 
     private lateinit var itemListViewAdapter: ItemListViewAdapter
 
@@ -97,6 +97,8 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
     private val sortOrderButton: ToggleButton by bindView(R.id.ui_toggle_sort_order)
 
     private lateinit var removalSnackbar: Snackbar
+
+    private var adapterObserver: FallbackRecyclerAdapterObserver? = null
 
     private val settingsFragment: BottomSheetDialogFragment?
         get() {
@@ -122,7 +124,6 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         setRightSubButtonImage(R.drawable.settings_dark)
         showRightSubButton()
 
-        itemListView.emptyView = emptyListMessageView
         itemListView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
         val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(context = this)
@@ -133,6 +134,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         itemListViewAdapter = ItemListViewAdapter()
 
         itemListView.adapter = itemListViewAdapter
+        adapterObserver = FallbackRecyclerAdapterObserver(emptyListMessageView, itemListViewAdapter)
 
         itemListView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -303,6 +305,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         super.onDestroy()
 
         itemListViewAdapter.dispose()
+
+        adapterObserver?.dispose()
+        adapterObserver = null
     }
 
     private fun reSort() {
@@ -408,7 +413,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             val monthView: TextView by bindView(R.id.ui_text_month)
             val dayView: TextView by bindView(R.id.ui_text_day)
 
-            val valueListView: RecyclerView by bindView(R.id.ui_recyclerview_with_fallback)
+            val valueListView: RecyclerView by bindView(R.id.ui_recyclerview)
 
             val moreButton: View by bindView(R.id.ui_button_more)
 
@@ -846,7 +851,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 }
             })
 
-            listView = contentView.findViewById(R.id.ui_recyclerview_with_fallback)
+            listView = contentView.findViewById(R.id.ui_recyclerview)
 
             listView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             listView.adapter = menuAdapter

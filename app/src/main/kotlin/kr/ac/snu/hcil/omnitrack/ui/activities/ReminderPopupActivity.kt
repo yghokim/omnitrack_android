@@ -17,7 +17,7 @@ import kr.ac.snu.hcil.omnitrack.receivers.ScreenReceiverBase
 /**
  * Created by younghokim on 2017. 4. 19..
  */
-class ReminderPopupActivity : OTActivity(false, false), View.OnClickListener {
+class ReminderPopupActivity : OTActivity(R.layout.layout_reminder_popup_dialog, false, false), View.OnClickListener {
 
     companion object {
         const val TAG = "ReminderPopupActivity"
@@ -53,9 +53,6 @@ class ReminderPopupActivity : OTActivity(false, false), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        Log.d(TAG, "onCreate")
-        setContentView(R.layout.layout_reminder_popup_dialog)
         window.decorView.systemUiVisibility = VISIBILITY_FLAGS
 
         skipButton.setOnClickListener(this)

@@ -6,7 +6,7 @@
     tools:parentTag="android.widget.LinearLayout">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/ui_recyclerview_with_fallback"
+        android:id="@+id/ui_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

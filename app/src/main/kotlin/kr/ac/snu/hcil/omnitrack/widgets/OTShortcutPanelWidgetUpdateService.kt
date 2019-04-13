@@ -105,9 +105,9 @@ class OTShortcutPanelWidgetUpdateService : Service() {
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
             intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME))
 
-            rv.setRemoteAdapter(R.id.ui_recyclerview_with_fallback, intent)
+            rv.setRemoteAdapter(R.id.ui_recyclerview, intent)
 
-            rv.setPendingIntentTemplate(R.id.ui_recyclerview_with_fallback, PendingIntent.getBroadcast(context, widgetId,
+            rv.setPendingIntentTemplate(R.id.ui_recyclerview, PendingIntent.getBroadcast(context, widgetId,
                     Intent(OTShortcutPanelWidgetProvider.ACTION_TRACKER_CLICK_EVENT), PendingIntent.FLAG_UPDATE_CURRENT))
 
             /*
@@ -202,7 +202,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
                                 val options = appWidgetManager.getAppWidgetOptions(id)
                                 val rv = makeRemoteViewsForNormalMode(this, id, options)
                                 appWidgetManager.updateAppWidget(id, rv)
-                                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.ui_recyclerview_with_fallback)
+                                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.ui_recyclerview)
                             }
                         } else {
                             for (id in appWidgetIds) {
@@ -225,7 +225,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
                     }
 
                     ACTION_NOTIFY_DATA_CHANGED -> {
-                        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.ui_recyclerview_with_fallback)
+                        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.ui_recyclerview)
                     }
 
                     ACTION_RESIZED -> {

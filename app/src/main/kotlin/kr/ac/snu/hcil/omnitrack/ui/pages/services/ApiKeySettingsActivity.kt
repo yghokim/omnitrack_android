@@ -33,8 +33,8 @@ class ApiKeySettingsActivity : MultiButtonActionBarActivity(R.layout.activity_mu
 
         adapter = ApiKeyAdapter(externalServiceManager.installedServices.map { it.requiredApiKeyNames }.toTypedArray().flatten().toTypedArray())
 
-        ui_recyclerview_with_fallback.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-        ui_recyclerview_with_fallback.adapter = adapter
+        ui_recyclerview.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        ui_recyclerview.adapter = adapter
     }
 
 

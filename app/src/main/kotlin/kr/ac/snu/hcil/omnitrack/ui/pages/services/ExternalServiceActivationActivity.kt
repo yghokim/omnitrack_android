@@ -34,7 +34,7 @@ import javax.inject.Inject
 /**
  * Created by younghokim on 2017. 5. 25..
  */
-class ExternalServiceActivationActivity : OTActivity(false, false) {
+class ExternalServiceActivationActivity : OTActivity(R.layout.activity_service_activation_wizard, false, false) {
 
     companion object {
 
@@ -78,7 +78,6 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_service_activation_wizard)
 
         dependencyListView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         dependencyListView.adapter = dependencyAdapter

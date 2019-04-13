@@ -31,11 +31,13 @@ public abstract class MaterialAboutActivity extends AppCompatActivity {
 
     protected abstract CharSequence getActivityTitle();
 
+    public MaterialAboutActivity() {
+        super(R.layout.mal_material_about_activity);
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.mal_material_about_activity);
 
         CharSequence title = getActivityTitle();
         if (title == null)

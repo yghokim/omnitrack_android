@@ -44,7 +44,7 @@ import javax.inject.Provider
 /**
  * Created by younghokim on 2017. 5. 19..
  */
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : AppCompatActivity(R.layout.activity_multibutton_single_fragment) {
 
     companion object {
         const val PREF_REMINDER_NOTI_RINGTONE = "pref_reminder_noti_ringtone"
@@ -67,7 +67,6 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_multibutton_single_fragment)
         ui_appbar_title.text = title
         ui_appbar_button_left.setOnClickListener { finish() }
         ui_appbar_button_right.visibility = View.GONE

@@ -15,6 +15,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import kotlinx.android.synthetic.main.experiment_list_element.view.*
 import kotlinx.android.synthetic.main.fragment_recyclerview_and_fab.view.*
 import kr.ac.snu.hcil.android.common.time.TimeHelper
+import kr.ac.snu.hcil.android.common.view.container.adapter.FallbackRecyclerAdapterObserver
 import kr.ac.snu.hcil.android.common.view.container.decoration.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
@@ -59,21 +60,22 @@ class ExperimentListFragment : OTFragment() {
     }
 
     private val adapter = ExperimentListAdapter()
+    private var adapterObserver: FallbackRecyclerAdapterObserver? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_recyclerview_and_fab, container, false)
 
         rootView.ui_empty_list_message.setText(R.string.msg_empty_experiments)
-        rootView.ui_recyclerview_with_fallback.emptyView = rootView.ui_empty_list_message
+        this.adapterObserver = FallbackRecyclerAdapterObserver(rootView.ui_empty_list_message, this.adapter)
 
-        rootView.ui_recyclerview_with_fallback.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        rootView.ui_recyclerview.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
-        rootView.ui_recyclerview_with_fallback.adapter = this.adapter
+        rootView.ui_recyclerview.adapter = this.adapter
 
         val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(context = requireContext(), heightMultiplier = 0.8f)
-        rootView.ui_recyclerview_with_fallback.addItemDecoration(shadowDecoration)
-        (rootView.ui_recyclerview_with_fallback.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
+        rootView.ui_recyclerview.addItemDecoration(shadowDecoration)
+        (rootView.ui_recyclerview.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
 
         rootView.fab.setOnClickListener {
             invitationCodeInputDialog.input("Paste invitation code", null, false) { dialog, invitationCode ->
@@ -82,6 +84,12 @@ class ExperimentListFragment : OTFragment() {
         }
 
         return rootView
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        adapterObserver?.dispose()
+        adapterObserver = null
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
