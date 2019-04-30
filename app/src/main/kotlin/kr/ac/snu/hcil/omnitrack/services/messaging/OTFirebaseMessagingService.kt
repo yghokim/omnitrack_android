@@ -26,6 +26,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.di.global.InformationUpload
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSynchronizationCommands
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.workers.OTInformationUploadWorker
@@ -47,6 +48,8 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
         const val COMMAND_SYNC = "sync_down"
         const val COMMAND_SIGNOUT = "sign_out"
         const val COMMAND_DUMP_DB = "dump_db"
+
+        const val COMMAND_FULL_SYNC = "full_sync"
 
         const val COMMAND_NEW_UPDATE_RELEASED = "update_released"
         const val COMMAND_EXPERIMENT_DROPPED = "experiment_dropped"
@@ -121,6 +124,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
                             try {
                                 when (data.get("command")) {
                                     COMMAND_SYNC -> handleSyncCommand(data)
+                                    COMMAND_FULL_SYNC -> handleSyncUploadCommand(data)
                                     COMMAND_SIGNOUT -> handleSignOutCommand(data)
                                     COMMAND_DUMP_DB -> handleDumpCommand(data)
                                     COMMAND_EXPERIMENT_DROPPED -> handleExperimentDropout(data)
@@ -154,6 +158,10 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
         if (registeredCount > 0) {
             (application as OTAndroidApp).applicationComponent.getSyncManager().reserveSyncServiceNow()
         }
+    }
+
+    private fun handleSyncUploadCommand(data: Map<String, String>) {
+        OTSynchronizationCommands(this).createSynchronizationTask(true).blockingAwait()
     }
 
     private fun handleDumpCommand(data: Map<String, String>) {

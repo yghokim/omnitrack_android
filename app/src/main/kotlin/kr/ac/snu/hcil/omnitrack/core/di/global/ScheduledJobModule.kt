@@ -46,8 +46,6 @@ class ScheduledJobModule {
                 .setConstraints(networkConstraints)
                 .setInitialDelay(1, TimeUnit.SECONDS)
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
-                .setInputData(Data.Builder().putBoolean(OTSynchronizationWorker.EXTRA_KEY_ONESHOT, true).build())
-                .addTag(OTSynchronizationWorker.EXTRA_KEY_ONESHOT)
                 .build()
         /*
         return builder

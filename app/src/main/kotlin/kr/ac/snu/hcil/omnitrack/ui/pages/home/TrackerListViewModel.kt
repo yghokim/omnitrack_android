@@ -30,9 +30,9 @@ import kr.ac.snu.hcil.omnitrack.core.di.global.Research
 import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSynchronizationCommands
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
-import kr.ac.snu.hcil.omnitrack.core.workers.OTSynchronizationWorker
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import java.util.*
@@ -74,12 +74,12 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         get() = requiredPermissionsSubject
 
     private val syncIntentFilter: IntentFilter by lazy {
-        IntentFilter(OTSynchronizationWorker.BROADCAST_ACTION_SYNCHRONIZATION_FINISHED)
+        IntentFilter(OTSynchronizationCommands.BROADCAST_ACTION_SYNCHRONIZATION_FINISHED)
     }
     private val syncBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == OTSynchronizationWorker.BROADCAST_ACTION_SYNCHRONIZATION_FINISHED) {
-                val entityTypes = intent.getIntArrayExtra(OTSynchronizationWorker.BROADCAST_EXTRA_ENTITY_TYPES).map { ESyncDataType.values()[it] }
+            if (intent.action == OTSynchronizationCommands.BROADCAST_ACTION_SYNCHRONIZATION_FINISHED) {
+                val entityTypes = intent.getIntArrayExtra(OTSynchronizationCommands.BROADCAST_EXTRA_ENTITY_TYPES).map { ESyncDataType.values()[it] }
                 println("synchronization finished: ${entityTypes.joinToString(", ")}")
             }
         }

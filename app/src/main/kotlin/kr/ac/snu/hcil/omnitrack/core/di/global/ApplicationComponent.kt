@@ -30,6 +30,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitApi
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSynchronizationCommands
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataDrivenTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
@@ -37,7 +38,10 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.measures.OTItemMetadataMeasureFactoryLogicImpl
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
-import kr.ac.snu.hcil.omnitrack.core.workers.*
+import kr.ac.snu.hcil.omnitrack.core.workers.OTBinaryUploadWorker
+import kr.ac.snu.hcil.omnitrack.core.workers.OTInformationUploadWorker
+import kr.ac.snu.hcil.omnitrack.core.workers.OTResearchSynchronizationWorker
+import kr.ac.snu.hcil.omnitrack.core.workers.OTUsageLogUploadWorker
 import kr.ac.snu.hcil.omnitrack.receivers.DataDrivenTriggerCheckReceiver
 import kr.ac.snu.hcil.omnitrack.receivers.PackageReceiver
 import kr.ac.snu.hcil.omnitrack.receivers.RebootReceiver
@@ -289,7 +293,7 @@ interface ApplicationComponent {
     fun inject(worker: OTBinaryUploadWorker)
     fun inject(worker: OTUsageLogUploadWorker)
     fun inject(worker: OTInformationUploadWorker)
-    fun inject(worker: OTSynchronizationWorker)
+    fun inject(commands: OTSynchronizationCommands)
 
     fun inject(task: OTReminderCommands)
 
