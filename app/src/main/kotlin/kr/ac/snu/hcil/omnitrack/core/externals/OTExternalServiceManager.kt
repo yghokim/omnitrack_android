@@ -44,11 +44,12 @@ class OTExternalServiceManager constructor(
         )
     }
 
+
     private val availableServicesCache = ArrayList<OTExternalService>()
     private var isAvailableServiceCacheInvalid = true
 
     val availableServices: List<OTExternalService>
-        get() {
+        @Synchronized get() {
             if (isAvailableServiceCacheInvalid) {
                 availableServicesCache.clear()
                 factoryCodeDict.clear()
