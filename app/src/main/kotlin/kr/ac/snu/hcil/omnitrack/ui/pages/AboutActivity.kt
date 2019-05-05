@@ -44,7 +44,7 @@ class AboutActivity : MaterialAboutActivity() {
                                 .iconTintRes(R.color.buttonIconColorDark)
                                 .text(R.string.msg_version)
                                 .textColorOverrideRes(R.color.textColorMidDark)
-                                .subText(this.versionName())
+                                .subText("${this.versionName()} (source ver: ${BuildConfig.SOURCE_VERSION_NAME})")
                                 .setOnClickListener {
                                     val versionCheckDialog = VersionCheckDialogFragment()
                                     versionCheckDialog.show(supportFragmentManager, "VersionCheck")

@@ -372,12 +372,14 @@ repositories {
 apply plugin: 'realm-android'
 
 ext.refreshVersion = {
-    increase ->
+    increaseVersionCode ->
         println(buildConfigJson.disableVersionAutoIncrement == true ? "Use version properties without auto-increment." : "auto-increment version name.")
         def versionPropsFile = rootProject.file("version.properties")
         Properties versionProperties = new Properties()
         versionProperties.load(new FileInputStream(versionPropsFile))
-        def releaseIncrease = increase && buildConfigJson.disableVersionAutoIncrement != true ? 1 : 0
+        def releaseIncrease = increaseVersionCode && buildConfigJson.disableVersionAutoIncrement != true && buildConfigJson.overrideVersionCode == null ? 1 : 0
+        def patchIncrease = (buildConfigJson.disableVersionAutoIncrement == true || buildConfigJson.overrideVersionName != null) ? 0 : 1
+
 
         def patternVersionNumber = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)(-[a-zA-Z0-9]+)?")
         def matcherVersionNumber = patternVersionNumber.matcher(versionProperties["versionName"])
@@ -388,38 +390,52 @@ ext.refreshVersion = {
         def buildVersion = Integer.parseInt(matcherVersionNumber.group(4))
         def suffix = matcherVersionNumber.group(5)
 
-        def versionName = majorVersion + "." + minorVersion + "." + (pointVersion + releaseIncrease) + "." + (buildVersion + (buildConfigJson.disableVersionAutoIncrement == true ? 0 : 1)) + suffix
+        def versionName = majorVersion + "." + minorVersion + "." + (pointVersion + releaseIncrease) + "." + (buildVersion + patchIncrease) + suffix
         def versionCode = versionProperties["versionCode"].toInteger() + releaseIncrease
-        versionProperties.setProperty("versionName", versionName)
-        versionProperties.setProperty("versionCode", versionCode.toString())
 
-        if (buildConfigJson.disableVersionAutoIncrement != true) {
+        if (releaseIncrease > 0 || patchIncrease > 0) {
+            versionProperties.setProperty("versionName", versionName)
+            versionProperties.setProperty("versionCode", versionCode.toString())
             versionProperties.store(versionPropsFile.newWriter(), "auto-incremented version information.")
         }
 
-        android.defaultConfig.versionName = versionName
-        android.defaultConfig.versionCode = versionCode
+        def finalVersionName = buildConfigJson.overrideVersionName ?: versionName
+        def finalVersionCode = buildConfigJson.overrideVersionCode ?: versionCode
+
+        android.defaultConfig.versionName = finalVersionName
+        android.defaultConfig.versionCode = finalVersionCode
+
+        android.buildTypes.each {
+            buildType ->
+                buildType.buildConfigField 'String', 'SOURCE_VERSION_NAME', "\"${versionName}\""
+                buildType.buildConfigField 'int', 'SOURCE_VERSION_CODE', "${versionCode}"
+                buildType.buildConfigField 'String', 'APP_VERSION_NAME', "\"${finalVersionName}\""
+                buildType.buildConfigField 'int', 'APP_VERSION_CODE', "${finalVersionCode}"
+
+
+        }
+
         android.applicationVariants.all {
             variant ->
                 variant.outputs.each {
                     output ->
-                        output.versionCodeOverride = versionCode
-                        output.versionNameOverride = versionName
+                        output.versionCodeOverride = finalVersionCode
+                        output.versionNameOverride = finalVersionName
                 }
 
-                variant.mergedFlavor.manifestPlaceholders.versionName = versionName
-                variant.mergedFlavor.manifestPlaceholders.versionCode = versionCode
+                variant.mergedFlavor.manifestPlaceholders.versionName = finalVersionName
+                variant.mergedFlavor.manifestPlaceholders.versionCode = finalVersionCode
         }
 
-        println("new versionName: ${versionName}, versionCode: ${versionCode}")
+        println("new versionName: ${finalVersionName}, versionCode: ${finalVersionCode}")
 
         android.applicationVariants.all {
             variant ->
                 variant.outputs.all { output ->
-                    outputFileName = "${variant.name}-${versionName}.apk"
+                    outputFileName = "${variant.name}-${finalVersionName}.apk"
                 }
 
-                variant.resValue "string", "version_name", versionName
+                variant.resValue "string", "version_name", finalVersionName
         }
 }
 
