@@ -100,7 +100,7 @@
         android:layout_marginStart="16dp"
         android:adjustViewBounds="true"
         android:contentDescription="The OmniTrack Research Kit logo"
-        android:src="@drawable/powered_by_omnitrack_research_kit_logo"
+        android:src="@drawable/omnitrack_for_research_logo"
         app:layout_constraintBottom_toTopOf="@+id/ui_copyright"
         app:layout_constraintLeft_toLeftOf="@+id/guideline_team_logo_left"
         app:layout_constraintRight_toRightOf="@+id/guideline_team_logo_right" />
@@ -113,7 +113,7 @@
         android:layout_marginEnd="8dp"
         android:fontFamily="sans-serif-condensed"
         android:gravity="center"
-        android:text="Copyright © 2016-2018 The OmniTrack Team. All Rights Reserved."
+        android:text="Copyright © 2016-2019 The OmniTrack Team. All Rights Reserved."
         android:textColor="@color/textColorMidLight"
 
         android:textSize="10sp"
