@@ -19,21 +19,22 @@ def firebaseProjectId = googleServices.project_info.project_id
 
 def buildConfigJson = project.buildConfigJson
 
-static def fallbackUrl(String url) {
-    try {
+static def fallbackUrl(String url){
+    try{
         URI parsedUri = new URI(url)
-        if (parsedUri.scheme == 'https' || parsedUri.scheme == 'http') {
+        if(parsedUri.scheme == 'https' || parsedUri.scheme == 'http')
+        {
             return url
-        } else throw new Exception("The URI does not have an HTTP or HTTPS scheme.")
-    } catch (Exception ex) {
+        }else throw new Exception("The URI does not have an HTTP or HTTPS scheme.")
+    }catch(Exception ex) {
         return new URIBuilder().setPath(url).setScheme("http").build().toString()
     }
 }
 
-static def makePropertyHashTableString(Properties properties) {
+static def makePropertyHashTableString(Properties properties){
     StringBuilder infix = new StringBuilder("")
 
-    for (prop in properties) {
+    for(prop in properties){
         infix.append("put(\"${prop.key}\", ${prop.value}); ")
     }
 
@@ -43,7 +44,7 @@ static def makePropertyHashTableString(Properties properties) {
 android {
 
     if (
-    buildConfigJson.signing != null &&
+            buildConfigJson.signing != null &&
             buildConfigJson.signing.releaseKeystoreLocation != null &&
             buildConfigJson.signing.releaseKeystoreLocation.length() > 0 &&
             buildConfigJson.signing.releaseAlias != null &&
@@ -188,13 +189,15 @@ android {
                 return it.client_info.android_client_info.package_name == finalApplicationId
             }
 
-            def googleAuthClientId = googleServiceClient.oauth_client.find { c -> c.client_type == 3 }.client_id
-            def firebaseApiKey = googleServiceClient.api_key[0].current_key
-            def mobileSdkAppId = googleServiceClient.client_info.mobilesdk_app_id
+            if (googleServiceClient != null) {
+                def googleAuthClientId = googleServiceClient.oauth_client.find { c -> c.client_type == 3 }.client_id
+                def firebaseApiKey = googleServiceClient.api_key[0].current_key
+                def mobileSdkAppId = googleServiceClient.client_info.mobilesdk_app_id
 
-            buildType.buildConfigField 'String', 'FIREBASE_API_KEY', "\"$firebaseApiKey\""
-            buildType.buildConfigField 'String', 'FIREBASE_AUTH_CLIENT_ID', "\"$googleAuthClientId\""
-            buildType.buildConfigField 'String', 'FIREBASE_CLIENT_ID', "\"$mobileSdkAppId\""
+                buildType.buildConfigField 'String', 'FIREBASE_API_KEY', "\"$firebaseApiKey\""
+                buildType.buildConfigField 'String', 'FIREBASE_AUTH_CLIENT_ID', "\"$googleAuthClientId\""
+                buildType.buildConfigField 'String', 'FIREBASE_CLIENT_ID', "\"$mobileSdkAppId\""
+            }
 
             buildType.buildConfigField 'String', 'FIREBASE_CLOUD_MESSAGING_SENDER_ID', "\"$gcmSenderId\""
             buildType.buildConfigField 'String', 'FIREBASE_PROJECT_ID', "\"$firebaseProjectId\""
@@ -215,9 +218,9 @@ android {
                 buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "null"
             }
 
-            if (buildConfigJson.enableDynamicApiKeyModification == true) {
+            if(buildConfigJson.enableDynamicApiKeyModification == true){
                 buildType.buildConfigField 'boolean', 'ENABLE_DYNAMIC_API_KEY_MODIFICATION', "true"
-            } else {
+            }else{
                 buildType.buildConfigField 'boolean', 'ENABLE_DYNAMIC_API_KEY_MODIFICATION', "false"
             }
 
