@@ -31,10 +31,6 @@ class PackageExportActivity : MultiButtonActionBarActivity(R.layout.activity_pac
 
     private lateinit var viewModel: PackageExportViewModel
 
-    private val packageHandlingDialogFragment: PackageHandlingBottomSheetFragment by lazy {
-        PackageHandlingBottomSheetFragment()
-    }
-
     override fun onToolbarLeftButtonClicked() {
         finish()
     }
@@ -42,7 +38,7 @@ class PackageExportActivity : MultiButtonActionBarActivity(R.layout.activity_pac
     override fun onToolbarRightButtonClicked() {
         creationSubscriptions.add(
                 viewModel.extractPackage().subscribe { jsonString ->
-                    packageHandlingDialogFragment.showJsonDialog(jsonString, supportFragmentManager, TAG)
+                    PackageHandlingBottomSheetFragment().showJsonDialog(jsonString, supportFragmentManager, TAG)
                 }
         )
     }
