@@ -373,7 +373,6 @@ apply plugin: 'realm-android'
 
 ext.refreshVersion = {
     increaseVersionCode ->
-        println(buildConfigJson.disableVersionAutoIncrement == true ? "Use version properties without auto-increment." : "auto-increment version name.")
         def versionPropsFile = rootProject.file("version.properties")
         Properties versionProperties = new Properties()
         versionProperties.load(new FileInputStream(versionPropsFile))
@@ -394,6 +393,7 @@ ext.refreshVersion = {
         def versionCode = versionProperties["versionCode"].toInteger() + releaseIncrease
 
         if (releaseIncrease > 0 || patchIncrease > 0) {
+            println("Version name or code were auto-incremented.")
             versionProperties.setProperty("versionName", versionName)
             versionProperties.setProperty("versionCode", versionCode.toString())
             versionProperties.store(versionPropsFile.newWriter(), "auto-incremented version information.")
