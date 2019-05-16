@@ -38,24 +38,6 @@ class ResearchManager @Inject constructor(val serverApiController: IResearchServ
         }
     }
 
-    fun approveInvitation(invitationCode: String): Single<Boolean> {
-        return serverApiController.approveExperimentInvitation(invitationCode).flatMap { result ->
-            if (result.success && result.experiment != null) {
-                return@flatMap Single.defer {
-                    researchRealmFactory.get().use { realm ->
-                        realm.executeTransaction {
-                            saveExperimentInfo(result.experiment, realm)
-                        }
-                        println("Joined to new experiment: ${result.experiment.name}")
-                    }
-                    return@defer Single.just(true)
-                }.subscribeOn(Schedulers.io())
-            } else {
-                return@flatMap Single.just(false)
-            }
-        }
-    }
-
     private fun saveExperimentInfo(experiment: ExperimentInfo, realm: Realm) {
         val dao = realm.where(OTExperimentDAO::class.java).equalTo("id", experiment.id).findFirst() ?: realm.createObject(OTExperimentDAO::class.java, experiment.id)
         dao.name = experiment.name

@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.core.net
 
 import androidx.annotation.Keep
 import androidx.recyclerview.widget.DiffUtil
-import io.reactivex.Completable
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.database.models.research.ExperimentInfo
 
@@ -64,8 +63,6 @@ data class DropoutBody(val reason: String?)
 
 interface IResearchServerAPI {
 
-    fun approveExperimentInvitation(invitationCode: String): Single<ExperimentCommandResult>
-    fun rejectExperimentInvitation(invitationCode: String): Completable
     fun dropOutFromExperiment(experimentId: String, reason: CharSequence?): Single<ExperimentCommandResult>
 
     fun retrieveJoinedExperiments(after: Long = Long.MIN_VALUE): Single<List<ExperimentInfo>>

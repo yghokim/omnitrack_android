@@ -25,8 +25,6 @@ interface OTOfficialServerService {
     @GET("api/user/auth/check_status/{experimentId}")
     fun getExperimentParticipationStatus(@Path("experimentId") experimentId: String): Single<Boolean>
 
-    @POST("api/user/auth/authenticate")
-    fun authenticate(@Body data: JsonObject): Single<ISynchronizationServerSideAPI.AuthenticationResult>
 
     @POST("api/user/auth/device")
     fun postDeviceInfo(@Body info: OTDeviceInfo): Single<ISynchronizationServerSideAPI.DeviceInfoResult>
@@ -47,8 +45,6 @@ interface OTOfficialServerService {
     fun postUserName(@Body nameAndTimestamp: ValueWithTimestamp<String>): Single<ISynchronizationServerSideAPI.InformationUpdateResult>
 
     //Research
-    @POST("api/research/invitation/approve")
-    fun approveExperimentInvitation(@Query("invitationCode") invitationCode: String): Single<ExperimentCommandResult>
 
     @POST("api/research/invitation/reject")
     fun rejectExperimentInvitation(@Query("invitationCode") invitationCode: String): Completable

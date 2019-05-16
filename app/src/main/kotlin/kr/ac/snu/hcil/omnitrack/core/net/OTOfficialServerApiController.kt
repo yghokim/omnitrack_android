@@ -2,12 +2,12 @@ package kr.ac.snu.hcil.omnitrack.core.net
 
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
-import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.android.common.containers.ValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.BuildConfig
+import kr.ac.snu.hcil.omnitrack.core.auth.IAuthServerAPI
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
@@ -75,18 +75,6 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    override fun approveExperimentInvitation(invitationCode: String): Single<ExperimentCommandResult> {
-        return service.approveExperimentInvitation(invitationCode)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-    }
-
-    override fun rejectExperimentInvitation(invitationCode: String): Completable {
-        return service.rejectExperimentInvitation(invitationCode)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-    }
-
     override fun dropOutFromExperiment(experimentId: String, reason: CharSequence?): Single<ExperimentCommandResult> {
         return service.dropOutFromExperiment(experimentId, DropoutBody(reason?.toString()))
                 .subscribeOn(Schedulers.io())
@@ -126,7 +114,7 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    override fun authenticate(deviceInfo: OTDeviceInfo, invitationCode: String?, demographicData: JsonObject?): Single<ISynchronizationServerSideAPI.AuthenticationResult> {
+    override fun authenticate(deviceInfo: OTDeviceInfo, invitationCode: String?, demographicData: JsonObject?): Single<IAuthServerAPI.AuthenticationResult> {
         return service.authenticate(
                 jsonObject(
                         "experimentId" to BuildConfig.DEFAULT_EXPERIMENT_ID,

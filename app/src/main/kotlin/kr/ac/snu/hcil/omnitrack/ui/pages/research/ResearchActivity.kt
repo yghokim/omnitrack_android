@@ -84,13 +84,12 @@ class ResearchActivity : MultiButtonActionBarActivity(R.layout.activity_research
         override fun getItem(position: Int): Fragment {
             return when (position) {
                 TAB_INDEX_EXPERIMENTS -> ExperimentListFragment()
-                TAB_INDEX_INVITATIONS -> InvitationListFragment()
                 else -> ExperimentListFragment()
             }
         }
 
         override fun getCount(): Int {
-            return 2
+            return 1
         }
 
         override fun getPageTitle(position: Int): CharSequence? {

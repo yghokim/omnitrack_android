@@ -3,17 +3,11 @@ package kr.ac.snu.hcil.omnitrack.core.auth
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.google.android.gms.auth.api.Auth
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.GoogleApiClient
-import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import dagger.Lazy
@@ -32,12 +26,10 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTUserDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
-import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneralAuth
+import kr.ac.snu.hcil.omnitrack.core.di.global.Default
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
-import kr.ac.snu.hcil.omnitrack.core.toCompletable
-import kr.ac.snu.hcil.omnitrack.core.toSingle
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignUpActivity
 import org.jetbrains.anko.runOnUiThread
@@ -53,18 +45,17 @@ import javax.inject.Singleton
 @Singleton
 class OTAuthManager @Inject constructor(
         private val context: Context,
-        private val firebaseAuth: FirebaseAuth,
+        @Default private val sharedPreferences: SharedPreferences,
         private val triggerSystemManager: Lazy<OTTriggerSystemManager>,
         private val shortcutPanelManager: OTShortcutPanelManager,
         private val eventLogger: Lazy<IEventLogger>,
         @ForGeneric private val gson: Gson,
         @Backend private val realmFactory: Factory<Realm>,
-        @ForGeneralAuth private val googleSignInOptions: Lazy<GoogleSignInOptions>,
+        private val authApiController: Lazy<OTAuthApiController>,
         private val synchronizationServerController: Lazy<ISynchronizationServerSideAPI>) {
 
     companion object {
         const val LOG_TAG = "OMNITRACK Auth Manager"
-        const val GOOGLE_SIGN_IN_REQUEST_CODE = 9428
     }
     enum class SignedInLevel {
         NONE, CACHED, AUTHORIZED
@@ -72,18 +63,6 @@ class OTAuthManager @Inject constructor(
 
     enum class AuthError(@StringRes messageResId: Int) {
         NETWORK_NOT_CONNECTED(0), OMNITRACK_SERVER_NOT_RESPOND(0)
-    }
-
-    private val mGoogleApiClient: GoogleApiClient
-
-    init {
-        Log.d(LOG_TAG, "Initializing Google SDK...")
-
-        // Build GoogleApiClient with access to basic profile
-        mGoogleApiClient = GoogleApiClient.Builder(context)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions.get())
-                .build()
-        mGoogleApiClient.connect()
     }
 
     fun getDeviceLocalKey(): String? {
@@ -98,7 +77,7 @@ class OTAuthManager @Inject constructor(
 
     val userId: String?
         get() {
-            val id = firebaseAuth.currentUser?.uid
+            val id = firebaseAuth.currentUser.uid
             println("user id: $id")
             return id
         }
@@ -142,7 +121,7 @@ class OTAuthManager @Inject constructor(
             if (user != null) {
                 val task = user.getIdToken(true).addOnCompleteListener { result ->
                     if (result.isSuccessful) {
-                        val token = result.result?.token!!
+                        val token = result.result.token!!
                         if (!disposable.isDisposed) {
                             disposable.onSuccess(token)
                         }
@@ -282,7 +261,7 @@ class OTAuthManager @Inject constructor(
         }
     }
 
-    fun handleAuthenticationResult(result: ISynchronizationServerSideAPI.AuthenticationResult): Single<Boolean> {
+    fun handleAuthenticationResult(result: IAuthServerAPI.AuthenticationResult): Single<Boolean> {
         return Single.defer {
             val userInfo = result.userInfo
             if (userInfo != null) {

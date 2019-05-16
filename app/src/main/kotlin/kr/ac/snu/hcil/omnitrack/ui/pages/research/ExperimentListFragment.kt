@@ -77,12 +77,6 @@ class ExperimentListFragment : OTFragment() {
         rootView.ui_recyclerview.addItemDecoration(shadowDecoration)
         (rootView.ui_recyclerview.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
 
-        rootView.fab.setOnClickListener {
-            invitationCodeInputDialog.input("Paste invitation code", null, false) { dialog, invitationCode ->
-                viewModel.insertInvitationCode(invitationCode.toString())
-            }.show()
-        }
-
         return rootView
     }
 

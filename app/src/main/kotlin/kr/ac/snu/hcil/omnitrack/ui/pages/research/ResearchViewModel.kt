@@ -62,15 +62,6 @@ class ResearchViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun insertInvitationCode(invitationCode: String) {
-        subscriptions.add(
-                researchManager.approveInvitation(invitationCode).subscribe { result ->
-                    println("invitation approval success: $result")
-                    reload()
-                }
-        )
-    }
-
     fun startWatchingNetworkForRefresh() {
         this.networkSubscription.set(
                 ReactiveNetwork.observeInternetConnectivity().subscribe { connectivity ->
