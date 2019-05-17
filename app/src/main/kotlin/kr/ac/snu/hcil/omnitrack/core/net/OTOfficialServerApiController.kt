@@ -6,8 +6,6 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.android.common.containers.ValueWithTimestamp
-import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.core.auth.IAuthServerAPI
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
@@ -110,18 +108,6 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
 
     override fun checkExperimentParticipationStatus(experimentId: String): Single<Boolean> {
         return service.getExperimentParticipationStatus(experimentId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-    }
-
-    override fun authenticate(deviceInfo: OTDeviceInfo, invitationCode: String?, demographicData: JsonObject?): Single<IAuthServerAPI.AuthenticationResult> {
-        return service.authenticate(
-                jsonObject(
-                        "experimentId" to BuildConfig.DEFAULT_EXPERIMENT_ID,
-                        "invitationCode" to invitationCode,
-                        "demographic" to demographicData,
-                        "deviceInfo" to deviceInfo.convertToJson()
-                ))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

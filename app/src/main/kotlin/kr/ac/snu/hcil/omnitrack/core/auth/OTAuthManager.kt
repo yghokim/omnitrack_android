@@ -8,17 +8,16 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.auth0.android.jwt.JWT
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import dagger.Lazy
 import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.Completable.defer
-import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
-import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -56,6 +55,7 @@ class OTAuthManager @Inject constructor(
 
     companion object {
         const val LOG_TAG = "OMNITRACK Auth Manager"
+        const val PREF_KEY_TOKEN = "auth_jwt"
     }
     enum class SignedInLevel {
         NONE, CACHED, AUTHORIZED
@@ -64,6 +64,24 @@ class OTAuthManager @Inject constructor(
     enum class AuthError(@StringRes messageResId: Int) {
         NETWORK_NOT_CONNECTED(0), OMNITRACK_SERVER_NOT_RESPOND(0)
     }
+
+    private var decodedTokenCache: JWT? = null
+    private val decodedToken: JWT?
+        @Synchronized get() {
+            if (decodedTokenCache == null) {
+                val storedToken = getCurrentAuthToken()
+                if (storedToken != null) {
+                    decodedTokenCache = JWT(storedToken)
+                }
+            }
+            return decodedTokenCache
+        }
+
+    private fun updateToken(newToken: String) {
+        decodedTokenCache = null
+        sharedPreferences.edit().putString(PREF_KEY_TOKEN, newToken).apply()
+    }
+
 
     fun getDeviceLocalKey(): String? {
         val uid = userId
@@ -77,20 +95,13 @@ class OTAuthManager @Inject constructor(
 
     val userId: String?
         get() {
-            val id = firebaseAuth.currentUser.uid
+            val id = decodedToken?.getClaim("uid").toString()
             println("user id: $id")
             return id
         }
 
     fun isUserSignedIn(): Boolean {
-        return firebaseAuth.currentUser != null && isUserInDb(firebaseAuth.currentUser!!.uid)
-    }
-
-    private fun isUserInDb(uid: String): Boolean {
-        realmFactory.get().use { realm ->
-            return realm.where(OTUserDAO::class.java).equalTo("uid", uid)
-                    .findFirst() != null
-        }
+        return decodedTokenCache?.isExpired(10) == false
     }
 
     val currentSignedInLevel: SignedInLevel get() {
@@ -106,62 +117,25 @@ class OTAuthManager @Inject constructor(
         return result
     }
 
-    fun loadGoogleSignInAccount(): Maybe<GoogleSignInAccount> {
-        return Maybe.defer {
-            val connectionResult = mGoogleApiClient.blockingConnect()
-            if (connectionResult.isSuccess) {
-                return@defer Maybe.just(Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient).await().signInAccount!!)
-            } else return@defer Maybe.never<GoogleSignInAccount>()
-        }.observeOn(Schedulers.io())
-    }
-
-    fun getAuthToken(): Maybe<String> {
-        return Maybe.create { disposable ->
-            val user = firebaseAuth.currentUser
-            if (user != null) {
-                val task = user.getIdToken(true).addOnCompleteListener { result ->
-                    if (result.isSuccessful) {
-                        val token = result.result.token!!
-                        if (!disposable.isDisposed) {
-                            disposable.onSuccess(token)
-                        }
-                    } else {
-                        if (!disposable.isDisposed) {
-                            disposable.onError(result.exception ?: Exception("Token error"))
-                        }
-                    }
-                }
-            } else {
-                if (!disposable.isDisposed) {
-                    disposable.onComplete()
-                }
-            }
-        }
-    }
-
-    private fun signInSilently(): Completable {
-        return loadGoogleSignInAccount().flatMapSingle { acc ->
-            firebaseAuthWithGoogle(acc)
-        }.ignoreElement()
+    fun getCurrentAuthToken(): String? {
+        return sharedPreferences.getString(PREF_KEY_TOKEN, null)
     }
 
     fun refreshCredentialSilently(skipValidationIfCacheHit: Boolean): Completable {
         return defer {
             if (isUserSignedIn()) {
                 if (skipValidationIfCacheHit) {
-                    Log.d(LOG_TAG, "Skip sign in. use cached Firebase User.")
+                    Log.d(LOG_TAG, "Skip sign in. use cached user token.")
                     return@defer Completable.complete()
-                } else {
-                    Log.d(LOG_TAG, "Reload Firebase User to check connection.")
-
-                    return@defer firebaseAuth.currentUser!!.reload().toCompletable().onErrorResumeNext {
-                        signInSilently()
-                    }
                 }
-            } else {
-                Log.d(LOG_TAG, "Firebase user does not exist. Sign in silently")
-                return@defer signInSilently()
             }
+
+            val token = getCurrentAuthToken()
+            return@defer if (token != null) {
+                authApiController.get().refreshToken(token).doAfterSuccess { newToken ->
+                    updateToken(newToken)
+                }.ignoreElement()
+            } else Completable.error(IllegalAccessException())
         }
 
     }
@@ -282,33 +256,13 @@ class OTAuthManager @Inject constructor(
         }
     }
 
-    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount): Single<AuthResult> {
-        return Single.defer {
-            Log.d(LOG_TAG, "firebaseAuthWithGooogle:" + acct.id)
-            val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
-            return@defer firebaseAuth.signInWithCredential(credential).toSingle()
-        }
-    }
-
-    /*
-    fun deleteUser() {
-        firebaseAuth.currentUser?.delete()?.addOnCompleteListener {
-            task ->
-            if (task.isSuccessful) {
-                resultsHandler.onSuccess()
-                signOut()
-            } else {
-                resultsHandler.onError(task.exception!!)
-            }
-        } ?: resultsHandler.onError(Exception("Not signed in."))
-    }*/
 
     fun signOut() {
         val lastUserId = userId
         if (lastUserId != null) {
+
+            //TODO sign out from server
             clearUserInfo()
-            firebaseAuth.signOut()
-            Auth.GoogleSignInApi.signOut(mGoogleApiClient)
 
             triggerSystemManager.get().checkOutAllFromSystem(lastUserId)
             shortcutPanelManager.disposeShortcutPanel()

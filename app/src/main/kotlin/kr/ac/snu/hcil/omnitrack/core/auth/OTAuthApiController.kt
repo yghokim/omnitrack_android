@@ -24,6 +24,9 @@ class OTAuthApiController(retrofit: Lazy<Retrofit>) : IAuthServerAPI {
         @POST("api/user/auth/authenticate")
         fun authenticate(@Body data: JsonObject): Single<String>
 
+        @POST("api/user/auth/refresh_token")
+        fun refreshToken(@Body data: JsonObject): Single<String>
+
         @POST("api/user/auth/signout")
         fun signOut(@Body data: JsonObject): Single<String>
     }
@@ -32,10 +35,10 @@ class OTAuthApiController(retrofit: Lazy<Retrofit>) : IAuthServerAPI {
         retrofit.get().create(AuthRetrofitService::class.java)
     }
 
-    override fun register(email: String, password: String, deviceInfo: OTDeviceInfo, invitationCode: String?, demographicData: JsonObject?): Single<String> {
+    override fun register(username: String, password: String, deviceInfo: OTDeviceInfo, invitationCode: String?, demographicData: JsonObject?): Single<String> {
         return service.register(jsonObject(
-                "email" to email.trim(),
-                "password" to email.trim(),
+                "username" to username.trim(),
+                "password" to password.trim(),
                 "deviceInfo" to deviceInfo.convertToJson(),
                 "experimentId" to BuildConfig.DEFAULT_EXPERIMENT_ID,
                 "invitationCode" to invitationCode,
@@ -43,11 +46,16 @@ class OTAuthApiController(retrofit: Lazy<Retrofit>) : IAuthServerAPI {
         )).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
 
-    override fun authenticate(email: String, password: String, deviceInfo: OTDeviceInfo): Single<String> {
+    override fun authenticate(username: String, password: String, deviceInfo: OTDeviceInfo): Single<String> {
         return service.authenticate(jsonObject(
-                "email" to email,
+                "username" to username,
                 "password" to password,
                 "deviceInfo" to deviceInfo
-        ))
+        )).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun refreshToken(token: String): Single<String> {
+        return service.refreshToken(jsonObject("token" to token))
+                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
 }

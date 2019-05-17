@@ -14,11 +14,14 @@ interface IAuthServerAPI {
     data class AuthenticationResult(val inserted: Boolean, val deviceLocalKey: String, val userInfo: ServerUserInfo?)
 
     fun register(
-            email: String,
+            username: String,
             password: String,
             deviceInfo: OTDeviceInfo,
             invitationCode: String?,
             demographicData: JsonObject?): Single<String>
 
-    fun authenticate(email: String, password: String, deviceInfo: OTDeviceInfo): Single<String>
+    fun authenticate(username: String, password: String, deviceInfo: OTDeviceInfo): Single<String>
+
+    fun refreshToken(token: String): Single<String>
+
 }

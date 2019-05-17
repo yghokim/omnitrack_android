@@ -63,7 +63,7 @@ class NetworkModule {
         return OkHttpClient.Builder()
                 .cache(cache)
                 .addInterceptor { chain ->
-                    val bearer = "Bearer " + authManager.get().getAuthToken().blockingGet()
+                    val bearer = "Bearer " + authManager.get().getCurrentAuthToken()
                     val newRequest = chain.request().newBuilder()
                             .addHeader("Authorization", bearer)
                             .addHeader("OTDeviceId", deviceId.get())
@@ -180,7 +180,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun getAuthApiController(retrofit: Lazy<Retrofit>): OTAuthApiController {
+    fun getAuthApiController(@Backend retrofit: Lazy<Retrofit>): OTAuthApiController {
         return OTAuthApiController(retrofit)
     }
 

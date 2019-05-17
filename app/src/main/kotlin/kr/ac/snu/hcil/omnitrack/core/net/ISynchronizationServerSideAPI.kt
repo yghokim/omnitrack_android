@@ -9,7 +9,6 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.core.auth.IAuthServerAPI
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
@@ -72,7 +71,6 @@ interface ISynchronizationServerSideAPI {
 
     fun checkExperimentParticipationStatus(experimentId: String): Single<Boolean>
 
-    fun authenticate(deviceInfo: OTDeviceInfo, invitationCode: String?, demographicData: JsonObject?): Single<IAuthServerAPI.AuthenticationResult>
     fun getExperimentConsentInfo(experimentId: String): Single<ExperimentConsentInfo>
     fun verifyInvitationCode(invitationCode: String, experimentId: String): Single<Boolean>
     //=============================================================

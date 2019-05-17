@@ -147,13 +147,17 @@ class SignInActivity : AppCompatActivity(R.layout.activity_sign_in) {
         super.onCreate(savedInstanceState)
         (application as OTAndroidApp).applicationComponent.inject(this)
 
+        ui_app_title.text = BuildConfig.APP_NAME
+        toIdleMode()
+
+
+
         ui_button_settings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
         val task = GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this)
         task.addOnCompleteListener { apiCheckTask ->
-            ui_login_group_switcher.visibility = View.VISIBLE
             g_login_button.setOnClickListener(View.OnClickListener { view ->
                 toBusyMode()
                 creationSubscription.add(
@@ -189,14 +193,14 @@ class SignInActivity : AppCompatActivity(R.layout.activity_sign_in) {
 
     private fun toBusyMode() {
         runOnUiThread {
-            g_login_button.visibility = View.GONE
+            ui_group_signin.visibility = View.GONE
             ui_loading_indicator.visibility = View.VISIBLE
         }
     }
 
     private fun toIdleMode() {
         runOnUiThread {
-            g_login_button.visibility = View.VISIBLE
+            ui_group_signin.visibility = View.VISIBLE
             ui_loading_indicator.visibility = View.GONE
         }
     }
