@@ -241,7 +241,7 @@
             android:name=".ui.pages.diagnostics.SystemLogActivity"
             android:label="System Logs" />
         <activity
-            android:name=".ui.pages.SignInActivity"
+            android:name=".ui.pages.auth.SignInActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:launchMode="singleTop"
             android:label="@string/title_activity_sign_in" />
@@ -290,7 +290,7 @@
             android:parentActivityName=".ui.pages.home.HomeActivity" />
 
         <activity
-            android:name=".ui.pages.experiment.ExperimentSignUpActivity"
+            android:name=".ui.pages.auth.SignUpActivity"
             android:windowSoftInputMode="adjustPan" />
 
         <activity

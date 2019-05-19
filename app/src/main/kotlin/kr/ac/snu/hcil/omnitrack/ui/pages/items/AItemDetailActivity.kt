@@ -70,7 +70,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
     //==================================================================================================================
 
     protected val invalidOutsideDialogBuilder: MaterialDialog.Builder by lazy {
-        DialogHelper.makeSimpleAlertBuilder(this, "", null) {
+        DialogHelper.makeSimpleAlertBuilder(this, "", null, null) {
             finish()
         }
     }

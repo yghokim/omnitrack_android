@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.content.Intent
 import android.text.InputType
+import android.util.Patterns
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
@@ -10,16 +11,12 @@ import androidx.appcompat.widget.AppCompatImageButton
 import androidx.lifecycle.LifecycleObserver
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.afollestad.materialdialogs.MaterialDialog
-import com.squareup.picasso.Picasso
 import dagger.Lazy
 import dagger.internal.Factory
-import de.hdodenhof.circleimageview.CircleImageView
-import io.reactivex.BackpressureStrategy
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
 import io.realm.Realm
@@ -31,12 +28,10 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTUserDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.InformationUpload
 import kr.ac.snu.hcil.omnitrack.core.di.global.ResearchSync
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
-import kr.ac.snu.hcil.omnitrack.core.workers.OTInformationUploadWorker
 import kr.ac.snu.hcil.omnitrack.core.workers.OTResearchSynchronizationWorker
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
@@ -75,7 +70,6 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
 
     private val userWatchDisposable = SerialDisposable()
 
-    private val photoView: CircleImageView = view.findViewById(R.id.ui_user_photo)
     private val profileMenuButton: AppCompatImageButton = view.findViewById(R.id.ui_button_profile_menu)
 
     private val menuList: RecyclerView = view.findViewById(R.id.ui_menu_list)
@@ -96,17 +90,6 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
 
         (parentActivity.application as OTAndroidApp).applicationComponent.inject(this)
 
-        /*
-        val signOutButton = view.findViewById(R.id.ui_button_sign_out)
-        signOutButton.setOnClickListener {
-            if (AWSMobileClient.defaultMobileClient().identityManager.isUserSignedIn) {
-                AWSMobileClient.defaultMobileClient().identityManager.signOut()
-            } else {
-                val intent = Intent(parentActivity, SignInActivity::class.java)
-                parentActivity.startActivity(intent)
-                parentActivity.finish()
-            }
-        }*/
 
         val popupMenu = PopupMenu(parentActivity, profileMenuButton, Gravity.TOP or Gravity.END)
         popupMenu.inflate(R.menu.menu_sidebar_profile)
@@ -125,7 +108,9 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
             R.id.action_unlink_with_this_device -> {
                 DialogHelper.makeNegativePhrasedYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), R.string.msg_logout, onYes = {
                     eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_SIGNED_OUT)
-                    authManager.signOut()
+                    this.subscriptions.add(
+                            authManager.signOut().subscribe()
+                    )
                 }).show()
                 return true
             }
@@ -139,16 +124,35 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
         backendRealm = realmFactory.get()
 
         userWatchDisposable.set(
-                parentActivity.signedInUserObservable.toFlowable(BackpressureStrategy.LATEST).flatMap { userId ->
-                    backendRealm = realmFactory.get()
-                    return@flatMap backendRealm.where(OTUserDAO::class.java).equalTo("uid", userId).findFirstAsync().asFlowable<OTUserDAO>().filter { it.isValid && it.isLoaded }
-                }.subscribe { user ->
-                    view.ui_user_name.text = user.name
-                    view.ui_user_email.text = user.email
-                    Picasso.get().load(user.photoServerPath).fit().into(photoView)
-                })
+                authManager.authTokenChanged.subscribe { token ->
+                    val userName = authManager.userName
+                    if (userName != null) {
+                        if (Patterns.EMAIL_ADDRESS.matcher(userName).matches()) {
+                            //email
+                            val emailSplit = userName.split("@")
+                            view.ui_username_main.text = emailSplit.first()
+                            view.ui_username_sub.text = emailSplit.last()
+                        } else {
+                            //plain string
+                            view.ui_username_main.text = userName
+                            view.ui_username_sub.visibility = View.GONE
+                        }
+                    } else {
+                        view.ui_username_sub.text = "User signed out."
+                    }
+                }
+        )
+        /*
+parentActivity.signedInUserObservable.toFlowable(BackpressureStrategy.LATEST).flatMap { userId ->
+    backendRealm = realmFactory.get()
+    return@flatMap backendRealm.where(OTUserDAO::class.java).equalTo("uid", userId).findFirstAsync().asFlowable<OTUserDAO>().filter { it.isValid && it.isLoaded }
+}.subscribe { user ->
+    view.ui_user_name.text = user.name
+    view.ui_user_email.text = user.email
+    Picasso.get().load(user.photoServerPath).fit().into(photoView)
+})*/
 
-
+/*
         view.ui_button_edit_screen_name.setOnClickListener {
             screenNameDialogBuilder.input(null, view.ui_user_name.text, false) { dialog, input ->
                 val newScreenName = input.trim().toString()
@@ -178,7 +182,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                     }
                 }
             }.show()
-        }
+        }*/
     }
 
     fun onDestroy() {

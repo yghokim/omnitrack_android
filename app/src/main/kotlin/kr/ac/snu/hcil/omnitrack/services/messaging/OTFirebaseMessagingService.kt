@@ -172,7 +172,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun handleSignOutCommand(data: Map<String, String>) {
-        (application as OTAndroidApp).applicationComponent.getAuthManager().signOut()
+        (application as OTAndroidApp).applicationComponent.getAuthManager().signOut().blockingAwait()
     }
 
     private fun handleExperimentDropout(data: Map<String, String>) {
@@ -180,7 +180,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
         if (data.containsKey("experimentId")) {
             val experimentId = data["experimentId"]!!
             if (BuildConfig.DEFAULT_EXPERIMENT_ID == experimentId) {
-                (application as OTAndroidApp).applicationComponent.getAuthManager().signOut()
+                (application as OTAndroidApp).applicationComponent.getAuthManager().signOut().blockingAwait()
             }
         } else {
             println("experiment dropout message does not contain the experiment ID.")

@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.auth
 
 import androidx.annotation.Keep
 import com.google.gson.JsonObject
+import io.reactivex.Completable
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 
@@ -18,10 +19,12 @@ interface IAuthServerAPI {
             password: String,
             deviceInfo: OTDeviceInfo,
             invitationCode: String?,
-            demographicData: JsonObject?): Single<String>
+            demographicData: JsonObject?): Single<OTAuthApiController.AuthResponseData>
 
-    fun authenticate(username: String, password: String, deviceInfo: OTDeviceInfo): Single<String>
+    fun authenticate(username: String, password: String, deviceInfo: OTDeviceInfo): Single<OTAuthApiController.AuthResponseData>
 
     fun refreshToken(token: String): Single<String>
+
+    fun signOut(deviceInfo: OTDeviceInfo): Completable
 
 }

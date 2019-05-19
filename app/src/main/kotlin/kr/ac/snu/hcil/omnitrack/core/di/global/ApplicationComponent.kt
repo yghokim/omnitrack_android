@@ -61,13 +61,15 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.MultiLineChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.pages.SendReportActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.pages.SourceSelectionPage
+import kr.ac.snu.hcil.omnitrack.ui.pages.auth.SignInActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.auth.SignUpActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.auth.SignUpCredentialSlideFragment
+import kr.ac.snu.hcil.omnitrack.ui.pages.auth.SignUpViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.InvitationCodePromptSlideFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.export.PackageExportViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.export.UploadTemporaryPackageDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.*
@@ -299,8 +301,6 @@ interface ApplicationComponent {
 
     fun inject(viewModel: UploadTemporaryPackageDialogFragment.ViewModel)
 
-    fun inject(slide: InvitationCodePromptSlideFragment)
-
     fun inject(fragment: ServiceListFragment)
 
     fun inject(activity: ExternalServiceActivationActivity)
@@ -315,4 +315,10 @@ interface ApplicationComponent {
     fun inject(misfitApi: MisfitApi)
 
     fun inject(activity: ApiKeySettingsActivity)
+
+    fun inject(viewModel: SignUpViewModel)
+
+    fun inject(fragment: SignUpCredentialSlideFragment)
+
+    fun inject(activity: SignUpActivity)
 }

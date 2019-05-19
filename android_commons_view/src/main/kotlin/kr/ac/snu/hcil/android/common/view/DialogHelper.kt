@@ -47,9 +47,13 @@ object DialogHelper {
         return makeYesNoDialogBuilder(context, title, message, R.string.msg_yes, R.string.msg_no, onYes, onNo)
     }
 
-    fun makeSimpleAlertBuilder(context: Context, message: CharSequence, @StringRes okLabelRes: Int? = null, onOk: (() -> Unit)? = null): MaterialDialog.Builder {
+    fun makeSimpleAlertBuilder(context: Context, message: CharSequence, title: CharSequence?, @StringRes okLabelRes: Int? = null, onOk: (() -> Unit)? = null): MaterialDialog.Builder {
         return MaterialDialog.Builder(context)
-                .title("OmniTrack")
+                .apply {
+                    if (title != null) {
+                        this.title(title)
+                    }
+                }
                 .content(message)
                 .cancelable(false)
                 .positiveColorRes(R.color.colorPointed)

@@ -24,7 +24,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
-import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.auth.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceListFragment
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService

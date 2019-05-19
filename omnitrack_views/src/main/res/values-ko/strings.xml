@@ -12,4 +12,20 @@
     <string name="choice_add_new_entry">항목 추가</string>
     <string name="choice_add_new_entry_hint">새 선택지를 입력하세요.</string>
     <string name="choice_add_new_entry_error_duplicate">중복된 항목입니다.</string>
+
+    <string name="msg_auth_validation_error_username_blank">아이디는 빈칸이 아니어야 합니다.</string>
+    <string name="msg_auth_validation_error_username_length">아이디는 %1$d자 이상 %2$d자 이하여야 합니다.</string>
+    <string name="msg_auth_validation_error_username_alphanumeric">아이디는 알파벳이나 숫자로만 이루어져야 하며, 숫자로 시작할 수 없습니다.</string>
+
+    <string name="msg_auth_validation_error_password_blank">패스워드는 빈칸이 아니어야 합니다.</string>
+    <string name="msg_auth_validation_error_password_length">패스워드는 %1$d글자 이상이어야 합니다.</string>
+    <string name="username">아이디</string>
+    <string name="password">패스워드</string>
+    <string name="auth_sign_in">로그인</string>
+    <string name="create_new_account">새 계정 만들기</string>
+    <string name="msg_auth_confirm_password">패스워드 다시 입력</string>
+    <string name="msg_auth_invitation_code">초대 코드</string>
+    <string name="msg_auth_invitation_code_description">안내자로부터 전달받은 초대 코드를 입력해 주세요.</string>
+    <string name="auth_signin_wrong_credential">아이디 혹은 패스워드가 잘못되었습니다.</string>
+    <string name="msg_auth_description_username_researcher">아이디는 서버에 등록된 연구자 중 한 명의 이메일과 같아야 합니다.</string>
 </resources>

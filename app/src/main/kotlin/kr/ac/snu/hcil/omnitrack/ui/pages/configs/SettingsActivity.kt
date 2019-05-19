@@ -160,6 +160,7 @@ class SettingsActivity : AppCompatActivity(R.layout.activity_multibutton_single_
                                             TextHelper.fromHtml(
                                                     String.format(getString(R.string.msg_pref_dialog_content_ignore_battery_optimization_off), BuildConfig.APP_NAME)
                                             ),
+                                            null,
                                             R.string.msg_open) {
                                         settingsPrompter.askUserBatterOptimizationWhitelist()
                                     }

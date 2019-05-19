@@ -12,4 +12,22 @@
     <string name="choice_add_new_entry">Add New Entry</string>
     <string name="choice_add_new_entry_hint">Insert new entry</string>
     <string name="choice_add_new_entry_error_duplicate">Duplicate entry text</string>
+
+    <string name="msg_auth_validation_error_username_blank">Username should not be blank.</string>
+    <string name="msg_auth_validation_error_username_length">Username should have be between %1$d to %2$d characters.</string>
+    <string name="msg_auth_validation_error_username_alphanumeric">Username should consist of alpha-numeric characters only, and cannot be started with a number.</string>
+
+    <string name="msg_auth_validation_error_password_blank">Password should not be blank.</string>
+    <string name="msg_auth_validation_error_password_length">Password should not be shorter than %1$d.</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="auth_sign_in">Sign In</string>
+    <string name="create_new_account">Create New Account</string>
+    <string name="msg_auth_confirm_password">Confirm Password</string>
+    <string name="msg_auth_invitation_code">Invitation Code</string>
+    <string name="msg_auth_invitation_code_description">Use the invitation code you received from the experimenter.</string>
+    <string name="auth_signin_wrong_credential">Username or password is wrong.</string>
+    <string name="msg_auth_description_username_researcher">Username must match one of the registered researchers\' E-mails.</string>
+
+
 </resources>

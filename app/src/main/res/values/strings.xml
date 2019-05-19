@@ -419,8 +419,8 @@
     <string name="msg_send_report_error_message">Couldn\'t send inquiry because of an error. Please try it later.</string>
     <string name="msg_send_report_success_message">Sent inquiry successfully.</string>
     <string name="msg_background_logging_started_notification_message">Processing new item…</string>
-    <string name="msg_sign_in_google_succeeded">You were authorized successfully.</string>
-    <string name="msg_sign_in_google_canceled">The sign-in process was canceled.</string>
+    <string name="msg_signin_succeeded">Signed in successfully.</string>
+    <string name="msg_signin_canceled">The sign-in process was canceled.</string>
     <string name="msg_under_development">This feature is under development. It will be unlocked soon!</string>
     <string name="msg_permission_required">Permissions Required</string>
     <string name="msg_contacts_permission_required">Contacts permissions Required</string>

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    tools:context=".ui.pages.SignInActivity">
+    tools:context=".ui.pages.auth.SignInActivity">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ui_app_logo"
@@ -75,10 +75,12 @@
         android:id="@+id/ui_form_signin_username"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
-        android:layout_height="@dimen/button_height_normal"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:hint="Insert Username"
+        android:hint="@string/username"
+        app:errorEnabled="true"
+        app:hintTextAppearance="@style/TextInputHintTextAppearance"
         app:hintAnimationEnabled="true"
         app:hintEnabled="true"
         app:layout_constraintBottom_toTopOf="@id/ui_form_signin_password"
@@ -89,8 +91,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/ui_textfield_signin_username"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:digits="abcdefghijklmnopqrstuvwxyz1234567890"
+            android:layout_height="wrap_content"
             android:inputType="textVisiblePassword|textNoSuggestions" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -98,13 +99,15 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/ui_form_signin_password"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_height="wrap_content"
         android:layout_width="0dp"
-        android:layout_height="@dimen/button_height_normal"
+        android:hint="@string/password"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="3dp"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:hint="Insert Password"
+        app:errorEnabled="true"
         app:endIconMode="password_toggle"
+        app:hintTextAppearance="@style/TextInputHintTextAppearance"
         app:hintAnimationEnabled="true"
         app:hintEnabled="true"
         app:layout_constraintBottom_toTopOf="@+id/ui_button_signin"
@@ -115,20 +118,24 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/ui_textfield_signin_password"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/ui_button_signup"
         style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="@dimen/button_height_normal"
         android:layout_marginEnd="8dp"
-        android:text="Create New Account"
+        android:foregroundGravity="left"
+        android:text="@string/create_new_account"
+        android:textStyle="bold"
         android:textColor="@color/colorAccent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintBottom_toBottomOf="@id/ui_button_signin"
         app:layout_constraintEnd_toStartOf="@+id/ui_button_signin"
+        app:rippleColor="@color/textColorLight"
         app:layout_constraintStart_toStartOf="@id/ui_form_signin_username"
         app:layout_constraintTop_toTopOf="@id/ui_button_signin" />
 
@@ -138,7 +145,8 @@
         android:layout_height="@dimen/button_height_normal"
         android:layout_marginTop="6dp"
         android:backgroundTint="@color/colorPointed"
-        android:text="Sign In"
+        android:text="@string/auth_sign_in"
+        android:textStyle="bold"
         android:textColor="#FFF"
         app:layout_constraintEnd_toEndOf="@+id/ui_form_signin_password"
         app:layout_constraintTop_toBottomOf="@+id/ui_form_signin_password"

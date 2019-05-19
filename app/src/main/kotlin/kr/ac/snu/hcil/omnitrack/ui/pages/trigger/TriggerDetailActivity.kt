@@ -248,7 +248,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                                 finish()
                             } else {
                                 DialogHelper.makeSimpleAlertBuilder(this, errorMessages?.joinToString("\n")
-                                        ?: "Configuration is not valid.").show()
+                                        ?: "Configuration is not valid.", null).show()
                             }
                         }
                 )
@@ -274,7 +274,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                         finish()
                     } else {
                         DialogHelper.makeSimpleAlertBuilder(this, errorMessages?.joinToString("\n")
-                                ?: "Configuration is not valid.").show()
+                                ?: "Configuration is not valid.", null).show()
                     }
                 }
         )

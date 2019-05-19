@@ -56,7 +56,7 @@ class ServiceListFragment : OTFragment() {
     private val onActivatingColor: Int by lazy { ContextCompat.getColor(requireContext(), R.color.material_grey_100) }
 
     private val internetRequiredAlertBuilder: MaterialDialog.Builder by lazy {
-        DialogHelper.makeSimpleAlertBuilder(requireContext(), requireContext().resources.getString(R.string.msg_external_service_activation_requires_internet))
+        DialogHelper.makeSimpleAlertBuilder(requireContext(), requireContext().resources.getString(R.string.msg_external_service_activation_requires_internet), null)
     }
 
     private val apiKeyChangedBroadcastReceiver: BroadcastReceiver by lazy {

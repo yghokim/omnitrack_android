@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.pages.experiment
+package kr.ac.snu.hcil.omnitrack.ui.pages.auth
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,7 +13,7 @@ import us.feras.mdv.MarkdownView
 /**
  * Created by Young-Ho on 1/26/2017.
  */
-class ConsentFormSlideFragment : ExperimentSignUpActivity.SlideFragment(ExperimentSignUpActivity.ESlide.CONSENT_FORM) {
+class ConsentFormSlideFragment : SignUpActivity.SlideFragment(SignUpActivity.ESlide.CONSENT_FORM) {
 
     companion object {
         fun getInstanceFromAsset(path: String): ConsentFormSlideFragment {
