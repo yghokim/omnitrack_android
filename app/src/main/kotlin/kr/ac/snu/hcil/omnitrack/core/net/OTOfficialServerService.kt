@@ -16,6 +16,9 @@ import retrofit2.http.*
  */
 interface OTOfficialServerService {
 
+    @GET("api/user/validate_client")
+    fun validateClientCertified(): Single<Boolean>
+
     @GET("api/research/experiment/{experimentId}/consent")
     fun getExperimentConsentInfo(@Path("experimentId") experimentId: String): Single<ISynchronizationServerSideAPI.ExperimentConsentInfo>
 

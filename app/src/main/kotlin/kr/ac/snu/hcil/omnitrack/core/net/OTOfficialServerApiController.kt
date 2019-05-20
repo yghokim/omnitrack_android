@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.net
 
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.JsonObject
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -122,5 +123,10 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
         return service.verifyInvitationCode(experimentId, invitationCode)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+    }
+
+
+    override fun validateClientCertified(): Completable {
+        return service.validateClientCertified().ignoreElement()
     }
 }

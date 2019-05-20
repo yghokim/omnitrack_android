@@ -11,9 +11,6 @@ interface IAuthServerAPI {
     data class ServerUserInfo(val _id: String, val name: String?, val email: String, val picture: String?, val nameUpdatedAt: Long?,
                               val dataStore: JsonObject?)
 
-    @Keep
-    data class AuthenticationResult(val inserted: Boolean, val deviceLocalKey: String, val userInfo: ServerUserInfo?)
-
     fun register(
             username: String,
             password: String,

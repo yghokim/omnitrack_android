@@ -68,4 +68,5 @@ class OTAuthApiController(retrofit: Lazy<Retrofit>) : IAuthServerAPI {
     override fun signOut(deviceInfo: OTDeviceInfo): Completable {
         return service.signOut(jsonObject("deviceInfo" to deviceInfo.convertToJson())).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
+
 }

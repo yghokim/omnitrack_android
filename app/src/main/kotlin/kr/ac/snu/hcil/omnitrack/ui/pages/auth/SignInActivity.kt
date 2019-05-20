@@ -10,7 +10,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import dagger.Lazy
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -28,7 +27,8 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.di.global.ServerResponsive
-import kr.ac.snu.hcil.omnitrack.core.serialization.getStringCompat
+import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
+import kr.ac.snu.hcil.omnitrack.core.net.ServerError
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import retrofit2.HttpException
@@ -48,6 +48,9 @@ class SignInActivity : AppCompatActivity(R.layout.activity_sign_in), TextWatcher
 
     @field:[Inject ServerResponsive]
     protected lateinit var checkServerConnection: Provider<Completable>
+
+    @Inject
+    protected lateinit var serverApi: ISynchronizationServerSideAPI
 
     private val creationSubscription = CompositeDisposable()
 
@@ -96,7 +99,9 @@ class SignInActivity : AppCompatActivity(R.layout.activity_sign_in), TextWatcher
             //valid
             toBusyMode()
             creationSubscription.add(
-                    checkServerConnection.get().andThen(authManager.authenticate(username, password))
+                    checkServerConnection.get()
+                            .andThen(serverApi.validateClientCertified())
+                            .andThen(authManager.authenticate(username, password))
                             .observeOn(AndroidSchedulers.mainThread()).doAfterTerminate {
                                 toIdleMode()
                             }.subscribe(
@@ -116,12 +121,18 @@ class SignInActivity : AppCompatActivity(R.layout.activity_sign_in), TextWatcher
                                                     .setNeutralButton("Ok", null)
                                                     .show()
                                         } else if (e is HttpException) {
-                                            if (e.code() == 401) {
-
-                                                val errorObj = gson.fromJson<JsonObject>(e.response().errorBody()?.charStream(), JsonObject::class.java)
-                                                if (errorObj.getStringCompat("error") == "CredentialWrong") {
+                                            val serverErrorCode = ServerError.extractServerErrorCode(gson, e)
+                                            when (serverErrorCode) {
+                                                ServerError.ERROR_CODE_WRONG_CREDENTIAL -> {
                                                     ui_form_signin_username.error = getString(R.string.auth_signin_wrong_credential)
                                                     ui_form_signin_password.error = getString(R.string.auth_signin_wrong_credential)
+                                                }
+                                                ServerError.ERROR_CODE_UNCERTIFIED_CLIENT -> {
+                                                    val noticeDialogBuilder = DialogHelper.makeSimpleAlertBuilder(
+                                                            this,
+                                                            "This application is not certified in the server. You can't use this app unless the admin researcher registers this app.",
+                                                            "Client Not Verified")
+                                                    noticeDialogBuilder.show()
                                                 }
                                             }
                                         } else {
