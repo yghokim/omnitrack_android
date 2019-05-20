@@ -9,16 +9,20 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.auth0.android.jwt.JWT
 import com.google.gson.JsonObject
 import dagger.Lazy
+import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.Completable.defer
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
+import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,6 +34,7 @@ import javax.inject.Singleton
 class OTAuthManager @Inject constructor(
         private val context: Context,
         @Default private val sharedPreferences: SharedPreferences,
+        @Backend private val realmFactory: Factory<Realm>,
         private val triggerSystemManager: Lazy<OTTriggerSystemManager>,
         private val shortcutPanelManager: OTShortcutPanelManager,
         private val authApiController: Lazy<OTAuthApiController>) {
@@ -189,8 +194,16 @@ class OTAuthManager @Inject constructor(
                         .remove(PREF_KEY_TOKEN)
                         .remove(PREF_DEVICE_LOCAL_KEY).apply()
 
+
                 triggerSystemManager.get().checkOutAllFromSystem(lastUserId)
                 shortcutPanelManager.disposeShortcutPanel()
+
+                realmFactory.get().use { realm ->
+                    realm.executeTransactionIfNotIn {
+                        realm.deleteAll()
+                    }
+                }
+
                 notifySignedOut()
             }
         } else return Completable.complete()
