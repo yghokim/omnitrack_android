@@ -7,23 +7,16 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.auth0.android.jwt.JWT
-import com.google.gson.Gson
 import com.google.gson.JsonObject
 import dagger.Lazy
-import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.Completable.defer
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
-import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
-import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
-import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import org.jetbrains.anko.runOnUiThread
@@ -39,11 +32,7 @@ class OTAuthManager @Inject constructor(
         @Default private val sharedPreferences: SharedPreferences,
         private val triggerSystemManager: Lazy<OTTriggerSystemManager>,
         private val shortcutPanelManager: OTShortcutPanelManager,
-        private val eventLogger: Lazy<IEventLogger>,
-        @ForGeneric private val gson: Gson,
-        @Backend private val realmFactory: Factory<Realm>,
-        private val authApiController: Lazy<OTAuthApiController>,
-        private val synchronizationServerController: Lazy<ISynchronizationServerSideAPI>) {
+        private val authApiController: Lazy<OTAuthApiController>) {
 
     companion object {
         const val LOG_TAG = "OMNITRACK Auth Manager"
@@ -189,85 +178,6 @@ class OTAuthManager @Inject constructor(
             triggerSystemManager.get().checkInAllToSystem(userId!!)
         }
     }
-
-    /* TODO handle 'sign up' process.
-
-    fun handleSignInProcessResult(activityResult: Result<AppCompatActivity>): Single<Boolean> {
-        return Single.defer {
-            val result = Auth.GoogleSignInApi.getSignInResultFromIntent(activityResult.data())
-            if (result.isSuccess) {
-                //Signed in successfully.
-                println("signed in google account: ${result.signInAccount}")
-                firebaseAuthWithGoogle(result.signInAccount!!)
-
-                        .flatMap { authResult ->
-                            println("Signed in through Google account. try to push device info to server...")
-                            OTDeviceInfo.makeDeviceInfo(context)
-                        }
-                        .flatMap { deviceInfo ->
-                            if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
-                                synchronizationServerController.get()
-                                        .checkExperimentParticipationStatus(BuildConfig.DEFAULT_EXPERIMENT_ID)
-                                        .flatMap { isInExperiment ->
-                                            if (!isInExperiment) {
-                                                synchronizationServerController.get().getExperimentConsentInfo(BuildConfig.DEFAULT_EXPERIMENT_ID)
-                                                        .flatMap {
-                                                            if (BuildConfig.DEFAULT_INVITATION_CODE != null && (!it.receiveConsentInApp || (it.consent == null && it.demographicFormSchema == null))) {
-                                                                Single.just(Pair<String, JsonObject?>(BuildConfig.DEFAULT_INVITATION_CODE, null))
-                                                            } else RxActivityResult.on(activityResult.targetUI())
-                                                                    .startIntent(SignUpActivity.makeIntent(activityResult.targetUI(), BuildConfig.DEFAULT_INVITATION_CODE == null, if (it.receiveConsentInApp) it.consent else null, if (it.receiveConsentInApp) it.demographicFormSchema else null))
-                                                                    .firstOrError()
-                                                                    .map { result ->
-                                                                        if (result.resultCode() != Activity.RESULT_OK) {
-                                                                            throw CancellationException()
-                                                                        } else {
-                                                                            Pair<String, JsonObject?>(
-                                                                                    BuildConfig.DEFAULT_INVITATION_CODE
-                                                                                            ?: result.data().getStringExtra(SignUpActivity.INVITATION_CODE),
-                                                                                    result.data().getStringExtra(SignUpActivity.DEMOGRAPHIC_SCHEMA)?.let { serializedSchema ->
-                                                                                        gson.fromJson(serializedSchema, JsonObject::class.java)
-                                                                                    })
-                                                                        }
-                                                                    }
-                                                        }.flatMap {
-                                                            synchronizationServerController.get().authenticate(deviceInfo, it.first, it.second)
-                                                        }
-                                            } else synchronizationServerController.get().authenticate(deviceInfo, null, null)
-                                        }
-                            } else {
-                                //Pure experiment-free authentication
-                                synchronizationServerController.get().authenticate(deviceInfo, null, null)
-                            }
-                        }
-                        .flatMap { authenticationResult ->
-                            handleAuthenticationResult(authenticationResult)
-                        }
-                        .doOnSuccess { success ->
-                            if (success) {
-                                activityResult.targetUI().applicationContext.runOnUiThread { notifySignedIn() }
-                                triggerSystemManager.get().checkInAllToSystem(userId!!)
-                            }
-                        }.doOnError { ex ->
-                            ex.printStackTrace()
-                            firebaseAuth.signOut()
-                            Auth.GoogleSignInApi.signOut(mGoogleApiClient)
-                        }
-            } else if (result.status.isCanceled || result.status.statusCode == 12501) {
-                throw CancellationException(result.status.statusMessage)
-            } else {
-                println("Google sign in failed")
-                eventLogger.get().logExceptionEvent("GoogleSignInError",
-                        Exception(result.status.statusMessage),
-                        Thread.currentThread()) { json ->
-                    json.addProperty("statusCode", result.status.statusCode)
-                    json.addProperty("isInterrupted", result.status.isInterrupted)
-                    json.addProperty("isCanceled", result.status.isCanceled)
-                    json.addProperty("hasResolution", result.status.hasResolution())
-                }
-                return@defer Single.error<Boolean>(Exception("Google login process was failed. status code: ${result.status.statusCode}, message: ${result.status.statusMessage}"))
-            }
-        }
-    }*/
 
     fun signOut(): Completable {
         val lastUserId = userId

@@ -37,6 +37,10 @@ import javax.inject.Provider
 
 class SignInActivity : AppCompatActivity(R.layout.activity_sign_in), TextWatcher {
 
+    companion object {
+        private val LOG_TAG = "SignInActivity"
+    }
+
     @Inject
     protected lateinit var authManager: OTAuthManager
 
@@ -185,13 +189,5 @@ class SignInActivity : AppCompatActivity(R.layout.activity_sign_in), TextWatcher
     override fun onDestroy() {
         super.onDestroy()
         creationSubscription.clear()
-    }
-
-    companion object {
-        private val LOG_TAG = SignInActivity::class.java.simpleName
-        /**
-         * Permission Request Code (Must be < 256).
-         */
-        private val GET_ACCOUNTS_PERMISSION_REQUEST_CODE = 93
     }
 }
