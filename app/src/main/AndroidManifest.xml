@@ -207,6 +207,16 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.pages.AboutActivity" />
+
+        <activity
+            android:name=".ui.pages.auth.SignInActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_sign_in" />
+
+        <activity
+            android:name=".ui.pages.auth.SignUpActivity"
+            android:windowSoftInputMode="adjustPan" />
+
         <activity
             android:name=".ui.pages.home.HomeActivity"
             android:label="${appName}${appNameSuffix}" />
@@ -240,11 +250,6 @@
         <activity
             android:name=".ui.pages.diagnostics.SystemLogActivity"
             android:label="System Logs" />
-        <activity
-            android:name=".ui.pages.auth.SignInActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:launchMode="singleTop"
-            android:label="@string/title_activity_sign_in" />
 
         <activity
             android:name=".ui.pages.SendReportActivity"
@@ -289,9 +294,6 @@
             android:label="@string/msg_export_tracking_plan"
             android:parentActivityName=".ui.pages.home.HomeActivity" />
 
-        <activity
-            android:name=".ui.pages.auth.SignUpActivity"
-            android:windowSoftInputMode="adjustPan" />
 
         <activity
             android:name=".ui.pages.services.ApiKeySettingsActivity"

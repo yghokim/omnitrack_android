@@ -66,7 +66,6 @@ class SignInActivity : AppCompatActivity(R.layout.activity_sign_in), TextWatcher
         toIdleMode()
 
         ui_button_signup.setOnClickListener {
-
             startActivity(SignUpActivity.makeIntent(this))
         }
 
@@ -177,13 +176,12 @@ class SignInActivity : AppCompatActivity(R.layout.activity_sign_in), TextWatcher
     private fun goHomeActivity() {
         eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_SIGNED_IN)
         Log.d(LOG_TAG, "Launching Main Activity...")
+        finishAffinity()
         startActivity(Intent(this@SignInActivity, HomeActivity::class.java)
-                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                 .putExtra(OTApp.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, true)
                 .putExtra(HomeActivity.INTENT_EXTRA_INITIAL_LOGIN, true)
         )
-        // finish should always be called on the main thread.
-        finish()
     }
 
     override fun onDestroy() {

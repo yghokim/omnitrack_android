@@ -119,12 +119,12 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
                         creationSubscriptions.add(
                                 viewModel.tryRegister().observeOn(AndroidSchedulers.mainThread()).subscribe({
                                     startActivity(Intent(this@SignUpActivity, HomeActivity::class.java)
-                                            .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                            .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                                             .putExtra(OTApp.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, true)
                                             .putExtra(HomeActivity.INTENT_EXTRA_INITIAL_LOGIN, true)
                                     )
                                     // finish should always be called on the main thread.
-                                    finish()
+                                    finishAffinity()
                                 }, { err ->
                                     if (err is HttpException) {
                                         val errorCode = ServerError.extractServerErrorCode(gson, err)
