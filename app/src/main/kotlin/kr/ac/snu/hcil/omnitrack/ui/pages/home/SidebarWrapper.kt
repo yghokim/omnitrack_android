@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.content.Intent
-import android.text.InputType
 import android.util.Patterns
 import android.view.Gravity
 import android.view.MenuItem
@@ -14,12 +13,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import com.afollestad.materialdialogs.MaterialDialog
 import dagger.Lazy
 import dagger.internal.Factory
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
-import io.realm.Realm
 import kotlinx.android.synthetic.main.layout_home_sidebar.view.*
 import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.android.common.view.container.adapter.RecyclerViewMenuAdapter
@@ -28,7 +25,6 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.InformationUpload
 import kr.ac.snu.hcil.omnitrack.core.di.global.ResearchSync
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
@@ -47,9 +43,6 @@ import javax.inject.Provider
  */
 class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu.OnMenuItemClickListener, LifecycleObserver {
 
-    @field:[Inject Backend]
-    lateinit var realmFactory: Factory<Realm>
-
     @Inject
     lateinit var authManager: OTAuthManager
 
@@ -66,7 +59,6 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
     @field:[Inject ResearchSync]
     lateinit var researchSyncRequest: Provider<OneTimeWorkRequest>
 
-    private lateinit var backendRealm: Realm
 
     private val userWatchDisposable = SerialDisposable()
 
@@ -76,7 +68,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
 
     private val subscriptions = CompositeDisposable()
 
-
+/*
     private val screenNameDialogBuilder: MaterialDialog.Builder by lazy {
         MaterialDialog.Builder(parentActivity)
                 .title(R.string.msg_change_screen_name)
@@ -84,7 +76,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                 .inputRangeRes(1, 40, R.color.colorRed)
                 .cancelable(true)
                 .negativeText(R.string.msg_cancel)
-    }
+    }*/
 
     init {
 
@@ -106,7 +98,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
     override fun onMenuItemClick(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_unlink_with_this_device -> {
-                DialogHelper.makeNegativePhrasedYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), R.string.msg_logout, onYes = {
+                DialogHelper.makeNegativePhrasedYesNoDialogBuilder(parentActivity, null, parentActivity.getString(R.string.msg_profile_unlink_account_confirm), R.string.msg_logout, onYes = {
                     eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_SIGNED_OUT)
                     this.subscriptions.add(
                             authManager.signOut().subscribe()
@@ -121,25 +113,11 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
     }
 
     fun onCreate() {
-        backendRealm = realmFactory.get()
+        refreshUsername()
 
         userWatchDisposable.set(
                 authManager.authTokenChanged.subscribe { token ->
-                    val userName = authManager.userName
-                    if (userName != null) {
-                        if (Patterns.EMAIL_ADDRESS.matcher(userName).matches()) {
-                            //email
-                            val emailSplit = userName.split("@")
-                            view.ui_username_main.text = emailSplit.first()
-                            view.ui_username_sub.text = emailSplit.last()
-                        } else {
-                            //plain string
-                            view.ui_username_main.text = userName
-                            view.ui_username_sub.visibility = View.GONE
-                        }
-                    } else {
-                        view.ui_username_sub.text = "User signed out."
-                    }
+                    refreshUsername()
                 }
         )
         /*
@@ -185,15 +163,27 @@ parentActivity.signedInUserObservable.toFlowable(BackpressureStrategy.LATEST).fl
         }*/
     }
 
+    private fun refreshUsername() {
+        val userName = authManager.userName
+        if (userName != null) {
+            if (Patterns.EMAIL_ADDRESS.matcher(userName).matches()) {
+                //email
+                val emailSplit = userName.split("@")
+                view.ui_username_main.text = emailSplit.first()
+                view.ui_username_sub.text = emailSplit.last()
+            } else {
+                //plain string
+                view.ui_username_main.text = userName
+                view.ui_username_sub.visibility = View.GONE
+            }
+        } else {
+            view.ui_username_sub.text = "User signed out."
+        }
+    }
+
     fun onDestroy() {
         userWatchDisposable.set(null)
         subscriptions.clear()
-
-        if (this::backendRealm.isInitialized) {
-            if (!backendRealm.isClosed) {
-                backendRealm.close()
-            }
-        }
     }
 
     fun onShowSidebar() {

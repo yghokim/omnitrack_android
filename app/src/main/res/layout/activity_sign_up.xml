@@ -41,7 +41,7 @@
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="0dp"
             android:layout_height="@dimen/button_height_tall"
-            android:text="Next Step"
+            tools:text="Next Step"
             android:textAllCaps="false"
             android:textColor="@color/colorPointed"
             android:textSize="20sp"

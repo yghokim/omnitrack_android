@@ -28,4 +28,8 @@
     <string name="msg_auth_invitation_code_description">안내자로부터 전달받은 초대 코드를 입력해 주세요.</string>
     <string name="auth_signin_wrong_credential">아이디 혹은 패스워드가 잘못되었습니다.</string>
     <string name="msg_auth_description_username_researcher">아이디는 서버에 등록된 연구자 중 한 명의 이메일과 같아야 합니다.</string>
+    <string name="msg_auth_next_step">다음 단계로</string>
+    <string name="msg_auth_approve_and_continue">동의하고 계속하기</string>
+    <string name="msg_auth_sign_up_complete">완료하기</string>
+
 </resources>

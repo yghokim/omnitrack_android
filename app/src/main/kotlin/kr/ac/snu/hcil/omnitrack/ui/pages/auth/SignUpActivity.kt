@@ -6,13 +6,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProviders
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_sign_up.*
@@ -20,15 +20,14 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
-import kr.ac.snu.hcil.omnitrack.core.serialization.getStringCompat
+import kr.ac.snu.hcil.omnitrack.core.net.ServerError
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
-import org.jetbrains.anko.support.v4.onPageChangeListener
 import retrofit2.HttpException
 import javax.inject.Inject
 
 class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
-    enum class ESlide {
-        CONSENT_FORM,
+    enum class ESlide(@StringRes val nextStepLabel: Int = R.string.msg_auth_next_step) {
+        CONSENT_FORM(R.string.msg_auth_approve_and_continue),
         CREDENTIAL_FORM,
         DEMOGRAPHIC_QUESTIONNAIRE
     }
@@ -78,11 +77,6 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
                 viewModel.slideListInfo.observeOn(AndroidSchedulers.mainThread()).subscribe { (slides, data) ->
                     ui_button_next.isEnabled = true
                     ui_button_next.alpha = 1f
-                    this.slideList.clear()
-                    this.slideList.addAll(slides)
-                    this.adapter.notifyDataSetChanged()
-                    main_viewpager.setCurrentItem(0, false)
-                    updateProgressIndicator()
 
                     if (slides.contains(ESlide.DEMOGRAPHIC_QUESTIONNAIRE)) {
                         demographicSchema = data!![DEMOGRAPHIC_SCHEMA]!!
@@ -92,25 +86,29 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
                         consentFormMarkdown = data!![CONSENT_FORM]!!
                     }
 
+                    this.slideList.clear()
+                    this.slideList.addAll(slides)
+                    this.adapter.notifyDataSetChanged()
+                    main_viewpager.setCurrentItem(0, false)
+                    updateIndicators()
+
                     setBusyMode(false)
                 }
         )
-
-        main_viewpager.onPageChangeListener {
-            updateProgressIndicator()
-        }
 
         ui_button_previous.setOnClickListener {
             if (main_viewpager.currentItem == 0) {
                 setResult(Activity.RESULT_CANCELED)
                 finish()
             } else {
-
+                main_viewpager.currentItem--
+                updateIndicators()
             }
         }
 
         ui_button_next.setOnClickListener {
             viewModel.tryNext(slideList[main_viewpager.currentItem])
+            updateIndicators()
         }
 
         creationSubscriptions.add(
@@ -129,11 +127,19 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
                                     finish()
                                 }, { err ->
                                     if (err is HttpException) {
-                                        val errorBody = gson.fromJson(err.response().errorBody()?.charStream(), JsonObject::class.java)
-                                        val serverErrorCode = errorBody.getStringCompat("error")
-                                        when (serverErrorCode) {
-                                            "UsernameNotMatchResearcher" -> {
+                                        val errorCode = ServerError.extractServerErrorCode(gson, err)
+                                        when (errorCode) {
+                                            ServerError.ERROR_CODE_USERNAME_NOT_MATCH_RESEARCHER -> {
                                                 Toast.makeText(this, "Username must match one of the researchers' E-mails.", Toast.LENGTH_LONG).show()
+                                                main_viewpager.setCurrentItem(ESlide.values().indexOf(ESlide.CREDENTIAL_FORM), true)
+                                            }
+                                            ServerError.ERROR_CODE_ILLEGAL_INVITATION_CODE -> {
+                                                Toast.makeText(this, "You entered a wrong invitation code. Please re-check.", Toast.LENGTH_LONG).show()
+                                                main_viewpager.setCurrentItem(ESlide.values().indexOf(ESlide.CREDENTIAL_FORM), true)
+                                            }
+                                            ServerError.ERROR_CODE_USER_ALREADY_EXISTS -> {
+                                                Toast.makeText(this, "You can't use this username. Please try another one.", Toast.LENGTH_LONG).show()
+                                                main_viewpager.setCurrentItem(ESlide.values().indexOf(ESlide.CREDENTIAL_FORM), true)
                                             }
                                         }
                                     } else {
@@ -148,8 +154,15 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
         )
     }
 
-    private fun updateProgressIndicator() {
-        ui_progress_indicator.text = "${main_viewpager.currentItem + 1}/${slideList.size}"
+    private fun updateIndicators() {
+        if (slideList.size > 0) {
+            ui_progress_indicator.text = "${main_viewpager.currentItem + 1}/${slideList.size}"
+            ui_button_next.setText(if (main_viewpager.currentItem == slideList.size - 1) {
+                R.string.msg_auth_sign_up_complete
+            } else {
+                slideList[main_viewpager.currentItem].nextStepLabel
+            })
+        }
     }
 
     private fun setBusyMode(isBusy: Boolean) {
@@ -171,8 +184,8 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
 
         override fun getItem(position: Int): Fragment {
             return when (slideList[position]) {
-                ESlide.CREDENTIAL_FORM -> SignUpCredentialSlideFragment()
                 ESlide.CONSENT_FORM -> ConsentFormSlideFragment.getInstanceFromString(consentFormMarkdown)
+                ESlide.CREDENTIAL_FORM -> SignUpCredentialSlideFragment()
                 ESlide.DEMOGRAPHIC_QUESTIONNAIRE -> DemographicQuestionnaireSlideFragment.getInstance(demographicSchema)
             }
         }

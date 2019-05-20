@@ -28,6 +28,9 @@
     <string name="msg_auth_invitation_code_description">Use the invitation code you received from the experimenter.</string>
     <string name="auth_signin_wrong_credential">Username or password is wrong.</string>
     <string name="msg_auth_description_username_researcher">Username must match one of the registered researchers\' E-mails.</string>
+    <string name="msg_auth_next_step">Next Step</string>
+    <string name="msg_auth_approve_and_continue">Approve and Continue</string>
+    <string name="msg_auth_sign_up_complete">Complete</string>
 
 
 </resources>

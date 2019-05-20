@@ -37,13 +37,13 @@ object DialogHelper {
                 }
     }
 
-    fun makeNegativePhrasedYesNoDialogBuilder(context: Context, title: String, message: String, yesLabel: Int = R.string.msg_yes, noLabel: Int = R.string.msg_no, onYes: ((Dialog) -> Unit)?, onNo: ((Dialog) -> Unit)? = null): MaterialDialog.Builder {
+    fun makeNegativePhrasedYesNoDialogBuilder(context: Context, title: String?, message: String, yesLabel: Int = R.string.msg_yes, noLabel: Int = R.string.msg_no, onYes: ((Dialog) -> Unit)?, onNo: ((Dialog) -> Unit)? = null): MaterialDialog.Builder {
         return makeYesNoDialogBuilder(context, title, message, yesLabel, noLabel, onYes, onNo)
                 .positiveColorRes(R.color.colorRed_Light)
                 .negativeColorRes(R.color.colorPointed)
     }
 
-    fun makeYesNoDialogBuilder(context: Context, title: String, message: String, onYes: ((Dialog) -> Unit)?, onNo: ((Dialog) -> Unit)? = null): MaterialDialog.Builder {
+    fun makeYesNoDialogBuilder(context: Context, title: String?, message: String, onYes: ((Dialog) -> Unit)?, onNo: ((Dialog) -> Unit)? = null): MaterialDialog.Builder {
         return makeYesNoDialogBuilder(context, title, message, R.string.msg_yes, R.string.msg_no, onYes, onNo)
     }
 

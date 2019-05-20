@@ -80,12 +80,12 @@ class OTAuthManager @Inject constructor(
 
     val userName: String?
         get() {
-            return decodedToken?.getClaim("username").toString()
+            return decodedToken?.getClaim("username")?.asString()
         }
 
     val userId: String?
         get() {
-            val id = decodedToken?.getClaim("uid").toString()
+            val id = decodedToken?.getClaim("uid")?.asString()
             println("user id: $id")
             return id
         }
