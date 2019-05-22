@@ -33,7 +33,7 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
     }
 
     companion object {
-        const val INVITATION_CODE = "invitation_code"
+        const val CURRENT_SLIDE = "current_slide"
         const val CONSENT_FORM = "consent_form"
         const val DEMOGRAPHIC_SCHEMA = "demographic_schema"
 
@@ -89,7 +89,11 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
                     this.slideList.clear()
                     this.slideList.addAll(slides)
                     this.adapter.notifyDataSetChanged()
-                    main_viewpager.setCurrentItem(0, false)
+                    if (savedInstanceState != null && savedInstanceState.containsKey(CURRENT_SLIDE)) {
+                        main_viewpager.setCurrentItem(slideList.indexOf(ESlide.valueOf(savedInstanceState.getString(CURRENT_SLIDE)!!)), false)
+                    } else {
+                        main_viewpager.setCurrentItem(0, false)
+                    }
                     updateIndicators()
 
                     setBusyMode(false)
@@ -152,6 +156,13 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
                     }
                 }
         )
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (slideList.size > 0) {
+            outState.putString(CURRENT_SLIDE, slideList[this.main_viewpager.currentItem].name)
+        }
     }
 
     private fun updateIndicators() {
