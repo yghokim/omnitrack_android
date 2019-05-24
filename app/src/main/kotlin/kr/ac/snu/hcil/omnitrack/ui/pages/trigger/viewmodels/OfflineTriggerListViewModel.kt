@@ -42,8 +42,8 @@ open class OfflineTriggerListViewModel(app: Application) : ATriggerListViewModel
     }
 
     override fun addNewTriggerImpl(dao: OTTriggerDAO) {
-        if (dao.objectId != null) {
-            val match = currentTriggerViewModels.find { it.objectId == dao.objectId }
+        if (dao._id != null) {
+            val match = currentTriggerViewModels.find { it._id == dao._id }
             if (match != null) {
                 match.apply(dao)
                 return
@@ -55,7 +55,7 @@ open class OfflineTriggerListViewModel(app: Application) : ATriggerListViewModel
     }
 
     override fun removeTrigger(objectId: String) {
-        currentTriggerViewModels.find { it.objectId == objectId }?.let {
+        currentTriggerViewModels.find { it._id == objectId }?.let {
             it.unregister()
             currentTriggerViewModels.remove(it)
             notifyNewTriggerViewModels()

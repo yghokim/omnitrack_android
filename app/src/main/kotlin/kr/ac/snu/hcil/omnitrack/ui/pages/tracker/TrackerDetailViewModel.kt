@@ -337,7 +337,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     fun addNewAttribute(name: String, type: Int, processor: ((OTAttributeDAO, Realm) -> OTAttributeDAO)? = null) {
         val newDao = OTAttributeDAO()
-        newDao.objectId = UUID.randomUUID().toString()
+        newDao._id = UUID.randomUUID().toString()
         newDao.name = name
         newDao.type = type
         newDao.trackerId = trackerId
@@ -346,7 +346,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
         if (trackerDao != null) {
             newDao.localId = attributeManager.get().makeNewAttributeLocalId(newDao.userCreatedAt)
-            newDao.trackerId = trackerDao?.objectId
+            newDao.trackerId = trackerDao?._id
 
             realm.executeTransactionIfNotIn {
                 trackerDao?.attributes?.add(newDao)
@@ -377,9 +377,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     fun removeAttribute(attrViewModel: AttributeInformationViewModel) {
         if (trackerDao != null) {
-            lastRemovedAttributeId = attrViewModel.objectId
+            lastRemovedAttributeId = attrViewModel._id
             realm.executeTransactionIfNotIn {
-                val attribute = trackerDao?.attributes?.find { it.objectId == attrViewModel.objectId }
+                val attribute = trackerDao?.attributes?.find { it._id == attrViewModel._id }
                 if (attribute != null) {
                     attribute.isInTrashcan = true
                 }
@@ -433,7 +433,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     private val areAttributesDirty: Boolean
         get() {
             return if (initialSnapshotDao == null) false else (currentAttributeViewModelList.find { it.isDirty == true } != null) ||
-                    !Arrays.equals(initialSnapshotDao?.attributes?.map { attr -> attr.objectId }?.toTypedArray(), currentAttributeViewModelList.map { it.attributeDAO.objectId }.toTypedArray())
+                    !Arrays.equals(initialSnapshotDao?.attributes?.map { attr -> attr._id }?.toTypedArray(), currentAttributeViewModelList.map { it.attributeDAO._id }.toTypedArray())
         }
 
     val isDirty: Boolean
@@ -444,7 +444,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     private fun makeUnmanagedTrackerDaoFromSettings(): OTTrackerDAO {
         val trackerDao = OTTrackerDAO()
-        trackerDao.objectId = UUID.randomUUID().toString()
+        trackerDao._id = UUID.randomUUID().toString()
         trackerDao.userId = authManager.get().userId
         trackerDao.name = nameObservable.value ?: ""
         trackerDao.isBookmarked = isBookmarkedObservable.value ?: false
@@ -472,7 +472,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
             currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
                 attrViewModel.attributeDAO.localId = attributeManager.get().makeNewAttributeLocalId(attrViewModel.attributeDAO.userCreatedAt)
-                attrViewModel.attributeDAO.trackerId = trackerDao.objectId
+                attrViewModel.attributeDAO.trackerId = trackerDao._id
                 attrViewModel.attributeDAO.position = index
             }
 
@@ -489,9 +489,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             registerSyncJob()
         }
 
-        onChangesApplied.onNext(trackerDao!!.objectId!!)
+        onChangesApplied.onNext(trackerDao!!._id!!)
 
-        return trackerDao!!.objectId!!
+        return trackerDao!!._id!!
     }
 
     fun clearTrackerSynchronizationFlag() {
@@ -519,7 +519,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     }
 
     class AttributeInformationViewModel(_attributeDAO: OTAttributeDAO, val realm: Realm, val attributeManager: OTAttributeManager, val connectionTypeAdapter: OTConnection.ConnectionTypeAdapter) : IReadonlyObjectId, RealmChangeListener<OTAttributeDAO> {
-        override val objectId: String? = _attributeDAO.objectId
+        override val _id: String? = _attributeDAO._id
 
         var attributeDAO: OTAttributeDAO = _attributeDAO
             private set
@@ -636,7 +636,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
         fun makeFrontalChangesToDao(): OTAttributeDAO {
             val dao = OTAttributeDAO()
-            dao.objectId = attributeDAO.objectId
+            dao._id = attributeDAO._id
             dao.type = attributeDAO.type
             dao.localId = attributeDAO.localId
             dao.position = attributeDAO.position

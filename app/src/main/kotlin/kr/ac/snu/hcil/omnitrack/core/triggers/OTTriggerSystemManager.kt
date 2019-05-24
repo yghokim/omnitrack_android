@@ -33,7 +33,7 @@ class OTTriggerSystemManager(
     }
 
     fun handleTriggerOn(managedTrigger: OTTriggerDAO) {
-        println("TriggerSystemManager: handleTriggerOn: ${managedTrigger.objectId}")
+        println("TriggerSystemManager: handleTriggerOn: ${managedTrigger._id}")
         when (managedTrigger.conditionType) {
             OTTriggerDAO.CONDITION_TYPE_TIME -> {
                 triggerAlarmManager.get().registerTriggerAlarm(System.currentTimeMillis(), managedTrigger)
@@ -45,7 +45,7 @@ class OTTriggerSystemManager(
     }
 
     fun handleTriggerOff(managedTrigger: OTTriggerDAO) {
-        println("TriggerSystemManager: handleTriggerOff: ${managedTrigger.objectId}")
+        println("TriggerSystemManager: handleTriggerOff: ${managedTrigger._id}")
         when (managedTrigger.conditionType) {
             OTTriggerDAO.CONDITION_TYPE_TIME -> {
                 triggerAlarmManager.get().cancelTrigger(managedTrigger)
@@ -67,7 +67,7 @@ class OTTriggerSystemManager(
 
 
     fun tryCheckInToSystem(managedTrigger: OTTriggerDAO): Boolean {
-        println("TriggerSystemManager: tryCheckInToSystem: ${managedTrigger.objectId}")
+        println("TriggerSystemManager: tryCheckInToSystem: ${managedTrigger._id}")
         if (!BuildConfig.DISABLE_EXTERNAL_ENTITIES || managedTrigger.experimentIdInFlags == BuildConfig.DEFAULT_EXPERIMENT_ID) {
             if (managedTrigger.isOn) {
                 when (managedTrigger.conditionType) {
@@ -89,7 +89,7 @@ class OTTriggerSystemManager(
     }
 
     fun tryCheckOutFromSystem(managedTrigger: OTTriggerDAO): Boolean {
-        println("TriggerSystemManager: tryCheckOutFromSystem: ${managedTrigger.objectId}")
+        println("TriggerSystemManager: tryCheckOutFromSystem: ${managedTrigger._id}")
         handleTriggerOff(managedTrigger)
         return false
     }

@@ -236,7 +236,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         if (this.viewModel.trackerId == trackerId) {
             if (itemId != null) {
-                val item = items.find { item -> item.objectId == itemId }
+                val item = items.find { item -> item._id == itemId }
                 if (item != null) {
                     item.setValueOf(attributeLocalId, value?.let { TypeStringSerializationHelper.serialize(it) })
 
@@ -326,10 +326,10 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     fun deleteItemPermanently(position: Int): String? {
         val removedItem = items[position]
-        removedItem.objectId?.let {
+        removedItem._id?.let {
             viewModel.removeItem(it)
         }
-        return removedItem.objectId
+        return removedItem._id
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -371,7 +371,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         }
 
         override fun onRemoveItem(position: Int) {
-            items.removeAt(position).objectId?.let { removedItems += it }
+            items.removeAt(position)._id?.let { removedItems += it }
             removalSnackbar.show()
         }
 
@@ -459,7 +459,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             override fun onMenuItemClick(p0: MenuItem): Boolean {
                 when (p0.itemId) {
                     R.id.action_edit -> {
-                        val intent = ItemEditActivity.makeItemEditPageIntent(items[adapterPosition].objectId!!, viewModel.trackerId, this@ItemBrowserActivity)
+                        val intent = ItemEditActivity.makeItemEditPageIntent(items[adapterPosition]._id!!, viewModel.trackerId, this@ItemBrowserActivity)
                         intent.putExtra(OTApp.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
                         startActivityForResult(intent, REQUEST_CODE_EDIT_ITEM)
                         return true
@@ -577,7 +577,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                         try {
 
                             val item = getParent()
-                            AttributeEditDialogFragment.makeInstance(item.objectId!!, attributeLocalId!!, viewModel.trackerId, this@ItemBrowserActivity)
+                            AttributeEditDialogFragment.makeInstance(item._id!!, attributeLocalId!!, viewModel.trackerId, this@ItemBrowserActivity)
                                     .show(this@ItemBrowserActivity.supportFragmentManager, "ValueModifyDialog")
                         } catch (e: Exception) {
                             e.printStackTrace()
@@ -864,7 +864,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     val exportUri = data.data
                     if (exportUri != null) {
                         println(exportUri.toString())
-                        viewModel.trackerDao.objectId?.let {
+                        viewModel.trackerDao._id?.let {
                             val serviceIntent = OTTableExportService.makeIntent(requireActivity(), it, exportUri.toString(), exportConfigIncludeFile, exportConfigTableFileType)
                             this@SettingsDialogFragment.dismiss()
                             activity?.startService(serviceIntent)

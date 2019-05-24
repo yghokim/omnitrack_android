@@ -78,7 +78,7 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
             isOffline = false
             viewModelMode.onNext(MODE_EDIT)
             this.triggerId = triggerId
-            val dao = dbManager.get().makeTriggersOfUserVisibleQuery(userId, realm).equalTo("objectId", triggerId).findFirst()
+            val dao = dbManager.get().makeTriggersOfUserVisibleQuery(userId, realm).equalTo("_id", triggerId).findFirst()
             if (dao != null) {
                 this.originalTriggerDao = dao
                 this.attachedTrackersRealmResults = dao.liveTrackersQuery.findAllAsync()
@@ -152,7 +152,7 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
         useScript.value?.let { outState.putBoolean("useScript", it) }
 
         if (attachedTrackers.value?.isNotEmpty() == true) {
-            outState.putStringArray("trackers", attachedTrackers.value!!.map { it.objectId }.toTypedArray())
+            outState.putStringArray("trackers", attachedTrackers.value!!.map { it._id }.toTypedArray())
         }
     }
 
@@ -216,8 +216,8 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
             if (triggerDao == null) return true
             else {
                 return !Arrays.equals(
-                        attachedTrackers.value?.map { it.objectId }?.toTypedArray() ?: emptyArray(),
-                        triggerDao.trackers.map { it.objectId }.toTypedArray()
+                        attachedTrackers.value?.map { it._id }?.toTypedArray() ?: emptyArray(),
+                        triggerDao.trackers.map { it._id }.toTypedArray()
                 )
             }
         }
@@ -237,9 +237,9 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
                 dao.checkScript = useScript.value ?: false
                 dao.trackers.clear()
                 attachedTrackers.value?.let {
-                    val trackerIds = it.mapNotNull { it.objectId }.toTypedArray()
+                    val trackerIds = it.mapNotNull { it._id }.toTypedArray()
                     if (trackerIds.isNotEmpty()) {
-                        val trackers = realm.where(OTTrackerDAO::class.java).`in`("objectId", trackerIds).findAll()
+                        val trackers = realm.where(OTTrackerDAO::class.java).`in`("_id", trackerIds).findAll()
                         if (dao.isManaged) {
                             dao.trackers.addAll(trackers)
                         } else {

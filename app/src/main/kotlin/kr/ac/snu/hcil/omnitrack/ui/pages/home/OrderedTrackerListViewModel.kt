@@ -39,7 +39,7 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
     val isDirty: Boolean
         get() {
             if (currentOrderedTrackerViewModels.filterIndexed { index, model -> model.dao.position != index }.isNotEmpty()) {
-                return !Arrays.equals(initialOrder.toTypedArray(), currentOrderedTrackerViewModels.map { it.dao.objectId!! }.toTypedArray())
+                return !Arrays.equals(initialOrder.toTypedArray(), currentOrderedTrackerViewModels.map { it.dao._id!! }.toTypedArray())
 
             } else return false
         }
@@ -60,20 +60,20 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
         if (changeSet.state == OrderedCollectionChangeSet.State.INITIAL)
         {
             //initial
-            initialOrder = snapshot.map { it.objectId!! }.toMutableList()
+            initialOrder = snapshot.map { it._id!! }.toMutableList()
 
             currentOrderedTrackerViewModels.clear()
             currentOrderedTrackerViewModels.addAll(snapshot.map{OrderedTrackerViewModel(it)})
         }
         else{
-            initialOrder.removeAll(changeSet.deletions.map { currentOrderedTrackerViewModels[it].objectId })
+            initialOrder.removeAll(changeSet.deletions.map { currentOrderedTrackerViewModels[it]._id })
             currentOrderedTrackerViewModels.removeAll(changeSet.deletions.map { currentOrderedTrackerViewModels[it] })
             changeSet.insertions.forEach {
                 currentOrderedTrackerViewModels.add(it, OrderedTrackerViewModel(snapshot[it]!!))
             }
 
             changeSet.changes.forEach {
-                onTrackerInfoChanged.onNext(currentOrderedTrackerViewModels[it].objectId!!)
+                onTrackerInfoChanged.onNext(currentOrderedTrackerViewModels[it]._id!!)
             }
         }
         orderedTrackerViewModels.onNext(currentOrderedTrackerViewModels)
@@ -105,7 +105,7 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
     }
 
     class OrderedTrackerViewModel(internal val dao: OTTrackerDAO) : IReadonlyObjectId {
-        override val objectId: String? = dao.objectId
+        override val _id: String? = dao._id
         val name: String get() = dao.name
         val color: Int get() = dao.color
     }

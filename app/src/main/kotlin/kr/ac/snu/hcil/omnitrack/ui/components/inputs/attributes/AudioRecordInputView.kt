@@ -147,7 +147,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
         valueView.mediaSessionId = attributeObjectId
 
         val realm = realmProvider.get()
-        val attributeInfo = realm.where(OTAttributeDAO::class.java).equalTo("objectId", attributeObjectId).findFirst()
+        val attributeInfo = realm.where(OTAttributeDAO::class.java).equalTo("_id", attributeObjectId).findFirst()
         if (attributeInfo != null) {
             val trackerName = attributeInfo.trackerId?.let {
                 val trackerInfo = dbManager.get().getTrackerQueryWithId(it, realm).findFirst()

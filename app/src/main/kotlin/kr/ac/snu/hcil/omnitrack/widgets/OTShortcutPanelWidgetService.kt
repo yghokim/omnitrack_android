@@ -75,7 +75,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
                     OTShortcutPanelWidgetUpdateService.MODE_SELECTIVE -> {
                         val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(widgetId, pref)?.toTypedArray()
                         if (selectedTrackerIds?.isNotEmpty() == true) {
-                            trackers.addAll(dbManager.makeTrackersOfUserVisibleQuery(userId, realm).`in`("objectId", selectedTrackerIds).findAll().map { it.getSimpleInfo() })
+                            trackers.addAll(dbManager.makeTrackersOfUserVisibleQuery(userId, realm).`in`("_id", selectedTrackerIds).findAll().map { it.getSimpleInfo() })
                         }
                     }
                 }
@@ -135,7 +135,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
             buttonCanvas.drawCircle(buttonRadius, buttonRadius, buttonRadius, paint)
             rv.setImageViewBitmap(R.id.ui_background_image, buttonBitmap)
 
-            val baseTrackerIntent = Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+            val baseTrackerIntent = Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker._id)
             rv.setOnClickFillInIntent(R.id.ui_clickable_area, Intent(baseTrackerIntent).putExtra(OTShortcutPanelWidgetProvider.EXTRA_CLICK_COMMAND, OTShortcutPanelWidgetProvider.CLICK_COMMAND_ROW))
             rv.setOnClickFillInIntent(R.id.ui_button_instant, Intent(baseTrackerIntent).putExtra(OTShortcutPanelWidgetProvider.EXTRA_CLICK_COMMAND, OTShortcutPanelWidgetProvider.CLICK_COMMAND_INSTANT_LOGGING))
 

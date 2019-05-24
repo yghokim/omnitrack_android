@@ -85,7 +85,7 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
     }
 
     override fun removeTrigger(objectId: String) {
-        val viewModel = currentTriggerViewModels.find { it.objectId == objectId }
+        val viewModel = currentTriggerViewModels.find { it._id == objectId }
         if (viewModel != null) {
             dbManager.get().removeTrigger(viewModel.dao, false, realm)
             syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD, ignoreDirtyFlags = false)

@@ -92,8 +92,8 @@ class TrackerAssignPanel : RecyclerView {
             subscriptions.add(
                     dbManager.makeTrackersOfUserVisibleQuery(authManager.userId!!, it).findAllAsync()
                             .asFlowable().filter { it.isLoaded && it.isValid }.firstOrError().subscribe { snapshot ->
-                        val dialog = TrackerPickerDialogBuilder(snapshot.map { it.getSimpleInfo() }).createDialog(getActivity()!!, trackers.mapNotNull { it.objectId }.toTypedArray()) { trackerId ->
-                            snapshot.find { it.objectId == trackerId }?.getSimpleInfo()?.let {
+                                val dialog = TrackerPickerDialogBuilder(snapshot.map { it.getSimpleInfo() }).createDialog(getActivity()!!, trackers.mapNotNull { it._id }.toTypedArray()) { trackerId ->
+                                    snapshot.find { it._id == trackerId }?.getSimpleInfo()?.let {
                                 trackers.add(it)
                                 elementAdapter.notifyItemInserted(trackers.size - 1)
                                 notifyTrackerListChanged()

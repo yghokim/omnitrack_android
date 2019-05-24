@@ -79,7 +79,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
     private val triggerFireBroadcastReceiver: BroadcastReceiver by lazy {
         object : TriggerFireBroadcastReceiver() {
             override fun onTriggerFired(triggerId: String, triggerTime: Long) {
-                currentTriggerViewModelList.find { it.dao.objectId == triggerId }?.onFired(triggerTime)
+                currentTriggerViewModelList.find { it.dao._id == triggerId }?.onFired(triggerTime)
             }
         }
     }
@@ -338,7 +338,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             when {
                 view === itemView.ui_button_proxy -> {
                     val intent = if (viewModel is AManagedTriggerListViewModel) {
-                        TriggerDetailActivity.makeEditTriggerIntent(context!!, attachedViewModel!!.objectId!!, viewModel.defaultTriggerInterfaceOptions)
+                        TriggerDetailActivity.makeEditTriggerIntent(context!!, attachedViewModel!!._id!!, viewModel.defaultTriggerInterfaceOptions)
                     } else if (viewModel is OfflineTriggerListViewModel) {
                         TriggerDetailActivity.makeEditTriggerIntent(context!!, attachedViewModel!!.dao, viewModel.defaultTriggerInterfaceOptions)
                     } else throw UnsupportedOperationException()
@@ -351,7 +351,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                             subscriptions.add(
                                     it.observeOn(AndroidSchedulers.mainThread()).subscribe({
                                         eventLogger.get().logTriggerChangeEvent(
-                                                IEventLogger.SUB_EDIT, attachedViewModel?.objectId
+                                                IEventLogger.SUB_EDIT, attachedViewModel?._id
                                         ) { content ->
                                             content[IEventLogger.CONTENT_KEY_PROPERTY] = "switch"
                                             attachedViewModel?.triggerSwitch?.value?.let {
@@ -379,10 +379,10 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                         String.format(getString(R.string.msg_format_confirm_remove_trigger), getString(OTTriggerInformationHelper.getActionNameResId(viewModel.defaultTriggerInterfaceOptions.defaultActionType)
                                 ?: 0)),
                         R.string.msg_remove, R.string.msg_cancel, {
-                    attachedViewModel?.objectId?.let {
+                    attachedViewModel?._id?.let {
                         viewModel.removeTrigger(it)
                         eventLogger.get().logTriggerChangeEvent(
-                                IEventLogger.SUB_REMOVE, attachedViewModel?.objectId
+                                IEventLogger.SUB_REMOVE, attachedViewModel?._id
                         )
                     }
                 }, onNo = null).show()

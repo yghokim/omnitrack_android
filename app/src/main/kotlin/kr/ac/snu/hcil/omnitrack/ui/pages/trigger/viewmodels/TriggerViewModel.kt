@@ -33,8 +33,8 @@ open class TriggerViewModel(val context: Context, val dao: OTTriggerDAO, val rea
     @Inject
     protected lateinit var triggerSystemManager: OTTriggerSystemManager
 
-    override val objectId: String?
-        get() = dao.objectId
+    override val _id: String?
+        get() = dao._id
 
     val triggerActionType: BehaviorSubject<Byte> = BehaviorSubject.create()
     val triggerAction = BehaviorSubject.create<OTTriggerAction>()
@@ -189,9 +189,9 @@ open class TriggerViewModel(val context: Context, val dao: OTTriggerDAO, val rea
                         return@defer dao.isValidToTurnOn(context)
                                 .flatMapCompletable { (validationError) ->
                                     if (validationError == null) {
-                                        val id = dao.objectId
+                                        val id = dao._id
                                         realm.executeTransactionAsObservable { realm ->
-                                            realm.where(OTTriggerDAO::class.java).equalTo("objectId", id).findFirst()
+                                            realm.where(OTTriggerDAO::class.java).equalTo("_id", id).findFirst()
                                                     ?.apply {
                                                         isOn = true
                                                         synchronizedAt = null
@@ -226,9 +226,9 @@ open class TriggerViewModel(val context: Context, val dao: OTTriggerDAO, val rea
             } else {
                 if (dao.isOn) {
                     if (dao.isManaged) {
-                        val id = dao.objectId
+                        val id = dao._id
                         realm.executeTransactionAsObservable { realm ->
-                            realm.where(OTTriggerDAO::class.java).equalTo("objectId", id).findFirst()
+                            realm.where(OTTriggerDAO::class.java).equalTo("_id", id).findFirst()
                                     ?.apply {
                                         isOn = false
                                         synchronizedAt = null

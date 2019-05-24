@@ -78,7 +78,18 @@ class SignUpViewModel(app: Application) : AndroidViewModel(app) {
                         //study mode
                         serverApiController.getExperimentConsentInfo(BuildConfig.DEFAULT_EXPERIMENT_ID).map {
                             if (it.receiveConsentInApp) {
-                                Pair(arrayOf(SignUpActivity.ESlide.CONSENT_FORM, SignUpActivity.ESlide.CREDENTIAL_FORM, SignUpActivity.ESlide.DEMOGRAPHIC_QUESTIONNAIRE), mapOf(
+                                val slides = ArrayList<SignUpActivity.ESlide>()
+                                if (it.consent != null) {
+                                    slides.add(SignUpActivity.ESlide.CONSENT_FORM)
+                                }
+
+                                slides.add(SignUpActivity.ESlide.CREDENTIAL_FORM)
+
+                                if (it.demographicFormSchema != null) {
+                                    slides.add(SignUpActivity.ESlide.DEMOGRAPHIC_QUESTIONNAIRE)
+                                }
+
+                                Pair(slides.toTypedArray(), mapOf(
                                         SignUpActivity.DEMOGRAPHIC_SCHEMA to it.demographicFormSchema,
                                         SignUpActivity.CONSENT_FORM to it.consent
                                 ))

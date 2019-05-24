@@ -105,7 +105,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Factory<Rea
                                     //repeated trigger was failed.
                                     it.trigger?.let { trigger ->
                                         registerTriggerAlarm(it.intrinsicAlarmTime, trigger)
-                                        OTApp.logger.writeSystemLog("Trigger was missed at ${it.intrinsicAlarmTime.toDatetimeString()}. reserve next alarm - ${trigger.objectId}", TAG)
+                                        OTApp.logger.writeSystemLog("Trigger was missed at ${it.intrinsicAlarmTime.toDatetimeString()}. reserve next alarm - ${trigger._id}", TAG)
                                     }
                                 }
                             } else {
@@ -144,7 +144,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Factory<Rea
 
     override fun registerTriggerAlarm(pivot: Long?, trigger: OTTriggerDAO): Boolean {
         val condition = retrieveTimeCondition(trigger)
-        val nextAlarmTimeInfo = calculateNextAlarmTime(pivot, condition, trigger.objectId!!)
+        val nextAlarmTimeInfo = calculateNextAlarmTime(pivot, condition, trigger._id!!)
         return if (nextAlarmTimeInfo != null) {
             OTApp.logger.writeSystemLog("Next alarm time is ${nextAlarmTimeInfo.first.toDatetimeString()}", TAG)
             reserveAlarm(trigger, nextAlarmTimeInfo, !condition.isRepeated)
@@ -233,7 +233,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Factory<Rea
             realm.executeTransactionIfNotIn {
                 val schedule = (realm.where(OTTriggerSchedule::class.java)
                         .equalTo(OTTriggerSchedule.FIELD_INTRINSIC_ALARM_TIME, alarmTimeInfo.first)
-                        .equalTo("trigger.objectId", trigger.objectId).findFirst()
+                        .equalTo("trigger.${BackendDbManager.FIELD_OBJECT_ID}", trigger._id).findFirst()
                         ?: realm.createObject(OTTriggerSchedule::class.java, scheduleIdGenerator.getNewUniqueLong())).apply {
                     this.trigger = trigger
                     this.stickyAlarm = trigger.condition?.isSticky ?: false
@@ -292,7 +292,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Factory<Rea
         val realm = realmProvider.get()
 
         val pendingTriggerSchedules = realm.where(OTTriggerSchedule::class.java)
-                .equalTo("trigger.${BackendDbManager.FIELD_OBJECT_ID}", trigger.objectId)
+                .equalTo("trigger.${BackendDbManager.FIELD_OBJECT_ID}", trigger._id)
                 .equalTo(OTTriggerSchedule.FIELD_FIRED, false)
                 .equalTo(OTTriggerSchedule.FIELD_SKIPPED, false)
                 .findAll()
@@ -392,7 +392,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Factory<Rea
 
         val realm = realmProvider.get()
         val latestPastSchedule = realm.where(OTTriggerSchedule::class.java)
-                .equalTo("trigger.${BackendDbManager.FIELD_OBJECT_ID}", trigger.objectId)
+                .equalTo("trigger.${BackendDbManager.FIELD_OBJECT_ID}", trigger._id)
                 .sort(OTTriggerSchedule.FIELD_INTRINSIC_ALARM_TIME, Sort.DESCENDING)
                 .findAll()
                 .find { it.fired || it.skipped }

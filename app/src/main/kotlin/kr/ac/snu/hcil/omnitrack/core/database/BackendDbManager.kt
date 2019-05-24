@@ -46,7 +46,7 @@ class BackendDbManager @Inject constructor(
 ) : ISynchronizationClientSideAPI {
 
     companion object {
-        const val FIELD_OBJECT_ID = "objectId"
+        const val FIELD_OBJECT_ID = "_id"
         const val FIELD_UPDATED_AT_LONG = "userUpdatedAt"
         const val FIELD_USER_CREATED_AT = "userCreatedAt"
         const val FIELD_SYNCHRONIZED_AT = "synchronizedAt"
@@ -130,7 +130,7 @@ class BackendDbManager @Inject constructor(
         return makeBookmarkedTrackersObservable(userId, realm).filter { it.isValid && it.isLoaded }.map { snapshot ->
             Intent(OTShortcutPanelManager.ACTION_BOOKMARKED_TRACKERS_CHANGED)
                     .apply {
-                        putExtra(OTShortcutPanelManager.INTENT_EXTRA_CURRENT_BOOKMARKED_SNAPSHOT, snapshot.map { it.objectId }.toTypedArray())
+                        putExtra(OTShortcutPanelManager.INTENT_EXTRA_CURRENT_BOOKMARKED_SNAPSHOT, snapshot.map { it._id }.toTypedArray())
                     }
         }.doOnNext {
                 intent->
@@ -268,7 +268,7 @@ class BackendDbManager @Inject constructor(
     }
 
     fun makeSingleItemQuery(itemId: String, realm: Realm): RealmQuery<OTItemDAO> {
-        return realm.where(OTItemDAO::class.java).equalTo("objectId", itemId)
+        return realm.where(OTItemDAO::class.java).equalTo("_id", itemId)
     }
 
     fun makeTriggersOfUserVisibleQuery(userId: String, realm: Realm): RealmQuery<OTTriggerDAO> {
@@ -319,7 +319,7 @@ class BackendDbManager @Inject constructor(
             } else {
                 realm.executeTransactionAsync({ realm ->
                     if (dao.trackers.isNotEmpty()) {
-                        val trackers = realm.where(OTTrackerDAO::class.java).`in`("objectId", dao.trackers.map { it.objectId }.toTypedArray()).findAll()
+                        val trackers = realm.where(OTTrackerDAO::class.java).`in`("_id", dao.trackers.map { it._id }.toTypedArray()).findAll()
                         dao.trackers.clear()
                         dao.trackers.addAll(trackers)
                     }
@@ -359,7 +359,7 @@ class BackendDbManager @Inject constructor(
                 })
 
                 intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, item.trackerId)
-                intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
+                intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, item._id)
 
                 context.sendBroadcast(intent)
 
@@ -374,16 +374,16 @@ class BackendDbManager @Inject constructor(
         return Single.create { subscriber ->
             var result: Int = SAVE_RESULT_FAIL
             try {
-                result = if (item.objectId == null) {
+                result = if (item._id == null) {
                     SAVE_RESULT_NEW
                 } else {
                     SAVE_RESULT_EDIT
                 }
 
                 //if itemId is null, set new Id.
-                if (item.objectId == null) {
+                if (item._id == null) {
                     val newItemId = UUID.randomUUID().toString()
-                    item.objectId = newItemId
+                    item._id = newItemId
                 }
 
                 realm.executeTransactionIfNotIn {
@@ -393,7 +393,7 @@ class BackendDbManager @Inject constructor(
                             if (value is OTServerFile && value.serverPath.isNotBlank()) {
                                 if (localCacheManager.isServerPathTemporal(value.serverPath)) {
                                     val newServerPath = localCacheManager.replaceTemporalServerPath(value.serverPath, item.trackerId
-                                            ?: "noTracker", item.objectId!!, entry.key)
+                                            ?: "noTracker", item._id!!, entry.key)
                                     if (newServerPath != null) {
                                         value.serverPath = newServerPath
                                         entry.value = TypeStringSerializationHelper.serialize(value)
@@ -410,7 +410,7 @@ class BackendDbManager @Inject constructor(
                 ex.printStackTrace()
             } finally {
                 if (!subscriber.isDisposed) {
-                    subscriber.onSuccess(Pair(result, item.objectId))
+                    subscriber.onSuccess(Pair(result, item._id))
                 }
             }
         }

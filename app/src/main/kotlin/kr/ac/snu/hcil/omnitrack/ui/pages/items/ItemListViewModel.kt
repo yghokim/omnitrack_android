@@ -41,7 +41,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
     private lateinit var managedTrackerDao: OTTrackerDAO
     private lateinit var managedAttributeList: RealmResults<OTAttributeDAO>
 
-    val trackerId: String get() = trackerDao.objectId!!
+    val trackerId: String get() = trackerDao._id!!
 
     val trackerNameObservable = BehaviorSubject.createDefault<String>("")
     var trackerName: String
@@ -115,7 +115,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
 
         currentItemQueryResults?.removeAllChangeListeners()
         currentItemQueryResults = dbManager.get()
-                .makeItemsQuery(trackerDao.objectId, null, null, realm)
+                .makeItemsQuery(trackerDao._id, null, null, realm)
                 .sort("timestamp", Sort.DESCENDING)
                 .findAllAsync()
         currentItemQueryResults?.addChangeListener(this)
@@ -154,7 +154,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
     }
 
     fun removeItem(itemId: String) {
-        val viewModel = itemsInTimestampDescendingOrder.find { it.objectId == itemId }
+        val viewModel = itemsInTimestampDescendingOrder.find { it._id == itemId }
         if (viewModel != null) {
             realm.executeTransaction {
                 dbManager.get().removeItem(viewModel.itemDao, false, realm)
@@ -170,7 +170,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
     }
 
     inner class ItemViewModel(val itemDao: OTItemDAO) : IReadonlyObjectId {
-        override val objectId: String? get() = _objectId
+        override val _id: String? get() = _objectId
 
         private var _objectId: String? = null
 
@@ -209,7 +209,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
             }
 
         init {
-            _objectId = itemDao.objectId
+            _objectId = itemDao._id
             timestamp = itemDao.timestamp
             timezone = itemDao.timezone
             loggingSource = itemDao.loggingSource

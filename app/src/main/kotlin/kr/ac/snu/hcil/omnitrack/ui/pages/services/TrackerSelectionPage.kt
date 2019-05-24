@@ -170,7 +170,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
 
     private fun createNewTracker(name: String) {
         val trackerDao = OTTrackerDAO()
-        trackerDao.objectId = UUID.randomUUID().toString()
+        trackerDao._id = UUID.randomUUID().toString()
         trackerDao.userId = authManager.userId
         trackerDao.name = name
         trackerDao.isBookmarked = false

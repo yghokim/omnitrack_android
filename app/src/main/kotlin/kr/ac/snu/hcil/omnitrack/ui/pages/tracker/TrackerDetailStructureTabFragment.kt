@@ -374,7 +374,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_ATTRIBUTE_DETAIL && resultCode == RESULT_OK && data != null) {
             val editedDao = serializationManager.get().parseAttribute(data.getStringExtra(AttributeDetailActivity.INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO))
-            val correspondingViewModel = currentAttributeViewModelList.find { it.attributeDAO.objectId == editedDao.objectId }
+            val correspondingViewModel = currentAttributeViewModelList.find { it.attributeDAO._id == editedDao._id }
 
             if (correspondingViewModel != null) {
                 correspondingViewModel.applyDaoChangesToFront(editedDao)

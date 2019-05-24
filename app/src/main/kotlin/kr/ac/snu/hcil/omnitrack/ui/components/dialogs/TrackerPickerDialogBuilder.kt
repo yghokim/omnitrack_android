@@ -95,7 +95,7 @@ class TrackerPickerDialogBuilder(val trackers: List<OTTrackerDAO.SimpleTrackerIn
         }
 
         open fun bind(trackerInfo: OTTrackerDAO.SimpleTrackerInfo) {
-            this.trackerId = trackerInfo.objectId
+            this.trackerId = trackerInfo._id
             circle.setColorFilter(trackerInfo.color)
             textView.text = trackerInfo.name
         }
@@ -117,7 +117,7 @@ class TrackerPickerDialogBuilder(val trackers: List<OTTrackerDAO.SimpleTrackerIn
         override fun onBindViewHolder(holder: TrackerViewHolder, position: Int) {
             val tracker = trackers[position]
             holder.bind(tracker)
-            holder.active = inactiveIds?.contains(tracker.objectId) != true
+            holder.active = inactiveIds?.contains(tracker._id) != true
         }
     }
 }

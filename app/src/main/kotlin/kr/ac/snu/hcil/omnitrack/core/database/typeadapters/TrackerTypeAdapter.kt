@@ -30,7 +30,7 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
         {
             when(reader.nextName())
             {
-                BackendDbManager.FIELD_OBJECT_ID -> dao.objectId = reader.nextString()
+                BackendDbManager.FIELD_OBJECT_ID -> dao._id = reader.nextString()
                 BackendDbManager.FIELD_REMOVED_BOOLEAN -> dao.removed = reader.nextBoolean()
                 if (isServerMode) "user" else BackendDbManager.FIELD_USER_ID -> dao.userId = reader.nextString()
                 BackendDbManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
@@ -63,8 +63,8 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
                     while(reader.hasNext())
                     {
                         val attribute = attributeTypeAdapter.get().read(reader)
-                        if (isServerMode && attribute.objectId.isNullOrBlank()) {
-                            attribute.objectId = UUID.randomUUID().toString()
+                        if (isServerMode && attribute._id.isNullOrBlank()) {
+                            attribute._id = UUID.randomUUID().toString()
                         }
                         dao.attributes.add(attribute)
                     }
@@ -82,7 +82,7 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
     override fun write(writer: JsonWriter, value: OTTrackerDAO, isServerMode: Boolean) {
         writer.beginObject()
 
-        writer.name(BackendDbManager.FIELD_OBJECT_ID).value(value.objectId)
+        writer.name(BackendDbManager.FIELD_OBJECT_ID).value(value._id)
         writer.name(BackendDbManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
         writer.name(if (isServerMode) "user" else BackendDbManager.FIELD_USER_ID).value(value.userId)
         writer.name(BackendDbManager.FIELD_USER_CREATED_AT).value(value.userCreatedAt)

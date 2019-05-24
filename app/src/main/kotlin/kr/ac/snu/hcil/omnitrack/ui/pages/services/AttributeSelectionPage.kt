@@ -74,7 +74,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
     }
 
     override fun onEnter() {
-        trackerId = parent.trackerDao.objectId!!
+        trackerId = parent.trackerDao._id!!
         currentMeasureFactory = parent.currentMeasureFactory
         if (parent.trackerDao.isManaged) {
             val trackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realmProvider.get()).findFirstAsync()
@@ -290,14 +290,14 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
     fun createNewAttribute(name: String, type: Int, realm: Realm, processor: ((OTAttributeDAO, Realm) -> OTAttributeDAO)? = null) {
         val trackerDao = parent.trackerDao
         val newDao = OTAttributeDAO()
-        newDao.objectId = UUID.randomUUID().toString()
+        newDao._id = UUID.randomUUID().toString()
         newDao.name = name
         newDao.type = type
         newDao.trackerId = trackerId
         newDao.initialize(parent.context)
         processor?.invoke(newDao, realm)
         newDao.localId = attributeManager.makeNewAttributeLocalId(newDao.userCreatedAt)
-        newDao.trackerId = trackerDao.objectId
+        newDao.trackerId = trackerDao._id
 
 
         this@AttributeSelectionPage.attributeDAO = newDao

@@ -15,8 +15,9 @@ import java.util.*
  */
 open class OTItemDAO : RealmObject() {
 
+    @Suppress("PropertyName")
     @PrimaryKey
-    var objectId: String? = null
+    var _id: String? = null
 
     @Index
     var trackerId: String? = null

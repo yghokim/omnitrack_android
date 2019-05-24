@@ -201,10 +201,10 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
     }
 
     class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm, val researchRealm: Realm, dbManager: BackendDbManager, val context: Context) : IReadonlyObjectId, RealmChangeListener<OTTrackerDAO> {
-        override val objectId: String?
+        override val _id: String?
             get() = _objectId
 
-        private var _objectId: String? = trackerDao.objectId
+        private var _objectId: String? = trackerDao._id
 
         val validationResult = BehaviorSubject.createDefault<Pair<Boolean, List<CharSequence>?>>(Pair(true, null))
 
@@ -236,8 +236,8 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         val isBookmarked: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
 
         val attributesResult: RealmResults<OTAttributeDAO> = trackerDao.makeAttributesQuery(false, false).findAllAsync()
-        val trackerItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQuery(trackerDao.objectId, null, null, realm).findAllAsync()
-        val todayItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQueryOfTheDay(trackerDao.objectId, realm).findAllAsync()
+        val trackerItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQuery(trackerDao._id, null, null, realm).findAllAsync()
+        val todayItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQueryOfTheDay(trackerDao._id, realm).findAllAsync()
 
         private val currentAttributeValidationResultDict = Hashtable<String, Pair<Boolean, List<CharSequence>?>>()
 

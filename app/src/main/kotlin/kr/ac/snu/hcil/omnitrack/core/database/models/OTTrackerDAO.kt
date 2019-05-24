@@ -26,10 +26,11 @@ import java.util.*
  */
 open class OTTrackerDAO : RealmObject() {
 
-    data class SimpleTrackerInfo(override val objectId: String?, val name: String, @ColorInt val color: Int, val reminders: Array<OTTriggerDAO.SimpleTriggerInfo>?) : IReadonlyObjectId
+    data class SimpleTrackerInfo(override val _id: String?, val name: String, @ColorInt val color: Int, val reminders: Array<OTTriggerDAO.SimpleTriggerInfo>?) : IReadonlyObjectId
 
+    @Suppress("PropertyName")
     @PrimaryKey
-    var objectId: String? = null
+    var _id: String? = null
 
     @Index
     var userId: String? = null
@@ -132,7 +133,7 @@ open class OTTrackerDAO : RealmObject() {
     }
 
     fun getSimpleInfo(populateReminders: Boolean = false): SimpleTrackerInfo {
-        return SimpleTrackerInfo(objectId, name, color, if (populateReminders) {
+        return SimpleTrackerInfo(_id, name, color, if (populateReminders) {
             if (isManaged) {
                 liveTriggersQuery?.equalTo("actionType", OTTriggerDAO.ACTION_TYPE_REMIND)?.findAll()
             } else {
@@ -190,8 +191,9 @@ open class OTTrackerDAO : RealmObject() {
 
 open class OTAttributeDAO : RealmObject() {
 
+    @Suppress("PropertyName")
     @PrimaryKey
-    var objectId: String? = null
+    var _id: String? = null
 
     @Index
     var localId: String = ""

@@ -109,7 +109,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
                     userId ->
                     val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(appWidgetId, OTShortcutPanelWidgetUpdateService.getPreferences(this))
                     trackerList = dbManager.makeTrackersOfUserVisibleQuery(userId, realm).findAll().map {
-                        WritablePair(it.getSimpleInfo(), selectedTrackerIds?.contains(it.objectId) == true)
+                        WritablePair(it.getSimpleInfo(), selectedTrackerIds?.contains(it._id) == true)
                     }
                     trackerSelectionAdapter.notifyDataSetChanged()
                 }, {
@@ -141,7 +141,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
         }, editor)
 
         trackerList?.let {
-            OTShortcutPanelWidgetUpdateService.setSelectedTrackerIds(appWidgetId, it.asSequence().filter { it.second }.map { it.first.objectId!! }.toSet(), editor)
+            OTShortcutPanelWidgetUpdateService.setSelectedTrackerIds(appWidgetId, it.asSequence().filter { it.second }.map { it.first._id!! }.toSet(), editor)
         }
         editor.apply()
 
