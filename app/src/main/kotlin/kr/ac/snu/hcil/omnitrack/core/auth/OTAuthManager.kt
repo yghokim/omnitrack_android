@@ -20,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
+import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
@@ -35,6 +36,7 @@ class OTAuthManager @Inject constructor(
         private val context: Context,
         @Default private val sharedPreferences: SharedPreferences,
         @Backend private val realmFactory: Factory<Realm>,
+        private val syncManager: OTSyncManager,
         private val triggerSystemManager: Lazy<OTTriggerSystemManager>,
         private val shortcutPanelManager: OTShortcutPanelManager,
         private val authApiController: Lazy<OTAuthApiController>) {
@@ -181,6 +183,7 @@ class OTAuthManager @Inject constructor(
         if (firstSignIn) {
             context.runOnUiThread { notifySignedIn() }
             triggerSystemManager.get().checkInAllToSystem(userId!!)
+            syncManager.reservePeriodicSyncWorker()
         }
     }
 
@@ -197,6 +200,7 @@ class OTAuthManager @Inject constructor(
 
                 triggerSystemManager.get().checkOutAllFromSystem(lastUserId)
                 shortcutPanelManager.disposeShortcutPanel()
+                syncManager.clearSynchronizationOnDevice()
 
                 realmFactory.get().use { realm ->
                     realm.executeTransactionIfNotIn {
