@@ -17,7 +17,7 @@ import retrofit2.http.POST
 class OTAuthApiController(retrofit: Lazy<Retrofit>) : IAuthServerAPI {
 
     @Keep
-    data class AuthResponseData(val token: String, val deviceLocalKey: String?)
+    data class AuthResponseData(val token: String, val deviceLocalKey: String?, val appFlags: JsonObject?)
 
     interface AuthRetrofitService {
         //Auth

@@ -202,15 +202,6 @@ android {
             buildType.buildConfigField 'String', 'FIREBASE_CLOUD_MESSAGING_SENDER_ID', "\"$gcmSenderId\""
             buildType.buildConfigField 'String', 'FIREBASE_PROJECT_ID', "\"$firebaseProjectId\""
 
-            if (buildConfigJson.disableExternalEntities == true && buildConfigJson.defaultExperimentId != null && buildConfigJson.defaultExperimentId.length() > 0) {
-                buildType.buildConfigField 'boolean', 'DISABLE_EXTERNAL_ENTITIES', "true"
-            } else buildType.buildConfigField 'boolean', 'DISABLE_EXTERNAL_ENTITIES', "false"
-
-            if (buildConfigJson.disableExternalEntities == true && buildConfigJson.defaultInvitationCode != null && buildConfigJson.defaultInvitationCode.length() > 0) {
-                buildType.buildConfigField 'String', 'DEFAULT_INVITATION_CODE', "\"$buildConfigJson.defaultInvitationCode\""
-            } else {
-                buildType.buildConfigField 'String', 'DEFAULT_INVITATION_CODE', "null"
-            }
 
             if (buildConfigJson.defaultExperimentId != null && buildConfigJson.defaultExperimentId.length() > 0) {
                 buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "\"$buildConfigJson.defaultExperimentId\""
