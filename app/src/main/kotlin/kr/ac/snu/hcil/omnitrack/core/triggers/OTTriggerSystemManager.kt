@@ -68,7 +68,7 @@ class OTTriggerSystemManager(
 
     fun tryCheckInToSystem(managedTrigger: OTTriggerDAO): Boolean {
         println("TriggerSystemManager: tryCheckInToSystem: ${managedTrigger._id}")
-        if (!BuildConfig.DISABLE_EXTERNAL_ENTITIES || managedTrigger.experimentIdInFlags == BuildConfig.DEFAULT_EXPERIMENT_ID) {
+        if (BuildConfig.DEFAULT_EXPERIMENT_ID == null || managedTrigger.experimentIdInFlags == BuildConfig.DEFAULT_EXPERIMENT_ID) {
             if (managedTrigger.isOn) {
                 when (managedTrigger.conditionType) {
                     OTTriggerDAO.CONDITION_TYPE_TIME -> {
@@ -131,7 +131,7 @@ class OTTriggerSystemManager(
         dataDrivenTriggerManager.get().setSuspendReadjustWorker(true)
         triggers.forEach { trigger ->
             if (trigger.liveTrackerCount > 0) {
-                if (BuildConfig.DISABLE_EXTERNAL_ENTITIES && trigger.experimentIdInFlags != BuildConfig.DEFAULT_EXPERIMENT_ID) {
+                if (BuildConfig.DEFAULT_EXPERIMENT_ID != null && trigger.experimentIdInFlags != BuildConfig.DEFAULT_EXPERIMENT_ID) {
                     tryCheckOutFromSystem(trigger)
                 } else tryCheckInToSystem(trigger)
             }

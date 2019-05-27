@@ -28,7 +28,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.research.ExperimentInfo
-import kr.ac.snu.hcil.omnitrack.core.database.models.research.OTExperimentDAO
 import kr.ac.snu.hcil.omnitrack.core.database.typeadapters.ServerCompatibleTypeAdapter
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForTracker
 import kr.ac.snu.hcil.omnitrack.core.di.global.Research
@@ -91,8 +90,6 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     var trackerId: String? = null
         private set
-
-    private var experimentList = ArrayList<ExperimentInfo>()
 
     //Observables========================================
     val hasTrackerRemovedOutside = BehaviorSubject.create<String>()
@@ -305,22 +302,6 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
                     attributeViewModelListObservable.onNext(newList)
                 }
-            }
-
-            if (!BuildConfig.DISABLE_EXTERNAL_ENTITIES) {
-                subscriptions.add(
-                        researchRealm.where(OTExperimentDAO::class.java)
-                                .isNull("droppedAt")
-                                .findAllAsync().asFlowable()
-                                .filter {
-                                    it.isValid && it.isLoaded
-                                }
-                                .subscribe { results ->
-                                    this.experimentList.clear()
-                                    this.experimentList.addAll(results.map { it.getInfo() })
-                                    this.experimentListObservable.onNext(this.experimentList)
-                                }
-                )
             }
 
             trackerIdObservable.onNext(Nullable(trackerId))

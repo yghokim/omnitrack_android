@@ -79,7 +79,7 @@ class BackendDbManager @Inject constructor(
 
 
         fun <T> branchCheckDefaultExperimentId(query: RealmQuery<T>): RealmQuery<T> {
-            return if (BuildConfig.DISABLE_EXTERNAL_ENTITIES) {
+            return if (BuildConfig.DEFAULT_EXPERIMENT_ID != null) {
                 query.equalTo(FIELD_EXPERIMENT_ID_IN_FLAGS, BuildConfig.DEFAULT_EXPERIMENT_ID)
             } else query
         }

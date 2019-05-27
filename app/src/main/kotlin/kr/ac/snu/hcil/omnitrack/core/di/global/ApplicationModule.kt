@@ -59,6 +59,13 @@ class ApplicationModule(private val mApp: OTApp) {
 
     @Provides
     @Singleton
+    @UserInfo
+    fun userInfoSharedPreferences(): SharedPreferences {
+        return mApp.contextCompat.getSharedPreferences("USER_INFO", Context.MODE_PRIVATE)
+    }
+
+    @Provides
+    @Singleton
     @DeviceId
     fun deviceId(): String {
         return mApp.deviceId
@@ -147,3 +154,7 @@ class ApplicationModule(private val mApp: OTApp) {
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class Default
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class UserInfo
