@@ -82,6 +82,16 @@ object LockedPropertiesHelper : AFlagsHelperBase() {
         return defaultValueDict.get(level, flag)!!
     }
 
+    fun flag(level: String, flag: String, properties: JsonObject?): Boolean {
+        return if (properties == null) {
+            getDefaultValue(level, flag)
+        } else {
+            if (properties.has(flag)) {
+                properties.getBooleanCompat(flag)!!
+            } else getDefaultValue(level, flag)
+        }
+    }
+
 
     fun isLocked(key: String, properties: JsonObject?): Boolean? {
         return properties?.getBooleanCompat(key)
@@ -89,13 +99,5 @@ object LockedPropertiesHelper : AFlagsHelperBase() {
 
     fun isLockedNotNull(key: String, properties: JsonObject?): Boolean {
         return properties?.getBooleanCompat(key) ?: false
-    }
-
-
-    class Builder : BuilderBase() {
-        fun setLocked(key: String, isLocked: Boolean?): Builder {
-            this.json.addProperty(key, isLocked)
-            return this
-        }
     }
 }

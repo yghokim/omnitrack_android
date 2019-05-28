@@ -132,7 +132,9 @@
             </intent-filter>
         </receiver>
 
+        <!--Temporarily disable the app widget.-->
         <receiver
+            android:enabled="false"
             android:name=".widgets.OTShortcutPanelWidgetProvider"
             android:label="@string/msg_shortcut_widget_name">
             <intent-filter>

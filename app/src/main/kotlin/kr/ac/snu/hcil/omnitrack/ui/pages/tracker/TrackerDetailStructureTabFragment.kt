@@ -36,6 +36,8 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
+import kr.ac.snu.hcil.omnitrack.core.flags.F
+import kr.ac.snu.hcil.omnitrack.core.flags.LockFlagLevel
 import kr.ac.snu.hcil.omnitrack.core.flags.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -149,11 +151,12 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
         creationSubscriptions.add(
                 this.viewModel.lockedPropertiesObservable.subscribe { (lockedProperties) ->
-                    val isBookmarkChangeable = !LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_BOOKMARK, lockedProperties)
-                    val canAddAttributes = !LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_ADD_NEW_ATTRIBUTE, lockedProperties)
-                    val isNameChangeable = !LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_CHANGE_NAME, lockedProperties)
-                    val isAttributeOrderChangeable = !LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_CHANGE_ATTRIBUTE_ORDER, lockedProperties)
+                    val isBookmarkChangeable = LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.ToggleShortcut, lockedProperties)
+                    val canAddAttributes = LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.AddNewFields, lockedProperties)
+                    val isNameChangeable = LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.EditName, lockedProperties)
+                    val isAttributeOrderChangeable = LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.ReorderFields, lockedProperties)
 
+                    attributeListView.isDragEnabled = isAttributeOrderChangeable
                     isOnShortcutProperty.isEnabled = isBookmarkChangeable
                     nameProperty.isEnabled = isNameChangeable
 
@@ -432,7 +435,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         }
 
         fun onMoveItem(fromPosition: Int, toPosition: Int) {
-            viewModel.moveAttribute(fromPosition, toPosition)
+            viewModel.moveField(fromPosition, toPosition)
             //notifyItemMoved(fromPosition, toPosition)
         }
 
@@ -531,10 +534,14 @@ class TrackerDetailStructureTabFragment : OTFragment() {
             }
 
             fun bindAttribute(attributeViewModel: TrackerDetailViewModel.AttributeInformationViewModel) {
+
                 itemView.ui_attribute_type.setImageResource(attributeViewModel.icon)
                 itemView.ui_column_name.text = attributeViewModel.name
 
                 itemView.ui_preview_container.alpha = 0.5f
+
+
+                itemView.ui_drag_handle.visibility = if (attributeListView.isDragEnabled) View.VISIBLE else View.INVISIBLE
 
                 viewHolderSubscriptions.add(
                         Observable.combineLatest<Nullable<JsonObject>, Boolean, Boolean>(viewModel.lockedPropertiesObservable, attributeViewModel.isEditable,

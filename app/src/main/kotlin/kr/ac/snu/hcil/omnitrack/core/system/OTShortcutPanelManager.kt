@@ -26,6 +26,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
+import kr.ac.snu.hcil.omnitrack.core.flags.F
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemActivity
@@ -43,7 +44,8 @@ class OTShortcutPanelManager @Inject constructor(
         val authManager: Lazy<OTAuthManager>,
         val dbManager: Lazy<BackendDbManager>,
         @Default val pref: SharedPreferences,
-        @Backend val backendRealmProvider: Factory<Realm>
+        @Backend val backendRealmProvider: Factory<Realm>,
+        private val appFlagManager: OTAppFlagManager
 ) {
 
     companion object {
@@ -60,7 +62,7 @@ class OTShortcutPanelManager @Inject constructor(
 
     val showPanels: Boolean
         get() {
-            return pref.getBoolean("pref_show_shortcut_panel", false)
+            return pref.getBoolean("pref_show_shortcut_panel", false) && appFlagManager.flag(F.UseShortcutPanel)
         }
 
     private fun buildNewNotificationShortcutViews(trackerList: List<OTTrackerDAO>, context: Context, bigStyle: Boolean): RemoteViews {

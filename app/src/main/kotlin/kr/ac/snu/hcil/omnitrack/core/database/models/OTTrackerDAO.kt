@@ -18,6 +18,8 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTStringStringEntryDAO
 import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
+import kr.ac.snu.hcil.omnitrack.core.flags.F
+import kr.ac.snu.hcil.omnitrack.core.flags.LockFlagLevel
 import kr.ac.snu.hcil.omnitrack.core.flags.LockedPropertiesHelper
 import java.util.*
 
@@ -161,9 +163,8 @@ open class OTTrackerDAO : RealmObject() {
         return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_ENTER_ITEM_LIST, getParsedLockedPropertyInfo())
     }
 
-
-    fun isAddNewAttributeLocked(): Boolean {
-        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_ADD_NEW_ATTRIBUTE, getParsedLockedPropertyInfo())
+    fun isAddNewFieldsAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.AddNewFields, getParsedLockedPropertyInfo())
     }
 
     fun isAddNewReminderLocked(): Boolean {
@@ -174,6 +175,9 @@ open class OTTrackerDAO : RealmObject() {
         return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_SELF_INITIATED_INPUT, getParsedLockedPropertyInfo())
     }
 
+    fun isFieldReorderAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.ReorderFields, getParsedLockedPropertyInfo())
+    }
 
     fun isInstantLoggingAvailable(): Boolean {
         for (attribute in getLiveAttributesSync()) {
@@ -243,19 +247,17 @@ open class OTAttributeDAO : RealmObject() {
         return _parsedLockedPropertyInfo!!
     }
 
-    fun isEditingLocked(): Boolean {
-        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.COMMON_EDIT, getParsedLockedPropertyInfo())
-                ?: false
+    //TODO in the future, it should be divided into fine-grained modification flags.
+    fun isEditingAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(LockFlagLevel.Field, F.Modify, getParsedLockedPropertyInfo())
     }
 
-    fun isDeletionLocked(): Boolean {
-        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.COMMON_DELETE, getParsedLockedPropertyInfo())
-                ?: false
+    fun isRemovalAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(LockFlagLevel.Field, F.Delete, getParsedLockedPropertyInfo())
     }
 
-    fun isVisibilityLocked(): Boolean {
-        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.ATTRIBUTE_VISIBILITY, getParsedLockedPropertyInfo())
-                ?: false
+    fun isVisibilityToggleAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(LockFlagLevel.Field, F.ToggleVisibility, getParsedLockedPropertyInfo())
     }
 
     fun getHelper(context: Context): OTAttributeHelper {

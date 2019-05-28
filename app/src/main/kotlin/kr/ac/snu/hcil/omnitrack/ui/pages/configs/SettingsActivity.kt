@@ -32,6 +32,8 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.flags.F
+import kr.ac.snu.hcil.omnitrack.core.system.OTAppFlagManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.workers.OTVersionCheckWorker
@@ -50,6 +52,7 @@ class SettingsActivity : AppCompatActivity(R.layout.activity_multibutton_single_
         const val PREF_REMINDER_NOTI_RINGTONE = "pref_reminder_noti_ringtone"
         const val PREF_REMINDER_LIGHT_COLOR = "pref_reminder_light_color"
         const val PREF_CATEGORY_GENERAL = "pref_key_category_general"
+        const val PREF_USE_SHORTCUT_PANEL = "pref_show_shortcut_panel"
 
         const val FLAG_CONFIGURATION_CHANGED = "flag_configuration_changed"
 
@@ -109,6 +112,9 @@ class SettingsActivity : AppCompatActivity(R.layout.activity_multibutton_single_
 
         @Inject
         protected lateinit var shortcutPanelManager: OTShortcutPanelManager
+
+        @Inject
+        protected lateinit var appFlagManager: OTAppFlagManager
 
         private var turnOnIgnoreBatteryOptimizationForwardingDialog: MaterialDialog? = null
 
@@ -221,6 +227,8 @@ class SettingsActivity : AppCompatActivity(R.layout.activity_multibutton_single_
 
             (requireActivity().application as OTAndroidApp).applicationComponent.inject(this)
             languageOnCreation = LocaleHelper.getLanguageCode(requireContext())
+
+            findPreference<SwitchPreference>(PREF_USE_SHORTCUT_PANEL)?.isVisible = appFlagManager.flag(F.UseShortcutPanel)
         }
 
         override fun onDestroy() {
