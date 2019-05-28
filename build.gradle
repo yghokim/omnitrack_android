@@ -47,7 +47,7 @@ buildscript {
     ext.dagger_version = '2.16'
     ext.gson_version = '2.8.5'
     ext.picasso_version = '2.71828'
-    ext.rxjava_version = '2.2.7'
+    ext.rxjava_version = '2.2.8'
     ext.rxandroid_version = '2.1.1'
     ext.retrofit_version = '2.5.0'
     ext.okhttp_version = '3.12.1' // should be fixed if we maintain the minimum SDK 19.
@@ -65,7 +65,7 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:$gradle_version"
         classpath 'com.google.gms:google-services:4.2.0'
-        classpath "io.realm:realm-gradle-plugin:5.9.1"
+        classpath "io.realm:realm-gradle-plugin:5.11.0"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.cookpad.android.licensetools:license-tools-plugin:1.4.0'
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.3'

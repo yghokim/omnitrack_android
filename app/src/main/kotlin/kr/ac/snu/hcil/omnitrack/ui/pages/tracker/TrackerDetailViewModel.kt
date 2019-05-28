@@ -340,7 +340,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         }
     }
 
-    fun moveAttribute(from: Int, to: Int) {
+    fun moveField(from: Int, to: Int) {
         if (trackerDao != null) {
             val attributes = currentAttributeViewModelList.asSequence().map { it.attributeDAO }.toMutableList()
             attributes.move(from, to)
@@ -643,9 +643,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
             isRequired = editedDao.isRequired
 
-            isEditable.onNextIfDifferAndNotNull(!editedDao.isEditingLocked())
-            isRemovable.onNextIfDifferAndNotNull(!editedDao.isDeletionLocked())
-            isVisibilityEditable.onNextIfDifferAndNotNull(!editedDao.isVisibilityLocked())
+            isEditable.onNextIfDifferAndNotNull(editedDao.isEditingAllowed())
+            isRemovable.onNextIfDifferAndNotNull(editedDao.isRemovalAllowed())
+            isVisibilityEditable.onNextIfDifferAndNotNull(editedDao.isVisibilityToggleAllowed())
 
             defaultValuePolicy = editedDao.fallbackValuePolicy
             defaultValuePreset = editedDao.fallbackPresetSerializedValue
