@@ -5,7 +5,6 @@
   "defaultExperimentId": null,
   "overridePackageName": null,
   "overrideAppName": null,
-  "disableTriggerCreation": false,
   "enableDynamicApiKeyModification": false,
 
   "signing": {

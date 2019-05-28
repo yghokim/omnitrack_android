@@ -52,7 +52,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
     private lateinit var viewModel: HomeScreenViewModel
 
-    private val homeTabInfos: Array<HomeTabInfo>
+    private lateinit var homeTabInfos: Array<HomeTabInfo>
 
     @Inject
     protected lateinit var tutorialManager: TutorialManager
@@ -66,6 +66,12 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     }
 
     init {
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+
         val homeTabs = HomeTabInfo.values().toMutableList()
 
         if (!appFlagManager.flag(F.AccessServicesTab)) {
@@ -77,10 +83,6 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
         }
 
         homeTabInfos = homeTabs.toTypedArray()
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
         rightActionBarButton?.visibility = View.VISIBLE
         rightActionBarButton?.setImageResource(R.drawable.icon_reorder_dark)

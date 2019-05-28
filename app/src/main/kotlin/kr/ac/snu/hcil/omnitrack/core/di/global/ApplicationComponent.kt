@@ -321,4 +321,6 @@ interface ApplicationComponent {
     fun inject(fragment: SignUpCredentialSlideFragment)
 
     fun inject(activity: SignUpActivity)
+
+    fun inject(viewModel: LoggingTriggerListViewModel)
 }
