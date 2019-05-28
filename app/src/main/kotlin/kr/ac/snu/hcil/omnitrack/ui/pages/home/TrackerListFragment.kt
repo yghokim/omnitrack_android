@@ -55,6 +55,8 @@ import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.flags.F
+import kr.ac.snu.hcil.omnitrack.core.system.OTAppFlagManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
@@ -79,6 +81,9 @@ class TrackerListFragment : OTFragment() {
 
     @Inject
     lateinit var tutorialManager: TutorialManager
+
+    @Inject
+    lateinit var appFlagManager: OTAppFlagManager
 
     private val trackerListAdapter: TrackerListAdapter = TrackerListAdapter()
 
@@ -197,10 +202,7 @@ class TrackerListFragment : OTFragment() {
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_recyclerview_and_fab, container, false)
 
-        if (BuildConfig.DISABLE_TRACKER_CREATION) {
-            rootView.fab.hide()
-            rootView.fab.isEnabled = false
-        } else {
+        if (appFlagManager.flag(F.AddNewTracker)) {
             rootView.fab.setOnClickListener { view ->
                 newTrackerNameDialog.input(null, viewModel.generateNewTrackerName(), false) { dialog, text ->
                     startActivityForResult(TrackerDetailActivity.makeNewTrackerIntent(text.toString(), requireContext()), REQUEST_CODE_NEW_TRACKER)
@@ -208,6 +210,9 @@ class TrackerListFragment : OTFragment() {
                 }.show()
                 //Toast.makeText(context,String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
             }
+        } else {
+            rootView.fab.hide()
+            rootView.fab.isEnabled = false
         }
 
         rootView.ui_empty_list_message.setText(R.string.msg_tracker_empty)

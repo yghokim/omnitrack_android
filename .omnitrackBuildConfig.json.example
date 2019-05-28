@@ -5,7 +5,6 @@
   "defaultExperimentId": null,
   "overridePackageName": null,
   "overrideAppName": null,
-  "disableTrackerCreation": false,
   "disableTriggerCreation": false,
   "enableDynamicApiKeyModification": false,
 
@@ -16,6 +15,4 @@
     "releaseStorePassword": null
   },
   "showTutorials": true,
-  "hideServicesTab": false,
-  "hideTriggersTab": false,
 }

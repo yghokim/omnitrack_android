@@ -22,6 +22,8 @@ import kr.ac.snu.hcil.android.common.net.NetworkNotConnectedException
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.flags.F
+import kr.ac.snu.hcil.omnitrack.core.system.OTAppFlagManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.auth.SignInActivity
@@ -55,6 +57,9 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     @Inject
     protected lateinit var tutorialManager: TutorialManager
 
+    @Inject
+    protected lateinit var appFlagManager: OTAppFlagManager
+
     override fun onInject(app: OTAndroidApp) {
         super.onInject(app)
         app.applicationComponent.inject(this)
@@ -62,12 +67,15 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
     init {
         val homeTabs = HomeTabInfo.values().toMutableList()
-        if (BuildConfig.HIDE_SERVICES_TAB) {
+
+        if (!appFlagManager.flag(F.AccessServicesTab)) {
             homeTabs.remove(HomeTabInfo.TAB_SERVICES)
         }
-        if (BuildConfig.HIDE_TRIGGERS_TAB) {
+
+        if (!appFlagManager.flag(F.AccessTriggersTab)) {
             homeTabs.remove(HomeTabInfo.TAB_TRIGGERS)
         }
+
         homeTabInfos = homeTabs.toTypedArray()
     }
 
@@ -82,7 +90,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
 
-        if (BuildConfig.HIDE_TRIGGERS_TAB && BuildConfig.HIDE_SERVICES_TAB) {
+        if (!appFlagManager.flag(F.AccessServicesTab) && !appFlagManager.flag(F.AccessTriggersTab)) {
             //only a tracker tab exists. hide tab bar.
             tabLayout.visibility = View.GONE
         }
