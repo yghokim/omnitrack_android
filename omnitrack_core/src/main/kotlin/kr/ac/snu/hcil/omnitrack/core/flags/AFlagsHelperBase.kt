@@ -9,15 +9,6 @@ import com.google.gson.JsonObject
 abstract class AFlagsHelperBase {
     companion object {
 
-        const val PREF_PREFIX = "lockedProp:"
-        fun toPreferenceKey(flagName: String): String {
-            return "$PREF_PREFIX$flagName"
-        }
-
-        fun fromPreferenceKey(preferenceKey: String): String {
-            return preferenceKey.substring(PREF_PREFIX.length)
-        }
-
         val parser: Gson by lazy {
             Gson()
         }

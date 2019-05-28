@@ -7,7 +7,6 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.auth0.android.jwt.JWT
-import com.github.salomonbrys.kotson.keys
 import com.google.gson.JsonObject
 import dagger.Lazy
 import dagger.internal.Factory
@@ -21,9 +20,8 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.UserInfo
-import kr.ac.snu.hcil.omnitrack.core.flags.AFlagsHelperBase
-import kr.ac.snu.hcil.omnitrack.core.serialization.getBooleanCompat
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.system.OTAppFlagManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
@@ -42,13 +40,13 @@ class OTAuthManager @Inject constructor(
         private val syncManager: OTSyncManager,
         private val triggerSystemManager: Lazy<OTTriggerSystemManager>,
         private val shortcutPanelManager: OTShortcutPanelManager,
-        private val authApiController: Lazy<OTAuthApiController>) {
+        private val authApiController: Lazy<OTAuthApiController>,
+        private val appFlagManager: OTAppFlagManager) {
 
     companion object {
         const val LOG_TAG = "OMNITRACK Auth Manager"
         const val PREF_KEY_TOKEN = "auth_jwt"
         const val PREF_DEVICE_LOCAL_KEY = "device_local_key"
-        const val PREF_APP_FLAG_KEYSET = "app_flag_keyset"
 
         const val MIN_LENGTH_USERNAME = 3
         const val MAX_LENGTH_USERNAME = 50
@@ -182,7 +180,7 @@ class OTAuthManager @Inject constructor(
     private fun handleAuthResult(responseData: OTAuthApiController.AuthResponseData, firstSignIn: Boolean) {
 
         sharedPreferences.edit().putString(PREF_DEVICE_LOCAL_KEY, responseData.deviceLocalKey).apply()
-        updateAppFlags(responseData.appFlags)
+        appFlagManager.updateAppFlags(responseData.appFlags)
 
         updateToken(responseData.token)
 
@@ -190,20 +188,6 @@ class OTAuthManager @Inject constructor(
             context.runOnUiThread { notifySignedIn() }
             triggerSystemManager.get().checkInAllToSystem(userId!!)
             syncManager.reservePeriodicSyncWorker()
-        }
-    }
-
-    private fun updateAppFlags(flags: JsonObject?) {
-        if (flags != null) {
-            sharedPreferences.edit()
-                    .putStringSet(PREF_APP_FLAG_KEYSET, flags.keys().map { AFlagsHelperBase.toPreferenceKey(it) }.toSet())
-                    .apply {
-                        for (key in flags.keys()) {
-                            val prefKey = AFlagsHelperBase.toPreferenceKey(key)
-                            this.putBoolean(prefKey, flags.getBooleanCompat(key)!!)
-                        }
-                    }
-                    .apply()
         }
     }
 

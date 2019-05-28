@@ -14,6 +14,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
+import kr.ac.snu.hcil.android.common.toInt
 import kr.ac.snu.hcil.android.common.view.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
@@ -23,6 +24,8 @@ import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
+import kr.ac.snu.hcil.omnitrack.core.flags.F
+import kr.ac.snu.hcil.omnitrack.core.system.OTAppFlagManager
 import kr.ac.snu.hcil.omnitrack.views.color.ColorHelper
 import org.jetbrains.anko.padding
 import java.util.*
@@ -54,6 +57,9 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
 
     @Inject
     protected lateinit var authManager: OTAuthManager
+
+    @Inject
+    protected lateinit var appFlagManager: OTAppFlagManager
 
     init {
         (parent.context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
@@ -99,7 +105,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            if (position >= 1 || BuildConfig.DISABLE_TRACKER_CREATION == true) {
+            if (position >= 1 || !appFlagManager.flag(F.AddNewTracker)) {
                 (holder as TrackerListViewHolder).run {
                     holder.bind(trackers[position - indexShift])
                 }
@@ -110,11 +116,11 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
 
         private val indexShift: Int
             get() {
-                return if (BuildConfig.DISABLE_TRACKER_CREATION == true) 0 else 1
+                return appFlagManager.flag(F.AddNewTracker).toInt()
             }
 
         override fun getItemViewType(position: Int): Int = if (position == 0) {
-            if (BuildConfig.DISABLE_TRACKER_CREATION != true) 0 else 1
+            appFlagManager.flag(F.AddNewTracker).toInt()
         } else 1
 
     }
