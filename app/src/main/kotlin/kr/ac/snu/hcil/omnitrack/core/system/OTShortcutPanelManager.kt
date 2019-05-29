@@ -67,7 +67,7 @@ class OTShortcutPanelManager @Inject constructor(
 
     private fun buildNewNotificationShortcutViews(trackerList: List<OTTrackerDAO>, context: Context, bigStyle: Boolean): RemoteViews {
         val trackers = trackerList.filter {
-            !it.isIndependentInputLocked()
+            it.isManualInputAllowed()
         }
 
         val rv = RemoteViews(context.packageName, if (bigStyle) R.layout.remoteview_shortcut_notification_big else R.layout.remoteview_shortcut_notification_normal)

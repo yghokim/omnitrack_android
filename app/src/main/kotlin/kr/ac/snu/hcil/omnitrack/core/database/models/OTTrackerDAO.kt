@@ -151,32 +151,28 @@ open class OTTrackerDAO : RealmObject() {
         return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.COMMON_EDIT, getParsedLockedPropertyInfo())
     }
 
-    fun isDeletionLocked(): Boolean {
-        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.COMMON_DELETE, getParsedLockedPropertyInfo())
+    fun isRemovalAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.Delete, getParsedLockedPropertyInfo())
     }
 
-    fun isVisualizationLocked(): Boolean {
-        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_ENTER_VISUALIZATION, getParsedLockedPropertyInfo())
+    fun isVisualizationAccessAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.AccessVisualization, getParsedLockedPropertyInfo())
     }
 
-    fun isItemListLocked(): Boolean {
-        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_ENTER_ITEM_LIST, getParsedLockedPropertyInfo())
+    fun isItemListAccessAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.AccessItems, getParsedLockedPropertyInfo())
     }
 
     fun isAddNewFieldsAllowed(): Boolean {
         return LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.AddNewFields, getParsedLockedPropertyInfo())
     }
 
-    fun isAddNewReminderLocked(): Boolean {
-        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_ADD_NEW_REMINDER, getParsedLockedPropertyInfo())
+    fun isAddNewRemindersAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.AddNewReminders, getParsedLockedPropertyInfo())
     }
 
-    fun isIndependentInputLocked(): Boolean {
-        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_SELF_INITIATED_INPUT, getParsedLockedPropertyInfo())
-    }
-
-    fun isFieldReorderAllowed(): Boolean {
-        return LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.ReorderFields, getParsedLockedPropertyInfo())
+    fun isManualInputAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.ManualInput, getParsedLockedPropertyInfo())
     }
 
     fun isInstantLoggingAvailable(): Boolean {
@@ -249,7 +245,25 @@ open class OTAttributeDAO : RealmObject() {
 
     //TODO in the future, it should be divided into fine-grained modification flags.
     fun isEditingAllowed(): Boolean {
-        return LockedPropertiesHelper.flag(LockFlagLevel.Field, F.Modify, getParsedLockedPropertyInfo())
+        /*
+        return LockedPropertiesHelper.flag(LockFlagLevel.Field, F.Modify, getParsedLockedPropertyInfo())*/
+        return true
+    }
+
+    fun isEditPropertyEnabled(): Boolean {
+        return LockedPropertiesHelper.flag(LockFlagLevel.Field, F.EditProperties, getParsedLockedPropertyInfo())
+    }
+
+    fun isEditNameEnabled(): Boolean {
+        return LockedPropertiesHelper.flag(LockFlagLevel.Field, F.EditName, getParsedLockedPropertyInfo())
+    }
+
+    fun isEditMeasureFactoryEnabled(): Boolean{
+        return LockedPropertiesHelper.flag(LockFlagLevel.Field, F.EditMeasureFactory, getParsedLockedPropertyInfo())
+    }
+
+    fun isRequiredToggleEnabled(): Boolean{
+        return LockedPropertiesHelper.flag(LockFlagLevel.Field, F.ToggleRequired, getParsedLockedPropertyInfo())
     }
 
     fun isRemovalAllowed(): Boolean {

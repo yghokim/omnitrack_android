@@ -22,6 +22,8 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.ExpressionEvaluator
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerMeasureEntry
+import kr.ac.snu.hcil.omnitrack.core.flags.F
+import kr.ac.snu.hcil.omnitrack.core.flags.LockFlagLevel
 import kr.ac.snu.hcil.omnitrack.core.flags.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTBackgroundLoggingTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
@@ -206,19 +208,21 @@ open class OTTriggerDAO : RealmObject() {
         return _parsedLockedPropertyInfo!!
     }
 
+    private val lockFlagLevel: String get(){
+       return if(actionType == ACTION_TYPE_REMIND) LockFlagLevel.Reminder else LockFlagLevel.Trigger
+    }
+
     fun isEditingLocked(): Boolean {
         return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.COMMON_EDIT, getParsedLockedPropertyInfo())
                 ?: false
     }
 
-    fun isDeletionLocked(): Boolean {
-        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.COMMON_DELETE, getParsedLockedPropertyInfo())
-                ?: false
+    fun isRemovalAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(lockFlagLevel, F.Delete, getParsedLockedPropertyInfo())
     }
 
-    fun isSwitchLocked(): Boolean {
-        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.TRIGGER_CHANGE_SWITCH, getParsedLockedPropertyInfo())
-                ?: false
+    fun isSwitchAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(lockFlagLevel, F.ToggleSwitch, getParsedLockedPropertyInfo())
     }
 
     fun invalidateConditionCache() {
