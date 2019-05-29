@@ -9,7 +9,6 @@ import kr.ac.snu.hcil.omnitrack.core.serialization.getBooleanCompat
  */
 object LockedPropertiesHelper : AFlagsHelperBase() {
 
-    const val COMMON_DELETE = "delete"
     const val COMMON_EDIT = "edit"
     const val TRACKER_BOOKMARK = "bookmark"
     const val TRACKER_ADD_NEW_ATTRIBUTE = "addNewAttribute"
@@ -19,15 +18,10 @@ object LockedPropertiesHelper : AFlagsHelperBase() {
     const val TRACKER_CHANGE_ATTRIBUTE_ORDER = "changeAttributeOrder"
     const val TRACKER_ADD_NEW_REMINDER = "addNewReminder"
     const val TRACKER_SELF_INITIATED_INPUT = "selfInitiatedInput"
-    const val TRACKER_VISIBLE_IN_APP = "visibleInApp"
 
-    const val TRACKER_ENTER_ITEM_LIST = "enterItemList"
     const val TRACKER_ENTER_VISUALIZATION = "enterVisualization"
     const val TRIGGER_CHANGE_ASSIGNED_TRACKERS = "changeAssignedTrackers"
     const val TRIGGER_CHANGE_SWITCH = "changeSwitch"
-    const val TRIGGER_VISIBLE_IN_APP = "visibleInApp"
-
-    const val ATTRIBUTE_VISIBILITY = "visibility"
 
     private val defaultValueDict = TwoKeyDictionary<String, String, Boolean>()
 

@@ -15,6 +15,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.models.*
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.flags.F
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
@@ -88,9 +89,9 @@ class BackendDbManager @Inject constructor(
             return query
                     .not()
                     .beginGroup()
-                    .contains(FIELD_LOCKED_PROPERTIES_SERIALIZED, "\"visibleInApp\":true", Case.INSENSITIVE)
+                    .contains(FIELD_LOCKED_PROPERTIES_SERIALIZED, "\"${F.Visible}\":false", Case.INSENSITIVE)
                     .or()
-                    .contains(FIELD_LOCKED_PROPERTIES_SERIALIZED, "\"visibleInApp\" : true", Case.INSENSITIVE)
+                    .contains(FIELD_LOCKED_PROPERTIES_SERIALIZED, "\"${F.Visible}\": false", Case.INSENSITIVE)
                     .endGroup()
         }
     }
@@ -545,10 +546,10 @@ class BackendDbManager @Inject constructor(
                     { dao, serverPojo ->
                         dao.userUpdatedAt < serverPojo.getLongCompat(FIELD_UPDATED_AT_LONG) ?: Long.MIN_VALUE
                     }, serializationManager.serverTrackerTypeAdapter as Lazy<JsonObjectApplier<OTTrackerDAO>>)
+
             ESyncDataType.TRIGGER -> applyServerRowsToSyncImpl(OTTriggerDAO::class.java, jsonList, { trigger -> trigger.synchronizedAt },
                     { trigger, realm -> saveTrigger(trigger, realm) },
                     { trigger, realm -> removeTrigger(trigger, true, realm) },
-
                     { trigger, realm ->
                         if (trigger.removed) {
                             triggerSystemManager.tryCheckOutFromSystem(trigger)
@@ -557,6 +558,7 @@ class BackendDbManager @Inject constructor(
                         }
                     },
                     { dao, serverPojo -> dao.userUpdatedAt < serverPojo.getLongCompat(FIELD_UPDATED_AT_LONG) ?: Long.MIN_VALUE }, serializationManager.serverTriggerTypeAdapter as Lazy<JsonObjectApplier<OTTriggerDAO>>)
+
             ESyncDataType.ITEM -> applyServerRowsToSyncImpl(OTItemDAO::class.java, jsonList, { item -> item.synchronizedAt },
                     { item, realm -> realm.insertOrUpdate(item) },
                     { item, realm -> removeItemImpl(item, true, realm) }, null, { dao, serverPojo -> dao.timestamp < serverPojo.getLongCompat(FIELD_TIMESTAMP_LONG) ?: Long.MIN_VALUE }, serializationManager.serverItemTypeAdapter as Lazy<JsonObjectApplier<OTItemDAO>>)

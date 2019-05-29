@@ -111,8 +111,6 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     val experimentIdObservable = BehaviorSubject.create<Nullable<String>>()
 
-    val experimentListObservable = BehaviorSubject.create<List<ExperimentInfo>>()
-
     //===================================================
 
     private var lastRemovedAttributeId: String? = null
@@ -507,9 +505,11 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
         val isInDatabase: Boolean get() = attributeDAO.isManaged
 
+
         val isEditable = BehaviorSubject.createDefault<Boolean>(true)
         val isRemovable = BehaviorSubject.createDefault<Boolean>(true)
         val isVisibilityEditable = BehaviorSubject.createDefault<Boolean>(true)
+        val isEditNameEnabled = BehaviorSubject.createDefault<Boolean>(true)
 
         val nameObservable = BehaviorSubject.createDefault<String>("")
         val isRequiredObservable = BehaviorSubject.createDefault<Boolean>(false)
@@ -646,6 +646,8 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             isEditable.onNextIfDifferAndNotNull(editedDao.isEditingAllowed())
             isRemovable.onNextIfDifferAndNotNull(editedDao.isRemovalAllowed())
             isVisibilityEditable.onNextIfDifferAndNotNull(editedDao.isVisibilityToggleAllowed())
+            isEditNameEnabled.onNextIfDifferAndNotNull(editedDao.isEditNameEnabled())
+
 
             defaultValuePolicy = editedDao.fallbackValuePolicy
             defaultValuePreset = editedDao.fallbackPresetSerializedValue

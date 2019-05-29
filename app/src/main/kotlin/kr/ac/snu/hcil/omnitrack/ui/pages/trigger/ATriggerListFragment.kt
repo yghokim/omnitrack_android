@@ -433,13 +433,13 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             )
 
             subscriptions.add(
-                    triggerViewModel.switchLocked.subscribe { locked ->
-                        itemView.ui_trigger_switch.isEnabled = !locked
+                    triggerViewModel.switchEnabled.subscribe { enabled ->
+                        itemView.ui_trigger_switch.isEnabled = enabled
 
-                        itemView.ui_trigger_switch.alpha = if (locked) {
-                            0.2f
-                        } else {
+                        itemView.ui_trigger_switch.alpha = if (enabled) {
                             1.0f
+                        } else {
+                            0.2f
                         }
                     }
             )
@@ -455,14 +455,9 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             )
 
             subscriptions.add(
-                    triggerViewModel.deletionLocked.subscribe { locked ->
-                        itemView.ui_button_remove.isEnabled = !locked
-
-                        itemView.ui_button_remove.alpha = if (locked) {
-                            0.2f
-                        } else {
-                            1.0f
-                        }
+                    triggerViewModel.deletionEnabled.subscribe { enabled ->
+                        itemView.ui_button_remove.isEnabled = enabled
+                        itemView.ui_button_remove.visibility = if(enabled) View.VISIBLE else View.GONE
                     }
             )
 

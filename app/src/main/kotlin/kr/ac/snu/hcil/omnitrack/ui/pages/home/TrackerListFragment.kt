@@ -325,7 +325,7 @@ class TrackerListFragment : OTFragment() {
     }
 
     private fun handleTrackerClick(tracker: OTTrackerDAO) {
-        if (tracker.isIndependentInputLocked() && !reminderCommands.isReminderPromptingToTracker(tracker._id!!)) {
+        if (!tracker.isManualInputAllowed() && !reminderCommands.isReminderPromptingToTracker(tracker._id!!)) {
             Toast.makeText(requireActivity(), "You cannot add new entry unless you are prompted by reminders.", Toast.LENGTH_LONG).show()
         } else {
             if (tracker.makeAttributesQuery(false, false).count() == 0L) {

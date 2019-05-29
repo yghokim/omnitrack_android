@@ -316,9 +316,9 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
             isForExperiment.onNextIfDifferAndNotNull(CreationFlagsHelper.isForExperiment(snapshot.getParsedCreationFlags()))
 
             trackerEditable.onNextIfDifferAndNotNull(!snapshot.isEditingLocked())
-            trackerRemovable.onNextIfDifferAndNotNull(!snapshot.isDeletionLocked())
-            isItemListAllowed.onNextIfDifferAndNotNull(!snapshot.isItemListLocked())
-            isVisualizationAllowed.onNextIfDifferAndNotNull(!snapshot.isVisualizationLocked())
+            trackerRemovable.onNextIfDifferAndNotNull(snapshot.isRemovalAllowed())
+            isItemListAllowed.onNextIfDifferAndNotNull(snapshot.isItemListAccessAllowed())
+            isVisualizationAllowed.onNextIfDifferAndNotNull(snapshot.isVisualizationAccessAllowed())
 
             CreationFlagsHelper.getExperimentId(trackerDao.getParsedCreationFlags())?.let { experimentId ->
                 println("Observe the name of the experiment : $experimentId")

@@ -4,6 +4,7 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.opengl.Visibility
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
@@ -64,8 +65,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     private lateinit var attributeListView: AdapterLinearLayout
     //lateinit private var attributeListAdapter: AttributeListAdapter
-
-    private lateinit var attributeListItemTouchHelper: ItemTouchHelper
 
     //private lateinit var fab: FloatingActionButton
 
@@ -147,26 +146,28 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 }
         )
 
-
-
         creationSubscriptions.add(
                 this.viewModel.lockedPropertiesObservable.subscribe { (lockedProperties) ->
                     val isBookmarkChangeable = LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.ToggleShortcut, lockedProperties)
                     val canAddAttributes = LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.AddNewFields, lockedProperties)
+                    val isColorEditable = LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.EditColor, lockedProperties)
                     val isNameChangeable = LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.EditName, lockedProperties)
                     val isAttributeOrderChangeable = LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.ReorderFields, lockedProperties)
 
                     attributeListView.isDragEnabled = isAttributeOrderChangeable
                     isOnShortcutProperty.isEnabled = isBookmarkChangeable
+                    isOnShortcutProperty.visibility = if(isBookmarkChangeable) View.VISIBLE else View.GONE
+
                     nameProperty.isEnabled = isNameChangeable
+                    colorProperty.isEnabled = isColorEditable
+                    colorProperty.visibility = if(isColorEditable) View.VISIBLE else View.GONE
+
 
                     if (canAddAttributes) {
                         newAttributeButton.show()
                     } else {
                         newAttributeButton.hide()
                     }
-
-                    //TODO: implement disabling the attribute order change.
                 }
         )
 
@@ -541,28 +542,31 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 itemView.ui_preview_container.alpha = 0.5f
 
 
-                itemView.ui_drag_handle.visibility = if (attributeListView.isDragEnabled) View.VISIBLE else View.INVISIBLE
+                viewHolderSubscriptions.add(
+                        viewModel.lockedPropertiesObservable.subscribe {
+                            (trackerLockedProperties) ->
+                            val isReorderEnabled = LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.ReorderFields, trackerLockedProperties)
+                            itemView.ui_drag_handle.visibility = if(isReorderEnabled) View.VISIBLE else View.INVISIBLE
+                        }
+                )
 
                 viewHolderSubscriptions.add(
-                        Observable.combineLatest<Nullable<JsonObject>, Boolean, Boolean>(viewModel.lockedPropertiesObservable, attributeViewModel.isEditable,
-                                BiFunction { lockedProperties: Nullable<JsonObject>, localEditable: Boolean ->
-                                    val trackerEditLocked = LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_EDIT_ATTRIBUTES, lockedProperties.datum)
-                                    val attributeEditLocked = !localEditable
-                                    !trackerEditLocked && !attributeEditLocked
-                                }).subscribe { isEditable: Boolean ->
-
+                        attributeViewModel.isEditable.subscribe { isEditable: Boolean ->
                             itemView.ui_preview_container.isEnabled = isEditable
-                            itemView.ui_column_name_button.isEnabled = isEditable
                             itemView.ui_button_edit.isEnabled = isEditable
                             itemView.ui_button_edit.alpha = if (isEditable) 1.0f else 0.2f
                         }
                 )
 
                 viewHolderSubscriptions.add(
-                        Observable.combineLatest<Nullable<JsonObject>, Boolean, Boolean>(viewModel.lockedPropertiesObservable, attributeViewModel.isRemovable,
-                                BiFunction { lockedProperties: Nullable<JsonObject>, localRemovable: Boolean ->
-                                    (!LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.TRACKER_REMOVE_ATTRIBUTES, lockedProperties.datum) && localRemovable)
-                                }).subscribe { isRemovable: Boolean ->
+                        attributeViewModel.isEditNameEnabled.subscribe {
+                            isNameEditable ->
+                            itemView.ui_column_name_button.isEnabled = isNameEditable
+                        }
+                )
+
+                viewHolderSubscriptions.add(
+                        attributeViewModel.isRemovable.subscribe { isRemovable: Boolean ->
                             itemView.ui_button_remove.isEnabled = isRemovable
                             itemView.ui_button_remove.alpha = if (isRemovable) 1.0f else 0.2f
                         }

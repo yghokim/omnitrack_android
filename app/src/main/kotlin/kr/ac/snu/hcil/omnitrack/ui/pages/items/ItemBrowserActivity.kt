@@ -221,9 +221,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         if (trackerId != null) {
             viewModel.init(trackerId)
 
-            if (viewModel.trackerDao.isIndependentInputLocked()) {
+            if (!viewModel.trackerDao.isManualInputAllowed()) {
                 rightActionBarButton?.isEnabled = false
-                rightActionBarButton?.alpha = 0.2f
+                rightActionBarButton?.visibility = View.GONE
             }
         }
 
