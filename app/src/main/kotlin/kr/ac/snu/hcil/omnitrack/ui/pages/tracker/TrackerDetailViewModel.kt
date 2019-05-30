@@ -27,7 +27,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.database.typeadapters.ServerCompatibleTypeAdapter
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForTracker
 import kr.ac.snu.hcil.omnitrack.core.di.global.Research
@@ -634,6 +633,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             }
 
             dao.serializedConnection = connectionObservable.value?.datum?.getSerializedString(connectionTypeAdapter)
+
+            dao.serializedLockedPropertyInfo = attributeDAO.serializedLockedPropertyInfo
+            dao.serializedCreationFlags = attributeDAO.serializedCreationFlags
 
             return dao
         }
