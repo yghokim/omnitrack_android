@@ -437,19 +437,19 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                         itemView.ui_trigger_switch.isEnabled = enabled
 
                         itemView.ui_trigger_switch.alpha = if (enabled) {
-                            1.0f
+                            InterfaceHelper.ALPHA_ORIGINAL
                         } else {
-                            0.2f
+                            InterfaceHelper.ALPHA_INACTIVE
                         }
                     }
             )
 
             subscriptions.add(
-                    triggerViewModel.editionLocked.subscribe { locked ->
-                        if (locked) {
-                            itemView.setOnClickListener(null)
-                        } else {
+                    triggerViewModel.editionEnabled.subscribe { enabled ->
+                        if (enabled) {
                             itemView.setOnClickListener(this)
+                        } else {
+                            itemView.setOnClickListener(null)
                         }
                     }
             )

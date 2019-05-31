@@ -147,8 +147,8 @@ open class OTTrackerDAO : RealmObject() {
         })
     }
 
-    fun isEditingLocked(): Boolean {
-        return LockedPropertiesHelper.isLockedNotNull(LockedPropertiesHelper.COMMON_EDIT, getParsedLockedPropertyInfo())
+    fun isEditingAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.Modify, getParsedLockedPropertyInfo())
     }
 
     fun isRemovalAllowed(): Boolean {
@@ -243,11 +243,8 @@ open class OTAttributeDAO : RealmObject() {
         return _parsedLockedPropertyInfo!!
     }
 
-    //TODO in the future, it should be divided into fine-grained modification flags.
     fun isEditingAllowed(): Boolean {
-        /*
-        return LockedPropertiesHelper.flag(LockFlagLevel.Field, F.Modify, getParsedLockedPropertyInfo())*/
-        return true
+        return LockedPropertiesHelper.flag(LockFlagLevel.Field, F.Modify, getParsedLockedPropertyInfo())
     }
 
     fun isEditPropertyEnabled(): Boolean {

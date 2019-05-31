@@ -72,7 +72,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
         val userId = authManager.userId!!
         val realm = realmProvider.get()
         trackers.clear()
-        trackers.addAll(dbManager.get().makeTrackersOfUserVisibleQuery(userId, realm).findAll().filter { !it.isEditingLocked() })
+        trackers.addAll(dbManager.get().makeTrackersOfUserVisibleQuery(userId, realm).findAll().filter { it.isEditingAllowed() })
         realm.close()
         trackerListView?.adapter?.notifyDataSetChanged()
     }

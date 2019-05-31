@@ -212,9 +212,8 @@ open class OTTriggerDAO : RealmObject() {
        return if(actionType == ACTION_TYPE_REMIND) LockFlagLevel.Reminder else LockFlagLevel.Trigger
     }
 
-    fun isEditingLocked(): Boolean {
-        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.COMMON_EDIT, getParsedLockedPropertyInfo())
-                ?: false
+    fun isEditingAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(lockFlagLevel, F.Modify, getParsedLockedPropertyInfo())
     }
 
     fun isRemovalAllowed(): Boolean {
