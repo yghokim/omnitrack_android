@@ -17,9 +17,9 @@ import com.jaredrummler.materialspinner.MaterialSpinner
 import dagger.Lazy
 import kotlinx.android.synthetic.main.activity_attribute_detail.*
 import kr.ac.snu.hcil.android.common.view.DialogHelper
+import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 import kr.ac.snu.hcil.android.common.view.setPaddingLeft
 import kr.ac.snu.hcil.android.common.view.setPaddingRight
-import kr.ac.snu.hcil.android.common.view.toVisibility
 import kr.ac.snu.hcil.android.common.view.wizard.WizardView
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
@@ -136,10 +136,14 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         nameProperty.isEnabled = viewModel.attributeDAO?.isEditNameEnabled() == true
         requiredProperty.isEnabled = viewModel.attributeDAO?.isRequiredToggleEnabled() == true
         ui_connection_group.isEnabled = viewModel.attributeDAO?.isEditMeasureFactoryEnabled() == true
-        ui_connection_group.alpha = if( viewModel.attributeDAO?.isEditMeasureFactoryEnabled() == true ) 1.0f else 0.2f
+        ui_connection_group.alpha = if (viewModel.attributeDAO?.isEditMeasureFactoryEnabled() == true) InterfaceHelper.ALPHA_ORIGINAL else InterfaceHelper.ALPHA_INACTIVE
 
         ui_property_list.isEnabled = viewModel.attributeDAO?.isEditPropertyEnabled() == true
-        ui_property_list.alpha = if( viewModel.attributeDAO?.isEditPropertyEnabled() == true ) 1.0f else 0.2f
+        ui_property_list.alpha = if (viewModel.attributeDAO?.isEditPropertyEnabled() == true) InterfaceHelper.ALPHA_ORIGINAL else InterfaceHelper.ALPHA_INACTIVE
+
+        ui_fallback_policy_container.isEnabled = viewModel.attributeDAO?.isEditPropertyEnabled() == true
+        ui_fallback_policy_container.alpha = if (viewModel.attributeDAO?.isEditPropertyEnabled() == true) InterfaceHelper.ALPHA_ORIGINAL else InterfaceHelper.ALPHA_INACTIVE
+
 
 
         //ui_attribute_connection.isEnabled = false
