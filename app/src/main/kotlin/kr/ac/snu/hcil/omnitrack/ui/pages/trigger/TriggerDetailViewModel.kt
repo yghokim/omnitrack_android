@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
+import com.google.gson.JsonObject
 import dagger.Lazy
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
@@ -46,7 +47,6 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
         private set
 
     private var originalTriggerDao: OTTriggerDAO? = null
-    private var attachedTrackersResult: RealmResults<OTTrackerDAO>? = null
 
     var isOffline: Boolean = false
         private set
@@ -59,6 +59,11 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
 
     val script = BehaviorSubject.create<Nullable<String>>()
     val useScript = BehaviorSubject.createDefault(false)
+
+    val lockedProperties: JsonObject?
+        get() {
+            return originalTriggerDao?.getParsedLockedPropertyInfo()
+        }
 
     var isInitialized: Boolean = false
         private set

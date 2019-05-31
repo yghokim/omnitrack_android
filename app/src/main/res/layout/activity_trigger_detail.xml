@@ -39,64 +39,72 @@
         android:layout_below="@+id/appbar"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <kr.ac.snu.hcil.android.common.view.container.LockableLinearLayout
+            android:id="@+id/ui_trigger_properties_container"
         android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <FrameLayout
-                android:id="@+id/ui_condition_control_panel_container"
-            android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <kr.ac.snu.hcil.omnitrack.views.properties.BooleanPropertyView
-                android:id="@+id/ui_use_script_property_view"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:text="@string/msg_use_validation_script" />
+                android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/ui_script_form"
-                style="@style/LongTextInputStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:background="@drawable/background_dark_code_form"
-                android:enabled="false"
-                android:fontFamily="monospace"
-                android:hint="Write script code here"
-                android:minLines="1"
-                android:text=""
-                android:textColor="@color/color_text_code_form"
-                android:textColorHint="#80ffffff"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                <FrameLayout
+                    android:id="@+id/ui_condition_control_panel_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-            <View style="@style/HorizontalSeparator" />
+                <kr.ac.snu.hcil.omnitrack.views.properties.BooleanPropertyView
+                    android:id="@+id/ui_use_script_property_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/activity_horizontal_margin"
+                    android:paddingEnd="@dimen/activity_horizontal_margin"
+                    android:text="@string/msg_use_validation_script" />
 
-            <kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ReminderActionConfigurationPanel
-                android:id="@+id/ui_reminder_config_view"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:orientation="vertical" />
+                <EditText
+                    android:id="@+id/ui_script_form"
+                    style="@style/LongTextInputStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:background="@drawable/background_dark_code_form"
+                    android:enabled="false"
+                    android:fontFamily="monospace"
+                    android:hint="Write script code here"
+                    android:minLines="1"
+                    android:text=""
+                    android:textColor="@color/color_text_code_form"
+                    android:textColorHint="#80ffffff"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
 
-            <kr.ac.snu.hcil.omnitrack.views.properties.BooleanPropertyView
-                android:id="@+id/ui_logging_config_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
-                android:text="@string/msg_trigger_config_send_notification_on_logging" />
+                <View style="@style/HorizontalSeparator" />
+
+                <kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ReminderActionConfigurationPanel
+                    android:id="@+id/ui_reminder_config_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <kr.ac.snu.hcil.omnitrack.views.properties.BooleanPropertyView
+                    android:id="@+id/ui_logging_config_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/activity_horizontal_margin"
+                    android:paddingEnd="@dimen/activity_horizontal_margin"
+                    android:text="@string/msg_trigger_config_send_notification_on_logging" />
+            </LinearLayout>
+
 
             <ViewStub
                 android:id="@+id/ui_tracker_assign_panel_stub"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout="@layout/layout_tracker_assign_panel" />
-        </LinearLayout>
+        </kr.ac.snu.hcil.android.common.view.container.LockableLinearLayout>
     </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

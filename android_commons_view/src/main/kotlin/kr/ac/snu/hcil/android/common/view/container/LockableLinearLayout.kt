@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.LinearLayout
+import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 
 class LockableLinearLayout: LinearLayout {
 
@@ -13,7 +14,7 @@ class LockableLinearLayout: LinearLayout {
 
     override fun setEnabled(enabled: Boolean) {
         super.setEnabled(enabled)
-        alpha = if(enabled) 1.0f else 0.2f
+        alpha = if (enabled) InterfaceHelper.ALPHA_ORIGINAL else InterfaceHelper.ALPHA_INACTIVE
     }
 
 

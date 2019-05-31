@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -16,6 +17,7 @@ import io.reactivex.subjects.BehaviorSubject
 import io.realm.Realm
 import kotlinx.android.synthetic.main.layout_attached_tracker_list_element_removable.view.*
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
+import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 import kr.ac.snu.hcil.android.common.view.container.decoration.ItemSpacingDecoration
 import kr.ac.snu.hcil.android.common.view.getActivity
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
@@ -85,6 +87,21 @@ class TrackerAssignPanel : RecyclerView {
 
     private fun notifyTrackerListChanged() {
         trackerListChanged.onNext(trackers.toList())
+    }
+
+
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+        alpha = if (enabled) InterfaceHelper.ALPHA_ORIGINAL else InterfaceHelper.ALPHA_INACTIVE
+    }
+
+
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        return if (isEnabled) {
+            super.onInterceptTouchEvent(ev)
+        } else {
+            true
+        }
     }
 
     private fun onAttachButtonClicked() {

@@ -4,7 +4,6 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.opengl.Visibility
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
@@ -14,23 +13,19 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ItemTouchHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.salomonbrys.kotson.set
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import com.google.gson.JsonObject
 import dagger.Lazy
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.attribute_list_element.view.*
 import kotlinx.android.synthetic.main.fragment_tracker_detail_structure.*
 import kr.ac.snu.hcil.android.common.DefaultNameGenerator
-import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.dipSize
 import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
+import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 import kr.ac.snu.hcil.android.common.view.container.AdapterLinearLayout
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -539,7 +534,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 itemView.ui_attribute_type.setImageResource(attributeViewModel.icon)
                 itemView.ui_column_name.text = attributeViewModel.name
 
-                itemView.ui_preview_container.alpha = 0.5f
+                itemView.ui_preview_container.alpha = InterfaceHelper.ALPHA_INACTIVE
 
 
                 viewHolderSubscriptions.add(
