@@ -43,7 +43,7 @@ open class TriggerViewModel(val context: Context, val dao: OTTriggerDAO, val rea
     val triggerId: BehaviorSubject<String> = BehaviorSubject.create()
 
     val deletionEnabled: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
-    val editionLocked: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+    val editionEnabled: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
     val switchEnabled: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
 
     val configIconResId: BehaviorSubject<Int> = BehaviorSubject.create()
@@ -117,7 +117,7 @@ open class TriggerViewModel(val context: Context, val dao: OTTriggerDAO, val rea
         scriptUsed.onNextIfDifferAndNotNull(dao.checkScript && dao.additionalScript?.isNotBlank() == true)
         triggerSwitch.onNextIfDifferAndNotNull(dao.isOn)
 
-        editionLocked.onNextIfDifferAndNotNull(dao.isEditingLocked())
+        editionEnabled.onNextIfDifferAndNotNull(dao.isEditingAllowed())
         deletionEnabled.onNextIfDifferAndNotNull(dao.isRemovalAllowed())
         switchEnabled.onNextIfDifferAndNotNull(dao.isSwitchAllowed())
 

@@ -315,7 +315,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
             isBookmarked.onNextIfDifferAndNotNull(snapshot.isBookmarked)
             isForExperiment.onNextIfDifferAndNotNull(CreationFlagsHelper.isForExperiment(snapshot.getParsedCreationFlags()))
 
-            trackerEditable.onNextIfDifferAndNotNull(!snapshot.isEditingLocked())
+            trackerEditable.onNextIfDifferAndNotNull(snapshot.isEditingAllowed())
             trackerRemovable.onNextIfDifferAndNotNull(snapshot.isRemovalAllowed())
             isItemListAllowed.onNextIfDifferAndNotNull(snapshot.isItemListAccessAllowed())
             isVisualizationAllowed.onNextIfDifferAndNotNull(snapshot.isVisualizationAccessAllowed())
