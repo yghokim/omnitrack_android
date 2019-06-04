@@ -421,7 +421,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
             val valueListAdapter: TableRowAdapter
 
-            val itemMenu: PopupMenu
+            val itemMenu: PopupMenu?
 
 
             init {
@@ -435,11 +435,17 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 if(tracker!=null)
                     colorBar.setBackgroundColor(tracker!!.color)
 */
-                moreButton.setOnClickListener(this)
 
-                itemMenu = PopupMenu(this@ItemBrowserActivity, moreButton, Gravity.TOP or Gravity.START)
-                itemMenu.inflate(R.menu.menu_item_list_element)
-                itemMenu.setOnMenuItemClickListener(this)
+                if (viewModel.isItemModificationAllowed) {
+                    moreButton.setOnClickListener(this)
+
+                    itemMenu = PopupMenu(this@ItemBrowserActivity, moreButton, Gravity.TOP or Gravity.START)
+                    itemMenu.inflate(R.menu.menu_item_list_element)
+                    itemMenu.setOnMenuItemClickListener(this)
+                } else {
+                    itemMenu = null
+                    moreButton.visibility = View.GONE
+                }
 
                 valueListView.layoutManager = LinearLayoutManager(this@ItemBrowserActivity, RecyclerView.VERTICAL, false)
 
@@ -451,7 +457,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
             override fun onClick(p0: View?) {
                 if (p0 === moreButton) {
-                    itemMenu.show()
+                    itemMenu?.show()
                     removalSnackbar.dismiss()
                 }
             }
@@ -570,7 +576,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                     init {
                         valueView = view.findViewById(R.id.ui_value_view_replace)
-                        view.setOnClickListener(this)
+                        if (viewModel.isItemModificationAllowed) {
+                            view.setOnClickListener(this)
+                        }
                     }
 
                     override fun onClick(v: View?) {
@@ -616,7 +624,11 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                             if (newValueView is IActivityLifeCycle && newValueView !== valueView) {
                                 newValueView.onCreate(null)
                             }
-                            newValueView.setOnClickListener(this)
+
+                            if (viewModel.isItemModificationAllowed) {
+                                newValueView.setOnClickListener(this)
+                            }
+
                             changeNewValueView(newValueView)
 
                             valueApplySubscription.set(attributeViewFactoryManager.get().get(attribute.type).applyValueToViewForItemList(this@ItemBrowserActivity, attribute, itemValue, valueView).subscribe({

@@ -19,6 +19,9 @@ import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.flags.F
+import kr.ac.snu.hcil.omnitrack.core.flags.LockFlagLevel
+import kr.ac.snu.hcil.omnitrack.core.flags.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -74,6 +77,17 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
 
     val sortedItemsObservable = BehaviorSubject.create<List<ItemViewModel>>()
 
+    private var _isItemModificationAllowed: Boolean? = null
+    val isItemModificationAllowed: Boolean
+        get() {
+            if (_isItemModificationAllowed == null) {
+                _isItemModificationAllowed = LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.ModifyItems, if (this::trackerDao.isInitialized) {
+                    this.trackerDao.getParsedLockedPropertyInfo()
+                } else null)
+            }
+            return _isItemModificationAllowed!!
+        }
+
     private val itemComparerMethod = Comparator<ItemViewModel> { p0, p1 -> currentSorter.compare(p0?.itemDao, p1?.itemDao) }
 
     val onItemContentChanged = PublishSubject.create<Array<OrderedCollectionChangeSet.Range>>()
@@ -100,7 +114,9 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
     }
 
     private fun refreshTracker(trackerDao: OTTrackerDAO) {
+        this._isItemModificationAllowed = null
         this.trackerDao = trackerDao
+
         this.attributes = trackerDao.attributes.asSequence().filter { it.isHidden == false && it.isInTrashcan == false }.toList()
         trackerName = trackerDao.name
 
