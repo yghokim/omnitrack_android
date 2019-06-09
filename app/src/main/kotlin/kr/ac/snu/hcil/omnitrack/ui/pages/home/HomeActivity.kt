@@ -164,9 +164,6 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
                         creationSubscriptions.add(
                                 serverConnectionChecker.get().subscribe({
                                     viewModel.startPullSync()
-                                    if (BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
-                                        viewModel.syncResearch()
-                                    }
                                 }, { ex ->
                                     if (ex is NetworkNotConnectedException) {
                                         Toast.makeText(this, "Server does not response.", Toast.LENGTH_SHORT).show()

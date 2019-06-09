@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.annotation.DrawableRes
 import com.google.gson.JsonObject
 import dagger.Lazy
-import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
@@ -29,7 +28,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.typeadapters.ServerCompatibleTypeAdapter
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForTracker
-import kr.ac.snu.hcil.omnitrack.core.di.global.Research
 import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
@@ -70,9 +68,6 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     @field:[Inject ForTracker]
     protected lateinit var trackerTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTTrackerDAO>>
-
-    @field:[Inject Research]
-    protected lateinit var researchRealmFactory: Factory<Realm>
 
     private lateinit var researchRealm: Realm
 
@@ -188,7 +183,6 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     override fun onInject(app: OTAndroidApp) {
         app.applicationComponent.inject(this)
         colorObservable = BehaviorSubject.createDefault<Int>(ColorHelper.getTrackerColorPalette(getApplication())[0])
-        researchRealm = researchRealmFactory.get()
     }
 
     fun init(trackerId: String?, savedInstanceState: Bundle?) {

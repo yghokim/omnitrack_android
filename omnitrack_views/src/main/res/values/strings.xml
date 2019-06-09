@@ -20,6 +20,8 @@
     <string name="msg_auth_validation_error_password_blank">Password should not be blank.</string>
     <string name="msg_auth_validation_error_password_length">Password should not be shorter than %1$d.</string>
     <string name="username">Username</string>
+    <string name="email">E-mail</string>
+
     <string name="password">Password</string>
     <string name="auth_sign_in">Sign In</string>
     <string name="create_new_account">Create New Account</string>
@@ -27,7 +29,7 @@
     <string name="msg_auth_invitation_code">Invitation Code</string>
     <string name="msg_auth_invitation_code_description">Use the invitation code you received from the experimenter.</string>
     <string name="auth_signin_wrong_credential">Username or password is wrong.</string>
-    <string name="msg_auth_description_username_researcher">Username must match one of the registered researchers\' E-mails.</string>
+    <string name="msg_auth_description_email_researcher">E-mail must match one of the registered researchers\' e-mail.</string>
     <string name="msg_auth_next_step">Next Step</string>
     <string name="msg_auth_approve_and_continue">Approve and Continue</string>
     <string name="msg_auth_sign_up_complete">Complete</string>

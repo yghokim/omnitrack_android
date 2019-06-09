@@ -440,6 +440,7 @@
     <string name="msg_attribute_detail_properties_invalid">일부 속성 설정을 다시 한번 확인해 주세요.</string>
     <string name="msg_sharing_tracking_plan">Sharing tracking plan...</string>
     <string name="msg_export_tracking_plan">Export Tracking Plan</string>
+    <string name="activity_title_my_account">내 계정정보</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>

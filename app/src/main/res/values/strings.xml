@@ -623,5 +623,6 @@
     <string name="msg_attribute_detail_properties_invalid">Please check that all property inputs are valid.</string>
     <string name="msg_sharing_tracking_plan">Sharing tracking plan...</string>
     <string name="msg_export_tracking_plan">Export Tracking Plan</string>
+    <string name="activity_title_my_account">My Account</string>
 
 </resources>

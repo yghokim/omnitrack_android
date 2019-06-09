@@ -203,10 +203,6 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         DaoSerializationModule()
     }
 
-    private val researchModule: ResearchModule by lazy {
-        ResearchModule()
-    }
-
     private val measureModule: MeasureModule by lazy {
         MeasureModule()
     }
@@ -229,7 +225,6 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
                 .networkModule(networkModule)
                 .informationHelpersModule(InformationHelpersModule())
                 .scriptingModule(ScriptingModule())
-                .researchModule(researchModule)
                 .synchronizationModule(synchronizationModule)
                 .triggerSystemModule(triggerSystemModule)
                 .build()

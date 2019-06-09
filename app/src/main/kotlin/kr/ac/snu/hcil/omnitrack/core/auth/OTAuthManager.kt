@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.auth0.android.jwt.JWT
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import dagger.Lazy
 import dagger.internal.Factory
@@ -15,17 +16,21 @@ import io.reactivex.Completable.defer
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import io.realm.Realm
+import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.di.global.UserInfo
+import kr.ac.snu.hcil.omnitrack.core.serialization.getStringCompat
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTAppFlagManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import org.jetbrains.anko.runOnUiThread
+import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -37,6 +42,7 @@ class OTAuthManager @Inject constructor(
         private val context: Context,
         @UserInfo private val sharedPreferences: SharedPreferences,
         @Backend private val realmFactory: Factory<Realm>,
+        @ForGeneric private val gson: Lazy<Gson>,
         private val syncManager: OTSyncManager,
         private val triggerSystemManager: Lazy<OTTriggerSystemManager>,
         private val shortcutPanelManager: OTShortcutPanelManager,
@@ -90,6 +96,11 @@ class OTAuthManager @Inject constructor(
     val userName: String?
         get() {
             return decodedToken?.getClaim("username")?.asString()
+        }
+
+    val email: String?
+        get() {
+            return decodedToken?.getClaim("email")?.asString()
         }
 
     val userId: String?
@@ -168,9 +179,9 @@ class OTAuthManager @Inject constructor(
         } else return null
     }
 
-    fun register(username: String, password: String, invitationCode: String?, demographicData: JsonObject?): Completable {
+    fun register(username: String, email: String, password: String, invitationCode: String?, demographicData: JsonObject?): Completable {
         return OTDeviceInfo.makeDeviceInfo(context).flatMap { deviceInfo ->
-            authApiController.get().register(username, password, deviceInfo, invitationCode, demographicData)
+            authApiController.get().register(username, email, password, deviceInfo, invitationCode, demographicData)
         }.doOnSuccess { responseData ->
             handleAuthResult(responseData, true)
         }.ignoreElement()
@@ -212,6 +223,32 @@ class OTAuthManager @Inject constructor(
                 notifySignedOut()
             }
         } else return Completable.complete()
+    }
+
+    fun updateEmail(email: String): Completable {
+        return authApiController.get().updateEmail(email).doOnSuccess { response ->
+            updateToken(response.token)
+        }.ignoreElement()
+    }
+
+    fun changePassword(original: String, newPassword: String): Completable {
+        return authApiController.get().changePassword(original, newPassword).doOnSuccess { response ->
+            updateToken(response.token)
+        }.ignoreElement().onErrorResumeNext { err ->
+            if (err is HttpException) {
+                val errorBody = gson.get().fromJson<JsonObject>(
+                        err.response().errorBody()?.charStream(), JsonObject::class.java)
+
+                if (errorBody != null) {
+                    when (errorBody.getStringCompat("error")) {
+                        "CredentialWrong" -> {
+                            Completable.error(DialogHelper.ChangePasswordWrongException(originalPasswordErrorMessage = "Inserted wrong password."))
+                        }
+                        else -> throw err
+                    }
+                } else throw err
+            } else throw err
+        }
     }
 
     private fun notifySignedIn() {

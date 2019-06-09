@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,7 +35,7 @@ class SignUpCredentialSlideFragment : SignUpActivity.SlideFragment(SignUpActivit
 
         if (BuildConfig.DEFAULT_EXPERIMENT_ID == null) {
             view.ui_form_invitation_code.visibility = View.GONE
-            view.ui_description.text = getString(R.string.msg_auth_description_username_researcher)
+            view.ui_description.text = getString(R.string.msg_auth_description_email_researcher)
             view.ui_description.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorPointed_Light))
         }
 
@@ -62,6 +63,27 @@ class SignUpCredentialSlideFragment : SignUpActivity.SlideFragment(SignUpActivit
 
         })
 
+        view.ui_textfield_email.filters += NoBlankInputFilter()
+        view.ui_textfield_email.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if (Patterns.EMAIL_ADDRESS.matcher(s?.toString() ?: "").matches()) {
+                    view.ui_form_email.error = null
+                    view.ui_form_email.endIconDrawable = checkDrawable
+                } else {
+                    view.ui_form_email.endIconDrawable = null
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+            }
+
+        })
+
         view.ui_textfield_invitation_code.filters += NoBlankInputFilter()
         view.ui_textfield_invitation_code.setOnEditorActionListener { v, actionId, event ->
             onNextTried()
@@ -74,22 +96,26 @@ class SignUpCredentialSlideFragment : SignUpActivity.SlideFragment(SignUpActivit
 
     override fun onNextTried() {
         val usernameInput = view?.ui_textfield_username?.text?.toString() ?: ""
+        val emailInput = view?.ui_textfield_email?.text?.toString() ?: ""
         val passwordInput = view?.ui_textfield_password?.text?.toString() ?: ""
         val confirmPasswordInput = view?.ui_textfield_confirm_password?.text?.toString() ?: ""
         val invitationCodeInput = view?.ui_textfield_invitation_code?.text?.toString() ?: ""
 
         val usernameInvalidMessage = authManager.validateUsername(usernameInput)
+        val emailInvalidMessage = if (Patterns.EMAIL_ADDRESS.matcher(emailInput).matches()) null else "Invalid E-mail address."
         val passwordInvalidMessage = authManager.validatePassword(passwordInput)
         val confirmPasswordInvalidMessage = if (passwordInput.contentEquals(confirmPasswordInput)) null else "Two password inputs are different."
         val invitationCodeInvalidMessage = if (invitationCodeInput.trimmedLength() > 0) null else "Invitation Code should not be blank."
 
         view?.ui_form_username?.error = usernameInvalidMessage
         view?.ui_form_password?.error = passwordInvalidMessage
+        view?.ui_form_email?.error = emailInvalidMessage
         view?.ui_form_confirm_password?.error = confirmPasswordInvalidMessage
         view?.ui_form_invitation_code?.error = invitationCodeInvalidMessage
 
-        if (usernameInvalidMessage == null && passwordInvalidMessage == null && confirmPasswordInvalidMessage == null && (BuildConfig.DEFAULT_EXPERIMENT_ID == null || invitationCodeInvalidMessage == null)) {
+        if (usernameInvalidMessage == null && emailInvalidMessage == null && passwordInvalidMessage == null && confirmPasswordInvalidMessage == null && (BuildConfig.DEFAULT_EXPERIMENT_ID == null || invitationCodeInvalidMessage == null)) {
             viewModel.username = usernameInput
+            viewModel.email = emailInput
             viewModel.password = passwordInput
             viewModel.invitationCode = invitationCodeInput
             goNext()

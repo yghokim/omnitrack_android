@@ -1,9 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.app.Application
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
@@ -11,15 +8,12 @@ import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.android.common.onNextIfDifferAndNotNull
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.di.global.ResearchSync
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncQueueDbHelper
-import kr.ac.snu.hcil.omnitrack.core.workers.OTResearchSynchronizationWorker
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import javax.inject.Inject
-import javax.inject.Provider
 
 /**
  * Created by younghokim on 2017-11-09.
@@ -34,10 +28,6 @@ class HomeScreenViewModel(app: Application):UserAttachedViewModel(app) {
 
     @Inject
     protected lateinit var syncManager: OTSyncManager
-
-
-    @field:[Inject ResearchSync]
-    protected lateinit var researchSyncRequest: Provider<OneTimeWorkRequest>
 
     val syncStateObservable: Observable<Int> get() = _syncStateSubject
 
@@ -72,10 +62,5 @@ class HomeScreenViewModel(app: Application):UserAttachedViewModel(app) {
             )
             return true
         }
-    }
-
-    fun syncResearch(): Boolean {
-        WorkManager.getInstance().enqueueUniqueWork(OTResearchSynchronizationWorker.TAG, ExistingWorkPolicy.REPLACE, researchSyncRequest.get())
-        return true
     }
 }

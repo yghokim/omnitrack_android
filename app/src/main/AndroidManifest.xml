@@ -287,11 +287,6 @@
             android:label="@string/msg_edit_tracker_order"/>
 
         <activity
-            android:name=".ui.pages.research.ResearchActivity"
-            android:label="@string/msg_title_research"
-            android:parentActivityName=".ui.pages.home.HomeActivity" />
-
-        <activity
             android:name=".ui.pages.export.PackageExportActivity"
             android:label="@string/msg_export_tracking_plan"
             android:parentActivityName=".ui.pages.home.HomeActivity" />
@@ -301,6 +296,10 @@
             android:name=".ui.pages.services.ApiKeySettingsActivity"
             android:label="Keystore Configuration"
             android:parentActivityName=".ui.pages.home.HomeActivity" />
+
+        <activity
+            android:name=".ui.pages.auth.MyAccountActivity"
+            android:label="@string/activity_title_my_account" />
 
     </application>
 
