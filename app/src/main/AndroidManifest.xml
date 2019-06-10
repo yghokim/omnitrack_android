@@ -132,9 +132,7 @@
             </intent-filter>
         </receiver>
 
-        <!--Temporarily disable the app widget.-->
         <receiver
-            android:enabled="false"
             android:name=".widgets.OTShortcutPanelWidgetProvider"
             android:label="@string/msg_shortcut_widget_name">
             <intent-filter>
@@ -209,16 +207,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.pages.AboutActivity" />
-
-        <activity
-            android:name=".ui.pages.auth.SignInActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_sign_in" />
-
-        <activity
-            android:name=".ui.pages.auth.SignUpActivity"
-            android:windowSoftInputMode="adjustPan" />
-
         <activity
             android:name=".ui.pages.home.HomeActivity"
             android:label="${appName}${appNameSuffix}" />
@@ -252,6 +240,11 @@
         <activity
             android:name=".ui.pages.diagnostics.SystemLogActivity"
             android:label="System Logs" />
+        <activity
+            android:name=".ui.pages.SignInActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:label="@string/title_activity_sign_in" />
 
         <activity
             android:name=".ui.pages.SendReportActivity"
@@ -287,19 +280,23 @@
             android:label="@string/msg_edit_tracker_order"/>
 
         <activity
+            android:name=".ui.pages.research.ResearchActivity"
+            android:label="@string/msg_title_research"
+            android:parentActivityName=".ui.pages.home.HomeActivity" />
+
+        <activity
             android:name=".ui.pages.export.PackageExportActivity"
             android:label="@string/msg_export_tracking_plan"
             android:parentActivityName=".ui.pages.home.HomeActivity" />
 
+        <activity
+            android:name=".ui.pages.experiment.ExperimentSignUpActivity"
+            android:windowSoftInputMode="adjustPan" />
 
         <activity
             android:name=".ui.pages.services.ApiKeySettingsActivity"
             android:label="Keystore Configuration"
             android:parentActivityName=".ui.pages.home.HomeActivity" />
-
-        <activity
-            android:name=".ui.pages.auth.MyAccountActivity"
-            android:label="@string/activity_title_my_account" />
 
     </application>
 

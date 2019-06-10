@@ -33,8 +33,8 @@ open class TriggerViewModel(val context: Context, val dao: OTTriggerDAO, val rea
     @Inject
     protected lateinit var triggerSystemManager: OTTriggerSystemManager
 
-    override val _id: String?
-        get() = dao._id
+    override val objectId: String?
+        get() = dao.objectId
 
     val triggerActionType: BehaviorSubject<Byte> = BehaviorSubject.create()
     val triggerAction = BehaviorSubject.create<OTTriggerAction>()
@@ -42,9 +42,9 @@ open class TriggerViewModel(val context: Context, val dao: OTTriggerDAO, val rea
     val triggerCondition: BehaviorSubject<ATriggerCondition> = BehaviorSubject.create()
     val triggerId: BehaviorSubject<String> = BehaviorSubject.create()
 
-    val deletionEnabled: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
-    val editionEnabled: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
-    val switchEnabled: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+    val deletionLocked: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+    val editionLocked: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+    val switchLocked: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
 
     val configIconResId: BehaviorSubject<Int> = BehaviorSubject.create()
     val configDescResId: BehaviorSubject<Int> = BehaviorSubject.create()
@@ -117,9 +117,9 @@ open class TriggerViewModel(val context: Context, val dao: OTTriggerDAO, val rea
         scriptUsed.onNextIfDifferAndNotNull(dao.checkScript && dao.additionalScript?.isNotBlank() == true)
         triggerSwitch.onNextIfDifferAndNotNull(dao.isOn)
 
-        editionEnabled.onNextIfDifferAndNotNull(dao.isEditingAllowed())
-        deletionEnabled.onNextIfDifferAndNotNull(dao.isRemovalAllowed())
-        switchEnabled.onNextIfDifferAndNotNull(dao.isSwitchAllowed())
+        editionLocked.onNextIfDifferAndNotNull(dao.isEditingLocked())
+        deletionLocked.onNextIfDifferAndNotNull(dao.isDeletionLocked())
+        switchLocked.onNextIfDifferAndNotNull(dao.isSwitchLocked())
 
         if (!dao.isManaged) {
 
@@ -189,9 +189,9 @@ open class TriggerViewModel(val context: Context, val dao: OTTriggerDAO, val rea
                         return@defer dao.isValidToTurnOn(context)
                                 .flatMapCompletable { (validationError) ->
                                     if (validationError == null) {
-                                        val id = dao._id
+                                        val id = dao.objectId
                                         realm.executeTransactionAsObservable { realm ->
-                                            realm.where(OTTriggerDAO::class.java).equalTo("_id", id).findFirst()
+                                            realm.where(OTTriggerDAO::class.java).equalTo("objectId", id).findFirst()
                                                     ?.apply {
                                                         isOn = true
                                                         synchronizedAt = null
@@ -226,9 +226,9 @@ open class TriggerViewModel(val context: Context, val dao: OTTriggerDAO, val rea
             } else {
                 if (dao.isOn) {
                     if (dao.isManaged) {
-                        val id = dao._id
+                        val id = dao.objectId
                         realm.executeTransactionAsObservable { realm ->
-                            realm.where(OTTriggerDAO::class.java).equalTo("_id", id).findFirst()
+                            realm.where(OTTriggerDAO::class.java).equalTo("objectId", id).findFirst()
                                     ?.apply {
                                         isOn = false
                                         synchronizedAt = null

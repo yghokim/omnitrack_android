@@ -2,13 +2,11 @@ package kr.ac.snu.hcil.omnitrack.core.synchronization
 
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
-import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import dagger.Lazy
 import io.reactivex.Completable
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
-import kr.ac.snu.hcil.omnitrack.core.di.global.ServerFullSync
 import kr.ac.snu.hcil.omnitrack.core.di.global.ServerSyncOneShot
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
@@ -26,9 +24,7 @@ class OTSyncManager @Inject constructor(
         private val syncClient: Lazy<ISynchronizationClientSideAPI>,
         private val syncServer: Lazy<ISynchronizationServerSideAPI>,
         private val eventLogger: Lazy<IEventLogger>,
-        @ServerSyncOneShot private val oneShotRequestProvider: Provider<OneTimeWorkRequest>,
-        @ServerFullSync private val periodicRequestProvider: Provider<PeriodicWorkRequest>
-) {
+        @ServerSyncOneShot private val oneShotRequestProvider: Provider<OneTimeWorkRequest>) {
 
     fun registerSyncQueue(type: ESyncDataType, direction: SyncDirection, reserveService: Boolean = true, ignoreDirtyFlags: Boolean = false) {
         syncQueueDbHelper.insertNewEntry(type, direction, System.currentTimeMillis(), ignoreDirtyFlags)
@@ -37,32 +33,17 @@ class OTSyncManager @Inject constructor(
         }
     }
 
-    fun clearSynchronizationOnDevice() {
-        WorkManager.getInstance().let {
-            it.cancelUniqueWork(OTSynchronizationWorker.TAG)
-            it.cancelAllWorkByTag(OTSynchronizationWorker.TAG)
-        }
-        syncQueueDbHelper.purgeEntries(null)
-    }
-
     fun queueFullSync(direction: SyncDirection = SyncDirection.BIDIRECTIONAL, ignoreFlags: Boolean) {
         ESyncDataType.values().forEach { type ->
             syncQueueDbHelper.insertNewEntry(type, direction, System.currentTimeMillis(), ignoreFlags)
         }
     }
 
-    @Synchronized
     fun reserveSyncServiceNow() {
         println("reserve data synchronization from server.")
         WorkManager.getInstance().enqueueUniqueWork(OTSynchronizationWorker.TAG, ExistingWorkPolicy.REPLACE, oneShotRequestProvider.get())
     }
 
-    @Synchronized
-    fun reservePeriodicSyncWorker() {
-        if (WorkManager.getInstance().getWorkInfosByTag(OTSynchronizationWorker.TAG).get().isEmpty()) {
-            WorkManager.getInstance().enqueue(periodicRequestProvider.get())
-        }
-    }
 
 
     fun makeSynchronizationTask(batchData: SyncQueueDbHelper.AggregatedSyncQueue): Completable {

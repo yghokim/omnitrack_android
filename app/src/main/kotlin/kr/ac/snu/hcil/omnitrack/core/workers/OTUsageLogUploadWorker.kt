@@ -1,16 +1,22 @@
 package kr.ac.snu.hcil.omnitrack.core.workers
 
 import android.content.Context
+import android.util.Log
+import androidx.work.RxWorker
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import dagger.Lazy
 import dagger.internal.Factory
+import io.reactivex.Scheduler
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.UsageLog
 import kr.ac.snu.hcil.omnitrack.core.di.global.UsageLogger
 import kr.ac.snu.hcil.omnitrack.core.net.IUsageLogUploadAPI
+import java.util.concurrent.Executors
 import javax.inject.Inject
 
 

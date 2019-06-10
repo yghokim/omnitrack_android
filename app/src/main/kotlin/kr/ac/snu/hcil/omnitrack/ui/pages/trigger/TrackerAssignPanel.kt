@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -17,7 +16,6 @@ import io.reactivex.subjects.BehaviorSubject
 import io.realm.Realm
 import kotlinx.android.synthetic.main.layout_attached_tracker_list_element_removable.view.*
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
-import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 import kr.ac.snu.hcil.android.common.view.container.decoration.ItemSpacingDecoration
 import kr.ac.snu.hcil.android.common.view.getActivity
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
@@ -89,28 +87,13 @@ class TrackerAssignPanel : RecyclerView {
         trackerListChanged.onNext(trackers.toList())
     }
 
-
-    override fun setEnabled(enabled: Boolean) {
-        super.setEnabled(enabled)
-        alpha = if (enabled) InterfaceHelper.ALPHA_ORIGINAL else InterfaceHelper.ALPHA_INACTIVE
-    }
-
-
-    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
-        return if (isEnabled) {
-            super.onInterceptTouchEvent(ev)
-        } else {
-            true
-        }
-    }
-
     private fun onAttachButtonClicked() {
         realm?.let {
             subscriptions.add(
                     dbManager.makeTrackersOfUserVisibleQuery(authManager.userId!!, it).findAllAsync()
                             .asFlowable().filter { it.isLoaded && it.isValid }.firstOrError().subscribe { snapshot ->
-                                val dialog = TrackerPickerDialogBuilder(snapshot.map { it.getSimpleInfo() }).createDialog(getActivity()!!, trackers.mapNotNull { it._id }.toTypedArray()) { trackerId ->
-                                    snapshot.find { it._id == trackerId }?.getSimpleInfo()?.let {
+                        val dialog = TrackerPickerDialogBuilder(snapshot.map { it.getSimpleInfo() }).createDialog(getActivity()!!, trackers.mapNotNull { it.objectId }.toTypedArray()) { trackerId ->
+                            snapshot.find { it.objectId == trackerId }?.getSimpleInfo()?.let {
                                 trackers.add(it)
                                 elementAdapter.notifyItemInserted(trackers.size - 1)
                                 notifyTrackerListChanged()

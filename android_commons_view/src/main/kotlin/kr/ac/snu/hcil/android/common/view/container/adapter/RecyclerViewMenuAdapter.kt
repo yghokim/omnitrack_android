@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.android.common.view.container.adapter
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 import kr.ac.snu.hcil.android.common.view.R
 import kr.ac.snu.hcil.android.common.view.container.viewholder.SimpleIconNameDescriptionViewHolder
 import kr.ac.snu.hcil.android.common.view.inflateContent
@@ -69,7 +68,7 @@ abstract class RecyclerViewMenuAdapter : RecyclerView.Adapter<RecyclerViewMenuAd
                 itemView.isClickable = true
             } else {
                 println("disable button.")
-                wrapped.descriptionView.alpha = InterfaceHelper.ALPHA_INACTIVE
+                wrapped.descriptionView.alpha = 0.5f
                 wrapped.nameView.alpha = 0.2f
                 wrapped.iconView.alpha = 0.2f
                 itemView.isClickable = false

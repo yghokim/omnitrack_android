@@ -29,7 +29,7 @@ class TimeConditionViewModel(trigger: OTTriggerDAO, context: Context) : ATrigger
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
 
         subscriptions.add(
-                triggerAlarmManager.makeNextAlarmTimeObservable(trigger._id!!).subscribe { alarmTime ->
+                triggerAlarmManager.makeNextAlarmTimeObservable(trigger.objectId!!).subscribe { alarmTime ->
                     println("next alarm time was changed: $alarmTime")
                     nextAlarmTimeSubject.onNextIfDifferAndNotNull(alarmTime)
                 }

@@ -41,7 +41,7 @@ class TimeSeriesPlotModel(tracker: OTTrackerDAO, protected val timeAttribute: OT
         return Single.defer {
             val yAttributeHelper = yAttribute.let { attributeManager.get(it.type) }
             if (yAttributeHelper is ISingleNumberAttributeHelper) {
-                val items = dbManager.getItemsQueriedWithTimeAttribute(tracker._id, getTimeScope(), timeAttributeLocalId, realm)
+                val items = dbManager.getItemsQueriedWithTimeAttribute(tracker.objectId, getTimeScope(), timeAttributeLocalId, realm)
                 return@defer Single.just(
                         items.asSequence().filter { it.getValueOf(yValueAttributeLocalId) != null }.map {
                             Pair(

@@ -17,7 +17,6 @@ import com.jaredrummler.materialspinner.MaterialSpinner
 import dagger.Lazy
 import kotlinx.android.synthetic.main.activity_attribute_detail.*
 import kr.ac.snu.hcil.android.common.view.DialogHelper
-import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 import kr.ac.snu.hcil.android.common.view.setPaddingLeft
 import kr.ac.snu.hcil.android.common.view.setPaddingRight
 import kr.ac.snu.hcil.android.common.view.wizard.WizardView
@@ -132,22 +131,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
         })
 
-        //apply locked properties
-        nameProperty.isEnabled = viewModel.attributeDAO?.isEditNameEnabled() == true
-        requiredProperty.isEnabled = viewModel.attributeDAO?.isRequiredToggleEnabled() == true
-        ui_connection_group.isEnabled = viewModel.attributeDAO?.isEditMeasureFactoryEnabled() == true
-        ui_connection_group.alpha = if (viewModel.attributeDAO?.isEditMeasureFactoryEnabled() == true) InterfaceHelper.ALPHA_ORIGINAL else InterfaceHelper.ALPHA_INACTIVE
-
-        ui_property_list.isEnabled = viewModel.attributeDAO?.isEditPropertyEnabled() == true
-        ui_property_list.alpha = if (viewModel.attributeDAO?.isEditPropertyEnabled() == true) InterfaceHelper.ALPHA_ORIGINAL else InterfaceHelper.ALPHA_INACTIVE
-
-        ui_fallback_policy_container.isEnabled = viewModel.attributeDAO?.isEditPropertyEnabled() == true
-        ui_fallback_policy_container.alpha = if (viewModel.attributeDAO?.isEditPropertyEnabled() == true) InterfaceHelper.ALPHA_ORIGINAL else InterfaceHelper.ALPHA_INACTIVE
-
-
-
-        //ui_attribute_connection.isEnabled = false
-
 
         creationSubscriptions.add(
                 viewModel.nameObservable.subscribe { name ->
@@ -213,7 +196,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                     println("type changed: $type")
                     try {
                         val attrHelper = attributeManager.get(type)
-                        ui_property_list.removeAllViewsInLayout()
+                        ui_recyclerview.removeAllViewsInLayout()
 
                         val layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
@@ -256,7 +239,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                             println("original view id: ${entry.second.id}, type: ${entry.second.javaClass}")
                             entry.second.id = View.generateViewId()
                             println("assigned view id: ${entry.second.id}, type: ${entry.second.javaClass}")
-                            ui_property_list.addView(entry.second, layoutParams)
+                            ui_recyclerview.addView(entry.second, layoutParams)
                         }
                         //end: refresh properties==================================================================================
 
@@ -274,13 +257,13 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
                         if (viewModel.isValid || viewModel.attributeHelper?.propertyKeys?.isEmpty() != false) {
                             //no property
-                            ui_property_list.setBackgroundResource(R.drawable.bottom_separator_light)
+                            ui_recyclerview.setBackgroundResource(R.drawable.bottom_separator_light)
                         } else if (viewModel.attributeHelper?.propertyKeys?.size == 1) {
                             //single property
-                            ui_property_list.setBackgroundResource(R.drawable.top_bottom_separator_light)
+                            ui_recyclerview.setBackgroundResource(R.drawable.top_bottom_separator_light)
                         } else {
                             //multiple properties
-                            ui_property_list.setBackgroundResource(R.drawable.expanded_view_inner_shadow)
+                            ui_recyclerview.setBackgroundResource(R.drawable.expanded_view_inner_shadow)
                         }
                     } catch (ex: Exception) {
                         ex.printStackTrace()

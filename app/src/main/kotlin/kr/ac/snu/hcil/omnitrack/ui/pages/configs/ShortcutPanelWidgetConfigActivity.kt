@@ -109,7 +109,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
                     userId ->
                     val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(appWidgetId, OTShortcutPanelWidgetUpdateService.getPreferences(this))
                     trackerList = dbManager.makeTrackersOfUserVisibleQuery(userId, realm).findAll().map {
-                        WritablePair(it.getSimpleInfo(), selectedTrackerIds?.contains(it._id) == true)
+                        WritablePair(it.getSimpleInfo(), selectedTrackerIds?.contains(it.objectId) == true)
                     }
                     trackerSelectionAdapter.notifyDataSetChanged()
                 }, {
@@ -123,8 +123,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
         if (modeRadioGroup.checkedRadioButtonId == R.id.ui_radio_mode_selective) {
             if (trackerList?.any { it.second == true } != true) {
                 DialogHelper.makeSimpleAlertBuilder(this,
-                        getString(R.string.msg_at_least_one_tracker_must_be_selected),
-                        null).show()
+                        getString(R.string.msg_at_least_one_tracker_must_be_selected)).show()
                 return false
             }
         }
@@ -141,7 +140,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
         }, editor)
 
         trackerList?.let {
-            OTShortcutPanelWidgetUpdateService.setSelectedTrackerIds(appWidgetId, it.asSequence().filter { it.second }.map { it.first._id!! }.toSet(), editor)
+            OTShortcutPanelWidgetUpdateService.setSelectedTrackerIds(appWidgetId, it.asSequence().filter { it.second }.map { it.first.objectId!! }.toSet(), editor)
         }
         editor.apply()
 

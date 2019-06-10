@@ -19,9 +19,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.flags.F
-import kr.ac.snu.hcil.omnitrack.core.flags.LockFlagLevel
-import kr.ac.snu.hcil.omnitrack.core.flags.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -44,7 +41,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
     private lateinit var managedTrackerDao: OTTrackerDAO
     private lateinit var managedAttributeList: RealmResults<OTAttributeDAO>
 
-    val trackerId: String get() = trackerDao._id!!
+    val trackerId: String get() = trackerDao.objectId!!
 
     val trackerNameObservable = BehaviorSubject.createDefault<String>("")
     var trackerName: String
@@ -77,17 +74,6 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
 
     val sortedItemsObservable = BehaviorSubject.create<List<ItemViewModel>>()
 
-    private var _isItemModificationAllowed: Boolean? = null
-    val isItemModificationAllowed: Boolean
-        get() {
-            if (_isItemModificationAllowed == null) {
-                _isItemModificationAllowed = LockedPropertiesHelper.flag(LockFlagLevel.Tracker, F.ModifyItems, if (this::trackerDao.isInitialized) {
-                    this.trackerDao.getParsedLockedPropertyInfo()
-                } else null)
-            }
-            return _isItemModificationAllowed!!
-        }
-
     private val itemComparerMethod = Comparator<ItemViewModel> { p0, p1 -> currentSorter.compare(p0?.itemDao, p1?.itemDao) }
 
     val onItemContentChanged = PublishSubject.create<Array<OrderedCollectionChangeSet.Range>>()
@@ -114,9 +100,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
     }
 
     private fun refreshTracker(trackerDao: OTTrackerDAO) {
-        this._isItemModificationAllowed = null
         this.trackerDao = trackerDao
-
         this.attributes = trackerDao.attributes.asSequence().filter { it.isHidden == false && it.isInTrashcan == false }.toList()
         trackerName = trackerDao.name
 
@@ -131,7 +115,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
 
         currentItemQueryResults?.removeAllChangeListeners()
         currentItemQueryResults = dbManager.get()
-                .makeItemsQuery(trackerDao._id, null, null, realm)
+                .makeItemsQuery(trackerDao.objectId, null, null, realm)
                 .sort("timestamp", Sort.DESCENDING)
                 .findAllAsync()
         currentItemQueryResults?.addChangeListener(this)
@@ -170,7 +154,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
     }
 
     fun removeItem(itemId: String) {
-        val viewModel = itemsInTimestampDescendingOrder.find { it._id == itemId }
+        val viewModel = itemsInTimestampDescendingOrder.find { it.objectId == itemId }
         if (viewModel != null) {
             realm.executeTransaction {
                 dbManager.get().removeItem(viewModel.itemDao, false, realm)
@@ -186,7 +170,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
     }
 
     inner class ItemViewModel(val itemDao: OTItemDAO) : IReadonlyObjectId {
-        override val _id: String? get() = _objectId
+        override val objectId: String? get() = _objectId
 
         private var _objectId: String? = null
 
@@ -225,7 +209,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
             }
 
         init {
-            _objectId = itemDao._id
+            _objectId = itemDao.objectId
             timestamp = itemDao.timestamp
             timezone = itemDao.timezone
             loggingSource = itemDao.loggingSource

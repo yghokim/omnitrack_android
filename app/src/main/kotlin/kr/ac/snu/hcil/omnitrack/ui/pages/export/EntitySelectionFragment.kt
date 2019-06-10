@@ -72,10 +72,10 @@ abstract class EntitySelectionFragment<EntityType : IReadonlyObjectId, ChildType
         override fun onBindViewHolder(holder: ACheckableTrackingEntityViewHolder<EntityType, ChildType>, position: Int) {
             val entity = entityList[position]
             holder.entity = entity
-            holder.isSelected = selectedIdList.contains(entity._id)
+            holder.isSelected = selectedIdList.contains(entity.objectId)
             holder.selectionChangedHandler = object : IEventListener<Boolean> {
                 override fun onEvent(sender: Any, args: Boolean) {
-                    setEntityChecked(entity, viewModel, args, entity._id ?: "")
+                    setEntityChecked(entity, viewModel, args, entity.objectId ?: "")
                 }
             }
         }

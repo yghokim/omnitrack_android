@@ -274,7 +274,7 @@ class AttributeEditDialogFragment : DialogFragment() {
         fun makeItemView(context: Context, originalView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
             val view = (context.applicationContext as OTAndroidApp).applicationComponent
                     .getAttributeViewFactoryManager().get(attribute.type).getInputView(context, false, attribute, originalView)
-            view.boundAttributeObjectId = attribute._id
+            view.boundAttributeObjectId = attribute.objectId
             return view
         }
 
@@ -285,7 +285,7 @@ class AttributeEditDialogFragment : DialogFragment() {
                 this.itemId = itemId
                 val itemObservable = dbManager.get()
                         .makeItemsQuery(trackerId, null, null, realm)
-                        .equalTo("_id", itemId).findFirstAsync()
+                        .equalTo("objectId", itemId).findFirstAsync()
                         .asFlowable<OTItemDAO>().filter { it.isValid && it.isLoaded }
                         .firstOrError()
                         .doOnSuccess { this.item = it }

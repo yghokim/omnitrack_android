@@ -17,9 +17,6 @@ import androidx.core.graphics.ColorUtils
  */
 object InterfaceHelper {
 
-    const val ALPHA_INACTIVE = 0.5f
-    const val ALPHA_ORIGINAL = 1.0f
-
     val grayscaleColorFilter: ColorFilter by lazy {
         ColorMatrixColorFilter(ColorMatrix().apply { this.setSaturation(0f) })
     }

@@ -26,7 +26,6 @@ import com.github.salomonbrys.kotson.set
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.android.common.view.DialogHelper
-import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 import kr.ac.snu.hcil.android.common.view.applyTint
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -76,7 +75,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     private val removedOutsideAlert: Dialog by lazy {
         DialogHelper.makeSimpleAlertBuilder(this,
-                String.format(getString(R.string.msg_format_removed_outside_return_home), getString(R.string.msg_text_tracker)), null, null)
+                String.format(getString(R.string.msg_format_removed_outside_return_home), getString(R.string.msg_text_tracker)), null)
         {
             finish()
         }.build()
@@ -109,7 +108,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             viewHolder.textView.text = mSectionsPagerAdapter.getPageTitle(i)
             tabView.tag = viewHolder
             if (tabLayout.getTabAt(i)?.isSelected == false) {
-                tabView.alpha = InterfaceHelper.ALPHA_INACTIVE
+                tabView.alpha = 0.5f
             }
         }
 
@@ -119,7 +118,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
-                tab?.customView?.alpha = InterfaceHelper.ALPHA_INACTIVE
+                tab?.customView?.alpha = 0.5f
             }
 
             override fun onTabSelected(tab: TabLayout.Tab?) {

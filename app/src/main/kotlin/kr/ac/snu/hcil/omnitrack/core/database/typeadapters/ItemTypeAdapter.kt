@@ -27,7 +27,7 @@ class ItemTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerCompa
             when(reader.nextName())
             {
                 BackendDbManager.FIELD_TRACKER_ID, "tracker" -> dao.trackerId = reader.nextString()
-                BackendDbManager.FIELD_OBJECT_ID -> dao._id = reader.nextString()
+                BackendDbManager.FIELD_OBJECT_ID -> dao.objectId = reader.nextString()
                 BackendDbManager.FIELD_REMOVED_BOOLEAN -> dao.removed = reader.nextBoolean()
                 BackendDbManager.FIELD_SYNCHRONIZED_AT -> dao.synchronizedAt = reader.nextLong()
                 BackendDbManager.FIELD_TIMESTAMP_LONG -> dao.timestamp = reader.nextLong()
@@ -83,7 +83,7 @@ class ItemTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerCompa
 
     override fun write(writer: JsonWriter, value: OTItemDAO, isServerMode: Boolean) {
         writer.beginObject()
-        writer.name(BackendDbManager.FIELD_OBJECT_ID).value(value._id)
+        writer.name(BackendDbManager.FIELD_OBJECT_ID).value(value.objectId)
         writer.name(if (isServerMode) "tracker" else BackendDbManager.FIELD_TRACKER_ID).value(value.trackerId)
         writer.name(BackendDbManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
         writer.name(BackendDbManager.FIELD_TIMESTAMP_LONG).value(value.timestamp)

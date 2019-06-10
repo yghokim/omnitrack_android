@@ -10,10 +10,6 @@ import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.DrawableCompat
 
-fun Boolean.toVisibility(userGone: Boolean=true): Int{
-    return if(this) View.VISIBLE else if(userGone) View.GONE else View.INVISIBLE
-}
-
 fun View.contains(x: Float, y: Float): Boolean {
     if (x < left || x > right || y < top || y > bottom) {
         return false

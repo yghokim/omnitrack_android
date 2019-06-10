@@ -104,7 +104,7 @@ class PackageExportActivity : MultiButtonActionBarActivity(R.layout.activity_pac
             viewModel.setTrackerIdChecked(checked, id)
             if (checked) {
                 entity.reminders?.forEach {
-                    viewModel.setReminderIdChecked(true, it._id)
+                    viewModel.setReminderIdChecked(true, it.objectId)
                 }
             }
         }
@@ -169,11 +169,11 @@ class PackageExportActivity : MultiButtonActionBarActivity(R.layout.activity_pac
                 holder.entity = reminders[position]
 
                 holder.selectionChangedHandler = this
-                holder.isSelected = viewModel.selectedReminderIds.contains(reminders[position]._id)
+                holder.isSelected = viewModel.selectedReminderIds.contains(reminders[position].objectId)
             }
 
             override fun onEvent(sender: Any, args: Boolean) {
-                viewModel.setReminderIdChecked(args, reminders[(sender as TriggerViewHolder).adapterPosition]._id)
+                viewModel.setReminderIdChecked(args, reminders[(sender as TriggerViewHolder).adapterPosition].objectId)
             }
 
 

@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
-import com.google.gson.JsonObject
 import dagger.Lazy
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
@@ -47,6 +46,7 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
         private set
 
     private var originalTriggerDao: OTTriggerDAO? = null
+    private var attachedTrackersResult: RealmResults<OTTrackerDAO>? = null
 
     var isOffline: Boolean = false
         private set
@@ -59,11 +59,6 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
 
     val script = BehaviorSubject.create<Nullable<String>>()
     val useScript = BehaviorSubject.createDefault(false)
-
-    val lockedProperties: JsonObject?
-        get() {
-            return originalTriggerDao?.getParsedLockedPropertyInfo()
-        }
 
     var isInitialized: Boolean = false
         private set
@@ -83,7 +78,7 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
             isOffline = false
             viewModelMode.onNext(MODE_EDIT)
             this.triggerId = triggerId
-            val dao = dbManager.get().makeTriggersOfUserVisibleQuery(userId, realm).equalTo("_id", triggerId).findFirst()
+            val dao = dbManager.get().makeTriggersOfUserVisibleQuery(userId, realm).equalTo("objectId", triggerId).findFirst()
             if (dao != null) {
                 this.originalTriggerDao = dao
                 this.attachedTrackersRealmResults = dao.liveTrackersQuery.findAllAsync()
@@ -157,7 +152,7 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
         useScript.value?.let { outState.putBoolean("useScript", it) }
 
         if (attachedTrackers.value?.isNotEmpty() == true) {
-            outState.putStringArray("trackers", attachedTrackers.value!!.map { it._id }.toTypedArray())
+            outState.putStringArray("trackers", attachedTrackers.value!!.map { it.objectId }.toTypedArray())
         }
     }
 
@@ -221,8 +216,8 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
             if (triggerDao == null) return true
             else {
                 return !Arrays.equals(
-                        attachedTrackers.value?.map { it._id }?.toTypedArray() ?: emptyArray(),
-                        triggerDao.trackers.map { it._id }.toTypedArray()
+                        attachedTrackers.value?.map { it.objectId }?.toTypedArray() ?: emptyArray(),
+                        triggerDao.trackers.map { it.objectId }.toTypedArray()
                 )
             }
         }
@@ -242,9 +237,9 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
                 dao.checkScript = useScript.value ?: false
                 dao.trackers.clear()
                 attachedTrackers.value?.let {
-                    val trackerIds = it.mapNotNull { it._id }.toTypedArray()
+                    val trackerIds = it.mapNotNull { it.objectId }.toTypedArray()
                     if (trackerIds.isNotEmpty()) {
-                        val trackers = realm.where(OTTrackerDAO::class.java).`in`("_id", trackerIds).findAll()
+                        val trackers = realm.where(OTTrackerDAO::class.java).`in`("objectId", trackerIds).findAll()
                         if (dao.isManaged) {
                             dao.trackers.addAll(trackers)
                         } else {

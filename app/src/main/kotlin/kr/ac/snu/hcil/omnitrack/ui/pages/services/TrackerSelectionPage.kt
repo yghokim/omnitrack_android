@@ -14,7 +14,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
-import kr.ac.snu.hcil.android.common.toInt
 import kr.ac.snu.hcil.android.common.view.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
@@ -24,8 +23,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
-import kr.ac.snu.hcil.omnitrack.core.flags.F
-import kr.ac.snu.hcil.omnitrack.core.system.OTAppFlagManager
 import kr.ac.snu.hcil.omnitrack.views.color.ColorHelper
 import org.jetbrains.anko.padding
 import java.util.*
@@ -58,9 +55,6 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
     @Inject
     protected lateinit var authManager: OTAuthManager
 
-    @Inject
-    protected lateinit var appFlagManager: OTAppFlagManager
-
     init {
         (parent.context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
     }
@@ -72,7 +66,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
         val userId = authManager.userId!!
         val realm = realmProvider.get()
         trackers.clear()
-        trackers.addAll(dbManager.get().makeTrackersOfUserVisibleQuery(userId, realm).findAll().filter { it.isEditingAllowed() })
+        trackers.addAll(dbManager.get().makeTrackersOfUserVisibleQuery(userId, realm).findAll().filter { !it.isEditingLocked() })
         realm.close()
         trackerListView?.adapter?.notifyDataSetChanged()
     }
@@ -105,7 +99,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            if (position >= 1 || !appFlagManager.flag(F.AddNewTracker)) {
+            if (position >= 1 || BuildConfig.DISABLE_TRACKER_CREATION == true) {
                 (holder as TrackerListViewHolder).run {
                     holder.bind(trackers[position - indexShift])
                 }
@@ -116,11 +110,11 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
 
         private val indexShift: Int
             get() {
-                return appFlagManager.flag(F.AddNewTracker).toInt()
+                return if (BuildConfig.DISABLE_TRACKER_CREATION == true) 0 else 1
             }
 
         override fun getItemViewType(position: Int): Int = if (position == 0) {
-            appFlagManager.flag(F.AddNewTracker).toInt()
+            if (BuildConfig.DISABLE_TRACKER_CREATION != true) 0 else 1
         } else 1
 
     }
@@ -176,7 +170,7 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
 
     private fun createNewTracker(name: String) {
         val trackerDao = OTTrackerDAO()
-        trackerDao._id = UUID.randomUUID().toString()
+        trackerDao.objectId = UUID.randomUUID().toString()
         trackerDao.userId = authManager.userId
         trackerDao.name = name
         trackerDao.isBookmarked = false

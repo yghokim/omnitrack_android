@@ -6,11 +6,11 @@ import androidx.recyclerview.widget.DiffUtil
  * Created by younghokim on 2017. 10. 20..
  */
 interface IReadonlyObjectId {
-    val _id: String?
+    val objectId: String?
 
     open class DiffUtilCallback(val oldList: List<IReadonlyObjectId>, val newList: List<IReadonlyObjectId>) : DiffUtil.Callback() {
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition]._id == newList[newItemPosition]._id
+            return oldList[oldItemPosition].objectId == newList[newItemPosition].objectId
         }
 
         override fun getOldListSize(): Int {

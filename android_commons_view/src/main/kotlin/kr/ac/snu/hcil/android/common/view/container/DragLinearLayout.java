@@ -82,8 +82,6 @@ public class DragLinearLayout extends LinearLayout {
     private int scrollSensitiveAreaHeight;
     private Runnable dragUpdater;
 
-    public boolean isDragEnabled = true;
-
     public DragLinearLayout(Context context) {
         this(context, null);
     }
@@ -774,7 +772,7 @@ public class DragLinearLayout extends LinearLayout {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            if (MotionEvent.ACTION_DOWN == event.getActionMasked() && isDragEnabled) {
+            if (MotionEvent.ACTION_DOWN == event.getActionMasked()) {
                 startDetectingDrag(view);
             }
             return false;

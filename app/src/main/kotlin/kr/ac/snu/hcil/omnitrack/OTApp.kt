@@ -14,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.work.WorkManager
 import com.squareup.leakcanary.LeakCanary
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -203,6 +204,10 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         DaoSerializationModule()
     }
 
+    private val researchModule: ResearchModule by lazy {
+        ResearchModule()
+    }
+
     private val measureModule: MeasureModule by lazy {
         MeasureModule()
     }
@@ -225,6 +230,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
                 .networkModule(networkModule)
                 .informationHelpersModule(InformationHelpersModule())
                 .scriptingModule(ScriptingModule())
+                .researchModule(researchModule)
                 .synchronizationModule(synchronizationModule)
                 .triggerSystemModule(triggerSystemModule)
                 .build()
@@ -291,10 +297,10 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
 
         //=================================================================
 
+        //TODO start service in job controller
         //startService(this.binaryUploadServiceController.makeResumeUploadIntent())
-        if (applicationComponent.getAuthManager().isUserSignedIn()) {
-            applicationComponent.getSyncManager().reservePeriodicSyncWorker()
-        }
+
+        WorkManager.getInstance().enqueue(applicationComponent.getFullSyncPeriodicRequestProvider().get())
 
 
         if (OTExternalSettingsPrompter.isBatteryOptimizationWhiteListed(this) || ProcessLifecycleOwner.get().lifecycle.currentState >= Lifecycle.State.STARTED) {

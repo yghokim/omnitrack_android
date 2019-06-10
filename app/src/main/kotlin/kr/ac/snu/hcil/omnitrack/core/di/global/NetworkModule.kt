@@ -19,7 +19,6 @@ import io.realm.RealmConfiguration
 import io.realm.annotations.RealmModule
 import kr.ac.snu.hcil.android.common.net.NetworkNotConnectedException
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthApiController
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.LocalMediaCacheEntry
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.UploadTaskInfo
@@ -63,12 +62,13 @@ class NetworkModule {
         return OkHttpClient.Builder()
                 .cache(cache)
                 .addInterceptor { chain ->
-                    val bearer = "Bearer " + authManager.get().getCurrentAuthToken()
+                    val bearer = "Bearer " + authManager.get().getAuthToken().blockingGet()
                     val newRequest = chain.request().newBuilder()
                             .addHeader("Authorization", bearer)
                             .addHeader("OTDeviceId", deviceId.get())
                             .addHeader("OTFingerPrint", fingerPrint)
                             .addHeader("OTPackageName", BuildConfig.APPLICATION_ID)
+                            .addHeader("OTRole", "ServiceUser")
                             .addHeader("OTLocale", LocaleHelper.getLanguageCode(context))
                             .apply {
                                 if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
@@ -99,8 +99,8 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    @Backend
-    fun provideBackendRetrofit(@Authorized client: OkHttpClient, @ForGeneric gson: Lazy<Gson>): Retrofit {
+    @SynchronizationServer
+    fun provideSynchronizationRetrofit(@Authorized client: OkHttpClient, @ForGeneric gson: Lazy<Gson>): Retrofit {
         return Retrofit.Builder()
                 .client(client)
                 .baseUrl(BuildConfig.OMNITRACK_SYNCHRONIZATION_SERVER_URL)
@@ -132,7 +132,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOfficialServerController(@Backend retrofit: Retrofit): OTOfficialServerApiController {
+    fun provideOfficialServerController(@SynchronizationServer retrofit: Retrofit): OTOfficialServerApiController {
         return OTOfficialServerApiController(retrofit)
     }
 
@@ -176,12 +176,6 @@ class NetworkModule {
     @Singleton
     fun provideUsageLogUploadController(controller: OTOfficialServerApiController): IUsageLogUploadAPI {
         return controller
-    }
-
-    @Provides
-    @Singleton
-    fun getAuthApiController(@Backend retrofit: Lazy<Retrofit>): OTAuthApiController {
-        return OTAuthApiController(retrofit)
     }
 
     private val realmConfiguration: RealmConfiguration by lazy {
@@ -234,6 +228,9 @@ enum class MediaTypeValue {
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class Authorized
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME) annotation class SynchronizationServer
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class BinaryStorageServer

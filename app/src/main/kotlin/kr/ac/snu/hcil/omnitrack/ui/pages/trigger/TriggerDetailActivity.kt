@@ -19,9 +19,6 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.flags.F
-import kr.ac.snu.hcil.omnitrack.core.flags.LockFlagLevel
-import kr.ac.snu.hcil.omnitrack.core.flags.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTBackgroundLoggingTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
@@ -174,7 +171,6 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
     }
 
     private fun connectViewsToViewModel(viewModel: TriggerDetailViewModel) {
-
         creationSubscriptions.addAll(
                 viewModel.actionType.subscribe { actionType ->
                     val actionNameResId = OTTriggerInformationHelper.getActionNameResId(actionType)
@@ -184,14 +180,6 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                         } else {
                             title = String.format(getString(R.string.msg_format_edit_something), getString(actionNameResId))
                         }
-                    }
-
-                    val level = if (actionType == OTTriggerDAO.ACTION_TYPE_LOG) LockFlagLevel.Trigger else LockFlagLevel.Reminder
-
-                    ui_trigger_properties_container.isEnabled = LockedPropertiesHelper.flag(level, F.EditProperties, viewModel.lockedProperties)
-
-                    if (level == LockFlagLevel.Trigger) {
-                        trackerAssignPanel?.isEnabled = LockedPropertiesHelper.flag(level, F.ModifyAssignedTrackers, viewModel.lockedProperties)
                     }
                 },
 
@@ -260,7 +248,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                                 finish()
                             } else {
                                 DialogHelper.makeSimpleAlertBuilder(this, errorMessages?.joinToString("\n")
-                                        ?: "Configuration is not valid.", null).show()
+                                        ?: "Configuration is not valid.").show()
                             }
                         }
                 )
@@ -286,7 +274,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                         finish()
                     } else {
                         DialogHelper.makeSimpleAlertBuilder(this, errorMessages?.joinToString("\n")
-                                ?: "Configuration is not valid.", null).show()
+                                ?: "Configuration is not valid.").show()
                     }
                 }
         )

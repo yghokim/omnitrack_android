@@ -146,7 +146,7 @@ class OTReminderCommands(val context: Context) {
                 val trigger = dbManager.getTriggerQueryWithId(triggerId, realm).findFirst()
                 if (trigger != null) {
                     trigger.liveTrackersQuery.equalTo(BackendDbManager.FIELD_OBJECT_ID, trackerId).findFirst()?.let {
-                        NewItemActivity.makeReminderOpenIntent(it._id!!, triggerTime, metadata, context)
+                        NewItemActivity.makeReminderOpenIntent(it.objectId!!, triggerTime, metadata, context)
                     }?.let {
                         it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                         context.runOnUiThread {
@@ -195,7 +195,7 @@ class OTReminderCommands(val context: Context) {
 
                             val pendingEntries = realm.where(OTTriggerReminderEntry::class.java)
                                     .equalTo("dismissed", false)
-                                    .equalTo("trackerId", tracker._id!!)
+                                    .equalTo("trackerId", tracker.objectId!!)
                                     .findAll()
                             val notificationIds = pendingEntries.map { it.systemIntrinsicId }
                             context.runOnUiThread {
@@ -210,7 +210,7 @@ class OTReminderCommands(val context: Context) {
 
                                 pendingEntries.forEach { it.dismissed = true }
 
-                                val entry = insertNewReminderEntry(trigger, tracker._id!!, action, triggerTime, metadata, realm)
+                                val entry = insertNewReminderEntry(trigger, tracker.objectId!!, action, triggerTime, metadata, realm)
                                 val notiBuilder = buildNotificationFromEntry(entry, trigger, tracker)
                                 if (notiBuilder != null) {
                                     notifyNotification(entry, notiBuilder.build(), true)
@@ -371,7 +371,7 @@ class OTReminderCommands(val context: Context) {
 
     internal fun dismissAllReminders(realm: Realm, vararg triggers: OTTriggerDAO) {
         val entries = realm.where(OTTriggerReminderEntry::class.java)
-                .`in`("triggerId", triggers.map { it._id }.toTypedArray())
+                .`in`("triggerId", triggers.map { it.objectId }.toTypedArray())
                 .equalTo("dismissed", false)
                 .findAll()
 
@@ -399,7 +399,7 @@ class OTReminderCommands(val context: Context) {
     private fun insertNewReminderEntry(trigger: OTTriggerDAO, trackerId: String, action: OTReminderAction, triggerTime: Long, metadata: JsonObject, realm: Realm): OTTriggerReminderEntry {
         val entry = realm.createObject(OTTriggerReminderEntry::class.java, entryIdGenerator.getNewUniqueLong(System.currentTimeMillis()))
         entry.level = action.notificationLevelForSystem
-        entry.triggerId = trigger._id
+        entry.triggerId = trigger.objectId
         entry.trackerId = trackerId
         entry.intrinsicTriggerTime = triggerTime
         entry.autoExpireAt = (trigger.action as? OTReminderAction)?.expiryMilliSeconds?.let { it + System.currentTimeMillis() } ?: Long.MAX_VALUE

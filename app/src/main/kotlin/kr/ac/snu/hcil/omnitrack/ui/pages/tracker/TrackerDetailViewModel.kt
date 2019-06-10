@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.annotation.DrawableRes
 import com.google.gson.JsonObject
 import dagger.Lazy
+import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
@@ -26,8 +27,11 @@ import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.research.ExperimentInfo
+import kr.ac.snu.hcil.omnitrack.core.database.models.research.OTExperimentDAO
 import kr.ac.snu.hcil.omnitrack.core.database.typeadapters.ServerCompatibleTypeAdapter
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForTracker
+import kr.ac.snu.hcil.omnitrack.core.di.global.Research
 import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
@@ -69,6 +73,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     @field:[Inject ForTracker]
     protected lateinit var trackerTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTTrackerDAO>>
 
+    @field:[Inject Research]
+    protected lateinit var researchRealmFactory: Factory<Realm>
+
     private lateinit var researchRealm: Realm
 
     private var isInitialized = false
@@ -84,6 +91,8 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     var trackerId: String? = null
         private set
+
+    private var experimentList = ArrayList<ExperimentInfo>()
 
     //Observables========================================
     val hasTrackerRemovedOutside = BehaviorSubject.create<String>()
@@ -104,6 +113,8 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     val isInjectedObservable = BehaviorSubject.create<Boolean>()
 
     val experimentIdObservable = BehaviorSubject.create<Nullable<String>>()
+
+    val experimentListObservable = BehaviorSubject.create<List<ExperimentInfo>>()
 
     //===================================================
 
@@ -183,6 +194,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     override fun onInject(app: OTAndroidApp) {
         app.applicationComponent.inject(this)
         colorObservable = BehaviorSubject.createDefault<Int>(ColorHelper.getTrackerColorPalette(getApplication())[0])
+        researchRealm = researchRealmFactory.get()
     }
 
     fun init(trackerId: String?, savedInstanceState: Bundle?) {
@@ -295,6 +307,22 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 }
             }
 
+            if (!BuildConfig.DISABLE_EXTERNAL_ENTITIES) {
+                subscriptions.add(
+                        researchRealm.where(OTExperimentDAO::class.java)
+                                .isNull("droppedAt")
+                                .findAllAsync().asFlowable()
+                                .filter {
+                                    it.isValid && it.isLoaded
+                                }
+                                .subscribe { results ->
+                                    this.experimentList.clear()
+                                    this.experimentList.addAll(results.map { it.getInfo() })
+                                    this.experimentListObservable.onNext(this.experimentList)
+                                }
+                )
+            }
+
             trackerIdObservable.onNext(Nullable(trackerId))
 
             isInitialized = true
@@ -309,7 +337,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     fun addNewAttribute(name: String, type: Int, processor: ((OTAttributeDAO, Realm) -> OTAttributeDAO)? = null) {
         val newDao = OTAttributeDAO()
-        newDao._id = UUID.randomUUID().toString()
+        newDao.objectId = UUID.randomUUID().toString()
         newDao.name = name
         newDao.type = type
         newDao.trackerId = trackerId
@@ -318,7 +346,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
         if (trackerDao != null) {
             newDao.localId = attributeManager.get().makeNewAttributeLocalId(newDao.userCreatedAt)
-            newDao.trackerId = trackerDao?._id
+            newDao.trackerId = trackerDao?.objectId
 
             realm.executeTransactionIfNotIn {
                 trackerDao?.attributes?.add(newDao)
@@ -331,7 +359,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         }
     }
 
-    fun moveField(from: Int, to: Int) {
+    fun moveAttribute(from: Int, to: Int) {
         if (trackerDao != null) {
             val attributes = currentAttributeViewModelList.asSequence().map { it.attributeDAO }.toMutableList()
             attributes.move(from, to)
@@ -349,9 +377,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     fun removeAttribute(attrViewModel: AttributeInformationViewModel) {
         if (trackerDao != null) {
-            lastRemovedAttributeId = attrViewModel._id
+            lastRemovedAttributeId = attrViewModel.objectId
             realm.executeTransactionIfNotIn {
-                val attribute = trackerDao?.attributes?.find { it._id == attrViewModel._id }
+                val attribute = trackerDao?.attributes?.find { it.objectId == attrViewModel.objectId }
                 if (attribute != null) {
                     attribute.isInTrashcan = true
                 }
@@ -405,7 +433,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     private val areAttributesDirty: Boolean
         get() {
             return if (initialSnapshotDao == null) false else (currentAttributeViewModelList.find { it.isDirty == true } != null) ||
-                    !Arrays.equals(initialSnapshotDao?.attributes?.map { attr -> attr._id }?.toTypedArray(), currentAttributeViewModelList.map { it.attributeDAO._id }.toTypedArray())
+                    !Arrays.equals(initialSnapshotDao?.attributes?.map { attr -> attr.objectId }?.toTypedArray(), currentAttributeViewModelList.map { it.attributeDAO.objectId }.toTypedArray())
         }
 
     val isDirty: Boolean
@@ -416,7 +444,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     private fun makeUnmanagedTrackerDaoFromSettings(): OTTrackerDAO {
         val trackerDao = OTTrackerDAO()
-        trackerDao._id = UUID.randomUUID().toString()
+        trackerDao.objectId = UUID.randomUUID().toString()
         trackerDao.userId = authManager.get().userId
         trackerDao.name = nameObservable.value ?: ""
         trackerDao.isBookmarked = isBookmarkedObservable.value ?: false
@@ -444,7 +472,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
             currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
                 attrViewModel.attributeDAO.localId = attributeManager.get().makeNewAttributeLocalId(attrViewModel.attributeDAO.userCreatedAt)
-                attrViewModel.attributeDAO.trackerId = trackerDao._id
+                attrViewModel.attributeDAO.trackerId = trackerDao.objectId
                 attrViewModel.attributeDAO.position = index
             }
 
@@ -461,9 +489,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             registerSyncJob()
         }
 
-        onChangesApplied.onNext(trackerDao!!._id!!)
+        onChangesApplied.onNext(trackerDao!!.objectId!!)
 
-        return trackerDao!!._id!!
+        return trackerDao!!.objectId!!
     }
 
     fun clearTrackerSynchronizationFlag() {
@@ -491,18 +519,16 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     }
 
     class AttributeInformationViewModel(_attributeDAO: OTAttributeDAO, val realm: Realm, val attributeManager: OTAttributeManager, val connectionTypeAdapter: OTConnection.ConnectionTypeAdapter) : IReadonlyObjectId, RealmChangeListener<OTAttributeDAO> {
-        override val _id: String? = _attributeDAO._id
+        override val objectId: String? = _attributeDAO.objectId
 
         var attributeDAO: OTAttributeDAO = _attributeDAO
             private set
 
         val isInDatabase: Boolean get() = attributeDAO.isManaged
 
-
         val isEditable = BehaviorSubject.createDefault<Boolean>(true)
         val isRemovable = BehaviorSubject.createDefault<Boolean>(true)
         val isVisibilityEditable = BehaviorSubject.createDefault<Boolean>(true)
-        val isEditNameEnabled = BehaviorSubject.createDefault<Boolean>(true)
 
         val nameObservable = BehaviorSubject.createDefault<String>("")
         val isRequiredObservable = BehaviorSubject.createDefault<Boolean>(false)
@@ -610,7 +636,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
         fun makeFrontalChangesToDao(): OTAttributeDAO {
             val dao = OTAttributeDAO()
-            dao._id = attributeDAO._id
+            dao.objectId = attributeDAO.objectId
             dao.type = attributeDAO.type
             dao.localId = attributeDAO.localId
             dao.position = attributeDAO.position
@@ -628,9 +654,6 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
             dao.serializedConnection = connectionObservable.value?.datum?.getSerializedString(connectionTypeAdapter)
 
-            dao.serializedLockedPropertyInfo = attributeDAO.serializedLockedPropertyInfo
-            dao.serializedCreationFlags = attributeDAO.serializedCreationFlags
-
             return dao
         }
 
@@ -639,11 +662,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
             isRequired = editedDao.isRequired
 
-            isEditable.onNextIfDifferAndNotNull(editedDao.isEditingAllowed())
-            isRemovable.onNextIfDifferAndNotNull(editedDao.isRemovalAllowed())
-            isVisibilityEditable.onNextIfDifferAndNotNull(editedDao.isVisibilityToggleAllowed())
-            isEditNameEnabled.onNextIfDifferAndNotNull(editedDao.isEditNameEnabled())
-
+            isEditable.onNextIfDifferAndNotNull(!editedDao.isEditingLocked())
+            isRemovable.onNextIfDifferAndNotNull(!editedDao.isDeletionLocked())
+            isVisibilityEditable.onNextIfDifferAndNotNull(!editedDao.isVisibilityLocked())
 
             defaultValuePolicy = editedDao.fallbackValuePolicy
             defaultValuePreset = editedDao.fallbackPresetSerializedValue

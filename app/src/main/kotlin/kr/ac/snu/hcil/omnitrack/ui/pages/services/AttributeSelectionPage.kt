@@ -74,23 +74,23 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
     }
 
     override fun onEnter() {
-        trackerId = parent.trackerDao._id!!
+        trackerId = parent.trackerDao.objectId!!
         currentMeasureFactory = parent.currentMeasureFactory
         if (parent.trackerDao.isManaged) {
             val trackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realmProvider.get()).findFirstAsync()
             subscriptions.add(
                     trackerDao.asFlowable<OTTrackerDAO>().filter { it.isValid && it.isLoaded }.subscribe { snapshot ->
-                        attributeCreationEnabled = snapshot.isAddNewFieldsAllowed()
-                        val validAttributes = snapshot.attributes.filter { !it.isHidden && !it.isInTrashcan && it.isEditingAllowed() }
+                        attributeCreationEnabled = !snapshot.isAddNewAttributeLocked()
+                        val validAttributes = snapshot.attributes.filter { !it.isHidden && !it.isInTrashcan && !it.isVisibilityLocked() }
                         attributes.clear()
                         attributes.addAll(validAttributes)
-                        //attributes.removeAll { !currentMeasureFactory.isAttachableTo(it) || it.isEditingAllowed() }
+                        //attributes.removeAll { !currentMeasureFactory.isAttachableTo(it) || it.isEditingLocked() }
                         attributeListView?.adapter?.notifyDataSetChanged()
                     }
             )
         } else {
             attributes.clear()
-            attributeCreationEnabled = parent.trackerDao.isAddNewFieldsAllowed()
+            attributeCreationEnabled = !parent.trackerDao.isAddNewAttributeLocked()
             attributeListView?.adapter?.notifyDataSetChanged()
         }
     }
@@ -191,7 +191,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
                 descriptionView.visibility = View.VISIBLE
                 descriptionView.setText(R.string.msg_service_wizard_no_attachable_field)
                 isAvailable = false
-            } else if (!attributeDao.isEditingAllowed()) {
+            } else if(attributeDao.isEditingLocked()){
                 descriptionView.visibility = View.VISIBLE
                 descriptionView.setText(R.string.msg_service_wizard_non_modifiable_field)
                 isAvailable = false
@@ -290,14 +290,14 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
     fun createNewAttribute(name: String, type: Int, realm: Realm, processor: ((OTAttributeDAO, Realm) -> OTAttributeDAO)? = null) {
         val trackerDao = parent.trackerDao
         val newDao = OTAttributeDAO()
-        newDao._id = UUID.randomUUID().toString()
+        newDao.objectId = UUID.randomUUID().toString()
         newDao.name = name
         newDao.type = type
         newDao.trackerId = trackerId
         newDao.initialize(parent.context)
         processor?.invoke(newDao, realm)
         newDao.localId = attributeManager.makeNewAttributeLocalId(newDao.userCreatedAt)
-        newDao.trackerId = trackerDao._id
+        newDao.trackerId = trackerDao.objectId
 
 
         this@AttributeSelectionPage.attributeDAO = newDao

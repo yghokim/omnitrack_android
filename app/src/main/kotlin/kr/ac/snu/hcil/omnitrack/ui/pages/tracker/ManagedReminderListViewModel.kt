@@ -16,7 +16,7 @@ class ManagedReminderListViewModel(app: Application) : AManagedTriggerListViewMo
 
     val trackerId: String?
         get() {
-            return trackerDao?._id
+            return trackerDao?.objectId
         }
 
     var trackerDao: OTTrackerDAO? = null
@@ -30,26 +30,26 @@ class ManagedReminderListViewModel(app: Application) : AManagedTriggerListViewMo
 
     fun init(trackerId: String) {
         if (this.trackerId != trackerId) {
-            trackerDao = realm.where(OTTrackerDAO::class.java).equalTo("_id", trackerId).findFirst()
+            trackerDao = realm.where(OTTrackerDAO::class.java).equalTo("objectId", trackerId).findFirst()
             currentDefaultTriggerInterfaceOptions = TriggerInterfaceOptions(
                     false,
                     arrayOf(trackerId),
                     arrayOf(OTTriggerDAO.CONDITION_TYPE_TIME, OTTriggerDAO.CONDITION_TYPE_DATA),
                     OTTriggerDAO.ACTION_TYPE_REMIND,
-                    trackerDao?.isAddNewRemindersAllowed() ?: false
+                    !(trackerDao?.isAddNewReminderLocked() ?: false)
             )
             init()
         }
     }
 
     override fun hookTriggerQuery(originalQuery: RealmQuery<OTTriggerDAO>): RealmQuery<OTTriggerDAO> {
-        return originalQuery.equalTo("userId", authManager.userId).equalTo("trackers._id", trackerId!!).equalTo("actionType", OTTriggerDAO.ACTION_TYPE_REMIND)
+        return originalQuery.equalTo("userId", authManager.userId).equalTo("trackers.objectId", trackerId!!).equalTo("actionType", OTTriggerDAO.ACTION_TYPE_REMIND)
     }
 
     override fun beforeAddNewTrigger(daoToAdd: OTTriggerDAO) {
         super.beforeAddNewTrigger(daoToAdd)
 
-        if (daoToAdd.trackers.find { it._id == trackerDao?._id } == null) {
+        if (daoToAdd.trackers.find { it.objectId == trackerDao?.objectId } == null) {
             daoToAdd.trackers.add(realm.copyFromRealm(trackerDao!!))
         }
     }

@@ -33,7 +33,7 @@ class OTTriggerSystemManager(
     }
 
     fun handleTriggerOn(managedTrigger: OTTriggerDAO) {
-        println("TriggerSystemManager: handleTriggerOn: ${managedTrigger._id}")
+        println("TriggerSystemManager: handleTriggerOn: ${managedTrigger.objectId}")
         when (managedTrigger.conditionType) {
             OTTriggerDAO.CONDITION_TYPE_TIME -> {
                 triggerAlarmManager.get().registerTriggerAlarm(System.currentTimeMillis(), managedTrigger)
@@ -45,7 +45,7 @@ class OTTriggerSystemManager(
     }
 
     fun handleTriggerOff(managedTrigger: OTTriggerDAO) {
-        println("TriggerSystemManager: handleTriggerOff: ${managedTrigger._id}")
+        println("TriggerSystemManager: handleTriggerOff: ${managedTrigger.objectId}")
         when (managedTrigger.conditionType) {
             OTTriggerDAO.CONDITION_TYPE_TIME -> {
                 triggerAlarmManager.get().cancelTrigger(managedTrigger)
@@ -67,8 +67,8 @@ class OTTriggerSystemManager(
 
 
     fun tryCheckInToSystem(managedTrigger: OTTriggerDAO): Boolean {
-        println("TriggerSystemManager: tryCheckInToSystem: ${managedTrigger._id}")
-        if (BuildConfig.DEFAULT_EXPERIMENT_ID == null || managedTrigger.experimentIdInFlags == BuildConfig.DEFAULT_EXPERIMENT_ID) {
+        println("TriggerSystemManager: tryCheckInToSystem: ${managedTrigger.objectId}")
+        if (!BuildConfig.DISABLE_EXTERNAL_ENTITIES || managedTrigger.experimentIdInFlags == BuildConfig.DEFAULT_EXPERIMENT_ID) {
             if (managedTrigger.isOn) {
                 when (managedTrigger.conditionType) {
                     OTTriggerDAO.CONDITION_TYPE_TIME -> {
@@ -89,7 +89,7 @@ class OTTriggerSystemManager(
     }
 
     fun tryCheckOutFromSystem(managedTrigger: OTTriggerDAO): Boolean {
-        println("TriggerSystemManager: tryCheckOutFromSystem: ${managedTrigger._id}")
+        println("TriggerSystemManager: tryCheckOutFromSystem: ${managedTrigger.objectId}")
         handleTriggerOff(managedTrigger)
         return false
     }
@@ -131,7 +131,7 @@ class OTTriggerSystemManager(
         dataDrivenTriggerManager.get().setSuspendReadjustWorker(true)
         triggers.forEach { trigger ->
             if (trigger.liveTrackerCount > 0) {
-                if (BuildConfig.DEFAULT_EXPERIMENT_ID != null && trigger.experimentIdInFlags != BuildConfig.DEFAULT_EXPERIMENT_ID) {
+                if (BuildConfig.DISABLE_EXTERNAL_ENTITIES && trigger.experimentIdInFlags != BuildConfig.DEFAULT_EXPERIMENT_ID) {
                     tryCheckOutFromSystem(trigger)
                 } else tryCheckInToSystem(trigger)
             }

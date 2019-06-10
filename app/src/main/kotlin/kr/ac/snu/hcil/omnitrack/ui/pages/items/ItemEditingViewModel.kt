@@ -103,7 +103,7 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
                         Maybe.fromSingle(dbManager.get().saveItemObservable(originalUnmanagedItemDao, false, originalItemFieldKeys.toTypedArray(), realm).map { it.second })
                                 .doAfterSuccess { syncItemToServer() }
                     }
-                } else Maybe.just(originalUnmanagedItemDao._id)
+                } else Maybe.just(originalUnmanagedItemDao.objectId)
             }
         } else return Maybe.just(null)
     }

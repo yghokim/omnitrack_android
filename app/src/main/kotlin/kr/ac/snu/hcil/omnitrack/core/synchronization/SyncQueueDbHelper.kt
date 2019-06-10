@@ -75,19 +75,11 @@ class SyncQueueDbHelper(context: Context, dbName: String) : ManagedSQLiteOpenHel
     }
 
     @Synchronized
-    fun purgeEntries(ids: IntArray?) {
-        if (ids != null) {
-            if (ids.isNotEmpty()) {
-                use {
-                    transaction {
-                        this.delete(TABLE_SYNC_ENTRY, "$COLUMN_ID in (${ids.joinToString(",")})")
-                    }
-                }
-            }
-        } else {
+    fun purgeEntries(ids: IntArray){
+        if(ids.isNotEmpty()) {
             use {
-                transaction {
-                    this.delete(TABLE_SYNC_ENTRY, "")
+                transaction{
+                    this.delete(TABLE_SYNC_ENTRY, "$COLUMN_ID in (${ids.joinToString(",")})")
                 }
             }
         }

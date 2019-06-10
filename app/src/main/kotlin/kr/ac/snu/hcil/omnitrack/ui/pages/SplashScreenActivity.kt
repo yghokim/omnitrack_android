@@ -51,7 +51,7 @@ class SplashScreenActivity : OTActivity(checkRefreshingCredential = true, checkU
                 }
             } else {
                 //unsupported device.
-                DialogHelper.makeSimpleAlertBuilder(this, "This device may not to support Google Play services, which is required to run the OmniTrack instance. If you are in the region such as China, where the Google Play service is unavailable, we're sorry to confirm that you can't use OmniTrack :(", null)
+                DialogHelper.makeSimpleAlertBuilder(this, "This device may not to support Google Play services, which is required to run the OmniTrack instance. If you are in the region such as China, where the Google Play service is unavailable, we're sorry to confirm that you can't use OmniTrack :(")
                         .dismissListener {
                             finish()
                         }.show()
