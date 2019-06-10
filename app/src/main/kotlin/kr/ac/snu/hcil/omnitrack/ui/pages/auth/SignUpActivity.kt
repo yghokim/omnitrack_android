@@ -154,6 +154,7 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
                     } else {
                         main_viewpager.currentItem = prevSlideIndex + 1
                     }
+                    updateIndicators()
                 }
         )
     }
