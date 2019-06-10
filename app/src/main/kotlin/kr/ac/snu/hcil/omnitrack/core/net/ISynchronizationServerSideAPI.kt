@@ -8,6 +8,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
+import io.reactivex.Completable
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
@@ -17,10 +18,6 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
  * Created by younghokim on 2017. 9. 27..
  */
 interface ISynchronizationServerSideAPI {
-
-    @Keep
-    data class ServerUserInfo(val _id: String, val name: String?, val email: String, val picture: String?, val nameUpdatedAt: Long?,
-                              val dataStore: JsonObject?)
 
     class ExperimentConsentInfo(var receiveConsentInApp: Boolean = false, var consent: String? = null, var demographicFormSchema: String? = null) {
         class ConsentInfoTypeAdapter(val gson: Lazy<Gson>) : TypeAdapter<ExperimentConsentInfo>() {
@@ -62,9 +59,6 @@ interface ISynchronizationServerSideAPI {
     }
 
     @Keep
-    data class AuthenticationResult(val inserted: Boolean, val deviceLocalKey: String, val userInfo: ServerUserInfo?)
-
-    @Keep
     data class DeviceInfoResult(var result: String, var deviceLocalKey: String?)
 
     @Keep
@@ -73,10 +67,11 @@ interface ISynchronizationServerSideAPI {
     @Keep
     data class DirtyRowBatchParameter(val type: ESyncDataType, val rows: Array<String>)
 
-    //New authentication APIs======================================
+
+    fun validateClientCertified(): Completable
+
     fun checkExperimentParticipationStatus(experimentId: String): Single<Boolean>
 
-    fun authenticate(deviceInfo: OTDeviceInfo, invitationCode: String?, demographicData: JsonObject?): Single<AuthenticationResult>
     fun getExperimentConsentInfo(experimentId: String): Single<ExperimentConsentInfo>
     fun verifyInvitationCode(invitationCode: String, experimentId: String): Single<Boolean>
     //=============================================================

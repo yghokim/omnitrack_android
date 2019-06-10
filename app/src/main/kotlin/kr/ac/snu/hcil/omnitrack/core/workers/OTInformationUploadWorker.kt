@@ -8,11 +8,9 @@ import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
-import io.realm.kotlin.where
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTUserDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import java.util.concurrent.Executors
@@ -62,6 +60,7 @@ class OTInformationUploadWorker(private val context: Context, private val worker
                             syncServerController
                                     .putDeviceInfo(deviceInfo)
                         }.map { Result.success() }
+                    /*
                     INFORMATION_USERNAME ->
                         Single.defer {
                             val realm = realmFactory.get()
@@ -92,7 +91,7 @@ class OTInformationUploadWorker(private val context: Context, private val worker
                                 realm.close()
                                 Single.just(Result.failure())
                             }
-                        }
+                        }*/
                     else -> Single.just(Result.failure())
                 }
             } else Single.just(Result.failure())

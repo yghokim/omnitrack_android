@@ -6,6 +6,7 @@ import dagger.internal.Factory
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.annotations.RealmModule
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.database.BackendRealmMigration
 import kr.ac.snu.hcil.omnitrack.core.database.models.*
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.*
@@ -29,7 +30,12 @@ class BackendDatabaseModule {
         return RealmConfiguration.Builder()
                 .name("backend.db")
                 .modules(BackendRealmModule())
-                .schemaVersion(7)
+                .schemaVersion(0)
+                .apply {
+                    if (BuildConfig.DEBUG == true) {
+                        this.deleteRealmIfMigrationNeeded()
+                    }
+                }
                 .migration(BackendRealmMigration())
                 .build()
     }
@@ -43,7 +49,6 @@ class BackendDatabaseModule {
 }
 
 @RealmModule(classes = [
-        OTUserDAO::class,
         OTTrackerDAO::class,
         OTAttributeDAO::class,
         OTTriggerDAO::class,

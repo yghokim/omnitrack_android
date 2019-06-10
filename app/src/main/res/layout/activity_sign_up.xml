@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ui_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <kr.ac.snu.hcil.android.common.view.container.ManualViewPager
+            android:id="@+id/main_viewpager"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/view2"
+            app:layout_constraintEnd_toEndOf="parent"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+
+            android:id="@+id/view2"
+            style="@style/HorizontalSeparator"
+            android:layout_marginBottom="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/ui_button_next" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/ui_button_previous"
+            style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+            android:layout_width="@dimen/button_height_tall"
+            android:layout_height="@dimen/button_height_tall"
+            android:tint="@color/textColorMid"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:srcCompat="@drawable/back_rhombus" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/ui_button_next"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/button_height_tall"
+            tools:text="Next Step"
+            android:textAllCaps="false"
+            android:textColor="@color/colorPointed"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/ui_progress_indicator"
+            app:layout_constraintStart_toEndOf="@+id/ui_button_previous" />
+
+        <TextView
+            android:id="@+id/ui_progress_indicator"
+            android:layout_width="@dimen/button_height_tall"
+            android:layout_height="@dimen/button_height_tall"
+            android:gravity="center"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="1/3" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/ui_loading_indicator"
+        style="@style/SpinKitView.CubeGrid"
+        android:layout_width="@dimen/button_height_tall"
+        android:layout_height="@dimen/button_height_tall"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

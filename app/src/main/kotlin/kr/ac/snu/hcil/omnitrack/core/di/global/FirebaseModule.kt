@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core.di.global
 import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.iid.FirebaseInstanceId
 import dagger.Module
 import dagger.Provides
@@ -23,7 +22,7 @@ class FirebaseModule {
     fun provideFirebaseApp(context: Context): FirebaseApp {
 
         return try {
-            FirebaseApp.getInstance()!!
+            FirebaseApp.getInstance()
         } catch (ex: Exception) {
             FirebaseApp.initializeApp(context, FirebaseOptions
                     .Builder()
@@ -33,12 +32,6 @@ class FirebaseModule {
                     .setProjectId(BuildConfig.FIREBASE_PROJECT_ID)
                     .build())
         }
-    }
-
-    @Provides
-    @Singleton
-    fun provideFirebaseAuth(fbApp: FirebaseApp): FirebaseAuth {
-        return FirebaseAuth.getInstance(fbApp)
     }
 
     @Provides

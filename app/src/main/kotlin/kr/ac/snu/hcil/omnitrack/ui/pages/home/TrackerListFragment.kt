@@ -55,6 +55,8 @@ import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.flags.F
+import kr.ac.snu.hcil.omnitrack.core.system.OTAppFlagManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
@@ -79,6 +81,9 @@ class TrackerListFragment : OTFragment() {
 
     @Inject
     lateinit var tutorialManager: TutorialManager
+
+    @Inject
+    lateinit var appFlagManager: OTAppFlagManager
 
     private val trackerListAdapter: TrackerListAdapter = TrackerListAdapter()
 
@@ -197,10 +202,7 @@ class TrackerListFragment : OTFragment() {
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_recyclerview_and_fab, container, false)
 
-        if (BuildConfig.DISABLE_TRACKER_CREATION) {
-            rootView.fab.hide()
-            rootView.fab.isEnabled = false
-        } else {
+        if (appFlagManager.flag(F.AddNewTracker)) {
             rootView.fab.setOnClickListener { view ->
                 newTrackerNameDialog.input(null, viewModel.generateNewTrackerName(), false) { dialog, text ->
                     startActivityForResult(TrackerDetailActivity.makeNewTrackerIntent(text.toString(), requireContext()), REQUEST_CODE_NEW_TRACKER)
@@ -208,6 +210,9 @@ class TrackerListFragment : OTFragment() {
                 }.show()
                 //Toast.makeText(context,String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
             }
+        } else {
+            rootView.fab.hide()
+            rootView.fab.isEnabled = false
         }
 
         rootView.ui_empty_list_message.setText(R.string.msg_tracker_empty)
@@ -276,7 +281,7 @@ class TrackerListFragment : OTFragment() {
                     diffResult.dispatchUpdatesTo(trackerListAdapter)
 
                     if (pendingNewTrackerId != null) {
-                        val position = currentTrackerViewModelList.indexOfFirst { it.objectId == pendingNewTrackerId }
+                        val position = currentTrackerViewModelList.indexOfFirst { it._id == pendingNewTrackerId }
                         if (position != -1) {
                             view?.ui_recyclerview?.smoothScrollToPosition(position)
                         }
@@ -320,21 +325,21 @@ class TrackerListFragment : OTFragment() {
     }
 
     private fun handleTrackerClick(tracker: OTTrackerDAO) {
-        if (tracker.isIndependentInputLocked() && !reminderCommands.isReminderPromptingToTracker(tracker.objectId!!)) {
+        if (!tracker.isManualInputAllowed() && !reminderCommands.isReminderPromptingToTracker(tracker._id!!)) {
             Toast.makeText(requireActivity(), "You cannot add new entry unless you are prompted by reminders.", Toast.LENGTH_LONG).show()
         } else {
             if (tracker.makeAttributesQuery(false, false).count() == 0L) {
                 emptyTrackerDialog
                         .onPositive { materialDialog, dialogAction ->
-                            activity?.startService(OTItemLoggingService.makeLoggingIntent(requireContext(), ItemLoggingSource.Manual, true, null, tracker.objectId!!))
+                            activity?.startService(OTItemLoggingService.makeLoggingIntent(requireContext(), ItemLoggingSource.Manual, true, null, tracker._id!!))
                             //OTBackgroundLoggingService.log(context, tracker, OTItem.ItemLoggingSource.Manual, notify = false).subscribe()
                         }
                         .onNeutral { materialDialog, dialogAction ->
-                            startActivity(TrackerDetailActivity.makeIntent(tracker.objectId, requireContext()))
+                            startActivity(TrackerDetailActivity.makeIntent(tracker._id, requireContext()))
                         }
                         .show()
             } else {
-                startActivity(NewItemActivity.makeNewItemPageIntent(tracker.objectId!!, requireContext()))
+                startActivity(NewItemActivity.makeNewItemPageIntent(tracker._id!!, requireContext()))
             }
         }
     }
@@ -500,7 +505,7 @@ class TrackerListFragment : OTFragment() {
                             onYes = { dialog ->
                                 viewModel.removeTracker(trackerViewModel)
                                 this@TrackerListFragment.view?.ui_recyclerview?.invalidateItemDecorations()
-                                eventLogger.get().logTrackerChangeEvent(IEventLogger.SUB_REMOVE, trackerViewModel.objectId)
+                                eventLogger.get().logTrackerChangeEvent(IEventLogger.SUB_REMOVE, trackerViewModel._id)
                             }).show()
                 } else if (view === chartViewButton) {
                     startActivity(ChartViewActivity.makeIntent(trackerId!!, this@TrackerListFragment.requireContext()))
@@ -553,7 +558,7 @@ class TrackerListFragment : OTFragment() {
 
             fun bindViewModel(viewModel: TrackerListViewModel.TrackerInformationViewModel) {
 
-                trackerId = viewModel.trackerDao.objectId
+                trackerId = viewModel.trackerDao._id
 
                 subscriptions.clear()
                 subscriptions.add(

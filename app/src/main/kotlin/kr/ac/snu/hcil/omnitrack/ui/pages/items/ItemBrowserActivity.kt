@@ -221,9 +221,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         if (trackerId != null) {
             viewModel.init(trackerId)
 
-            if (viewModel.trackerDao.isIndependentInputLocked()) {
+            if (!viewModel.trackerDao.isManualInputAllowed()) {
                 rightActionBarButton?.isEnabled = false
-                rightActionBarButton?.alpha = 0.2f
+                rightActionBarButton?.visibility = View.GONE
             }
         }
 
@@ -236,7 +236,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         if (this.viewModel.trackerId == trackerId) {
             if (itemId != null) {
-                val item = items.find { item -> item.objectId == itemId }
+                val item = items.find { item -> item._id == itemId }
                 if (item != null) {
                     item.setValueOf(attributeLocalId, value?.let { TypeStringSerializationHelper.serialize(it) })
 
@@ -326,10 +326,10 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     fun deleteItemPermanently(position: Int): String? {
         val removedItem = items[position]
-        removedItem.objectId?.let {
+        removedItem._id?.let {
             viewModel.removeItem(it)
         }
-        return removedItem.objectId
+        return removedItem._id
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -371,7 +371,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         }
 
         override fun onRemoveItem(position: Int) {
-            items.removeAt(position).objectId?.let { removedItems += it }
+            items.removeAt(position)._id?.let { removedItems += it }
             removalSnackbar.show()
         }
 
@@ -421,7 +421,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
             val valueListAdapter: TableRowAdapter
 
-            val itemMenu: PopupMenu
+            val itemMenu: PopupMenu?
 
 
             init {
@@ -435,11 +435,17 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 if(tracker!=null)
                     colorBar.setBackgroundColor(tracker!!.color)
 */
-                moreButton.setOnClickListener(this)
 
-                itemMenu = PopupMenu(this@ItemBrowserActivity, moreButton, Gravity.TOP or Gravity.START)
-                itemMenu.inflate(R.menu.menu_item_list_element)
-                itemMenu.setOnMenuItemClickListener(this)
+                if (viewModel.isItemModificationAllowed) {
+                    moreButton.setOnClickListener(this)
+
+                    itemMenu = PopupMenu(this@ItemBrowserActivity, moreButton, Gravity.TOP or Gravity.START)
+                    itemMenu.inflate(R.menu.menu_item_list_element)
+                    itemMenu.setOnMenuItemClickListener(this)
+                } else {
+                    itemMenu = null
+                    moreButton.visibility = View.GONE
+                }
 
                 valueListView.layoutManager = LinearLayoutManager(this@ItemBrowserActivity, RecyclerView.VERTICAL, false)
 
@@ -451,7 +457,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
             override fun onClick(p0: View?) {
                 if (p0 === moreButton) {
-                    itemMenu.show()
+                    itemMenu?.show()
                     removalSnackbar.dismiss()
                 }
             }
@@ -459,7 +465,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             override fun onMenuItemClick(p0: MenuItem): Boolean {
                 when (p0.itemId) {
                     R.id.action_edit -> {
-                        val intent = ItemEditActivity.makeItemEditPageIntent(items[adapterPosition].objectId!!, viewModel.trackerId, this@ItemBrowserActivity)
+                        val intent = ItemEditActivity.makeItemEditPageIntent(items[adapterPosition]._id!!, viewModel.trackerId, this@ItemBrowserActivity)
                         intent.putExtra(OTApp.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
                         startActivityForResult(intent, REQUEST_CODE_EDIT_ITEM)
                         return true
@@ -570,14 +576,16 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                     init {
                         valueView = view.findViewById(R.id.ui_value_view_replace)
-                        view.setOnClickListener(this)
+                        if (viewModel.isItemModificationAllowed) {
+                            view.setOnClickListener(this)
+                        }
                     }
 
                     override fun onClick(v: View?) {
                         try {
 
                             val item = getParent()
-                            AttributeEditDialogFragment.makeInstance(item.objectId!!, attributeLocalId!!, viewModel.trackerId, this@ItemBrowserActivity)
+                            AttributeEditDialogFragment.makeInstance(item._id!!, attributeLocalId!!, viewModel.trackerId, this@ItemBrowserActivity)
                                     .show(this@ItemBrowserActivity.supportFragmentManager, "ValueModifyDialog")
                         } catch (e: Exception) {
                             e.printStackTrace()
@@ -616,7 +624,11 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                             if (newValueView is IActivityLifeCycle && newValueView !== valueView) {
                                 newValueView.onCreate(null)
                             }
-                            newValueView.setOnClickListener(this)
+
+                            if (viewModel.isItemModificationAllowed) {
+                                newValueView.setOnClickListener(this)
+                            }
+
                             changeNewValueView(newValueView)
 
                             valueApplySubscription.set(attributeViewFactoryManager.get().get(attribute.type).applyValueToViewForItemList(this@ItemBrowserActivity, attribute, itemValue, valueView).subscribe({
@@ -864,7 +876,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     val exportUri = data.data
                     if (exportUri != null) {
                         println(exportUri.toString())
-                        viewModel.trackerDao.objectId?.let {
+                        viewModel.trackerDao._id?.let {
                             val serviceIntent = OTTableExportService.makeIntent(requireActivity(), it, exportUri.toString(), exportConfigIncludeFile, exportConfigTableFileType)
                             this@SettingsDialogFragment.dismiss()
                             activity?.startService(serviceIntent)

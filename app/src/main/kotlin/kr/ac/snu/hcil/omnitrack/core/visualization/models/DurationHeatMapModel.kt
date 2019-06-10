@@ -63,7 +63,7 @@ open class DurationHeatMapModel(tracker: OTTrackerDAO, timeSpanAttribute: OTAttr
 
     override fun reloadData(): Single<List<DataPoint>> {
         return Single.defer {
-            val items = dbManager.getItemsQueriedWithTimeAttribute(tracker.objectId, getTimeScope(), timeSpanAttributeLocalId, realm)
+            val items = dbManager.getItemsQueriedWithTimeAttribute(tracker._id, getTimeScope(), timeSpanAttributeLocalId, realm)
                     .filter {
                         it.getValueOf(numericAttributeLocalId) != null
                     }

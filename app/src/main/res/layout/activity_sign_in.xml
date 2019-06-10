@@ -5,7 +5,37 @@
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    tools:context=".ui.pages.SignInActivity">
+    tools:context=".ui.pages.auth.SignInActivity">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ui_app_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toTopOf="@id/ui_app_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ui_button_settings"
+        app:layout_constraintVertical_bias="1"
+        app:layout_constraintVertical_chainStyle="spread"
+        app:srcCompat="@drawable/logo_full" />
+
+    <TextView
+        android:id="@+id/ui_app_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:gravity="center"
+        android:text="OmniTrack"
+        android:textColor="@color/textColorMidDark"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ui_app_logo" />
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/ui_button_settings"
@@ -19,77 +49,124 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/settings_dark" />
 
-
-    <ImageView
-        android:id="@+id/ui_app_logo"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="0dp"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toTopOf="@+id/ui_app_sub_title"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintLeft_toLeftOf="@+id/guideline_logo_left"
-        app:layout_constraintRight_toLeftOf="@+id/guideline_logo_right"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/logo_full" />
-
-
-    <TextView
-        android:id="@+id/ui_app_sub_title"
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/ui_group_signin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:visibility="visible"
+        app:constraint_referenced_ids="ui_signin_title, ui_form_signin_username, ui_form_signin_password, ui_button_signup, ui_button_signin" />
 
-        android:text="Track What's Important For You"
-        android:textColor="@color/textColorMidLight"
-        android:textSize="16sp"
-        android:textStyle="bold|italic"
-        app:layout_constraintBottom_toTopOf="@+id/guideline_logo_bottom"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
-
-    <FrameLayout
-        android:id="@+id/ui_login_group_switcher"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/ui_signin_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:visibility="invisible"
-        tools:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/ui_logos"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ui_app_sub_title"
-        app:layout_constraintVertical_bias="0.37"
-        app:layout_constraintVertical_chainStyle="packed">
+        android:gravity="center"
+        android:text="Sign In with Existing Account"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/ui_form_signin_username"
+        app:layout_constraintEnd_toEndOf="@+id/ui_form_signin_username"
+        app:layout_constraintStart_toStartOf="@id/ui_form_signin_username"
+        app:layout_constraintTop_toBottomOf="@id/ui_app_title"
+        app:layout_constraintVertical_chainStyle="packed" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/g_login_button"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/ui_form_signin_username"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:hint="@string/username"
+        app:errorEnabled="true"
+        app:hintTextAppearance="@style/TextInputHintTextAppearance"
+        app:hintAnimationEnabled="true"
+        app:hintEnabled="true"
+        app:layout_constraintBottom_toTopOf="@id/ui_form_signin_password"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ui_signin_title">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/ui_textfield_signin_username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@drawable/google_button_background"
-            android:padding="0dp"
-            android:text="@string/sign_in_with_google"
-            android:textAllCaps="false"
-            android:textColor="@color/buttonIconColorDark" />
+            android:inputType="textVisiblePassword|textNoSuggestions" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-        <com.github.ybq.android.spinkit.SpinKitView
-            android:id="@+id/ui_loading_indicator"
-            android:layout_width="wrap_content"
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/ui_form_signin_password"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:hint="@string/password"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        app:errorEnabled="true"
+        app:endIconMode="password_toggle"
+        app:hintTextAppearance="@style/TextInputHintTextAppearance"
+        app:hintAnimationEnabled="true"
+        app:hintEnabled="true"
+        app:layout_constraintBottom_toTopOf="@+id/ui_button_signin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ui_form_signin_username">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/ui_textfield_signin_password"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            app:SpinKit_Color="@color/colorPointed"
-            app:SpinKit_Style="ThreeBounce" />
-    </FrameLayout>
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ui_button_signup"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/button_height_normal"
+        android:layout_marginEnd="8dp"
+        android:foregroundGravity="left"
+        android:text="@string/create_new_account"
+        android:textStyle="bold"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintBottom_toBottomOf="@id/ui_button_signin"
+        app:layout_constraintEnd_toStartOf="@+id/ui_button_signin"
+        app:rippleColor="@color/textColorLight"
+        app:layout_constraintStart_toStartOf="@id/ui_form_signin_username"
+        app:layout_constraintTop_toTopOf="@id/ui_button_signin" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ui_button_signin"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/button_height_normal"
+        android:layout_marginTop="6dp"
+        android:backgroundTint="@color/colorPointed"
+        android:text="@string/auth_sign_in"
+        android:textStyle="bold"
+        android:textColor="#FFF"
+        app:layout_constraintEnd_toEndOf="@+id/ui_form_signin_password"
+        app:layout_constraintTop_toBottomOf="@+id/ui_form_signin_password"
+
+        app:layout_constraintBottom_toTopOf="@+id/ui_logos"
+        app:layout_constraintVertical_bias="1" />
+
+
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/ui_loading_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        app:SpinKit_Color="@color/colorPointed"
+        app:SpinKit_Style="ThreeBounce"
+        app:layout_constraintBottom_toTopOf="@+id/ui_logos"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ui_app_title" />
 
     <ImageView
         android:id="@+id/ui_logos"
@@ -122,29 +199,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_logo_left"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.2" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_logo_right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.8" />
-
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_logo_bottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.55" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_team_logo_left"

@@ -236,7 +236,7 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
     fun makeFrontalChangesToDao(): OTAttributeDAO? {
         return attributeDAO?.let {
             val dao = OTAttributeDAO()
-            dao.objectId = it.objectId
+            dao._id = it._id
             dao.type = it.type
             dao.localId = it.localId
             dao.position = it.position

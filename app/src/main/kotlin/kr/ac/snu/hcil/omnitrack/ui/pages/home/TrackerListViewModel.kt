@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import dagger.Lazy
-import dagger.internal.Factory
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -25,8 +24,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.models.research.OTExperimentDAO
-import kr.ac.snu.hcil.omnitrack.core.di.global.Research
 import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
@@ -54,9 +51,6 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
     @Inject
     lateinit var shortcutPanelManager: Lazy<OTShortcutPanelManager>
 
-    @field:[Inject Research]
-    lateinit var researchRealmFactory: Factory<Realm>
-
     private var trackersRealmResults: RealmResults<OTTrackerDAO>? = null
 
     private var trackerViewModelListSubject: BehaviorSubject<List<TrackerInformationViewModel>> = BehaviorSubject.create()
@@ -64,8 +58,6 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
     private val currentTrackerViewModelList = ArrayList<TrackerInformationViewModel>()
 
     private val requiredPermissionsSubject: BehaviorSubject<Array<String>> = BehaviorSubject.create()
-
-    private lateinit var researchRealm: Realm
 
     val trackerViewModels: Observable<List<TrackerInformationViewModel>>
         get() = trackerViewModelListSubject
@@ -87,7 +79,6 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
     override fun onInject(app: OTAndroidApp) {
         getApplication<OTApp>().applicationComponent.inject(this)
-        researchRealm = researchRealmFactory.get()
     }
 
     override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet) {
@@ -95,7 +86,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
             if (changeSet.state == OrderedCollectionChangeSet.State.INITIAL) {
                 //first time emit
                 clearTrackerViewModelList()
-                val viewModels = snapshot.map { TrackerInformationViewModel(it, realm, researchRealm, dbManager.get(), getApplication()) }
+                val viewModels = snapshot.map { TrackerInformationViewModel(it, realm, dbManager.get(), getApplication()) }
                 currentTrackerViewModelList.addAll(viewModels)
 
                 trackerViewModelListSubject.onNext(
@@ -110,7 +101,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
                 //deal with additions
                 changeSet.insertions.forEach { index ->
-                    currentTrackerViewModelList.add(index, TrackerInformationViewModel(snapshot[index]!!, realm, researchRealm, dbManager.get(), getApplication()))
+                    currentTrackerViewModelList.add(index, TrackerInformationViewModel(snapshot[index]!!, realm, dbManager.get(), getApplication()))
                 }
 
                 trackerViewModelListSubject.onNext(
@@ -167,7 +158,6 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
     override fun onUserDisposed() {
         super.onUserDisposed()
-        researchRealm.close()
         clearTrackerViewModelList()
         shortcutPanelManager.get().unregisterShortcutRefreshSubscription(TAG)
         LocalBroadcastManager.getInstance(getApplication()).unregisterReceiver(syncBroadcastReceiver)
@@ -200,11 +190,11 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         }
     }
 
-    class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm, val researchRealm: Realm, dbManager: BackendDbManager, val context: Context) : IReadonlyObjectId, RealmChangeListener<OTTrackerDAO> {
-        override val objectId: String?
+    class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm, dbManager: BackendDbManager, val context: Context) : IReadonlyObjectId, RealmChangeListener<OTTrackerDAO> {
+        override val _id: String?
             get() = _objectId
 
-        private var _objectId: String? = trackerDao.objectId
+        private var _objectId: String? = trackerDao._id
 
         val validationResult = BehaviorSubject.createDefault<Pair<Boolean, List<CharSequence>?>>(Pair(true, null))
 
@@ -236,8 +226,8 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         val isBookmarked: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
 
         val attributesResult: RealmResults<OTAttributeDAO> = trackerDao.makeAttributesQuery(false, false).findAllAsync()
-        val trackerItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQuery(trackerDao.objectId, null, null, realm).findAllAsync()
-        val todayItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQueryOfTheDay(trackerDao.objectId, realm).findAllAsync()
+        val trackerItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQuery(trackerDao._id, null, null, realm).findAllAsync()
+        val todayItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQueryOfTheDay(trackerDao._id, realm).findAllAsync()
 
         private val currentAttributeValidationResultDict = Hashtable<String, Pair<Boolean, List<CharSequence>?>>()
 
@@ -315,25 +305,10 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
             isBookmarked.onNextIfDifferAndNotNull(snapshot.isBookmarked)
             isForExperiment.onNextIfDifferAndNotNull(CreationFlagsHelper.isForExperiment(snapshot.getParsedCreationFlags()))
 
-            trackerEditable.onNextIfDifferAndNotNull(!snapshot.isEditingLocked())
-            trackerRemovable.onNextIfDifferAndNotNull(!snapshot.isDeletionLocked())
-            isItemListAllowed.onNextIfDifferAndNotNull(!snapshot.isItemListLocked())
-            isVisualizationAllowed.onNextIfDifferAndNotNull(!snapshot.isVisualizationLocked())
-
-            CreationFlagsHelper.getExperimentId(trackerDao.getParsedCreationFlags())?.let { experimentId ->
-                println("Observe the name of the experiment : $experimentId")
-                subscriptions.add(
-                        researchRealm.where(OTExperimentDAO::class.java)
-                                .equalTo("id", experimentId)
-                                .findFirstAsync().asFlowable<OTExperimentDAO>()
-                                .filter {
-                                    it.isValid && it.isLoaded
-                                }
-                                .subscribe { experimentInfo ->
-                                    this.experimentName.onNextIfDifferAndNotNull(Nullable(experimentInfo.name))
-                                }
-                )
-            }
+            trackerEditable.onNextIfDifferAndNotNull(snapshot.isEditingAllowed())
+            trackerRemovable.onNextIfDifferAndNotNull(snapshot.isRemovalAllowed())
+            isItemListAllowed.onNextIfDifferAndNotNull(snapshot.isItemListAccessAllowed())
+            isVisualizationAllowed.onNextIfDifferAndNotNull(snapshot.isVisualizationAccessAllowed())
         }
 
         override fun onChange(snapshot: OTTrackerDAO) {

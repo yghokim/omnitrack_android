@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.pages.experiment
+package kr.ac.snu.hcil.omnitrack.ui.pages.auth
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -16,7 +16,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.serialization.getStringCompat
 
-class DemographicQuestionnaireSlideFragment : ExperimentSignUpActivity.SlideFragment(ExperimentSignUpActivity.ESlide.DEMOGRAPHIC_QUESTIONNAIRE) {
+class DemographicQuestionnaireSlideFragment : SignUpActivity.SlideFragment(SignUpActivity.ESlide.DEMOGRAPHIC_QUESTIONNAIRE) {
 
     companion object {
         const val INITIALIZE_URL = "file:///android_asset/web/questionnaire/index.html"

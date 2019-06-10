@@ -18,6 +18,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.otaliastudios.cameraview.*
 import kr.ac.snu.hcil.android.common.getActionPrefix
+import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 import kr.ac.snu.hcil.android.common.view.R
 import kr.ac.snu.hcil.android.common.view.applyTint
 import kr.ac.snu.hcil.android.common.view.indicator.LoadingIndicatorBar
@@ -120,7 +121,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
         if (view === shutterButton) {
             try {
                 shutterButton.isEnabled = false
-                shutterButton.alpha = 0.5f
+                shutterButton.alpha = InterfaceHelper.ALPHA_INACTIVE
                 loadingIndicator.show()
                 cameraView.capturePicture()
             } catch(e: Exception) {

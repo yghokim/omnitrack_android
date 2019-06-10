@@ -22,6 +22,8 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.ExpressionEvaluator
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerMeasureEntry
+import kr.ac.snu.hcil.omnitrack.core.flags.F
+import kr.ac.snu.hcil.omnitrack.core.flags.LockFlagLevel
 import kr.ac.snu.hcil.omnitrack.core.flags.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTBackgroundLoggingTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
@@ -34,9 +36,10 @@ import org.jetbrains.anko.runOnUiThread
 /**
  * Created by Young-Ho on 10/9/2017.
  */
+@Suppress("PropertyName")
 open class OTTriggerDAO : RealmObject() {
 
-    data class SimpleTriggerInfo(override val objectId: String, val conditionType: Byte, val condition: ATriggerCondition?, val actionType: Byte, val action: OTTriggerAction?, val trackers: Array<OTTrackerDAO.SimpleTrackerInfo>?) : IReadonlyObjectId
+    data class SimpleTriggerInfo(override val _id: String, val conditionType: Byte, val condition: ATriggerCondition?, val actionType: Byte, val action: OTTriggerAction?, val trackers: Array<OTTrackerDAO.SimpleTrackerInfo>?) : IReadonlyObjectId
 
     enum class TriggerInvalidReason { TRACKER_NOT_ATTACHED, CONDITION_INVALID }
     class TriggerConfigInvalidException(vararg _causes: TriggerInvalidReason) : Exception() {
@@ -56,7 +59,7 @@ open class OTTriggerDAO : RealmObject() {
     }
 
     @PrimaryKey
-    var objectId: String? = null
+    var _id: String? = null
     var alias: String = ""
     var position: Int = 0
 
@@ -176,7 +179,7 @@ open class OTTriggerDAO : RealmObject() {
                 liveTrackersQuery.findAll()
             } else {
                 trackers.filter { !it.removed }
-            }.map { it.objectId!! }.toTypedArray()
+            }.map { it._id!! }.toTypedArray()
         }
 
     var synchronizedAt: Long? = null
@@ -205,19 +208,20 @@ open class OTTriggerDAO : RealmObject() {
         return _parsedLockedPropertyInfo!!
     }
 
-    fun isEditingLocked(): Boolean {
-        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.COMMON_EDIT, getParsedLockedPropertyInfo())
-                ?: false
+    private val lockFlagLevel: String get(){
+       return if(actionType == ACTION_TYPE_REMIND) LockFlagLevel.Reminder else LockFlagLevel.Trigger
     }
 
-    fun isDeletionLocked(): Boolean {
-        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.COMMON_DELETE, getParsedLockedPropertyInfo())
-                ?: false
+    fun isEditingAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(lockFlagLevel, F.Modify, getParsedLockedPropertyInfo())
     }
 
-    fun isSwitchLocked(): Boolean {
-        return LockedPropertiesHelper.isLocked(LockedPropertiesHelper.TRIGGER_CHANGE_SWITCH, getParsedLockedPropertyInfo())
-                ?: false
+    fun isRemovalAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(lockFlagLevel, F.Delete, getParsedLockedPropertyInfo())
+    }
+
+    fun isSwitchAllowed(): Boolean {
+        return LockedPropertiesHelper.flag(lockFlagLevel, F.ToggleSwitch, getParsedLockedPropertyInfo())
     }
 
     fun invalidateConditionCache() {
@@ -282,7 +286,7 @@ open class OTTriggerDAO : RealmObject() {
     }
 
     fun getPerformFireCompletable(triggerTime: Long, metadata: JsonObject, context: Context): Completable {
-        val triggerId = objectId!!
+        val triggerId = _id!!
 
         val unManagedDAO = if (this.isManaged) this.realm.copyFromRealm(this) else this
         return (action?.performAction(this, triggerTime, metadata, context)
@@ -301,7 +305,7 @@ open class OTTriggerDAO : RealmObject() {
     }
 
     fun getSimpleInfo(populateTracker: Boolean = false): SimpleTriggerInfo {
-        return SimpleTriggerInfo(objectId!!, conditionType, condition, actionType, action,
+        return SimpleTriggerInfo(_id!!, conditionType, condition, actionType, action,
                 if (populateTracker) {
                     if (isManaged) {
                         if (liveTrackerCount > 0) {

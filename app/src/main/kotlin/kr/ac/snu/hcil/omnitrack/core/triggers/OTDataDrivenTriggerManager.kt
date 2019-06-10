@@ -310,7 +310,7 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
                         }
                     }.flatMap { (measure) ->
                         if (measure != null) {
-                            return@flatMap measure.asFlowable<OTTriggerMeasureEntry>().filter { it.isLoaded && it.isValid && it.triggers.any { it.objectId == triggerId } }
+                            return@flatMap measure.asFlowable<OTTriggerMeasureEntry>().filter { it.isLoaded && it.isValid && it.triggers.any { it._id == triggerId } }
                                     .map { measure ->
                                         val latestHistoryEntry = measure.measureHistory.maxBy { it.timestamp }
                                         return@map if (latestHistoryEntry != null) {

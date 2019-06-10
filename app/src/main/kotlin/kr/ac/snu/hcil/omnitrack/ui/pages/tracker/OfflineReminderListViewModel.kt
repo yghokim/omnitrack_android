@@ -22,8 +22,8 @@ class OfflineReminderListViewModel(app: Application) : OfflineTriggerListViewMod
         realm.executeTransactionAsync { realm ->
             currentTriggerViewModels.map { it.dao }.forEach {
                 beforeAddNewTrigger(it)
-                if (it.trackers.find { it.objectId == trackerId } == null) {
-                    val trackerDao = realm.where(OTTrackerDAO::class.java).equalTo("objectId", trackerId).findFirst()
+                if (it.trackers.find { it._id == trackerId } == null) {
+                    val trackerDao = realm.where(OTTrackerDAO::class.java).equalTo("_id", trackerId).findFirst()
                     if (trackerDao != null)
                         it.trackers.add(realm.copyFromRealm(trackerDao))
                 }

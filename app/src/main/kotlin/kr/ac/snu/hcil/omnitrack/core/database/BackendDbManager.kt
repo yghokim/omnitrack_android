@@ -15,6 +15,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.models.*
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.flags.F
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
@@ -46,7 +47,7 @@ class BackendDbManager @Inject constructor(
 ) : ISynchronizationClientSideAPI {
 
     companion object {
-        const val FIELD_OBJECT_ID = "objectId"
+        const val FIELD_OBJECT_ID = "_id"
         const val FIELD_UPDATED_AT_LONG = "userUpdatedAt"
         const val FIELD_USER_CREATED_AT = "userCreatedAt"
         const val FIELD_SYNCHRONIZED_AT = "synchronizedAt"
@@ -79,7 +80,7 @@ class BackendDbManager @Inject constructor(
 
 
         fun <T> branchCheckDefaultExperimentId(query: RealmQuery<T>): RealmQuery<T> {
-            return if (BuildConfig.DISABLE_EXTERNAL_ENTITIES) {
+            return if (BuildConfig.DEFAULT_EXPERIMENT_ID != null) {
                 query.equalTo(FIELD_EXPERIMENT_ID_IN_FLAGS, BuildConfig.DEFAULT_EXPERIMENT_ID)
             } else query
         }
@@ -88,9 +89,9 @@ class BackendDbManager @Inject constructor(
             return query
                     .not()
                     .beginGroup()
-                    .contains(FIELD_LOCKED_PROPERTIES_SERIALIZED, "\"visibleInApp\":true", Case.INSENSITIVE)
+                    .contains(FIELD_LOCKED_PROPERTIES_SERIALIZED, "\"${F.Visible}\":false", Case.INSENSITIVE)
                     .or()
-                    .contains(FIELD_LOCKED_PROPERTIES_SERIALIZED, "\"visibleInApp\" : true", Case.INSENSITIVE)
+                    .contains(FIELD_LOCKED_PROPERTIES_SERIALIZED, "\"${F.Visible}\": false", Case.INSENSITIVE)
                     .endGroup()
         }
     }
@@ -130,7 +131,7 @@ class BackendDbManager @Inject constructor(
         return makeBookmarkedTrackersObservable(userId, realm).filter { it.isValid && it.isLoaded }.map { snapshot ->
             Intent(OTShortcutPanelManager.ACTION_BOOKMARKED_TRACKERS_CHANGED)
                     .apply {
-                        putExtra(OTShortcutPanelManager.INTENT_EXTRA_CURRENT_BOOKMARKED_SNAPSHOT, snapshot.map { it.objectId }.toTypedArray())
+                        putExtra(OTShortcutPanelManager.INTENT_EXTRA_CURRENT_BOOKMARKED_SNAPSHOT, snapshot.map { it._id }.toTypedArray())
                     }
         }.doOnNext {
                 intent->
@@ -268,7 +269,7 @@ class BackendDbManager @Inject constructor(
     }
 
     fun makeSingleItemQuery(itemId: String, realm: Realm): RealmQuery<OTItemDAO> {
-        return realm.where(OTItemDAO::class.java).equalTo("objectId", itemId)
+        return realm.where(OTItemDAO::class.java).equalTo("_id", itemId)
     }
 
     fun makeTriggersOfUserVisibleQuery(userId: String, realm: Realm): RealmQuery<OTTriggerDAO> {
@@ -319,7 +320,7 @@ class BackendDbManager @Inject constructor(
             } else {
                 realm.executeTransactionAsync({ realm ->
                     if (dao.trackers.isNotEmpty()) {
-                        val trackers = realm.where(OTTrackerDAO::class.java).`in`("objectId", dao.trackers.map { it.objectId }.toTypedArray()).findAll()
+                        val trackers = realm.where(OTTrackerDAO::class.java).`in`("_id", dao.trackers.map { it._id }.toTypedArray()).findAll()
                         dao.trackers.clear()
                         dao.trackers.addAll(trackers)
                     }
@@ -359,7 +360,7 @@ class BackendDbManager @Inject constructor(
                 })
 
                 intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, item.trackerId)
-                intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
+                intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, item._id)
 
                 context.sendBroadcast(intent)
 
@@ -374,16 +375,16 @@ class BackendDbManager @Inject constructor(
         return Single.create { subscriber ->
             var result: Int = SAVE_RESULT_FAIL
             try {
-                result = if (item.objectId == null) {
+                result = if (item._id == null) {
                     SAVE_RESULT_NEW
                 } else {
                     SAVE_RESULT_EDIT
                 }
 
                 //if itemId is null, set new Id.
-                if (item.objectId == null) {
+                if (item._id == null) {
                     val newItemId = UUID.randomUUID().toString()
-                    item.objectId = newItemId
+                    item._id = newItemId
                 }
 
                 realm.executeTransactionIfNotIn {
@@ -393,7 +394,7 @@ class BackendDbManager @Inject constructor(
                             if (value is OTServerFile && value.serverPath.isNotBlank()) {
                                 if (localCacheManager.isServerPathTemporal(value.serverPath)) {
                                     val newServerPath = localCacheManager.replaceTemporalServerPath(value.serverPath, item.trackerId
-                                            ?: "noTracker", item.objectId!!, entry.key)
+                                            ?: "noTracker", item._id!!, entry.key)
                                     if (newServerPath != null) {
                                         value.serverPath = newServerPath
                                         entry.value = TypeStringSerializationHelper.serialize(value)
@@ -410,7 +411,7 @@ class BackendDbManager @Inject constructor(
                 ex.printStackTrace()
             } finally {
                 if (!subscriber.isDisposed) {
-                    subscriber.onSuccess(Pair(result, item.objectId))
+                    subscriber.onSuccess(Pair(result, item._id))
                 }
             }
         }
@@ -545,10 +546,10 @@ class BackendDbManager @Inject constructor(
                     { dao, serverPojo ->
                         dao.userUpdatedAt < serverPojo.getLongCompat(FIELD_UPDATED_AT_LONG) ?: Long.MIN_VALUE
                     }, serializationManager.serverTrackerTypeAdapter as Lazy<JsonObjectApplier<OTTrackerDAO>>)
+
             ESyncDataType.TRIGGER -> applyServerRowsToSyncImpl(OTTriggerDAO::class.java, jsonList, { trigger -> trigger.synchronizedAt },
                     { trigger, realm -> saveTrigger(trigger, realm) },
                     { trigger, realm -> removeTrigger(trigger, true, realm) },
-
                     { trigger, realm ->
                         if (trigger.removed) {
                             triggerSystemManager.tryCheckOutFromSystem(trigger)
@@ -557,6 +558,7 @@ class BackendDbManager @Inject constructor(
                         }
                     },
                     { dao, serverPojo -> dao.userUpdatedAt < serverPojo.getLongCompat(FIELD_UPDATED_AT_LONG) ?: Long.MIN_VALUE }, serializationManager.serverTriggerTypeAdapter as Lazy<JsonObjectApplier<OTTriggerDAO>>)
+
             ESyncDataType.ITEM -> applyServerRowsToSyncImpl(OTItemDAO::class.java, jsonList, { item -> item.synchronizedAt },
                     { item, realm -> realm.insertOrUpdate(item) },
                     { item, realm -> removeItemImpl(item, true, realm) }, null, { dao, serverPojo -> dao.timestamp < serverPojo.getLongCompat(FIELD_TIMESTAMP_LONG) ?: Long.MIN_VALUE }, serializationManager.serverItemTypeAdapter as Lazy<JsonObjectApplier<OTItemDAO>>)

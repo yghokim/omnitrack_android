@@ -45,7 +45,7 @@ class ReminderListFragment : ATriggerListFragment<ATriggerListViewModel>() {
 
     override fun onProcessNewDefaultTrigger(dao: OTTriggerDAO) {
         super.onProcessNewDefaultTrigger(dao)
-        dao.objectId = UUID.randomUUID().toString()
+        dao._id = UUID.randomUUID().toString()
     }
 
 

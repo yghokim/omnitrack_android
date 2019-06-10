@@ -113,7 +113,7 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
 
     override fun onToolbarRightButtonClicked() {
 
-        val errorDialog = DialogHelper.makeSimpleAlertBuilder(this, getString(R.string.msg_send_report_error_message))
+        val errorDialog = DialogHelper.makeSimpleAlertBuilder(this, getString(R.string.msg_send_report_error_message), null)
 
         DialogHelper.makeYesNoDialogBuilder(this, title.toString(), getString(R.string.msg_send_report_to_omnitrack_team), R.string.msg_send, R.string.msg_no, onYes = { dialog ->
             val inquiry = HashMap<String, Any>()

@@ -29,7 +29,7 @@ class DataDrivenConditionViewModel(trigger: OTTriggerDAO, context: Context) : AT
     init {
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
         subscriptions.add(
-                dataDrivenTriggerManager.get().makeLatestMeasuredValueObservable(trigger.objectId!!).subscribe { info ->
+                dataDrivenTriggerManager.get().makeLatestMeasuredValueObservable(trigger._id!!).subscribe { info ->
                     latestMeasuredInfoSubject.onNextIfDifferAndNotNull(info)
                 }
         )

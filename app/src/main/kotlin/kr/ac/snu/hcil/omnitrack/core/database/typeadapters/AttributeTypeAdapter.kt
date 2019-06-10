@@ -28,7 +28,7 @@ class AttributeTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : Server
                 reader.skipValue()
             } else {
                 when (name) {
-                    BackendDbManager.FIELD_OBJECT_ID -> dao.objectId = reader.nextString()
+                    BackendDbManager.FIELD_OBJECT_ID -> dao._id = reader.nextString()
                     "localId" -> dao.localId = reader.nextString()
                     "trackerId", "tracker" -> dao.trackerId = reader.nextString()
                     BackendDbManager.FIELD_NAME -> dao.name = reader.nextString()
@@ -90,7 +90,7 @@ class AttributeTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : Server
     override fun write(writer: JsonWriter, value: OTAttributeDAO, isServerMode: Boolean) {
         writer.beginObject()
 
-        writer.name(BackendDbManager.FIELD_OBJECT_ID).value(value.objectId)
+        writer.name(BackendDbManager.FIELD_OBJECT_ID).value(value._id)
         writer.name("localId").value(value.localId)
         writer.name("type").value(value.type)
         writer.name(if (isServerMode) "trackerId" else "tracker").value(value.trackerId)

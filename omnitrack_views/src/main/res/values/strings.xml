@@ -12,4 +12,35 @@
     <string name="choice_add_new_entry">Add New Entry</string>
     <string name="choice_add_new_entry_hint">Insert new entry</string>
     <string name="choice_add_new_entry_error_duplicate">Duplicate entry text</string>
+
+    <string name="msg_auth_validation_error_username_blank">Username should not be blank.</string>
+    <string name="msg_auth_validation_error_username_length">Username should have be between %1$d to %2$d characters.</string>
+    <string name="msg_auth_validation_error_username_alphanumeric">Username should consist of alpha-numeric characters only, and cannot be started with a number.</string>
+
+    <string name="msg_auth_validation_error_password_blank">Password should not be blank.</string>
+    <string name="msg_auth_validation_error_password_length">Password should not be shorter than %1$d.</string>
+    <string name="username">Username</string>
+    <string name="email">E-mail</string>
+
+    <string name="password">Password</string>
+    <string name="auth_sign_in">Sign In</string>
+    <string name="create_new_account">Create New Account</string>
+    <string name="msg_auth_confirm_password">Confirm Password</string>
+    <string name="msg_auth_invitation_code">Invitation Code</string>
+    <string name="msg_auth_invitation_code_description">Use the invitation code you received from the experimenter.</string>
+    <string name="auth_signin_wrong_credential">Username or password is wrong.</string>
+    <string name="msg_auth_description_email_researcher">E-mail must match one of the registered researchers\' e-mail.</string>
+    <string name="msg_auth_next_step">Next Step</string>
+    <string name="msg_auth_approve_and_continue">Approve and Continue</string>
+    <string name="msg_auth_sign_up_complete">Complete</string>
+    <string name="msg_auth_change_email">Change E-mail</string>
+    <string name="msg_auth_new_email_address">New E-mail address</string>
+    <string name="msg_auth_stop_participating_in_the_study">Stop Participating in the Study</string>
+    <string name="msg_auth_stop_participation">Stop Participation</string>
+    <string name="msg_auth_stop_participation_message">Do you really want to stop participating in the study? All your data, history, and account will be permanently deleted from the server and apps.</string>
+    <string name="msg_auth_stop_participation_confirm_email">Write down your E-mail address to confirm</string>
+    <string name="msg_auth_stop_participation_reason">(Optional) Could you provide the reason of stopping participation?</string>
+    <string name="msg_auth_stop_participation_insert_reason">Reason</string>
+
+
 </resources>

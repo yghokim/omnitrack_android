@@ -277,8 +277,8 @@
     <string name="msg_demographic_nationality">현재 어느 나라에 살고 있나요?</string>
     <string name="msg_demographic_complete_form">모든 정보를 입력해주세요.</string>
 
-    <string name="msg_profile_menu_unlink_account">이 기기와 연결 해제…</string>
-    <string name="msg_profile_unlink_account_confirm">서버와 동기화되지 않은 데이터는 유실될 것입니다.\n이 기기와 계정의 연결을 해제하시겠습니까?</string>
+    <string name="msg_profile_menu_unlink_account">기기에서 로그아웃</string>
+    <string name="msg_profile_unlink_account_confirm">서버와 동기화되지 않은 데이터는 유실될 것입니다.\n이 기기에서 로그아웃하시겠습니까?</string>
     <string name="msg_signup_complete">회원가입이 완료되었습니다</string>
     <string name="msg_signup_complete_description">이제 트래킹을 시작할 수 있습니다!</string>
     <string name="msg_purge_cache">이미 동기화된 미디어 파일 캐시 삭제</string>
@@ -312,8 +312,8 @@
     <string name="msg_send_report_success_message">문의 메시지를 성공적으로 전송했습니다.</string>
     <string name="msg_background_logging_started_notification_message">새 로그 값을 생성중입니다…</string>
     <string name="msg_background_logging_notification_title_format">%1$s 아이템 로깅</string>
-    <string name="msg_sign_in_google_succeeded">로그인에 성공했습니다</string>
-    <string name="msg_sign_in_google_canceled">로그인이 취소되었습니다.</string>
+    <string name="msg_signin_succeeded">로그인에 성공했습니다</string>
+    <string name="msg_signin_canceled">로그인이 취소되었습니다.</string>
     <string name="msg_under_development">이 기능은 아직 구현중입니다. 곧 언락하겠습니다!</string>
     <string name="msg_contacts_permission_required">주소록 접근 권한 필요</string>
     <string name="msg_permission_required">접근 권한 필요</string>
@@ -440,6 +440,7 @@
     <string name="msg_attribute_detail_properties_invalid">일부 속성 설정을 다시 한번 확인해 주세요.</string>
     <string name="msg_sharing_tracking_plan">Sharing tracking plan...</string>
     <string name="msg_export_tracking_plan">Export Tracking Plan</string>
+    <string name="activity_title_my_account">내 계정정보</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>

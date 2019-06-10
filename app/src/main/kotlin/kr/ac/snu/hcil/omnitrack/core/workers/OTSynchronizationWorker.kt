@@ -24,7 +24,10 @@ class OTSynchronizationWorker(private val context: Context, private val workerPa
         return OTSynchronizationCommands(context).createSynchronizationTask(
                 workerParams.inputData.getBoolean(EXTRA_KEY_FULLSYNC, false)
         ).toSingle { Result.success() }
-                .onErrorReturn { Result.retry() }
+                .onErrorReturn {
+                    it.printStackTrace()
+                    Result.retry()
+                }
 
 
     }

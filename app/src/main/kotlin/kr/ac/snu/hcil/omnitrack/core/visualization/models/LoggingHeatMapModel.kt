@@ -71,11 +71,11 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, val context: Cont
 
 
         return if (timeAttributeLocalId != null) {
-            Single.just(dbManager.getItemsQueriedWithTimeAttribute(tracker.objectId, getTimeScope(),
+            Single.just(dbManager.getItemsQueriedWithTimeAttribute(tracker._id, getTimeScope(),
                     timeAttributeLocalId, realm).sortedBy { (it.getValueOf(timeAttributeLocalId) as TimePoint).timestamp })
         } else {
             dbManager
-                    .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
+                    .makeItemsQuery(tracker._id, getTimeScope(), realm)
                     .sort("timestamp", Sort.ASCENDING)
                     .findAllAsync()
                     .asFlowable()
