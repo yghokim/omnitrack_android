@@ -70,7 +70,7 @@ class SplashScreenActivity : OTActivity(checkRefreshingCredential = true, checkU
                     val intent = Intent(this, HomeActivity::class.java)
                     intent.putExtra(OTApp.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, true)
                     startActivity(intent)
-                    finish()
+                    finishAffinity()
                 }
         )
     }

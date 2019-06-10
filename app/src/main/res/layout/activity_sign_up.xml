@@ -3,10 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ui_root">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ui_main"
+        android:visibility="invisible"
+        tools:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -64,9 +67,9 @@
 
     <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/ui_loading_indicator"
-        style="@style/SpinKitView.CubeGrid"
+        style="@style/SpinKitView.ThreeBounce"
+        android:layout_gravity="center"
         android:layout_width="@dimen/button_height_tall"
         android:layout_height="@dimen/button_height_tall"
-        android:layout_gravity="center"
-        android:visibility="gone" />
+        app:SpinKit_Color="@color/colorPointed" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

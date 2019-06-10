@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.auth
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -12,6 +13,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProviders
+import androidx.transition.Fade
+import androidx.transition.Transition
+import androidx.transition.TransitionManager
+import androidx.transition.TransitionSet
 import com.google.gson.Gson
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -55,6 +60,13 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
 
     private val creationSubscriptions = CompositeDisposable()
 
+    private val loadingTransitions: Transition by lazy {
+        TransitionSet()
+                .setOrdering(TransitionSet.ORDERING_SEQUENTIAL)
+                .addTransition(Fade(Fade.MODE_OUT).setDuration(300))
+                .addTransition(Fade(Fade.MODE_IN).setDuration(500))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -72,7 +84,7 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
             viewModel.initialize()
         }
 
-        setBusyMode(true)
+        setBusyMode(true, false)
         this.creationSubscriptions.add(
                 viewModel.slideListInfo.observeOn(AndroidSchedulers.mainThread()).subscribe { (slides, data) ->
                     ui_button_next.isEnabled = true
@@ -96,7 +108,7 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
                     }
                     updateIndicators()
 
-                    setBusyMode(false)
+                    setBusyMode(false, true)
                 }
         )
 
@@ -112,7 +124,6 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
 
         ui_button_next.setOnClickListener {
             viewModel.tryNext(slideList[main_viewpager.currentItem])
-            updateIndicators()
         }
 
         creationSubscriptions.add(
@@ -177,7 +188,10 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
         }
     }
 
-    private fun setBusyMode(isBusy: Boolean) {
+    private fun setBusyMode(isBusy: Boolean, animate: Boolean = true) {
+        if (animate) {
+            TransitionManager.beginDelayedTransition(ui_root, loadingTransitions)
+        }
         if (isBusy) {
             ui_loading_indicator.visibility = View.VISIBLE
             ui_main.visibility = View.INVISIBLE
@@ -192,6 +206,7 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
         creationSubscriptions.clear()
     }
 
+    @SuppressLint("WrongConstant")
     inner class PagerAdapter(fragmentManager: FragmentManager) : FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
         override fun getItem(position: Int): Fragment {

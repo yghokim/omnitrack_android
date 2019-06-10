@@ -49,7 +49,7 @@ class SignUpViewModel(app: Application) : AndroidViewModel(app) {
     var password: String? = null
     var email: String? = null
 
-    private val slideListInfoSubject = BehaviorSubject.createDefault<SignUpSlideListInfo>(SignUpSlideListInfo(emptyArray(), null))
+    private val slideListInfoSubject = BehaviorSubject.create<SignUpSlideListInfo>()
 
     private val onNextTrySubject = PublishSubject.create<SignUpActivity.ESlide>()
 
