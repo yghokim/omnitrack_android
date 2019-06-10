@@ -41,6 +41,10 @@
     <string name="msg_auth_stop_participation_confirm_email">Write down your E-mail address to confirm</string>
     <string name="msg_auth_stop_participation_reason">(Optional) Could you provide the reason of stopping participation?</string>
     <string name="msg_auth_stop_participation_insert_reason">Reason</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="msg_auth_invalid_email">Invalid E-mail address.</string>
+    <string name="msg_auth_confirm_password_invalid">Two password inputs are different.</string>
+    <string name="msg_auth_invitation_code_empty">Invitation Code should not be blank.</string>
 
 
 </resources>

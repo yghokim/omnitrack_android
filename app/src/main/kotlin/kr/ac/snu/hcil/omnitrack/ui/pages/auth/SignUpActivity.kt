@@ -62,9 +62,9 @@ class SignUpActivity : AppCompatActivity(R.layout.activity_sign_up) {
 
     private val loadingTransitions: Transition by lazy {
         TransitionSet()
-                .setOrdering(TransitionSet.ORDERING_SEQUENTIAL)
+                .setOrdering(TransitionSet.ORDERING_TOGETHER)
                 .addTransition(Fade(Fade.MODE_OUT).setDuration(300))
-                .addTransition(Fade(Fade.MODE_IN).setDuration(500))
+                .addTransition(Fade(Fade.MODE_IN).setDuration(300))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

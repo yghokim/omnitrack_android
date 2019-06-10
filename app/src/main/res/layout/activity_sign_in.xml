@@ -151,8 +151,24 @@
         app:layout_constraintEnd_toEndOf="@+id/ui_form_signin_password"
         app:layout_constraintTop_toBottomOf="@+id/ui_form_signin_password"
 
+        app:layout_constraintBottom_toTopOf="@+id/ui_button_forgot_password" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ui_button_forgot_password"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/forgot_password"
+        android:textAllCaps="false"
+        android:textColor="@color/textColorLight"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/ui_form_signin_password"
+        app:layout_constraintTop_toBottomOf="@+id/ui_button_signin"
+        app:layout_constraintVertical_bias="1"
+
         app:layout_constraintBottom_toTopOf="@+id/ui_logos"
-        app:layout_constraintVertical_bias="1" />
+        app:rippleColor="@color/textColorLightLight" />
 
 
     <com.github.ybq.android.spinkit.SpinKitView
@@ -197,7 +213,8 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        tools:ignore="HardcodedText" />
 
 
     <androidx.constraintlayout.widget.Guideline

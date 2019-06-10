@@ -102,10 +102,10 @@ class SignUpCredentialSlideFragment : SignUpActivity.SlideFragment(SignUpActivit
         val invitationCodeInput = view?.ui_textfield_invitation_code?.text?.toString() ?: ""
 
         val usernameInvalidMessage = authManager.validateUsername(usernameInput)
-        val emailInvalidMessage = if (Patterns.EMAIL_ADDRESS.matcher(emailInput).matches()) null else "Invalid E-mail address."
+        val emailInvalidMessage = if (Patterns.EMAIL_ADDRESS.matcher(emailInput).matches()) null else getString(R.string.msg_auth_invalid_email)
         val passwordInvalidMessage = authManager.validatePassword(passwordInput)
-        val confirmPasswordInvalidMessage = if (passwordInput.contentEquals(confirmPasswordInput)) null else "Two password inputs are different."
-        val invitationCodeInvalidMessage = if (invitationCodeInput.trimmedLength() > 0) null else "Invitation Code should not be blank."
+        val confirmPasswordInvalidMessage = if (passwordInput.contentEquals(confirmPasswordInput)) null else getString(R.string.msg_auth_confirm_password_invalid)
+        val invitationCodeInvalidMessage = if (invitationCodeInput.trimmedLength() > 0) null else getString(R.string.msg_auth_invitation_code_empty)
 
         view?.ui_form_username?.error = usernameInvalidMessage
         view?.ui_form_password?.error = passwordInvalidMessage
