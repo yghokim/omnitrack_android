@@ -3,8 +3,10 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.auth
 import android.os.Bundle
 import android.util.Patterns
 import android.view.View
+import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_my_account.*
 import kr.ac.snu.hcil.android.common.view.DialogHelper
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
@@ -35,6 +37,10 @@ class MyAccountActivity : MultiButtonActionBarActivity(R.layout.activity_my_acco
         ui_btn_change_email.setOnClickListener(this)
         ui_btn_change_password.setOnClickListener(this)
         ui_btn_drop_experiment.setOnClickListener(this)
+
+        if (BuildConfig.DEFAULT_EXPERIMENT_ID == null) {
+            ui_btn_drop_experiment.visibility = View.GONE
+        }
     }
 
     override fun onClick(v: View?) {
@@ -49,8 +55,9 @@ class MyAccountActivity : MultiButtonActionBarActivity(R.layout.activity_my_acco
             }
             ui_btn_change_email -> {
                 DialogHelper.makeValidationTextInputDialog(this,
-                        "Change E-mail",
-                        "New E-mail address",
+                        getString(R.string.msg_auth_change_email),
+                        null,
+                        getString(R.string.msg_auth_new_email_address),
                         { email ->
                             if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                                 null
@@ -66,6 +73,32 @@ class MyAccountActivity : MultiButtonActionBarActivity(R.layout.activity_my_acco
                         { original, newPassword ->
                             authManager.changePassword(original, newPassword)
                         }).show()
+            }
+
+            ui_btn_drop_experiment -> {
+                DialogHelper.makeValidationTextInputDialog(this,
+                        getString(R.string.msg_auth_stop_participation),
+                        getString(R.string.msg_auth_stop_participation_message),
+                        getString(R.string.msg_auth_stop_participation_confirm_email),
+                        { text ->
+                            if (authManager.email != text) "The E-mail address is wrong." else null
+                        },
+                        { text ->
+                            Completable.complete()
+                        }, { text, dialogAction ->
+                    if (text != null) {
+                        DialogHelper.makeValidationTextInputDialog(this,
+                                getString(R.string.msg_auth_stop_participation),
+                                getString(R.string.msg_auth_stop_participation_reason),
+                                getString(R.string.msg_auth_stop_participation_insert_reason),
+                                { null },
+                                { reason ->
+                                    authManager.dropOutFromStudy(reason)
+                                }).show()
+                    } else {
+
+                    }
+                }).show()
             }
         }
     }

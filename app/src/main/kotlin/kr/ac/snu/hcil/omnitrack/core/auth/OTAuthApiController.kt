@@ -37,6 +37,10 @@ class OTAuthApiController(retrofit: Lazy<Retrofit>) : IAuthServerAPI {
 
         @POST("api/user/auth/update")
         fun update(@Body data: JsonObject): Single<AuthResponseData>
+
+        @POST("api/user/auth/drop")
+        fun dropOutFromExperiment(@Body data: JsonObject): Completable
+
     }
 
     private val service: AuthRetrofitService by lazy {
@@ -81,5 +85,8 @@ class OTAuthApiController(retrofit: Lazy<Retrofit>) : IAuthServerAPI {
         return service.update(jsonObject("originalPassword" to original, "newPassword" to newPassword)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
 
+    override fun dropOutFromStudy(reason: String?): Completable {
+        return service.dropOutFromExperiment(jsonObject("reason" to reason)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+    }
 
 }

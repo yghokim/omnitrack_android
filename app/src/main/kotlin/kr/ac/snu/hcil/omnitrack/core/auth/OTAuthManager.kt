@@ -251,6 +251,10 @@ class OTAuthManager @Inject constructor(
         }
     }
 
+    fun dropOutFromStudy(reason: String?): Completable {
+        return authApiController.get().dropOutFromStudy(reason).andThen { signOut() }
+    }
+
     private fun notifySignedIn() {
         val intent = Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_IN)
                 .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId)

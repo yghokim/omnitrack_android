@@ -4,8 +4,10 @@ import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.StringRes
+import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
@@ -76,12 +78,19 @@ object DialogHelper {
                 }
     }
 
-    fun makeValidationTextInputDialog(context: Context, title: String?, hint: String?, validateFunc: ((String) -> String?)?, task: (String) -> Completable): MaterialDialog {
+    fun makeValidationTextInputDialog(context: Context, title: String?, content: String?, hint: String?, validateFunc: ((String) -> String?)?, task: (String) -> Completable, onResult: ((String?, DialogAction) -> Unit)? = null): MaterialDialog {
 
         var taskSubscription: Disposable? = null
 
         val view = LayoutInflater.from(context).inflate(R.layout.layout_dialog_validation_text_input, null)
         view.ui_input_form.hint = hint
+
+        if (content != null) {
+            view.ui_content_text.visibility = View.VISIBLE
+            view.ui_content_text.text = content
+        } else {
+            view.ui_content_text.visibility = View.GONE
+        }
 
 
         val tryOk = { dialog: DialogInterface ->
@@ -90,11 +99,13 @@ object DialogHelper {
             if (validationErrorMessage != null) {
                 //invalid
                 view.ui_input_form.error = validationErrorMessage
+                onResult?.invoke(null, DialogAction.POSITIVE)
                 false
             } else {
                 //valid
                 taskSubscription = task(inputText).subscribe({
                     dialog.dismiss()
+                    onResult?.invoke(inputText, DialogAction.POSITIVE)
                 }, { err ->
                     view.ui_input_form.error = err.message
                 })
@@ -119,6 +130,7 @@ object DialogHelper {
                 }
                 .onNegative { dialog, which ->
                     dialog.dismiss()
+                    onResult?.invoke(null, DialogAction.NEGATIVE)
                 }
                 .showListener {
                     view.ui_input_text.requestFocus()

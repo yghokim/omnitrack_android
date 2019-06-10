@@ -24,4 +24,6 @@ interface IAuthServerAPI {
 
     fun signOut(deviceInfo: OTDeviceInfo): Completable
 
+    fun dropOutFromStudy(reason: String?): Completable
+
 }

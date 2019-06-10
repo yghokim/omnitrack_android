@@ -103,7 +103,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="14dp"
             android:paddingBottom="14dp"
-            android:text="Stop Participating in the Study"
+            android:text="@string/msg_auth_stop_participating_in_the_study"
             android:textAllCaps="false"
             android:textStyle="bold"
             app:backgroundTint="@color/colorRed"
