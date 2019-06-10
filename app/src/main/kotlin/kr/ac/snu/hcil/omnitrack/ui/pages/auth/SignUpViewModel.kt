@@ -47,6 +47,7 @@ class SignUpViewModel(app: Application) : AndroidViewModel(app) {
     var demographicAnswers: JsonObject? = null
     var username: String? = null
     var password: String? = null
+    var email: String? = null
 
     private val slideListInfoSubject = BehaviorSubject.createDefault<SignUpSlideListInfo>(SignUpSlideListInfo(emptyArray(), null))
 
@@ -104,6 +105,6 @@ class SignUpViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun tryRegister(): Completable {
-        return authManager.register(username!!, password!!, invitationCode, demographicAnswers)
+        return authManager.register(username!!, email!!, password!!, invitationCode, demographicAnswers)
     }
 }

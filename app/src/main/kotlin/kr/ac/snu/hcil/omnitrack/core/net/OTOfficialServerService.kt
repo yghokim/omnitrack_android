@@ -1,11 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.net
 
 import com.google.gson.JsonObject
-import io.reactivex.Completable
 import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.ValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
-import kr.ac.snu.hcil.omnitrack.core.database.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
 import retrofit2.http.*
@@ -47,19 +45,6 @@ interface OTOfficialServerService {
     @POST("api/user/name")
     fun postUserName(@Body nameAndTimestamp: ValueWithTimestamp<String>): Single<ISynchronizationServerSideAPI.InformationUpdateResult>
 
-    //Research
-
-    @POST("api/research/invitation/reject")
-    fun rejectExperimentInvitation(@Query("invitationCode") invitationCode: String): Completable
-
-    @POST("api/research/experiment/{experimentId}/dropout")
-    fun dropOutFromExperiment(@Path("experimentId") experimentId: String, @Body reason: DropoutBody): Single<ExperimentCommandResult>
-
-    @GET("api/research/experiments/history")
-    fun getJoinedExperiments(@Query("after") after: Long): Single<List<ExperimentInfo>>
-
-    @GET("api/research/invitations/public")
-    fun getPublicInvitations(): Single<List<ExperimentInvitation>>
 
     @GET("api/package/extract")
     fun getExtractedTrackingPackage(@Query("trackerIds[]") trackerIds: Array<String>, @Query("triggerIds[]") triggerIds: Array<String>): Single<String>

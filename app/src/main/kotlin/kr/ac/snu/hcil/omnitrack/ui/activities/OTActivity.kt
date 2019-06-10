@@ -237,7 +237,7 @@ abstract class OTActivity : AppCompatActivity {
         val intent = Intent(this, SignInActivity::class.java)
         //val intent = Intent(this, ExperimentSignInActivity::class.java)
         startActivity(intent)
-        finish()
+        finishAffinity()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

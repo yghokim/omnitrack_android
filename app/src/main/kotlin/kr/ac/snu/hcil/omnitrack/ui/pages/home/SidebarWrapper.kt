@@ -1,47 +1,34 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.content.Intent
-import android.util.Patterns
-import android.view.Gravity
-import android.view.MenuItem
 import android.view.View
-import android.widget.PopupMenu
-import androidx.appcompat.widget.AppCompatImageButton
 import androidx.lifecycle.LifecycleObserver
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
 import dagger.Lazy
-import dagger.internal.Factory
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
 import kotlinx.android.synthetic.main.layout_home_sidebar.view.*
-import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.android.common.view.container.adapter.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.di.global.InformationUpload
-import kr.ac.snu.hcil.omnitrack.core.di.global.ResearchSync
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
-import kr.ac.snu.hcil.omnitrack.core.workers.OTResearchSynchronizationWorker
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.auth.MyAccountActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.export.PackageExportActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ApiKeySettingsActivity
 import javax.inject.Inject
-import javax.inject.Provider
 
 /**
  * Created by Young-Ho Kim on 2017-01-31.
  */
-class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu.OnMenuItemClickListener, LifecycleObserver {
+class SidebarWrapper(val view: View, val parentActivity: OTActivity) : LifecycleObserver {
 
     @Inject
     lateinit var authManager: OTAuthManager
@@ -52,17 +39,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
     @Inject
     lateinit var eventLogger: Lazy<IEventLogger>
 
-
-    @field:[Inject InformationUpload]
-    lateinit var informationUploadRequestBuilderFactory: Factory<OneTimeWorkRequest.Builder>
-
-    @field:[Inject ResearchSync]
-    lateinit var researchSyncRequest: Provider<OneTimeWorkRequest>
-
-
     private val userWatchDisposable = SerialDisposable()
-
-    private val profileMenuButton: AppCompatImageButton = view.findViewById(R.id.ui_button_profile_menu)
 
     private val menuList: RecyclerView = view.findViewById(R.id.ui_menu_list)
 
@@ -82,34 +59,8 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
 
         (parentActivity.application as OTAndroidApp).applicationComponent.inject(this)
 
-
-        val popupMenu = PopupMenu(parentActivity, profileMenuButton, Gravity.TOP or Gravity.END)
-        popupMenu.inflate(R.menu.menu_sidebar_profile)
-        popupMenu.setOnMenuItemClickListener(this)
-
-        profileMenuButton.setOnClickListener {
-            popupMenu.show()
-        }
-
         menuList.layoutManager = LinearLayoutManager(parentActivity, RecyclerView.VERTICAL, false)
         menuList.adapter = SidebarMenuAdapter()
-    }
-
-    override fun onMenuItemClick(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_unlink_with_this_device -> {
-                DialogHelper.makeNegativePhrasedYesNoDialogBuilder(parentActivity, null, parentActivity.getString(R.string.msg_profile_unlink_account_confirm), R.string.msg_logout, onYes = {
-                    eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_SIGNED_OUT)
-                    this.subscriptions.add(
-                            authManager.signOut().subscribe()
-                    )
-                }).show()
-                return true
-            }
-            else -> {
-                return false
-            }
-        }
     }
 
     fun onCreate() {
@@ -166,18 +117,17 @@ parentActivity.signedInUserObservable.toFlowable(BackpressureStrategy.LATEST).fl
     private fun refreshUsername() {
         val userName = authManager.userName
         if (userName != null) {
-            if (Patterns.EMAIL_ADDRESS.matcher(userName).matches()) {
-                //email
-                val emailSplit = userName.split("@")
-                view.ui_username_main.text = emailSplit.first()
-                view.ui_username_sub.text = emailSplit.last()
-            } else {
-                //plain string
-                view.ui_username_main.text = userName
-                view.ui_username_sub.visibility = View.GONE
-            }
+            view.ui_username.text = userName
+
         } else {
-            view.ui_username_sub.text = "User signed out."
+            view.ui_username.text = "User signed out."
+        }
+
+        val email = authManager.email
+        if (email != null) {
+            view.ui_email.text = email
+        } else {
+            view.ui_email.text = "E-mail was not set."
         }
     }
 
@@ -197,6 +147,12 @@ parentActivity.signedInUserObservable.toFlowable(BackpressureStrategy.LATEST).fl
     inner class SidebarMenuAdapter : RecyclerViewMenuAdapter() {
 
         private val menus = arrayListOf(
+
+                RecyclerViewMenuAdapter.MenuItem(R.drawable.ic_person_black_24dp, parentActivity.getString(R.string.activity_title_my_account), null, {
+                    val intent = Intent(parentActivity, MyAccountActivity::class.java)
+                    parentActivity.startActivity(intent)
+                }, true),
+
                 RecyclerViewMenuAdapter.MenuItem(R.drawable.settings_dark, parentActivity.getString(R.string.msg_settings), null, {
                     val intent = Intent(parentActivity, SettingsActivity::class.java)
                     parentActivity.startActivity(intent)
@@ -211,7 +167,6 @@ parentActivity.signedInUserObservable.toFlowable(BackpressureStrategy.LATEST).fl
                     //OTApp.instance.syncManager.performSynchronizationOf(ESyncDataType.ITEM)
                     syncManager.get().queueFullSync(ignoreFlags = false)
                     syncManager.get().reserveSyncServiceNow()
-                    WorkManager.getInstance().enqueueUniqueWork(OTResearchSynchronizationWorker.TAG, ExistingWorkPolicy.REPLACE, researchSyncRequest.get())
                 }, true)
         ).apply {
 

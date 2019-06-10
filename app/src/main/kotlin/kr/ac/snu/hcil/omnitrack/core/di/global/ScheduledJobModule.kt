@@ -130,27 +130,6 @@ class ScheduledJobModule {
                 ).build()*/
     }
 
-    @Provides
-    @Singleton
-    @ResearchSync
-    fun provideResearchSyncRequest(): OneTimeWorkRequest {
-        return OneTimeWorkRequest.Builder(OTResearchSynchronizationWorker::class.java)
-                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
-                .setConstraints(networkConstraints)
-                .build()
-        /*
-        return builder
-                .setTag("OTResearchSynchronizationWorker")
-                .setService(OTResearchSynchronizationWorker::class.java)
-                .setRecurring(false)
-                .setLifetime(Lifetime.FOREVER)
-                .setReplaceCurrent(true)
-                .setTrigger(Trigger.executionWindow(0, 10))
-                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
-                .addConstraint(Constraint.ON_ANY_NETWORK)
-                .build()*/
-    }
-
 }
 
 @Qualifier
@@ -166,7 +145,3 @@ annotation class ServerFullSync
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class InformationUpload
-
-@Qualifier
-@Retention(AnnotationRetention.RUNTIME)
-annotation class ResearchSync

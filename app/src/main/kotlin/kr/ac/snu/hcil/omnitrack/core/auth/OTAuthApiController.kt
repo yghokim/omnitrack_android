@@ -34,15 +34,23 @@ class OTAuthApiController(retrofit: Lazy<Retrofit>) : IAuthServerAPI {
 
         @POST("api/user/auth/signout")
         fun signOut(@Body data: JsonObject): Completable
+
+        @POST("api/user/auth/update")
+        fun update(@Body data: JsonObject): Single<AuthResponseData>
+
+        @POST("api/user/auth/drop")
+        fun dropOutFromExperiment(@Body data: JsonObject): Completable
+
     }
 
     private val service: AuthRetrofitService by lazy {
         retrofit.get().create(AuthRetrofitService::class.java)
     }
 
-    override fun register(username: String, password: String, deviceInfo: OTDeviceInfo, invitationCode: String?, demographicData: JsonObject?): Single<AuthResponseData> {
+    override fun register(username: String, email: String, password: String, deviceInfo: OTDeviceInfo, invitationCode: String?, demographicData: JsonObject?): Single<AuthResponseData> {
         return service.register(jsonObject(
                 "username" to username.trim(),
+                "email" to email.trim(),
                 "password" to password.trim(),
                 "deviceInfo" to deviceInfo.convertToJson(),
                 "experimentId" to BuildConfig.DEFAULT_EXPERIMENT_ID,
@@ -67,6 +75,18 @@ class OTAuthApiController(retrofit: Lazy<Retrofit>) : IAuthServerAPI {
 
     override fun signOut(deviceInfo: OTDeviceInfo): Completable {
         return service.signOut(jsonObject("deviceInfo" to deviceInfo.convertToJson())).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun updateEmail(email: String): Single<AuthResponseData> {
+        return service.update(jsonObject("email" to email)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun changePassword(original: String, newPassword: String): Single<AuthResponseData> {
+        return service.update(jsonObject("originalPassword" to original, "newPassword" to newPassword)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun dropOutFromStudy(reason: String?): Completable {
+        return service.dropOutFromExperiment(jsonObject("reason" to reason)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
 
 }

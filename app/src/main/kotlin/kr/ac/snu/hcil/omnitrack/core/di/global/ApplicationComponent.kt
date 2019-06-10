@@ -40,7 +40,6 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.measures.OTItemMetadataMeasureFact
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
 import kr.ac.snu.hcil.omnitrack.core.workers.OTBinaryUploadWorker
 import kr.ac.snu.hcil.omnitrack.core.workers.OTInformationUploadWorker
-import kr.ac.snu.hcil.omnitrack.core.workers.OTResearchSynchronizationWorker
 import kr.ac.snu.hcil.omnitrack.core.workers.OTUsageLogUploadWorker
 import kr.ac.snu.hcil.omnitrack.receivers.DataDrivenTriggerCheckReceiver
 import kr.ac.snu.hcil.omnitrack.receivers.PackageReceiver
@@ -74,7 +73,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.export.PackageExportViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.export.UploadTemporaryPackageDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.*
-import kr.ac.snu.hcil.omnitrack.ui.pages.research.ResearchViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.FieldPresetSelectionBottomSheetFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailStructureTabFragment
@@ -117,8 +115,7 @@ import javax.inject.Singleton
     TriggerSystemModule::class,
     InformationHelpersModule::class,
     ScriptingModule::class,
-    NetworkModule::class,
-    ResearchModule::class
+    NetworkModule::class
 ])
 interface ApplicationComponent {
 
@@ -180,9 +177,6 @@ interface ApplicationComponent {
     fun inject(alarmService: TimeTriggerAlarmReceiver.TimeTriggerWakefulHandlingService)
     fun inject(viewModel: TimeConditionViewModel)
     fun inject(service: OTReminderService)
-
-    fun inject(viewModel: ResearchViewModel)
-    fun inject(service: OTResearchSynchronizationWorker)
 
     fun shortcutPanelManager(): OTShortcutPanelManager
 
