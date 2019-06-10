@@ -64,7 +64,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
     protected fun init(trackerId: String): Boolean {
         isValid = true
-        if (!this::trackerDao.isInitialized || trackerDao._id != trackerId) {
+        if (!this::trackerDao.isInitialized || trackerDao.objectId != trackerId) {
             /*
             this.metadataForItem = metadata
             if (!this.metadataForItem.has("screenAccessedAt")) {
@@ -82,7 +82,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
                 subscriptions.add(
                         trackerDao.asFlowable<OTTrackerDAO>().filter { it.isLoaded }.subscribe { dao ->
                             if (!dao.isValid) {
-                                hasTrackerRemovedOutside.onNext(unManagedTrackerDao._id!!)
+                                hasTrackerRemovedOutside.onNext(unManagedTrackerDao.objectId!!)
                             }
                         }
                 )
@@ -115,7 +115,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
     }
 
     inner class AttributeInputViewModel(unmanagedAttributeDao: OTAttributeDAO) : IReadonlyObjectId {
-        override val _id: String? = unmanagedAttributeDao._id
+        override val objectId: String? = unmanagedAttributeDao.objectId
 
         val attributeLocalId: String = unmanagedAttributeDao.localId
         val columnNameObservable: Observable<String> = BehaviorSubject.createDefault<String>("")
@@ -167,7 +167,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
         val onAttributeChanged = PublishSubject.create<OTAttributeDAO>()
 
-        val attributeDAO: OTAttributeDAO = realm.where(OTAttributeDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, unmanagedAttributeDao._id).findFirst()!!
+        val attributeDAO: OTAttributeDAO = realm.where(OTAttributeDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, unmanagedAttributeDao.objectId).findFirst()!!
 
         init {
 

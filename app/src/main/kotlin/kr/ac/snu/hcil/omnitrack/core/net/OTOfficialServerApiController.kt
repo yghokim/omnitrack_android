@@ -7,7 +7,9 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.android.common.containers.ValueWithTimestamp
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
+import kr.ac.snu.hcil.omnitrack.core.database.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
 import retrofit2.Retrofit
@@ -15,7 +17,7 @@ import retrofit2.Retrofit
 /**
  * Created by younghokim on 2017. 9. 28..
  */
-class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServerSideAPI, IUserReportServerAPI, IUsageLogUploadAPI {
+class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServerSideAPI, IUserReportServerAPI, IUsageLogUploadAPI, IResearchServerAPI {
 
     private val service: OTOfficialServerService by lazy {
         retrofit.create(OTOfficialServerService::class.java)
@@ -73,6 +75,39 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
+    override fun approveExperimentInvitation(invitationCode: String): Single<ExperimentCommandResult> {
+        return service.approveExperimentInvitation(invitationCode)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun rejectExperimentInvitation(invitationCode: String): Completable {
+        return service.rejectExperimentInvitation(invitationCode)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun dropOutFromExperiment(experimentId: String, reason: CharSequence?): Single<ExperimentCommandResult> {
+        return service.dropOutFromExperiment(experimentId, DropoutBody(reason?.toString()))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+
+    override fun retrieveJoinedExperiments(after: Long): Single<List<ExperimentInfo>> {
+        return service.getJoinedExperiments(after)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+
+    override fun retrievePublicInvitations(): Single<List<ExperimentInvitation>> {
+        return service.getPublicInvitations()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+
     override fun getTrackingPackageJson(trackerIds: Array<String>, triggerIds: Array<String>): Single<String> {
         return service.getExtractedTrackingPackage(trackerIds, triggerIds)
                 .subscribeOn(Schedulers.io())
@@ -91,6 +126,18 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
+    override fun authenticate(deviceInfo: OTDeviceInfo, invitationCode: String?, demographicData: JsonObject?): Single<ISynchronizationServerSideAPI.AuthenticationResult> {
+        return service.authenticate(
+                jsonObject(
+                        "experimentId" to BuildConfig.DEFAULT_EXPERIMENT_ID,
+                        "invitationCode" to invitationCode,
+                        "demographic" to demographicData,
+                        "deviceInfo" to deviceInfo.convertToJson()
+                ))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
     override fun getExperimentConsentInfo(experimentId: String): Single<ISynchronizationServerSideAPI.ExperimentConsentInfo> {
         return service.getExperimentConsentInfo(experimentId)
                 .subscribeOn(Schedulers.io())
@@ -101,10 +148,5 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
         return service.verifyInvitationCode(experimentId, invitationCode)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-    }
-
-
-    override fun validateClientCertified(): Completable {
-        return service.validateClientCertified().ignoreElement()
     }
 }

@@ -70,7 +70,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
     //==================================================================================================================
 
     protected val invalidOutsideDialogBuilder: MaterialDialog.Builder by lazy {
-        DialogHelper.makeSimpleAlertBuilder(this, "", null, null) {
+        DialogHelper.makeSimpleAlertBuilder(this, "", null) {
             finish()
         }
     }
@@ -344,7 +344,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
                     val tracker = tracker
                     val attributeLocalId = attributeLocalId
                     if (tracker != null && attributeLocalId != null) {
-                        val historyDialog = RecentItemValuePickerBottomSheetFragment.getInstance(tracker._id, attributeLocalId)
+                        val historyDialog = RecentItemValuePickerBottomSheetFragment.getInstance(tracker.objectId, attributeLocalId)
                         historyDialog.show(supportFragmentManager, RecentItemValuePickerBottomSheetFragment.TAG)
                     }*/
                 }*/
@@ -455,7 +455,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
                 creationSubscriptions.addAll(internalSubscriptions)
 
-                inputView.boundAttributeObjectId = attributeViewModel.attributeDAO._id
+                inputView.boundAttributeObjectId = attributeViewModel.attributeDAO.objectId
 
 
                 inputView.onResume()

@@ -35,7 +35,7 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                 continue
             }
             when (nextName) {
-                BackendDbManager.FIELD_OBJECT_ID -> dao._id = reader.nextString()
+                BackendDbManager.FIELD_OBJECT_ID -> dao.objectId = reader.nextString()
                 BackendDbManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
                 BackendDbManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
                 BackendDbManager.FIELD_REMOVED_BOOLEAN -> dao.removed = reader.nextBoolean()
@@ -90,7 +90,7 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
 
     override fun write(writer: JsonWriter, value: OTTriggerDAO, isServerMode: Boolean) {
         writer.beginObject()
-        writer.name(BackendDbManager.FIELD_OBJECT_ID).value(value._id)
+        writer.name(BackendDbManager.FIELD_OBJECT_ID).value(value.objectId)
         writer.name("alias").value(value.alias)
         writer.name(BackendDbManager.FIELD_POSITION).value(value.position)
         writer.name(if (isServerMode) "user" else "userId").value(value.userId)
@@ -116,7 +116,7 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
 
         writer.name("trackers")
         writer.beginArray()
-        for (trackerId in value.trackers.asSequence().filter { !it.removed }.map { it._id }.toList()) {
+        for (trackerId in value.trackers.asSequence().filter { !it.removed }.map { it.objectId }.toList()) {
             writer.value(trackerId)
         }
         writer.endArray()

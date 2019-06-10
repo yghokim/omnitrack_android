@@ -33,7 +33,7 @@ import kr.ac.snu.hcil.omnitrack.core.di.global.Default
 import kr.ac.snu.hcil.omnitrack.core.di.global.ServerResponsive
 import kr.ac.snu.hcil.omnitrack.core.system.OTAppVersionCheckManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
-import kr.ac.snu.hcil.omnitrack.ui.pages.auth.SignInActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import org.jetbrains.anko.defaultSharedPreferences
@@ -223,12 +223,16 @@ abstract class OTActivity : AppCompatActivity {
 
     private fun goSignInUnlessUserCached() {
         println("OMNITRACK Check whether user is cached. Otherwise, go to sign in")
-        if (authManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
-            signedInUserSubject.onNext(authManager.userId!!)
-            onSignInProcessCompletelyFinished()
-        } else {
-            goSignIn()
-        }
+        creationSubscriptions.add(
+                authManager.getAuthStateRefreshObservable().firstOrError().subscribe { signInResult ->
+                    if (signInResult > OTAuthManager.SignedInLevel.NONE) {
+                        signedInUserSubject.onNext(authManager.userId!!)
+                        onSignInProcessCompletelyFinished()
+                    } else {
+                        goSignIn()
+                    }
+                }
+        )
     }
 
     fun goSignIn() {
@@ -237,7 +241,7 @@ abstract class OTActivity : AppCompatActivity {
         val intent = Intent(this, SignInActivity::class.java)
         //val intent = Intent(this, ExperimentSignInActivity::class.java)
         startActivity(intent)
-        finishAffinity()
+        finish()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

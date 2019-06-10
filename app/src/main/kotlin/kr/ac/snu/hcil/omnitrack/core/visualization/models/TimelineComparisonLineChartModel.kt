@@ -41,7 +41,7 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
         xScale.quantize(currentGranularity)
 
         return dbManager
-                .makeItemsQuery(parent._id, getTimeScope(), realm)
+                .makeItemsQuery(parent.objectId, getTimeScope(), realm)
                 .sort("timestamp", Sort.ASCENDING)
                 .findAllAsync()
                 .asFlowable()

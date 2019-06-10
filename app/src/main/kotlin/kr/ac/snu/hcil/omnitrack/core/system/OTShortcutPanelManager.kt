@@ -26,7 +26,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.di.global.Default
-import kr.ac.snu.hcil.omnitrack.core.flags.F
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemActivity
@@ -44,8 +43,7 @@ class OTShortcutPanelManager @Inject constructor(
         val authManager: Lazy<OTAuthManager>,
         val dbManager: Lazy<BackendDbManager>,
         @Default val pref: SharedPreferences,
-        @Backend val backendRealmProvider: Factory<Realm>,
-        private val appFlagManager: OTAppFlagManager
+        @Backend val backendRealmProvider: Factory<Realm>
 ) {
 
     companion object {
@@ -62,12 +60,12 @@ class OTShortcutPanelManager @Inject constructor(
 
     val showPanels: Boolean
         get() {
-            return pref.getBoolean("pref_show_shortcut_panel", false) && appFlagManager.flag(F.UseShortcutPanel)
+            return pref.getBoolean("pref_show_shortcut_panel", false)
         }
 
     private fun buildNewNotificationShortcutViews(trackerList: List<OTTrackerDAO>, context: Context, bigStyle: Boolean): RemoteViews {
         val trackers = trackerList.filter {
-            it.isManualInputAllowed()
+            !it.isIndependentInputLocked()
         }
 
         val rv = RemoteViews(context.packageName, if (bigStyle) R.layout.remoteview_shortcut_notification_big else R.layout.remoteview_shortcut_notification_normal)
@@ -120,7 +118,7 @@ class OTShortcutPanelManager @Inject constructor(
                     element.setImageViewBitmap(R.id.ui_button_instant, VectorIconHelper.getConvertedBitmap(context, R.drawable.instant_add))
 
 
-                    val instantLoggingIntent = PendingIntent.getService(context, i, OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, null, trackers[i]._id!!), PendingIntent.FLAG_UPDATE_CURRENT)
+                    val instantLoggingIntent = PendingIntent.getService(context, i, OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, null, trackers[i].objectId!!), PendingIntent.FLAG_UPDATE_CURRENT)
                     element.setOnClickPendingIntent(R.id.ui_button_instant, instantLoggingIntent)
 
                     if (fieldCount == 0L) {
@@ -132,7 +130,7 @@ class OTShortcutPanelManager @Inject constructor(
                 }
 
                 if (fieldCount > 0) {
-                    val openItemActivityIntent = PendingIntent.getActivity(context, i, NewItemActivity.makeNewItemPageIntent(trackers[i]._id!!, context), PendingIntent.FLAG_UPDATE_CURRENT)
+                    val openItemActivityIntent = PendingIntent.getActivity(context, i, NewItemActivity.makeNewItemPageIntent(trackers[i].objectId!!, context), PendingIntent.FLAG_UPDATE_CURRENT)
                     element.setOnClickPendingIntent(R.id.group, openItemActivityIntent)
                 }
             }

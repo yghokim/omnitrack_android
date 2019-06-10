@@ -77,7 +77,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
                 redirectedPageVisitStatusObservable.onNextIfDifferAndNotNull(RedirectedPageStatus.RedirectionNotSet)
             }
 
-            //val builderDaoResult = if (loadPendingItemBuilder) dbManager.get().getItemBuilderQuery(trackerDao._id!!, OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst() else null
+            //val builderDaoResult = if (loadPendingItemBuilder) dbManager.get().getItemBuilderQuery(trackerDao.objectId!!, OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst() else null
 
             val storedBuilderDao = if (savedInstanceState != null && savedInstanceState.containsKey(KEY_BUILDER_ID)) {
                 //there is a pending itemBuilder.
@@ -169,7 +169,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
             return isBusyObservable.filter { !it }.firstOrError().flatMapMaybe {
                 refreshDaoValues()
                 val item = builderWrapper.saveToItem(null, ItemLoggingSource.Manual)
-                item._id = reservedNewItemId
+                item.objectId = reservedNewItemId
 
                 return@flatMapMaybe Maybe.fromSingle<String>(dbManager.get().saveItemObservable(item, false, null, realm).map { it.second })
                         .doAfterSuccess {

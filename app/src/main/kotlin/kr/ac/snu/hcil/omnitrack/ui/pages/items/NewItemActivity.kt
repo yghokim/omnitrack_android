@@ -227,7 +227,7 @@ class NewItemActivity : AItemDetailActivity<NewItemCreationViewModel>(NewItemCre
             creationSubscriptions.add(
                     checkInputComplete().andThen(viewModel.applyEditingToDatabase()).subscribe({ itemId ->
                         viewModel.clearHistory()
-                        startService(OTReminderService.makeUserLoggedIntent(this, viewModel.trackerDao._id!!, System.currentTimeMillis()))
+                        startService(OTReminderService.makeUserLoggedIntent(this, viewModel.trackerDao.objectId!!, System.currentTimeMillis()))
                         itemSaved = true
                         eventLogger.get().logItemAddedEvent(itemId, ItemLoggingSource.Manual) { content ->
                             if (this.intent.hasExtra(INTENT_EXTRA_REMINDER_TIME)) {

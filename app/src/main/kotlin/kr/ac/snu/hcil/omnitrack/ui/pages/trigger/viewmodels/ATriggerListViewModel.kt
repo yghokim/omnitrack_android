@@ -39,8 +39,8 @@ abstract class ATriggerListViewModel(app: Application) : RealmViewModel(app) {
     }
 
     fun addNewTrigger(unManagedDAO: OTTriggerDAO) {
-        if (unManagedDAO._id == null) {
-            unManagedDAO._id = UUID.randomUUID().toString()
+        if (unManagedDAO.objectId == null) {
+            unManagedDAO.objectId = UUID.randomUUID().toString()
         }
         addNewTriggerImpl(unManagedDAO)
     }

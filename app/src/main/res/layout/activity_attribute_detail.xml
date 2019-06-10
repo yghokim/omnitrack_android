@@ -60,8 +60,8 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:text="@string/msg_required" />
 
-            <kr.ac.snu.hcil.android.common.view.container.LockableLinearLayout
-                android:id="@+id/ui_property_list"
+            <LinearLayout
+                android:id="@+id/ui_recyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/expanded_view_inner_shadow"
@@ -69,9 +69,9 @@
                 android:orientation="vertical"
                 android:showDividers="middle">
 
-            </kr.ac.snu.hcil.android.common.view.container.LockableLinearLayout>
+            </LinearLayout>
 
-            <kr.ac.snu.hcil.android.common.view.container.LockableLinearLayout
+            <LinearLayout
                 android:id="@+id/ui_connection_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -120,44 +120,39 @@
                         android:visibility="gone" />
                 </FrameLayout>
 
-            </kr.ac.snu.hcil.android.common.view.container.LockableLinearLayout>
+            </LinearLayout>
 
-            <kr.ac.snu.hcil.android.common.view.container.LockableLinearLayout
-                android:id="@+id/ui_fallback_policy_container"
+            <TextView
+                android:id="@+id/ui_title_fallback"
+                style="@style/PropertyHeaderStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="@dimen/property_top_padding"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:text="@string/msg_attribute_fallback_policy" />
+
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                app:cardElevation="3dp">
 
-                <TextView
-                    android:id="@+id/ui_title_fallback"
-                    style="@style/PropertyHeaderStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/property_top_padding"
-                    android:layout_marginBottom="8dp"
-                    android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:text="@string/msg_attribute_fallback_policy" />
-
-                <androidx.cardview.widget.CardView
+                <com.jaredrummler.materialspinner.MaterialSpinner
+                    android:id="@+id/ui_fallback_policy_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/activity_horizontal_margin"
-                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                    android:layout_marginBottom="10dp"
-                    app:cardElevation="3dp">
+                    android:background="@drawable/attribute_card"
+                    android:textSize="16sp"
+                    android:textStyle="italic"
+                    app:ms_arrow_tint="@color/buttonIconColorDark"
+                    app:ms_background_color="@android:color/white" />
+            </androidx.cardview.widget.CardView>
 
-                    <com.jaredrummler.materialspinner.MaterialSpinner
-                        android:id="@+id/ui_fallback_policy_spinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/attribute_card"
-                        android:textSize="16sp"
-                        android:textStyle="italic"
-                        app:ms_arrow_tint="@color/buttonIconColorDark"
-                        app:ms_background_color="@android:color/white" />
-                </androidx.cardview.widget.CardView>
-            </kr.ac.snu.hcil.android.common.view.container.LockableLinearLayout>
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

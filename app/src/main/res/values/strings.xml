@@ -307,8 +307,8 @@
     <string name="msg_demographic_nationality">Which country you live in?</string>
     <string name="msg_demographic_complete_form">Please complete the forms.</string>
 
-    <string name="msg_profile_menu_unlink_account">Sign out</string>
-    <string name="msg_profile_unlink_account_confirm">Any unsynchronized data will be lost.\nDo you want to sign out from this device?</string>
+    <string name="msg_profile_menu_unlink_account">Unlink this device…</string>
+    <string name="msg_profile_unlink_account_confirm">Any unsynchronized data will be lost.\nDo you want to unlink your account with this device?</string>
     <string name="msg_signup_complete">Sign up process is complete</string>
     <string name="msg_signup_complete_description">You can now start tracking!</string>
     <string name="msg_purge_cache">Clear cached media files that are alread synchronized</string>
@@ -419,8 +419,8 @@
     <string name="msg_send_report_error_message">Couldn\'t send inquiry because of an error. Please try it later.</string>
     <string name="msg_send_report_success_message">Sent inquiry successfully.</string>
     <string name="msg_background_logging_started_notification_message">Processing new item…</string>
-    <string name="msg_signin_succeeded">Signed in successfully.</string>
-    <string name="msg_signin_canceled">The sign-in process was canceled.</string>
+    <string name="msg_sign_in_google_succeeded">You were authorized successfully.</string>
+    <string name="msg_sign_in_google_canceled">The sign-in process was canceled.</string>
     <string name="msg_under_development">This feature is under development. It will be unlocked soon!</string>
     <string name="msg_permission_required">Permissions Required</string>
     <string name="msg_contacts_permission_required">Contacts permissions Required</string>
@@ -623,6 +623,5 @@
     <string name="msg_attribute_detail_properties_invalid">Please check that all property inputs are valid.</string>
     <string name="msg_sharing_tracking_plan">Sharing tracking plan...</string>
     <string name="msg_export_tracking_plan">Export Tracking Plan</string>
-    <string name="activity_title_my_account">My Account</string>
 
 </resources>

@@ -60,7 +60,7 @@ class OTAttributeManager @Inject constructor(val context: Context, val authManag
     fun makeNewAttributeLocalId(createdAt: Long = System.currentTimeMillis()): String {
         val nanoStamp = attributeLocalIdGenerator.getNewUniqueLong(createdAt)
 
-        val id = authManager.get().deviceLocalKey + "_" + nanoStamp.toString(36)
+        val id = authManager.get().getDeviceLocalKey() + "_" + nanoStamp.toString(36)
         println("new attribute local id: $id")
         return id
     }

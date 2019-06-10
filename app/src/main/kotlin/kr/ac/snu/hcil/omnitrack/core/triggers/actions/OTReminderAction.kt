@@ -159,7 +159,7 @@ class OTReminderAction : OTTriggerAction() {
     /*
     var localNotificationLevel: NotificationLevel?
         get() {
-            val deviceSetting = localSettingsPreferences.getString("${KEY_NOTIFICATION_LEVEL}_${trigger._id}", null)
+            val deviceSetting = localSettingsPreferences.getString("${KEY_NOTIFICATION_LEVEL}_${trigger.objectId}", null)
             if (deviceSetting != null) {
                 try {
                     return NotificationLevel.valueOf(deviceSetting)
@@ -171,9 +171,9 @@ class OTReminderAction : OTTriggerAction() {
         }
         set(value) {
             if (value != null) {
-                localSettingsPreferences.edit().putString("${KEY_NOTIFICATION_LEVEL}_${trigger._id}", value.name).apply()
+                localSettingsPreferences.edit().putString("${KEY_NOTIFICATION_LEVEL}_${trigger.objectId}", value.name).apply()
             } else {
-                localSettingsPreferences.edit().remove("${KEY_NOTIFICATION_LEVEL}_${trigger._id}").apply()
+                localSettingsPreferences.edit().remove("${KEY_NOTIFICATION_LEVEL}_${trigger.objectId}").apply()
             }
         }*/
 
@@ -184,7 +184,7 @@ class OTReminderAction : OTTriggerAction() {
 
             if (trigger.liveTrackerCount > 0) {
                 val reminderCommands = OTReminderCommands(context.applicationContext)
-                return@defer reminderCommands.remind(trigger._id!!, triggerTime, metadata)
+                return@defer reminderCommands.remind(trigger.objectId!!, triggerTime, metadata)
             }
             return@defer Completable.complete()
         }

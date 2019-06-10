@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/ui_sidebar"
     android:layout_width="@dimen/home_sidebar_width"
@@ -9,39 +10,102 @@
     android:focusable="true"
     android:orientation="vertical">
 
-    <LinearLayout
+    <View
+        android:id="@+id/ui_profile_panel"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/diagonal_gradient"
+        app:layout_constraintBottom_toBottomOf="@+id/ui_user_email"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+    </View>
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/ui_user_photo"
+        android:layout_width="@dimen/home_sidebar_profile_photo_width"
+        android:layout_height="@dimen/home_sidebar_profile_photo_width"
+        android:layout_gravity="center"
+        android:layout_marginTop="24dp"
+        app:civ_border_color="#cfffffff"
+        app:civ_border_overlay="false"
+
+        app:civ_border_width="2dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/service_thumb_fitbit" />
+
+    <TextView
+        android:id="@+id/ui_user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="8dp"
+        android:gravity="right"
+        android:paddingBottom="4dp"
+        android:paddingLeft="8dp"
+        android:paddingTop="4dp"
+        android:textColor="#FFF"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/ui_pen"
+        app:layout_constraintTop_toBottomOf="@+id/ui_user_photo"
+        tools:text="Talkative Armadilo" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ui_pen"
+        android:layout_width="wrap_content"
+        android:layout_height="15dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        app:layout_constraintBottom_toBottomOf="@+id/ui_user_name"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintLeft_toRightOf="@+id/ui_user_name"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ui_user_name"
+        app:srcCompat="@drawable/pen"
+
+        />
+
+    <mehdi.sakout.fancybuttons.FancyButton
+        android:id="@+id/ui_button_edit_screen_name"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:fb_defaultColor="@color/transparent"
+        app:fb_focusColor="@color/semiTransparentWhite"
+        app:fb_radius="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ui_user_name"
+        app:layout_constraintLeft_toLeftOf="@+id/ui_user_name"
+        app:layout_constraintRight_toRightOf="@+id/ui_pen"
+        app:layout_constraintTop_toTopOf="@+id/ui_user_name" />
+
+
+    <TextView
+        android:id="@+id/ui_user_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/diagonal_gradient"
-        android:orientation="vertical"
-        android:paddingStart="24dp"
-        android:paddingTop="24dp"
-        android:paddingEnd="24dp"
-        android:paddingBottom="24dp">
+        android:gravity="center"
+        android:paddingBottom="16dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:textColor="#FFF"
+        android:textSize="12sp"
 
-        <TextView
-            android:id="@+id/ui_username"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:textColor="#FFF"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            tools:text="Yhkim" />
+        app:layout_constraintTop_toBottomOf="@+id/ui_user_name"
 
-        <TextView
-            android:id="@+id/ui_email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:textColor="#FFF"
-            android:textSize="12sp"
-            android:ellipsize="end"
-            tools:text="yhkim\@hcil.snu.ac.kr" />
+        tools:text="yhkim@hcil.snu.ac.kr" />
 
-
-    </LinearLayout>
-
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/ui_button_profile_menu"
+        android:layout_width="@dimen/button_height_small"
+        android:layout_height="@dimen/button_height_small"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/transparent_button_background"
+        app:layout_constraintRight_toRightOf="parent"
+        app:srcCompat="@drawable/more" />
 
     <!--
     <LinearLayout
@@ -66,11 +130,13 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
 
-        android:layout_weight="1"
         android:orientation="vertical"
-        android:paddingTop="8dp">
+        android:paddingTop="8dp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ui_profile_panel">
 
     </androidx.recyclerview.widget.RecyclerView>
 
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

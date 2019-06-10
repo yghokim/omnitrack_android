@@ -88,6 +88,10 @@ android {
             buildConfigField 'String', 'APP_NAME', "\"OmniTrack\""
         }
 
+        buildConfigField 'boolean', 'DISABLE_TRACKER_CREATION', "${buildConfigJson.disableTrackerCreation ?: false}"
+        buildConfigField 'boolean', 'DISABLE_TRIGGER_CREATION', "${buildConfigJson.disableTriggerCreation ?: false}"
+        buildConfigField 'boolean', 'HIDE_TRIGGERS_TAB', "${buildConfigJson.hideTriggersTab ?: false}"
+        buildConfigField 'boolean', 'HIDE_SERVICES_TAB', "${buildConfigJson.hideServicesTab ?: false}"
         buildConfigField 'boolean', 'SHOW_TUTORIALS', "${buildConfigJson.showTutorials == null ? true : buildConfigJson.showTutorials}"
     }
 
@@ -198,6 +202,15 @@ android {
             buildType.buildConfigField 'String', 'FIREBASE_CLOUD_MESSAGING_SENDER_ID', "\"$gcmSenderId\""
             buildType.buildConfigField 'String', 'FIREBASE_PROJECT_ID', "\"$firebaseProjectId\""
 
+            if (buildConfigJson.disableExternalEntities == true && buildConfigJson.defaultExperimentId != null && buildConfigJson.defaultExperimentId.length() > 0) {
+                buildType.buildConfigField 'boolean', 'DISABLE_EXTERNAL_ENTITIES', "true"
+            } else buildType.buildConfigField 'boolean', 'DISABLE_EXTERNAL_ENTITIES', "false"
+
+            if (buildConfigJson.disableExternalEntities == true && buildConfigJson.defaultInvitationCode != null && buildConfigJson.defaultInvitationCode.length() > 0) {
+                buildType.buildConfigField 'String', 'DEFAULT_INVITATION_CODE', "\"$buildConfigJson.defaultInvitationCode\""
+            } else {
+                buildType.buildConfigField 'String', 'DEFAULT_INVITATION_CODE', "null"
+            }
 
             if (buildConfigJson.defaultExperimentId != null && buildConfigJson.defaultExperimentId.length() > 0) {
                 buildType.buildConfigField 'String', 'DEFAULT_EXPERIMENT_ID', "\"$buildConfigJson.defaultExperimentId\""
@@ -250,7 +263,7 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:$rootProject.ext.androidx_recyclerview_version"
     implementation "androidx.cardview:cardview:$rootProject.ext.android_support_version"
     implementation "androidx.preference:preference:$rootProject.ext.androidx_preference_version"
-    implementation "androidx.core:core-ktx:1.0.2"
+    implementation "androidx.core:core-ktx:1.0.1"
 
     implementation "androidx.constraintlayout:constraintlayout:$rootProject.ext.androidx_constraintlayout_version"
     implementation 'com.google.android:flexbox:1.1.0'
@@ -263,9 +276,11 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
     implementation 'com.google.android.gms:play-services-fitness:16.0.1'
+    implementation 'com.google.android.gms:play-services-auth:16.0.1'
 
-    implementation 'com.google.firebase:firebase-core:16.0.9'
-    implementation 'com.google.firebase:firebase-messaging:18.0.0'
+    implementation 'com.google.firebase:firebase-core:16.0.8'
+    implementation 'com.google.firebase:firebase-auth:16.2.1'
+    implementation 'com.google.firebase:firebase-messaging:17.6.0'
 
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     def work_version = "2.0.1"
@@ -302,7 +317,6 @@ dependencies {
     implementation project(':android_commons')
     implementation project(':android_commons_view')
 
-    implementation 'com.auth0.android:jwtdecode:1.3.0'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "com.google.code.gson:gson:$rootProject.ext.gson_version"
@@ -319,6 +333,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-scalars:$rootProject.ext.retrofit_version"
     implementation "com.squareup.picasso:picasso:$rootProject.ext.picasso_version"
     implementation 'us.feras.mdv:markdownview:1.1.0'
+    implementation 'de.hdodenhof:circleimageview:3.0.0'
     implementation 'com.github.tbruyelle:rxpermissions:0.10.2' //no androidx
     implementation 'com.patloew.rxlocation:rxlocation:1.0.5' //no androidx
     implementation 'uk.co.samuelwall:material-tap-target-prompt:2.14.0' //no androidx

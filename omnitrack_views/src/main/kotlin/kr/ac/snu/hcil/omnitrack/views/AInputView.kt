@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import kr.ac.snu.hcil.android.common.events.Event
-import kr.ac.snu.hcil.android.common.view.InterfaceHelper
 import kr.ac.snu.hcil.android.common.view.container.LockableFrameLayout
 import java.util.*
 
@@ -46,12 +45,12 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
 
     override fun onViewLocked() {
         super.onViewLocked()
-        this.alpha = InterfaceHelper.ALPHA_INACTIVE
+        this.alpha = 0.5f
     }
 
     override fun onViewUnlocked() {
         super.onViewUnlocked()
-        this.alpha = InterfaceHelper.ALPHA_ORIGINAL
+        this.alpha = 1.0f
     }
 
     fun addNewValidator(failedMessage: CharSequence?, func: (T) -> Boolean) {

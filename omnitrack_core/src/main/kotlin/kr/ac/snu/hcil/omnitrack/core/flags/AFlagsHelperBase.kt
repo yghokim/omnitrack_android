@@ -8,7 +8,6 @@ import com.google.gson.JsonObject
  */
 abstract class AFlagsHelperBase {
     companion object {
-
         val parser: Gson by lazy {
             Gson()
         }
@@ -32,10 +31,6 @@ abstract class AFlagsHelperBase {
 
         constructor(base: String) {
             this.json = parseFlags(base)
-        }
-
-        constructor(baseObj: JsonObject) {
-            this.json = baseObj
         }
 
         fun build(): String {
