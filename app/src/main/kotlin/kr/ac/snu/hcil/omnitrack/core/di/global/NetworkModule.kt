@@ -19,6 +19,7 @@ import io.realm.RealmConfiguration
 import io.realm.annotations.RealmModule
 import kr.ac.snu.hcil.android.common.net.NetworkNotConnectedException
 import kr.ac.snu.hcil.omnitrack.BuildConfig
+import kr.ac.snu.hcil.omnitrack.core.auth.IAuthServerAPI
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthApiController
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.LocalMediaCacheEntry
@@ -180,7 +181,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun getAuthApiController(@Backend retrofit: Lazy<Retrofit>): OTAuthApiController {
+    fun getAuthApiController(@Backend retrofit: Lazy<Retrofit>): IAuthServerAPI {
         return OTAuthApiController(retrofit)
     }
 

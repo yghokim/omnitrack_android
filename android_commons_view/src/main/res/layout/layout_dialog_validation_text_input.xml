@@ -35,4 +35,15 @@
             android:inputType="textEmailAddress" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/ui_loading_indicator"
+        style="@style/SpinKitView.Small.ThreeBounce"
+        android:layout_width="@dimen/button_height_tiny"
+        android:layout_height="@dimen/button_height_tiny"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:visibility="gone"
+        app:SpinKit_Color="@color/colorPointed" />
+
 </LinearLayout>

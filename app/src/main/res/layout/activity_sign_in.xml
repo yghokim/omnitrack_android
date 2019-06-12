@@ -54,22 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="visible"
-        app:constraint_referenced_ids="ui_signin_title, ui_form_signin_username, ui_form_signin_password, ui_button_signup, ui_button_signin" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/ui_signin_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:gravity="center"
-        android:text="Sign In with Existing Account"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/ui_form_signin_username"
-        app:layout_constraintEnd_toEndOf="@+id/ui_form_signin_username"
-        app:layout_constraintStart_toStartOf="@id/ui_form_signin_username"
-        app:layout_constraintTop_toBottomOf="@id/ui_app_title"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:constraint_referenced_ids="ui_form_signin_username, ui_form_signin_password, ui_button_signup, ui_button_signin, ui_button_forgot_password, ui_bottom_separator" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/ui_form_signin_username"
@@ -86,7 +71,9 @@
         app:layout_constraintBottom_toTopOf="@id/ui_form_signin_password"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ui_signin_title">
+
+        app:layout_constraintTop_toBottomOf="@id/ui_app_title"
+        app:layout_constraintVertical_chainStyle="packed">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/ui_textfield_signin_username"
@@ -103,7 +90,6 @@
         android:layout_width="0dp"
         android:hint="@string/password"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="3dp"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         app:errorEnabled="true"
         app:endIconMode="password_toggle"
@@ -123,27 +109,9 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/ui_button_signup"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/button_height_normal"
-        android:layout_marginEnd="8dp"
-        android:foregroundGravity="left"
-        android:text="@string/create_new_account"
-        android:textStyle="bold"
-        android:textColor="@color/colorAccent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintBottom_toBottomOf="@id/ui_button_signin"
-        app:layout_constraintEnd_toStartOf="@+id/ui_button_signin"
-        app:rippleColor="@color/textColorLight"
-        app:layout_constraintStart_toStartOf="@id/ui_form_signin_username"
-        app:layout_constraintTop_toTopOf="@id/ui_button_signin" />
-
-    <com.google.android.material.button.MaterialButton
         android:id="@+id/ui_button_signin"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/button_height_normal"
-        android:layout_marginTop="6dp"
         android:backgroundTint="@color/colorPointed"
         android:text="@string/auth_sign_in"
         android:textStyle="bold"
@@ -151,7 +119,7 @@
         app:layout_constraintEnd_toEndOf="@+id/ui_form_signin_password"
         app:layout_constraintTop_toBottomOf="@+id/ui_form_signin_password"
 
-        app:layout_constraintBottom_toTopOf="@+id/ui_button_forgot_password" />
+        app:layout_constraintBottom_toTopOf="@+id/ui_bottom_separator" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/ui_button_forgot_password"
@@ -163,12 +131,44 @@
         android:textColor="@color/textColorLight"
         android:textSize="12sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/ui_form_signin_password"
-        app:layout_constraintTop_toBottomOf="@+id/ui_button_signin"
-        app:layout_constraintVertical_bias="1"
 
-        app:layout_constraintBottom_toTopOf="@+id/ui_logos"
+        app:layout_constraintBottom_toBottomOf="@id/ui_button_signin"
+        app:layout_constraintEnd_toStartOf="@+id/ui_button_signin"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/ui_form_signin_username"
+        app:layout_constraintTop_toTopOf="@id/ui_button_signin"
+
         app:rippleColor="@color/textColorLightLight" />
+
+    <View
+        android:id="@+id/ui_bottom_separator"
+        style="@style/HorizontalSeparator"
+        android:layout_width="0dp"
+        app:layout_constraintBottom_toTopOf="@id/ui_button_signup"
+        app:layout_constraintEnd_toEndOf="@id/ui_form_signin_username"
+        app:layout_constraintStart_toStartOf="@id/ui_form_signin_username"
+        app:layout_constraintTop_toBottomOf="@id/ui_button_signin"
+
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ui_button_signup"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/button_height_normal"
+        android:foregroundGravity="left"
+        android:text="@string/create_new_account"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/ui_logos"
+
+        app:layout_constraintEnd_toEndOf="@+id/ui_form_signin_password"
+        app:layout_constraintStart_toStartOf="@+id/ui_form_signin_password"
+        app:layout_constraintTop_toBottomOf="@+id/ui_bottom_separator"
+
+        app:layout_constraintVertical_bias="1"
+        app:rippleColor="@color/textColorLight" />
+
 
 
     <com.github.ybq.android.spinkit.SpinKitView

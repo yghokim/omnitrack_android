@@ -46,7 +46,7 @@ class OTAuthManager @Inject constructor(
         private val syncManager: OTSyncManager,
         private val triggerSystemManager: Lazy<OTTriggerSystemManager>,
         private val shortcutPanelManager: OTShortcutPanelManager,
-        private val authApiController: Lazy<OTAuthApiController>,
+        private val authApiController: Lazy<IAuthServerAPI>,
         private val appFlagManager: OTAppFlagManager) {
 
     companion object {
@@ -188,7 +188,7 @@ class OTAuthManager @Inject constructor(
     }
 
 
-    private fun handleAuthResult(responseData: OTAuthApiController.AuthResponseData, firstSignIn: Boolean) {
+    private fun handleAuthResult(responseData: IAuthServerAPI.AuthResponseData, firstSignIn: Boolean) {
 
         sharedPreferences.edit().putString(PREF_DEVICE_LOCAL_KEY, responseData.deviceLocalKey).apply()
         appFlagManager.updateAppFlags(responseData.appFlags)

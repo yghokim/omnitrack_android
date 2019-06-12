@@ -93,7 +93,7 @@ object DialogHelper {
         }
 
 
-        val tryOk = { dialog: DialogInterface ->
+        val tryOk = { dialog: MaterialDialog ->
             val inputText = view.ui_input_text.text?.toString() ?: ""
             val validationErrorMessage = validateFunc?.invoke(inputText)
             if (validationErrorMessage != null) {
@@ -102,11 +102,30 @@ object DialogHelper {
                 onResult?.invoke(null, DialogAction.POSITIVE)
                 false
             } else {
+
+                //to busy mode
+                view.ui_input_form.visibility = View.GONE
+                view.ui_loading_indicator.visibility = View.VISIBLE
+                dialog.getActionButton(DialogAction.POSITIVE).isEnabled = false
+                dialog.getActionButton(DialogAction.POSITIVE).alpha = InterfaceHelper.ALPHA_INACTIVE
+                dialog.getActionButton(DialogAction.NEGATIVE).isEnabled = false
+                dialog.getActionButton(DialogAction.NEGATIVE).alpha = InterfaceHelper.ALPHA_INACTIVE
+
+
+
                 //valid
                 taskSubscription = task(inputText).subscribe({
                     dialog.dismiss()
                     onResult?.invoke(inputText, DialogAction.POSITIVE)
                 }, { err ->
+
+                    view.ui_input_form.visibility = View.VISIBLE
+                    view.ui_loading_indicator.visibility = View.GONE
+                    dialog.getActionButton(DialogAction.POSITIVE).isEnabled = true
+                    dialog.getActionButton(DialogAction.POSITIVE).alpha = InterfaceHelper.ALPHA_ORIGINAL
+                    dialog.getActionButton(DialogAction.NEGATIVE).isEnabled = true
+                    dialog.getActionButton(DialogAction.NEGATIVE).alpha = InterfaceHelper.ALPHA_ORIGINAL
+
                     view.ui_input_form.error = err.message
                 })
                 true

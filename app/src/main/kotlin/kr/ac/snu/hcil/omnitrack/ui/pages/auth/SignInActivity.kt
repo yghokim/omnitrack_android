@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.afollestad.materialdialogs.DialogAction
 import com.google.gson.Gson
 import dagger.Lazy
 import io.reactivex.Completable
@@ -24,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
+import kr.ac.snu.hcil.omnitrack.core.auth.IAuthServerAPI
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.di.global.ServerResponsive
@@ -35,7 +37,7 @@ import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Provider
 
-class SignInActivity : AppCompatActivity(R.layout.activity_sign_in), TextWatcher {
+class SignInActivity : AppCompatActivity(R.layout.activity_sign_in), TextWatcher, View.OnClickListener {
 
     companion object {
         private val LOG_TAG = "SignInActivity"
@@ -43,6 +45,9 @@ class SignInActivity : AppCompatActivity(R.layout.activity_sign_in), TextWatcher
 
     @Inject
     protected lateinit var authManager: OTAuthManager
+
+    @Inject
+    protected lateinit var authApiController: IAuthServerAPI
 
     @Inject
     protected lateinit var eventLogger: Lazy<IEventLogger>
@@ -65,26 +70,64 @@ class SignInActivity : AppCompatActivity(R.layout.activity_sign_in), TextWatcher
         ui_app_title.text = BuildConfig.APP_NAME
         toIdleMode()
 
-        ui_button_signup.setOnClickListener {
-            startActivity(SignUpActivity.makeIntent(this))
-        }
-
-        ui_button_settings.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
-
         ui_textfield_signin_username.filters += arrayOf(LowercaseInputFilter(), NoBlankInputFilter())
 
         ui_textfield_signin_username.addTextChangedListener(this)
         ui_textfield_signin_password.addTextChangedListener(this)
 
-        ui_button_signin.setOnClickListener {
-            trySignIn()
-        }
-
         ui_textfield_signin_password.setOnEditorActionListener { v, actionId, event ->
             trySignIn()
             false
+        }
+
+        ui_button_settings.setOnClickListener(this)
+        ui_button_signup.setOnClickListener(this)
+        ui_button_forgot_password.setOnClickListener(this)
+        ui_button_signin.setOnClickListener(this)
+
+    }
+
+    override fun onClick(v: View?) {
+        when (v) {
+            ui_button_signup -> {
+                startActivity(SignUpActivity.makeIntent(this))
+            }
+            ui_button_signin -> {
+                trySignIn()
+            }
+            ui_button_settings -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
+            }
+            ui_button_forgot_password -> {
+
+                var passwordSentEmail: String? = null
+
+                DialogHelper.makeValidationTextInputDialog(this,
+                        "Don't remember the password?",
+                        "Insert your username. If you enter a valid one, we will send you a link to reset the password via E-mail.",
+                        getString(R.string.username),
+                        { username ->
+                            authManager.validateUsername(username)
+                        },
+                        { username ->
+                            authApiController.requestResetPassword(username)
+                                    .doOnSuccess { result ->
+                                        if (result.success) {
+                                            passwordSentEmail = result.email
+                                        } else {
+                                            throw Exception("E-mail was not sent. Your username may not exist.")
+                                        }
+                                    }.ignoreElement()
+                        },
+                        { username, dialogAction ->
+                            if (dialogAction == DialogAction.POSITIVE && username != null && passwordSentEmail != null) {
+                                Toast.makeText(this, "Requested a reset password link to [${passwordSentEmail}-@-]. Check your inbox.", Toast.LENGTH_LONG).show()
+                            } else {
+
+                            }
+                        }
+                ).show()
+            }
         }
     }
 

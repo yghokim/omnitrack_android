@@ -7,7 +7,6 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import io.realm.internal.Keep
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import retrofit2.Retrofit
@@ -16,18 +15,15 @@ import retrofit2.http.POST
 
 class OTAuthApiController(retrofit: Lazy<Retrofit>) : IAuthServerAPI {
 
-    @Keep
-    data class AuthResponseData(val token: String, val deviceLocalKey: String?, val appFlags: JsonObject?)
-
     interface AuthRetrofitService {
         //Auth
 
         //Register and get JWT Token
         @POST("api/user/auth/register")
-        fun register(@Body data: JsonObject): Single<AuthResponseData>
+        fun register(@Body data: JsonObject): Single<IAuthServerAPI.AuthResponseData>
 
         @POST("api/user/auth/authenticate")
-        fun authenticate(@Body data: JsonObject): Single<AuthResponseData>
+        fun authenticate(@Body data: JsonObject): Single<IAuthServerAPI.AuthResponseData>
 
         @POST("api/user/auth/refresh_token")
         fun refreshToken(@Body data: JsonObject): Single<String>
@@ -36,10 +32,13 @@ class OTAuthApiController(retrofit: Lazy<Retrofit>) : IAuthServerAPI {
         fun signOut(@Body data: JsonObject): Completable
 
         @POST("api/user/auth/update")
-        fun update(@Body data: JsonObject): Single<AuthResponseData>
+        fun update(@Body data: JsonObject): Single<IAuthServerAPI.AuthResponseData>
 
         @POST("api/user/auth/drop")
         fun dropOutFromExperiment(@Body data: JsonObject): Completable
+
+        @POST("api/user/auth/request_password_link")
+        fun requestResetPasswordLink(@Body data: JsonObject): Single<IAuthServerAPI.PasswordResetRequestResult>
 
     }
 
@@ -47,7 +46,7 @@ class OTAuthApiController(retrofit: Lazy<Retrofit>) : IAuthServerAPI {
         retrofit.get().create(AuthRetrofitService::class.java)
     }
 
-    override fun register(username: String, email: String, password: String, deviceInfo: OTDeviceInfo, invitationCode: String?, demographicData: JsonObject?): Single<AuthResponseData> {
+    override fun register(username: String, email: String, password: String, deviceInfo: OTDeviceInfo, invitationCode: String?, demographicData: JsonObject?): Single<IAuthServerAPI.AuthResponseData> {
         return service.register(jsonObject(
                 "username" to username.trim(),
                 "email" to email.trim(),
@@ -59,7 +58,7 @@ class OTAuthApiController(retrofit: Lazy<Retrofit>) : IAuthServerAPI {
         )).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
 
-    override fun authenticate(username: String, password: String, deviceInfo: OTDeviceInfo): Single<AuthResponseData> {
+    override fun authenticate(username: String, password: String, deviceInfo: OTDeviceInfo): Single<IAuthServerAPI.AuthResponseData> {
         return service.authenticate(jsonObject(
                 "username" to username,
                 "password" to password,
@@ -77,16 +76,25 @@ class OTAuthApiController(retrofit: Lazy<Retrofit>) : IAuthServerAPI {
         return service.signOut(jsonObject("deviceInfo" to deviceInfo.convertToJson())).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
 
-    override fun updateEmail(email: String): Single<AuthResponseData> {
+    override fun updateEmail(email: String): Single<IAuthServerAPI.AuthResponseData> {
         return service.update(jsonObject("email" to email)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
 
-    override fun changePassword(original: String, newPassword: String): Single<AuthResponseData> {
+    override fun changePassword(original: String, newPassword: String): Single<IAuthServerAPI.AuthResponseData> {
         return service.update(jsonObject("originalPassword" to original, "newPassword" to newPassword)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
 
     override fun dropOutFromStudy(reason: String?): Completable {
         return service.dropOutFromExperiment(jsonObject("reason" to reason)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun requestResetPassword(username: String): Single<IAuthServerAPI.PasswordResetRequestResult> {
+        return service.requestResetPasswordLink(jsonObject(
+                "username" to username,
+                "appName" to BuildConfig.APP_NAME
+        ))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
     }
 
 }
