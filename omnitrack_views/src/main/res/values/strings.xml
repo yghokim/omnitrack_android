@@ -35,9 +35,9 @@
     <string name="msg_auth_sign_up_complete">Complete</string>
     <string name="msg_auth_change_email">Change E-mail</string>
     <string name="msg_auth_new_email_address">New E-mail address</string>
-    <string name="msg_auth_stop_participating_in_the_study">Stop Participating in the Study</string>
-    <string name="msg_auth_stop_participation">Stop Participation</string>
-    <string name="msg_auth_stop_participation_message">Do you really want to stop participating in the study? All your data, history, and account will be permanently deleted from the server and apps.</string>
+    <string name="msg_auth_stop_participating_in_the_study">I don\'t want to participate in the study anymore</string>
+    <string name="msg_auth_stop_participation">Stop Participation?</string>
+    <string name="msg_auth_stop_participation_message">Your participation is voluntary and their will be no penalty for stopping. Contact the researcher to stop participation.</string>
     <string name="msg_auth_stop_participation_confirm_email">Write down your E-mail address to confirm</string>
     <string name="msg_auth_stop_participation_reason">(Optional) Could you provide the reason of stopping participation?</string>
     <string name="msg_auth_stop_participation_insert_reason">Reason</string>
@@ -45,6 +45,7 @@
     <string name="msg_auth_invalid_email">Invalid E-mail address.</string>
     <string name="msg_auth_confirm_password_invalid">Two password inputs are different.</string>
     <string name="msg_auth_invitation_code_empty">Invitation Code should not be blank.</string>
+    <string name="msg_gotit">Got it</string>
 
 
 </resources>

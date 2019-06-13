@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.auth
 import android.os.Bundle
 import android.util.Patterns
 import android.view.View
-import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_my_account.*
 import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.omnitrack.BuildConfig
@@ -41,6 +40,10 @@ class MyAccountActivity : MultiButtonActionBarActivity(R.layout.activity_my_acco
         if (BuildConfig.DEFAULT_EXPERIMENT_ID == null) {
             ui_btn_drop_experiment.visibility = View.GONE
         }
+
+        if (!BuildConfig.DEBUG) {
+            ui_btn_logout.visibility = View.GONE
+        }
     }
 
     override fun onClick(v: View?) {
@@ -76,6 +79,7 @@ class MyAccountActivity : MultiButtonActionBarActivity(R.layout.activity_my_acco
             }
 
             ui_btn_drop_experiment -> {
+                /*
                 DialogHelper.makeValidationTextInputDialog(this,
                         getString(R.string.msg_auth_stop_participation),
                         getString(R.string.msg_auth_stop_participation_message),
@@ -98,7 +102,12 @@ class MyAccountActivity : MultiButtonActionBarActivity(R.layout.activity_my_acco
                     } else {
 
                     }
-                }).show()
+                }).show()*/
+                DialogHelper.makeSimpleAlertBuilder(this,
+                        getString(R.string.msg_auth_stop_participation_message),
+                        getString(R.string.msg_auth_stop_participation),
+                        R.string.msg_gotit
+                ).show()
             }
         }
     }
