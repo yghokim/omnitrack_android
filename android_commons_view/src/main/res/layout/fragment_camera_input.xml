@@ -68,13 +68,15 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <mehdi.sakout.fancybuttons.FancyButtontton
+    <TextView
         android:id="@+id/ui_camera_shutter"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height_tall"
+        android:background="@drawable/button_background_color_pointed_grad"
         android:text="@string/msg_tab_to_take_a_photo"
-        app:cornerRadius="0dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center"
         android:textColor="#FFF"
         app:layout_flexGrow="0"
         app:layout_flexShrink="0" />
