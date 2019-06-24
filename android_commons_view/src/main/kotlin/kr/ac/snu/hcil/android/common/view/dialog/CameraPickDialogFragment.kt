@@ -56,7 +56,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
     }
 
     private lateinit var cameraView: CameraView
-    private lateinit var shutterButton: Button
+    private lateinit var shutterButton: View
     private lateinit var cameraModeToggleButton: ToggleButton
     private lateinit var titleView: TextView
     private lateinit var cancelButton: AppCompatImageButton

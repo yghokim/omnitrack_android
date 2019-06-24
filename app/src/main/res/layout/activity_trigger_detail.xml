@@ -7,9 +7,7 @@
     android:layout_height="match_parent"
     android:descendantFocusability="beforeDescendants"
     android:fitsSystemWindows="true"
-    android:focusableInTouchMode="true"
-
-    tools:context=".ui.pages.field.AttributeDetailActivity">
+    android:focusableInTouchMode="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
