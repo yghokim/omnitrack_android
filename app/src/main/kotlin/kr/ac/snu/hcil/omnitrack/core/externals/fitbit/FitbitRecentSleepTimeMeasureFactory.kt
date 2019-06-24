@@ -7,7 +7,7 @@ import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.net.AuthConstants
 import kr.ac.snu.hcil.android.common.net.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
@@ -21,7 +21,7 @@ import java.util.*
  */
 class FitbitRecentSleepTimeMeasureFactory(context: Context, service: FitbitService) : OTServiceMeasureFactory(context, service, "slp") {
 
-    override fun getAttributeType() = OTAttributeManager.TYPE_TIMESPAN
+    override fun getAttributeType() = OTFieldManager.TYPE_TIMESPAN
 
     override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
     override val isRangedQueryAvailable: Boolean = true

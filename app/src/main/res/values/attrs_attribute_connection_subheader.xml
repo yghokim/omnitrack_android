@@ -1,5 +1,5 @@
 <resources>
-    <declare-styleable name="AttributeConnectionViewSubHeader">
+    <declare-styleable name="FieldConnectionViewSubHeader">
         <attr name="icon" format="reference" />
         <attr name="label" format="string" />
     </declare-styleable>

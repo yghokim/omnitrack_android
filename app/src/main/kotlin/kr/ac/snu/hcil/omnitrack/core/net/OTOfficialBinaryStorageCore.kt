@@ -29,22 +29,22 @@ class OTOfficialBinaryStorageCore(val context: Context, val retrofit: Lazy<Retro
     interface OfficialBinaryStorageServerService {
 
         @Multipart
-        @POST("api/upload/item_media/{trackerId}/{itemId}/{attrLocalId}/{fileIdentifier}")
-        fun uploadItemMediaFile(@Path("trackerId") trackerId: String, @Path("itemId") itemId: String, @Path("attrLocalId") attributeLocalId: String, @Path("fileIdentifier") fileIdentifier: String, @Part file: MultipartBody.Part): Single<ResponseBody>
+        @POST("api/upload/item_media/{trackerId}/{itemId}/{fieldLocalId}/{fileIdentifier}")
+        fun uploadItemMediaFile(@Path("trackerId") trackerId: String, @Path("itemId") itemId: String, @Path("fieldLocalId") fieldLocalId: String, @Path("fileIdentifier") fileIdentifier: String, @Part file: MultipartBody.Part): Single<ResponseBody>
 
-        @GET("api/files/item_media/{trackerId}/{itemId}/{attrLocalId}/{fileIdentifier}/{processingType}")
+        @GET("api/files/item_media/{trackerId}/{itemId}/{fieldLocalId}/{fileIdentifier}/{processingType}")
         fun downloadMediaFile(
                 @Path("trackerId") trackerId: String,
                 @Path("itemId") itemId: String,
-                @Path("attrLocalId") attributeLocalId: String,
+                @Path("fieldLocalId") fieldLocalId: String,
                 @Path("fileIdentifier") fileIdentifie: String,
                 @Path("processingType") processingType: String): Single<ResponseBody>
 
-        @GET("api/files/item_media/{trackerId}/{itemId}/{attrLocalId}/{fileIdentifier}")
+        @GET("api/files/item_media/{trackerId}/{itemId}/{fieldLocalId}/{fileIdentifier}")
         fun downloadMediaFile(
                 @Path("trackerId") trackerId: String,
                 @Path("itemId") itemId: String,
-                @Path("attrLocalId") attributeLocalId: String,
+                @Path("fieldLocalId") fieldLocalId: String,
                 @Path("fileIdentifier") fileIdentifier: String): Single<ResponseBody>
 
 
@@ -72,8 +72,8 @@ class OTOfficialBinaryStorageCore(val context: Context, val retrofit: Lazy<Retro
         }
     }
 
-    override fun makeServerPath(userId: String, trackerId: String, itemId: String, attributeLocalId: String, fileIdentifier: String): String {
-        return "$trackerId/$itemId/$attributeLocalId/$fileIdentifier"
+    override fun makeServerPath(userId: String, trackerId: String, itemId: String, fieldLocalId: String, fileIdentifier: String): String {
+        return "$trackerId/$itemId/$fieldLocalId/$fileIdentifier"
     }
 
     override fun decodeTrackerIdFromServerPath(serverPath: String): String? {

@@ -138,8 +138,8 @@ class BackendDbManager @Inject constructor(
         }
     }*/
 
-    fun getAttributeListQuery(trackerId: String, realm: Realm): RealmQuery<OTAttributeDAO> {
-        return realm.where(OTAttributeDAO::class.java).equalTo(FIELD_TRACKER_ID, trackerId)
+    fun getAttributeListQuery(trackerId: String, realm: Realm): RealmQuery<OTFieldDAO> {
+        return realm.where(OTFieldDAO::class.java).equalTo(FIELD_TRACKER_ID, trackerId)
     }
 
     fun getUnManagedTrackerDao(trackerId: String?, realm: Realm?): OTTrackerDAO? {
@@ -303,8 +303,8 @@ class BackendDbManager @Inject constructor(
             }
         } else {
             realm.executeTransactionIfNotIn {
-                dao.attributes.forEach { it.properties.deleteAllFromRealm() }
-                dao.attributes.deleteAllFromRealm()
+                dao.fields.forEach { it.properties.deleteAllFromRealm() }
+                dao.fields.deleteAllFromRealm()
                 dao.deleteFromRealm()
             }
         }

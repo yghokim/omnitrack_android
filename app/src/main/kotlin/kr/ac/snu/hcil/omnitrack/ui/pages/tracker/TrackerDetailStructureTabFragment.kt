@@ -30,17 +30,17 @@ import kr.ac.snu.hcil.android.common.view.container.AdapterLinearLayout
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
-import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
+import kr.ac.snu.hcil.omnitrack.core.fields.FieldPresetInfo
 import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.flags.F
 import kr.ac.snu.hcil.omnitrack.core.flags.LockFlagLevel
 import kr.ac.snu.hcil.omnitrack.core.flags.LockedPropertiesHelper
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactoryManager
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.AFieldInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.OTFieldViewFactoryManager
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
-import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.field.FieldDetailActivity
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -95,7 +95,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
     lateinit var tutorialManager: TutorialManager
 
     @Inject
-    lateinit var attributeViewFactoryManager: Lazy<AttributeViewFactoryManager>
+    lateinit var fieldViewFactoryManager: Lazy<OTFieldViewFactoryManager>
 
     override fun onInject(app: OTAndroidApp) {
         app.applicationComponent.inject(this)
@@ -316,7 +316,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         newAttributeButton.setOnClickListener {
             val newAttributePanel = FieldPresetSelectionBottomSheetFragment()
             newAttributePanel.callback = object : FieldPresetSelectionBottomSheetFragment.Callback {
-                override fun onAttributePermittedToAdd(typeInfo: AttributePresetInfo) {
+                override fun onAttributePermittedToAdd(typeInfo: FieldPresetInfo) {
                     addNewAttribute(typeInfo)
                 }
             }
@@ -362,7 +362,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     fun openAttributeDetailActivity(position: Int) {
         val attrViewModel = currentAttributeViewModelList[position]
-        startActivityForResult(AttributeDetailActivity.makeIntent(requireContext(), attrViewModel.makeFrontalChangesToDao()), REQUEST_CODE_ATTRIBUTE_DETAIL)
+        startActivityForResult(FieldDetailActivity.makeIntent(requireContext(), attrViewModel.makeFrontalChangesToDao()), REQUEST_CODE_ATTRIBUTE_DETAIL)
     }
 
     fun scrollToBottom() {
@@ -372,8 +372,8 @@ class TrackerDetailStructureTabFragment : OTFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_ATTRIBUTE_DETAIL && resultCode == RESULT_OK && data != null) {
-            val editedDao = serializationManager.get().parseAttribute(data.getStringExtra(AttributeDetailActivity.INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO))
-            val correspondingViewModel = currentAttributeViewModelList.find { it.attributeDAO._id == editedDao._id }
+            val editedDao = serializationManager.get().parseAttribute(data.getStringExtra(FieldDetailActivity.INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO))
+            val correspondingViewModel = currentAttributeViewModelList.find { it.fieldDAO._id == editedDao._id }
 
             if (correspondingViewModel != null) {
                 correspondingViewModel.applyDaoChangesToFront(editedDao)
@@ -439,7 +439,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
             private val connectionIndicatorStubProxy: ConnectionIndicatorStubProxy
 
-            var preview: AAttributeInputView<out Any>? = null
+            var preview: AFieldInputView<out Any>? = null
                 set(value) {
                     if (field !== value) {
                         view.ui_preview_container.removeAllViews()
@@ -481,7 +481,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                         viewModel.removeAttribute(attrViewModel)
                         showRemovalSnackbar()
 
-                        eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_REMOVE, attrViewModel.attributeDAO.localId, viewModel.trackerId)
+                        eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_REMOVE, attrViewModel.fieldDAO.localId, viewModel.trackerId)
 
                     }, onNo = null)
                             .let {
@@ -520,7 +520,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                         attrViewModel.applyChanges()
                     }
                     attributeListAdapter.notifyItemChanged(adapterPosition)
-                    eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_EDIT, attrViewModel.attributeDAO.localId, viewModel.trackerId)
+                    eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_EDIT, attrViewModel.fieldDAO.localId, viewModel.trackerId)
                     { it ->
                         it.addProperty(IEventLogger.CONTENT_KEY_PROPERTY, "isHidden")
                         it.addProperty(IEventLogger.CONTENT_KEY_NEWVALUE, isHidden)
@@ -588,7 +588,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
                 viewHolderSubscriptions.add(
                         attributeViewModel.connectionObservable.subscribe { connection ->
-                            connectionIndicatorStubProxy.onBind(attributeViewModel.attributeDAO, connection.datum)
+                            connectionIndicatorStubProxy.onBind(attributeViewModel.fieldDAO, connection.datum)
                         }
                 )
 
@@ -625,14 +625,14 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 viewHolderSubscriptions.add(
                         attributeViewModel.typeObservable.subscribe { args ->
 
-                            preview = attributeViewFactoryManager.get().get(args).getInputView(requireContext(), true, attributeViewModel.makeFrontalChangesToDao(), preview)
+                            preview = fieldViewFactoryManager.get().get(args).getInputView(requireContext(), true, attributeViewModel.makeFrontalChangesToDao(), preview)
                         }
                 )
 
                 viewHolderSubscriptions.add(
                         attributeViewModel.onPropertyChanged.subscribe {
                             attributeViewModel.typeObservable.value?.let { type ->
-                                preview = attributeViewFactoryManager.get().get(type).getInputView(requireContext(), true, attributeViewModel.makeFrontalChangesToDao(), preview)
+                                preview = fieldViewFactoryManager.get().get(type).getInputView(requireContext(), true, attributeViewModel.makeFrontalChangesToDao(), preview)
                             }
                         }
                 )
@@ -643,7 +643,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     }
 
-    protected fun addNewAttribute(typeInfo: AttributePresetInfo) {
+    protected fun addNewAttribute(typeInfo: FieldPresetInfo) {
 
         val newAttributeName = DefaultNameGenerator.generateName(typeInfo.name, currentAttributeViewModelList.map {
             it.nameObservable.value ?: ""

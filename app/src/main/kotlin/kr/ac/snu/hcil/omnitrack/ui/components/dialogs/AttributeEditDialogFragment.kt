@@ -25,11 +25,11 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactoryManager
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.AFieldInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.OTFieldViewFactoryManager
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import javax.inject.Inject
 
@@ -41,10 +41,10 @@ class AttributeEditDialogFragment : DialogFragment() {
     companion object {
         const val TAG = "AttributeEditDialog"
 
-        fun makeInstance(itemId: String, attributeLocalId: String, trackerId: String, listener: Listener): AttributeEditDialogFragment {
+        fun makeInstance(itemId: String, fieldLocalId: String, trackerId: String, listener: Listener): AttributeEditDialogFragment {
             val args = Bundle()
             args.putString(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
-            args.putString(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE, attributeLocalId)
+            args.putString(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE, fieldLocalId)
             args.putString(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
 
             val instance = AttributeEditDialogFragment()
@@ -56,14 +56,14 @@ class AttributeEditDialogFragment : DialogFragment() {
     }
 
     interface Listener {
-        fun onOkAttributeEditDialog(changed: Boolean, value: Any?, trackerId: String, attributeLocalId: String, itemId: String?)
+        fun onOkAttributeEditDialog(changed: Boolean, value: Any?, trackerId: String, fieldLocalId: String, itemId: String?)
     }
 
     private lateinit var container: LockableFrameLayout
     private lateinit var progressBar: View
 
     private var titleView: TextView? = null
-    private var valueView: AAttributeInputView<out Any>? = null
+    private var valueView: AFieldInputView<out Any>? = null
 
     private val listeners = HashSet<Listener>()
 
@@ -79,7 +79,7 @@ class AttributeEditDialogFragment : DialogFragment() {
     lateinit var dbManager: BackendDbManager
 
     @Inject
-    lateinit var attributeViewFActoryManager: Lazy<AttributeViewFactoryManager>
+    lateinit var fieldViewFactoryManager: Lazy<OTFieldViewFactoryManager>
 
     private val subscriptions = CompositeDisposable()
 
@@ -103,10 +103,10 @@ class AttributeEditDialogFragment : DialogFragment() {
         val arguments = this.arguments
         if (arguments != null) {
             val trackerId = arguments.getString(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
-            val attributeLocalId = arguments.getString(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE)
+            val fieldLocalId = arguments.getString(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE)
             val itemId = arguments.getString(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM)
 
-            viewModel.init(trackerId, itemId, attributeLocalId)
+            viewModel.init(trackerId, itemId, fieldLocalId)
         }
     }
 
@@ -133,7 +133,7 @@ class AttributeEditDialogFragment : DialogFragment() {
                                     if (viewModel.initialized) {
                                         changed = viewModel.originalValue != viewModel.frontalItemValue.value?.datum
                                         for (listener in listeners) {
-                                            listener.onOkAttributeEditDialog(changed, value, viewModel.trackerId, viewModel.attributeLocalId, viewModel.itemId)
+                                            listener.onOkAttributeEditDialog(changed, value, viewModel.trackerId, viewModel.fieldLocalId, viewModel.itemId)
                                         }
                                     }
 
@@ -173,7 +173,7 @@ class AttributeEditDialogFragment : DialogFragment() {
 
         subscriptions.add(
                 viewModel.onInformationMounted.subscribe {
-                    println("item edit dialog: loaded attribute and item")
+                    println("item edit dialog: loaded field and item")
                     this.valueView = viewModel.makeItemView(requireActivity(), this.valueView)
                     if (valueView != null) {
                         valueView?.onCreate(savedInstanceState)
@@ -252,9 +252,9 @@ class AttributeEditDialogFragment : DialogFragment() {
         lateinit var trackerId: String
             private set
         private lateinit var item: OTItemDAO
-        private lateinit var attribute: OTAttributeDAO
+        private lateinit var field: OTFieldDAO
 
-        lateinit var attributeLocalId: String
+        lateinit var fieldLocalId: String
             private set
         lateinit var itemId: String
             private set
@@ -271,17 +271,17 @@ class AttributeEditDialogFragment : DialogFragment() {
 
         val attributeName = BehaviorSubject.create<String>()
 
-        fun makeItemView(context: Context, originalView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
+        fun makeItemView(context: Context, originalView: AFieldInputView<out Any>?): AFieldInputView<out Any> {
             val view = (context.applicationContext as OTAndroidApp).applicationComponent
-                    .getAttributeViewFactoryManager().get(attribute.type).getInputView(context, false, attribute, originalView)
-            view.boundAttributeObjectId = attribute._id
+                    .getAttributeViewFactoryManager().get(field.type).getInputView(context, false, field, originalView)
+            view.boundAttributeObjectId = field._id
             return view
         }
 
-        fun init(trackerId: String, itemId: String, attributeLocalId: String) {
+        fun init(trackerId: String, itemId: String, fieldLocalId: String) {
             if (!initialized) {
                 this.trackerId = trackerId
-                this.attributeLocalId = attributeLocalId
+                this.fieldLocalId = fieldLocalId
                 this.itemId = itemId
                 val itemObservable = dbManager.get()
                         .makeItemsQuery(trackerId, null, null, realm)
@@ -290,25 +290,25 @@ class AttributeEditDialogFragment : DialogFragment() {
                         .firstOrError()
                         .doOnSuccess { this.item = it }
 
-                val attributeObservable = realm.where(OTAttributeDAO::class.java).equalTo("trackerId", trackerId).equalTo("localId", attributeLocalId)
+                val attributeObservable = realm.where(OTFieldDAO::class.java).equalTo("trackerId", trackerId).equalTo("localId", fieldLocalId)
                         .findFirstAsync()
-                        .asFlowable<OTAttributeDAO>().filter { it.isValid && it.isLoaded }
+                        .asFlowable<OTFieldDAO>().filter { it.isValid && it.isLoaded }
                         .firstOrError()
                         .doOnSuccess {
-                            this.attribute = it
+                            this.field = it
                             attributeName.onNextIfDifferAndNotNull(it.name)
                         }
 
                 loadingSubscription.set(Single.zip(listOf(attributeObservable, itemObservable)) { array ->
-                    println("item edit dialog: loaded attribute and item (zip)")
-                    val attribute = array[0] as OTAttributeDAO
+                    println("item edit dialog: loaded field and item (zip)")
+                    val attribute = array[0] as OTFieldDAO
                     val item = array[1] as OTItemDAO
                     Pair(attribute, item)
                 }.subscribe { (attr, item) ->
                     initialized = true
-                    this.attribute = attr
+                    this.field = attr
                     this.item = item
-                    originalValue = item.getValueOf(attributeLocalId)
+                    originalValue = item.getValueOf(fieldLocalId)
                     frontalItemValue.onNext(Nullable(originalValue))
 
                     onInformationMounted.onNext(attr.type)

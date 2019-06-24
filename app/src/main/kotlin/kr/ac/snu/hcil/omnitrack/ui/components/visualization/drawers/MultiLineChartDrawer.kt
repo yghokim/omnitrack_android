@@ -82,7 +82,7 @@ class MultiLineChartDrawer(context: Context) : ATimelineChartDrawer(context) {
             if (model is CompoundAttributeChartModel) {
                 legend.entries.clear()
                 val colorPalette = ColorHelper.getTrackerColorPalette(context)
-                for (attr in (model as CompoundAttributeChartModel).attributes.withIndex()) {
+                for (attr in (model as CompoundAttributeChartModel).fields.withIndex()) {
                     legend.entries.add(
                             Pair(attr.value.name, colorPalette[attr.index % colorPalette.size])
                     )

@@ -13,10 +13,10 @@ import kr.ac.snu.hcil.android.common.onNextIfDifferAndNotNull
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
-import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
-import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimestampSorter
+import kr.ac.snu.hcil.omnitrack.core.fields.logics.ItemComparator
+import kr.ac.snu.hcil.omnitrack.core.fields.logics.TimestampSorter
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.flags.F
@@ -42,7 +42,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
         private set
 
     private lateinit var managedTrackerDao: OTTrackerDAO
-    private lateinit var managedAttributeList: RealmResults<OTAttributeDAO>
+    private lateinit var managedFieldList: RealmResults<OTFieldDAO>
 
     val trackerId: String get() = trackerDao._id!!
 
@@ -55,10 +55,10 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
             }
         }
 
-    lateinit var attributes: List<OTAttributeDAO>
+    lateinit var fields: List<OTFieldDAO>
         private set
     //localKey / Type
-    val onSchemaChanged = PublishSubject.create<List<OTAttributeDAO>>()
+    val onSchemaChanged = PublishSubject.create<List<OTFieldDAO>>()
 
     val sorterSetObservable = BehaviorSubject.create<List<ItemComparator>>()
     private val currentSorterSet = ArrayList<ItemComparator>()
@@ -104,9 +104,9 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
             managedTrackerDao.addChangeListener<OTTrackerDAO> { snapshot ->
                 println("tracker db changed in background")
             }
-            managedAttributeList = dbManager.get().getAttributeListQuery(trackerId, realm).findAllAsync()
-            managedAttributeList.addChangeListener { snapshot, changeSet ->
-                println("tracker attribute list db changed in background")
+            managedFieldList = dbManager.get().getAttributeListQuery(trackerId, realm).findAllAsync()
+            managedFieldList.addChangeListener { snapshot, changeSet ->
+                println("tracker field list db changed in background")
             }
 
             refreshTracker(realm.copyFromRealm(dao))
@@ -117,17 +117,17 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
         this._isItemModificationAllowed = null
         this.trackerDao = trackerDao
 
-        this.attributes = trackerDao.attributes.asSequence().filter { it.isHidden == false && it.isInTrashcan == false }.toList()
+        this.fields = trackerDao.fields.asSequence().filter { it.isHidden == false && it.isInTrashcan == false }.toList()
         trackerName = trackerDao.name
 
         currentSorterSet.clear()
         currentSorterSet.add(TimestampSorter(getApplication()))
-        attributes.forEach {
+        fields.forEach {
             currentSorterSet += it.getHelper(getApplication()).getSupportedSorters(it)
         }
 
         sorterSetObservable.onNext(currentSorterSet)
-        onSchemaChanged.onNext(attributes)
+        onSchemaChanged.onNext(fields)
 
         currentItemQueryResults?.removeAllChangeListeners()
         currentItemQueryResults = dbManager.get()
@@ -190,7 +190,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
 
         private var _objectId: String? = null
 
-        fun getItemValueOf(attributeLocalId: String): Any? = itemDao.getValueOf(attributeLocalId)
+        fun getItemValueOf(fieldLocalId: String): Any? = itemDao.getValueOf(fieldLocalId)
 
         val timestampObservable = BehaviorSubject.create<Long>()
         var timestamp: Long
@@ -232,10 +232,10 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
             isSynchronized = itemDao.synchronizedAt != null
         }
 
-        fun setValueOf(attributeLocalId: String, serializedValue: String?) {
+        fun setValueOf(fieldLocalId: String, serializedValue: String?) {
             realm.executeTransaction {
                 itemDao.synchronizedAt = null
-                itemDao.setValueOf(attributeLocalId, serializedValue)
+                itemDao.setValueOf(fieldLocalId, serializedValue)
             }
         }
 

@@ -8,7 +8,7 @@ import kr.ac.snu.hcil.android.common.isNumericPrimitive
 import kr.ac.snu.hcil.android.common.toBigDecimal
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.CompoundAttributeChartModel
@@ -23,8 +23,8 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-08.
  */
-class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent: OTTrackerDAO, realm: Realm, val context: Context)
-    : CompoundAttributeChartModel<ILineChartOnTime.TimeSeriesTrendData>(attributes, parent, realm), ILineChartOnTime, INativeChartModel {
+class TimelineComparisonLineChartModel(fields: List<OTFieldDAO>, parent: OTTrackerDAO, realm: Realm, val context: Context)
+    : CompoundAttributeChartModel<ILineChartOnTime.TimeSeriesTrendData>(fields, parent, realm), ILineChartOnTime, INativeChartModel {
 
     override val name: String = context.resources.getString(R.string.msg_vis_numeric_line_timeline_title)
 
@@ -52,7 +52,7 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
             val itemBinCache = ArrayList<OTItemDAO>()
 
             val attrPivotedPoints = HashMap<String, MutableList<Pair<Long, BigDecimal>>>()
-            attributes.forEach {
+            fields.forEach {
                 attrPivotedPoints[it.localId] = ArrayList()
             }
 
@@ -79,7 +79,7 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
                 }
 
 
-                for (attribute in attributes) {
+                for (attribute in fields) {
                     values.clear()
 
                     var count = 0

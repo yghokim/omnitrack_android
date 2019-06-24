@@ -31,8 +31,8 @@ open class OTItemBuilderDAO : RealmObject() {
 
     var serializedMetadata: String? = null
 
-    fun setValue(attributeLocalId: String, value: AnyValueWithTimestamp?) {
-        val match = data.find { it.attributeLocalId == attributeLocalId }
+    fun setValue(fieldLocalId: String, value: AnyValueWithTimestamp?) {
+        val match = data.find { it.fieldLocalId == fieldLocalId }
         if (match != null) {
             if (value == null) {
                 if (match.isManaged)
@@ -45,7 +45,7 @@ open class OTItemBuilderDAO : RealmObject() {
         } else {
             if (value != null) {
                 val newEntryDao = OTItemBuilderFieldValueEntry()
-                newEntryDao.attributeLocalId = attributeLocalId
+                newEntryDao.fieldLocalId = fieldLocalId
                 newEntryDao.serializedValue = value.value?.let { TypeStringSerializationHelper.serialize(it) }
                 newEntryDao.timestamp = value.timestamp ?: 0
                 data.add(newEntryDao)
@@ -58,7 +58,7 @@ open class OTItemBuilderFieldValueEntry : RealmObject() {
     @PrimaryKey
     var id: Long = -1
 
-    var attributeLocalId: String? = null
+    var fieldLocalId: String? = null
     var serializedValue: String? = null
     var timestamp: Long = System.currentTimeMillis()
 }

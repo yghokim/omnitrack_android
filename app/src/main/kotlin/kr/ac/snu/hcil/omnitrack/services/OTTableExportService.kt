@@ -26,7 +26,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
-import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTFileInvolvedFieldHelper
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
@@ -222,7 +222,7 @@ class OTTableExportService : WakefulService(TAG) {
             subscriptions.add(
                     Single.defer<Boolean> {
                         val tracker = dbManager.get().getUnManagedTrackerDao(trackerId, realm)
-                        val attributes = tracker?.attributes?.filter { it.isHidden == false && it.isInTrashcan == false }
+                        val attributes = tracker?.fields?.filter { it.isHidden == false && it.isInTrashcan == false }
                                 ?: emptyList()
                         loadedTracker = tracker
                         if (tracker == null) {
@@ -271,8 +271,8 @@ class OTTableExportService : WakefulService(TAG) {
                                 }
 
                                 val storeObservables = ArrayList<Single<Uri>>()
-                                attributes.filter { it.getHelper(this).isExternalFile(it) && it.getHelper(this) is OTFileInvolvedAttributeHelper }.forEach { attr ->
-                                    val helper = attr.getHelper(this) as OTFileInvolvedAttributeHelper
+                                attributes.filter { it.getHelper(this).isExternalFile(it) && it.getHelper(this) is OTFileInvolvedFieldHelper }.forEach { attr ->
+                                    val helper = attr.getHelper(this) as OTFileInvolvedFieldHelper
                                     items.withIndex().forEach { itemWithIndex ->
                                         val itemValue = itemWithIndex.value.getValueOf(attr.localId)
                                         if (itemValue != null && helper.isValueContainingFileInfo(attr, itemValue)) {

@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 
 class OTUnSupportedDummyService(context: Context, pref: SharedPreferences) : OTExternalService(context, pref, "UnSupported", 0) {
@@ -64,12 +64,12 @@ class OTUnSupportedDummyService(context: Context, pref: SharedPreferences) : OTE
         override val nameResourceId: Int = R.string.msg_external_service_unsupported_measure
         override val descResourceId: Int = 0
 
-        override fun isAvailableToRequestValue(attribute: OTAttributeDAO, invalidMessages: MutableList<CharSequence>?): Boolean {
+        override fun isAvailableToRequestValue(field: OTFieldDAO, invalidMessages: MutableList<CharSequence>?): Boolean {
             invalidMessages?.add(context.getString(R.string.msg_external_service_unsupported_measure))
             return false
         }
 
-        override fun makeAvailabilityCheckObservable(attribute: OTAttributeDAO): Observable<Pair<Boolean, List<CharSequence>?>> {
+        override fun makeAvailabilityCheckObservable(field: OTFieldDAO): Observable<Pair<Boolean, List<CharSequence>?>> {
             return Observable.just(Pair(false, listOf(context.getString(R.string.msg_external_service_unsupported_measure))))
         }
 

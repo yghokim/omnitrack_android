@@ -114,9 +114,13 @@ android {
 
     applicationVariants.all { variant ->
         if (variant.name.toLowerCase().contains("minapi") && variant.name.toLowerCase().contains("release")) {
-            variant.generateBuildConfig.dependsOn("refreshVersionsByIncreasingVersionCode")
+            variant.generateBuildConfigProvider.configure{
+                it.dependsOn("refreshVersionsByIncreasingVersionCode")
+            }
         } else
-            variant.generateBuildConfig.dependsOn("refreshVersionsNotRelease")
+            variant.generateBuildConfigProvider.configure{
+                it.dependsOn("refreshVersionsNotRelease")
+            }
     }
 
     dataBinding.enabled = false
@@ -321,7 +325,7 @@ dependencies {
     implementation 'us.feras.mdv:markdownview:1.1.0'
     implementation 'com.github.tbruyelle:rxpermissions:0.10.2' //no androidx
     implementation 'com.patloew.rxlocation:rxlocation:1.0.5' //no androidx
-    implementation 'uk.co.samuelwall:material-tap-target-prompt:2.14.0' //no androidx
+    implementation 'uk.co.samuelwall:material-tap-target-prompt:2.15.0' //no androidx
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.3'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.3'
     debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.3'

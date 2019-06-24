@@ -5,7 +5,7 @@ import io.reactivex.Observable
 import kr.ac.snu.hcil.android.common.TextHelper
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 
 /**
  * Created by Young-Ho Kim on 16. 7. 28
@@ -20,15 +20,15 @@ abstract class OTServiceMeasureFactory(context: Context, val parentService: OTEx
         "${parentService.identifier}_$factoryTypeName"
     }
 
-    override fun makeAvailabilityCheckObservable(attribute: OTAttributeDAO): Observable<Pair<Boolean, List<CharSequence>?>> {
+    override fun makeAvailabilityCheckObservable(field: OTFieldDAO): Observable<Pair<Boolean, List<CharSequence>?>> {
         return parentService.onStateChanged.map { state ->
             val invalidMessages = ArrayList<CharSequence>()
-            val valid = isAvailableToRequestValue(attribute, invalidMessages)
+            val valid = isAvailableToRequestValue(field, invalidMessages)
             return@map Pair(valid, invalidMessages)
         }
     }
 
-    override fun isAvailableToRequestValue(attribute: OTAttributeDAO, invalidMessages: MutableList<CharSequence>?): Boolean {
+    override fun isAvailableToRequestValue(field: OTFieldDAO, invalidMessages: MutableList<CharSequence>?): Boolean {
         if (parentService.state == OTExternalService.ServiceState.ACTIVATED) {
             return true
         } else {

@@ -231,7 +231,7 @@
                 android:value=".ui.pages.home.HomeActivity" />
         </activity>
         <activity
-            android:name=".ui.pages.attribute.AttributeDetailActivity"
+            android:name=".ui.pages.field.FieldDetailActivity"
             android:label="@string/title_activity_attribute_detail" />
 
         <activity

@@ -51,7 +51,7 @@ class ItemTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerCompa
                         {
                             when(reader.nextName())
                             {
-                                "attrLocalId" -> key = reader.nextString()
+                                "fieldLocalId" -> key = reader.nextString()
                                 "sVal" -> {
                                     if (reader.peek() == JsonToken.NULL) {
                                         reader.skipValue()
@@ -101,7 +101,7 @@ class ItemTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerCompa
         for (entry in value.fieldValueEntries)
         {
             writer.beginObject()
-            writer.name("attrLocalId").value(entry.key)
+            writer.name("fieldLocalId").value(entry.key)
             writer.name("sVal").value(entry.value)
             writer.endObject()
         }
@@ -135,7 +135,7 @@ class ItemTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerCompa
                         //synchronize
                         jsonList.forEach { entryJson ->
                             val entryJsonObj = entryJson.asJsonObject
-                            val matchedDao = copiedEntries.find { it.key == entryJsonObj.getStringCompat("attrLocalId") }
+                            val matchedDao = copiedEntries.find { it.key == entryJsonObj.getStringCompat("fieldLocalId") }
                             if (matchedDao != null) {
                                 //update entry
                                 matchedDao.value = entryJsonObj.getStringCompat("sVal")
@@ -144,13 +144,13 @@ class ItemTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerCompa
                             } else {
                                 //add new entry
                                 val newEntry = applyTo.realm.createObject(OTItemValueEntryDAO::class.java, UUID.randomUUID().toString())
-                                newEntry.key = entryJsonObj.getStringCompat("attrLocalId") ?: ""
+                                newEntry.key = entryJsonObj.getStringCompat("fieldLocalId") ?: ""
                                 newEntry.value = entryJsonObj.getStringCompat("sVal")
                                 applyTo.fieldValueEntries.add(newEntry)
                             }
                         }
 
-                        //deal with dangling attributes
+                        //deal with dangling fields
                         copiedEntries.forEach {
                             it.deleteFromRealm()
                         }

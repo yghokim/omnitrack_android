@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.triggers.measures
 import android.content.Context
 import io.reactivex.Observable
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 
@@ -23,11 +23,11 @@ class OTDataDrivenTriggerMetadataMeasureLogicImpl(context: Context) : OTItemMeta
     }
 
 
-    fun makeAvailabilityCheckObservable(attribute: OTAttributeDAO): Observable<Pair<Boolean, List<CharSequence>?>> {
-        if (attribute.trackerId != null) {
+    fun makeAvailabilityCheckObservable(field: OTFieldDAO): Observable<Pair<Boolean, List<CharSequence>?>> {
+        if (field.trackerId != null) {
             return Observable.defer {
                 val realm = realmProvider.get()
-                val tracker = dbManager.get().getTrackerQueryWithId(attribute.trackerId!!, realm).findFirst()
+                val tracker = dbManager.get().getTrackerQueryWithId(field.trackerId!!, realm).findFirst()
                 if (tracker != null) {
                     return@defer tracker.liveTriggersQuery!!
                             .equalTo("conditionType", OTTriggerDAO.CONDITION_TYPE_DATA)

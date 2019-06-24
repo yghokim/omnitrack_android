@@ -15,7 +15,7 @@
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin">
 
-            <kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeConnectionViewSubHeader
+            <kr.ac.snu.hcil.omnitrack.ui.pages.field.FieldConnectionViewSubHeader
                 android:id="@+id/ui_header1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin">
 
-            <kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeConnectionViewSubHeader
+            <kr.ac.snu.hcil.omnitrack.ui.pages.field.FieldConnectionViewSubHeader
                 android:id="@+id/ui_header2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -87,7 +87,7 @@
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin">
 
-            <kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeConnectionViewSubHeader
+            <kr.ac.snu.hcil.omnitrack.ui.pages.field.AttributeConnectionViewSubHeader
                 android:id="@+id/ui_header1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -117,7 +117,7 @@
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin">
 
-            <kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeConnectionViewSubHeader
+            <kr.ac.snu.hcil.omnitrack.ui.pages.field.AttributeConnectionViewSubHeader
                 android:id="@+id/ui_header2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -156,7 +156,7 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin">
 
-        <kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeConnectionViewSubHeader
+        <kr.ac.snu.hcil.omnitrack.ui.pages.field.FieldConnectionViewSubHeader
             android:id="@+id/ui_header3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

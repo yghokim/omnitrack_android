@@ -7,7 +7,7 @@ import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.net.OAuth2Client
 import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
@@ -19,7 +19,7 @@ import java.util.*
  */
 class FitbitDistanceMeasureFactory(context: Context, parentService: FitbitService) : OTServiceMeasureFactory(context, parentService, "dist") {
 
-    override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
+    override fun getAttributeType() = OTFieldManager.TYPE_NUMBER
 
     override val isRangedQueryAvailable: Boolean = true
     override val minimumGranularity: OTTimeRangeQuery.Granularity? = OTTimeRangeQuery.Granularity.Minute

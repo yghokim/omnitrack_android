@@ -5,7 +5,7 @@ import com.google.gson.stream.JsonReader
 import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
@@ -18,7 +18,7 @@ class MisfitSleepMeasureFactory(context: Context, service: MisfitService) : OTSe
 
     override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
 
-    override fun getAttributeType(): Int = OTAttributeManager.TYPE_TIMESPAN
+    override fun getAttributeType(): Int = OTFieldManager.TYPE_TIMESPAN
 
     override val isRangedQueryAvailable: Boolean = true
     override val minimumGranularity: OTTimeRangeQuery.Granularity? = OTTimeRangeQuery.Granularity.Day

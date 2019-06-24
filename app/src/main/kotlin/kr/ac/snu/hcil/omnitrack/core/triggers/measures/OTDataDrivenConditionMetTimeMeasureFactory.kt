@@ -5,7 +5,7 @@ import com.google.gson.stream.JsonReader
 import io.reactivex.Observable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimePointMetadataMeasureFactory
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataDrivenTriggerManager
 
 class OTDataDrivenConditionMetTimeMeasureFactory(context: Context) : OTTimePointMetadataMeasureFactory(context, "dataDrivenConditionMetTime") {
@@ -14,8 +14,8 @@ class OTDataDrivenConditionMetTimeMeasureFactory(context: Context) : OTTimePoint
 
     override val metadataKey: String = OTDataDrivenTriggerManager.METADATA_KEY_TIMESTAMP
 
-    override fun isAvailableToRequestValue(attribute: OTAttributeDAO, invalidMessages: MutableList<CharSequence>?): Boolean {
-        return logicImpl.isAvailableToRequestValue(attribute, invalidMessages)
+    override fun isAvailableToRequestValue(field: OTFieldDAO, invalidMessages: MutableList<CharSequence>?): Boolean {
+        return logicImpl.isAvailableToRequestValue(field, invalidMessages)
     }
 
     override fun makeMeasure(): OTMeasure {
@@ -39,8 +39,8 @@ class OTDataDrivenConditionMetTimeMeasureFactory(context: Context) : OTTimePoint
     override val nameResourceId: Int = R.string.msg_trigger_data_measure_time_name
     override val descResourceId: Int = R.string.msg_trigger_data_measure_time_description
 
-    override fun makeAvailabilityCheckObservable(attribute: OTAttributeDAO): Observable<Pair<Boolean, List<CharSequence>?>> {
-        return logicImpl.makeAvailabilityCheckObservable(attribute)
+    override fun makeAvailabilityCheckObservable(field: OTFieldDAO): Observable<Pair<Boolean, List<CharSequence>?>> {
+        return logicImpl.makeAvailabilityCheckObservable(field)
     }
 
 }

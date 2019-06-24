@@ -50,7 +50,7 @@ class BackendDatabaseModule {
 
 @RealmModule(classes = [
         OTTrackerDAO::class,
-        OTAttributeDAO::class,
+        OTFieldDAO::class,
         OTTriggerDAO::class,
         OTItemDAO::class,
         OTItemValueEntryDAO::class,

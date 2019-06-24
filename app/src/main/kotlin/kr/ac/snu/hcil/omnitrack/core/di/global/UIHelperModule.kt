@@ -4,8 +4,8 @@ import android.content.Context
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactoryManager
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.OTFieldViewFactoryManager
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import javax.inject.Singleton
 
@@ -19,7 +19,7 @@ class UIHelperModule {
 
     @Provides
     @Singleton
-    fun provideAttributeViewFactoryManager(attributeManager: Lazy<OTAttributeManager>): AttributeViewFactoryManager {
-        return AttributeViewFactoryManager(attributeManager)
+    fun provideAttributeViewFactoryManager(fieldManager: Lazy<OTFieldManager>): OTFieldViewFactoryManager {
+        return OTFieldViewFactoryManager(fieldManager)
     }
 }

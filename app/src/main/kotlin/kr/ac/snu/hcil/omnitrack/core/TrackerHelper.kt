@@ -2,8 +2,8 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Context
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.ISingleNumberAttributeHelper
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.ISingleNumberFieldHelper
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.DailyCountChartModel
@@ -21,11 +21,11 @@ object TrackerHelper {
 
         val list = ArrayList<ChartModel<*>>()
 
-        val timePointAttributes = trackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan && it.type == OTAttributeManager.TYPE_TIME }
+        val timePointAttributes = trackerDao.fields.filter { !it.isHidden && !it.isInTrashcan && it.type == OTFieldManager.TYPE_TIME }
 
-        val timeSpanAttributes = trackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan && it.type == OTAttributeManager.TYPE_TIMESPAN }
+        val timeSpanAttributes = trackerDao.fields.filter { !it.isHidden && !it.isInTrashcan && it.type == OTFieldManager.TYPE_TIMESPAN }
 
-        val singleNumberAttributes = trackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan && it.getHelper(context) is ISingleNumberAttributeHelper }
+        val singleNumberAttributes = trackerDao.fields.filter { !it.isHidden && !it.isInTrashcan && it.getHelper(context) is ISingleNumberFieldHelper }
 
         //generate tracker-level charts
 
@@ -41,7 +41,7 @@ object TrackerHelper {
 
         //add line timeline if numeric variables exist
         /*
-        val numberAttrs = trackerDao.makeAttributesQuery(false,false).equalTo("type", OTAttributeManager.TYPE_NUMBER).findAll()
+        val numberAttrs = trackerDao.makeAttributesQuery(false,false).equalTo("type", OTFieldManager.TYPE_NUMBER).findAll()
         if (numberAttrs.isNotEmpty()) {
             list.add(TimelineComparisonLineChartModel(numberAttrs, trackerDao, realm))
         }*/
@@ -53,8 +53,8 @@ object TrackerHelper {
             }
         }
 
-        for (attribute in trackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan }) {
-            list.addAll(attribute.getHelper(context).makeRecommendedChartModels(attribute, realm))
+        for (field in trackerDao.fields.filter { !it.isHidden && !it.isInTrashcan }) {
+            list.addAll(field.getHelper(context).makeRecommendedChartModels(field, realm))
         }
 
         return list.toTypedArray()

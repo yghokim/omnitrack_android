@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="attribute" />
+        android:text="field" />
 
     <TextView
         android:id="@+id/ui_value_view_replace"

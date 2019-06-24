@@ -16,11 +16,11 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.analytics.OTUsageLoggingManager
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAudioRecordAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTImageAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTAudioRecordFieldHelper
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTFileInvolvedFieldHelper
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTImageFieldHelper
+import kr.ac.snu.hcil.omnitrack.core.fields.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions.RealmLazyFunction
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
@@ -53,16 +53,16 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioItemListView
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactoryManager
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AudioRecordInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.OTFieldViewFactoryManager
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.AudioRecordInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.ChoiceInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.ImageInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.MultiLineChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.pages.SendReportActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailViewModel
-import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.pages.SourceSelectionPage
+import kr.ac.snu.hcil.omnitrack.ui.pages.field.FieldDetailActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.field.FieldDetailViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.field.wizard.pages.SourceSelectionPage
 import kr.ac.snu.hcil.omnitrack.ui.pages.auth.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.auth.SignUpActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.auth.SignUpCredentialSlideFragment
@@ -143,7 +143,7 @@ interface ApplicationComponent {
 
     fun getTriggerSystemManager(): Lazy<OTTriggerSystemManager>
 
-    fun getAttributeViewFactoryManager(): AttributeViewFactoryManager
+    fun getAttributeViewFactoryManager(): OTFieldViewFactoryManager
 
 
     @ServerFullSync
@@ -195,7 +195,7 @@ interface ApplicationComponent {
 
     fun getSyncManager(): OTSyncManager
 
-    fun getAttributeManager(): OTAttributeManager
+    fun getAttributeManager(): OTFieldManager
     fun getPropertyManager(): OTPropertyManager
 
     fun inject(application: OTApp)
@@ -243,9 +243,9 @@ interface ApplicationComponent {
 
     fun inject(service: OTTableExportService)
 
-    fun inject(helper: OTFileInvolvedAttributeHelper)
-    fun inject(helper: OTAudioRecordAttributeHelper)
-    fun inject(helper: OTImageAttributeHelper)
+    fun inject(helper: OTFileInvolvedFieldHelper)
+    fun inject(helper: OTAudioRecordFieldHelper)
+    fun inject(helper: OTImageFieldHelper)
 
     fun inject(chartModel: LoggingHeatMapModel)
     fun inject(chartModel: DailyCountChartModel)
@@ -274,13 +274,13 @@ interface ApplicationComponent {
 
     fun inject(viewModel: TimeSeriesPlotModel)
     fun inject(viewModel: DurationHeatMapModel)
-    fun inject(viewModel: AttributeDetailViewModel)
+    fun inject(viewModel: FieldDetailViewModel)
 
     fun inject(viewModel: PackageExportViewModel)
 
     fun inject(activity: ItemBrowserActivity)
     fun inject(activity: NewItemActivity)
-    fun inject(activity: AttributeDetailActivity)
+    fun inject(activity: FieldDetailActivity)
 
     fun inject(fragment: TrackerDetailStructureTabFragment)
 

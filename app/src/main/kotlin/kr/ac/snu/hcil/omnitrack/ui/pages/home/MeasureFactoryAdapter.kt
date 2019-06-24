@@ -102,7 +102,7 @@ class MeasureFactoryAdapter(private val context: Context) : RecyclerView.Adapter
             override fun bind(tracker: OTTracker) {
                //TODO migrate this logic
                 super.bind(tracker.)
-                val numConnectedAttributes = tracker.attributes.filter { it.isMeasureFactoryConnected(measureFactory) }.size
+                val numConnectedAttributes = tracker.fields.filter { it.isMeasureFactoryConnected(measureFactory) }.size
                 if (numConnectedAttributes > 0) {
                     messageView.visibility = View.VISIBLE
                     messageView.text = String.format(itemView.context.resources.getString(R.string.msg_sentence_field_already_connected_to_measure),

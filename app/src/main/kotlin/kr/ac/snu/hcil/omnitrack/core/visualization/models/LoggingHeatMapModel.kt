@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.android.common.time.getHourOfDay
 import kr.ac.snu.hcil.android.common.time.setHourOfDay
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.types.TimePoint
@@ -34,12 +34,12 @@ import java.util.*
  */
 
 
-class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, val context: Context, timeAttribute: OTAttributeDAO? = null) : TrackerChartModel<ITimeBinnedHeatMap.CounterVector>(tracker, realm), ITimeBinnedHeatMap, INativeChartModel {
+class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, val context: Context, timeField: OTFieldDAO? = null) : TrackerChartModel<ITimeBinnedHeatMap.CounterVector>(tracker, realm), ITimeBinnedHeatMap, INativeChartModel {
 
     val hoursInYBin = 2
 
-    val timeAttributeLocalId: String? = timeAttribute?.localId
-    val timeAttributeName: String? = timeAttribute?.name
+    val timeAttributeLocalId: String? = timeField?.localId
+    val timeAttributeName: String? = timeField?.name
 
     init {
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)

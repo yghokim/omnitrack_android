@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- These top three attributes are not accessible to library users -->
+    <!-- These top three fields are not accessible to library users -->
     <attr name="md_divider" format="color" />
 
-    <!-- Accessible global theming attributes -->
+    <!-- Accessible global theming fields -->
     <attr name="md_dark_theme" format="boolean" />
     <attr name="md_background_color" format="color" />
 

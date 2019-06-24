@@ -14,7 +14,7 @@ import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
@@ -90,7 +90,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
                 currentAttributeViewModelList.forEach { it.unregister() }
                 currentAttributeViewModelList.clear()
 
-                currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.asSequence().filter { !it.isHidden && !it.isInTrashcan }.map { AttributeInputViewModel(it) }.toList())
+                currentAttributeViewModelList.addAll(unManagedTrackerDao.fields.asSequence().filter { !it.isHidden && !it.isInTrashcan }.map { AttributeInputViewModel(it) }.toList())
                 attributeViewModelListObservable.onNext(currentAttributeViewModelList)
 
                 this.checkAllInputCompleteAndReturn()
@@ -114,10 +114,10 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
     }
 
-    inner class AttributeInputViewModel(unmanagedAttributeDao: OTAttributeDAO) : IReadonlyObjectId {
-        override val _id: String? = unmanagedAttributeDao._id
+    inner class AttributeInputViewModel(unmanagedFieldDao: OTFieldDAO) : IReadonlyObjectId {
+        override val _id: String? = unmanagedFieldDao._id
 
-        val attributeLocalId: String = unmanagedAttributeDao.localId
+        val fieldLocalId: String = unmanagedFieldDao.localId
         val columnNameObservable: Observable<String> = BehaviorSubject.createDefault<String>("")
         val isRequiredObservable: Observable<Boolean> = BehaviorSubject.create<Boolean>()
         val stateObservable: Observable<OTItemBuilderWrapperBase.EAttributeValueState> = BehaviorSubject.create<OTItemBuilderWrapperBase.EAttributeValueState>()
@@ -141,7 +141,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
             get() = (validationObservable as BehaviorSubject).value ?: true
             internal set(value) {
                 if ((validationObservable as BehaviorSubject).value != value) {
-                    println("validation changed: $attributeLocalId, $value")
+                    println("validation changed: $fieldLocalId, $value")
                     validationObservable.onNext(value)
                 }
             }
@@ -165,18 +165,18 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
         private val subscriptions = CompositeDisposable()
 
-        val onAttributeChanged = PublishSubject.create<OTAttributeDAO>()
+        val onAttributeChanged = PublishSubject.create<OTFieldDAO>()
 
-        val attributeDAO: OTAttributeDAO = realm.where(OTAttributeDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, unmanagedAttributeDao._id).findFirst()!!
+        val fieldDAO: OTFieldDAO = realm.where(OTFieldDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, unmanagedFieldDao._id).findFirst()!!
 
         init {
 
-            attributeDAO.addChangeListener<OTAttributeDAO> { newAttributeDao ->
+            fieldDAO.addChangeListener<OTFieldDAO> { newAttributeDao ->
                 onAttributeChanged.onNext(newAttributeDao)
             }
 
-            (columnNameObservable as BehaviorSubject<String>).onNext(attributeDAO.name)
-            (isRequiredObservable as BehaviorSubject<Boolean>).onNext(attributeDAO.isRequired)
+            (columnNameObservable as BehaviorSubject<String>).onNext(fieldDAO.name)
+            (isRequiredObservable as BehaviorSubject<Boolean>).onNext(fieldDAO.isRequired)
             validateValue()
         }
 
@@ -192,15 +192,15 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
     abstract fun isViewModelsDirty(): Boolean
 
-    protected open fun setValueOfAttribute(attributeLocalId: String, valueWithTimestamp: AnyValueWithTimestamp) {
-        val match = currentAttributeViewModelList.find { it.attributeLocalId == attributeLocalId }
+    protected open fun setValueOfAttribute(fieldLocalId: String, valueWithTimestamp: AnyValueWithTimestamp) {
+        val match = currentAttributeViewModelList.find { it.fieldLocalId == fieldLocalId }
         if (match != null) {
             match.value = valueWithTimestamp
         }
     }
 
-    override fun onAttributeStateChanged(attributeLocalId: String, state: OTItemBuilderWrapperBase.EAttributeValueState) {
-        val match = currentAttributeViewModelList.find { it.attributeLocalId == attributeLocalId }
+    override fun onAttributeStateChanged(fieldLocalId: String, state: OTItemBuilderWrapperBase.EAttributeValueState) {
+        val match = currentAttributeViewModelList.find { it.fieldLocalId == fieldLocalId }
         if (match != null) {
             match.state = state
         }

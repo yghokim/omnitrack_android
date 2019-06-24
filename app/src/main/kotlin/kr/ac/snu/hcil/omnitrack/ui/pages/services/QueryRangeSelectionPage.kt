@@ -5,7 +5,7 @@ import android.view.View
 import kr.ac.snu.hcil.android.common.view.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.pages.SourceConfigurationPanel
+import kr.ac.snu.hcil.omnitrack.ui.pages.field.wizard.pages.SourceConfigurationPanel
 
 /**
  * Created by junhoe on 2017. 11. 6..

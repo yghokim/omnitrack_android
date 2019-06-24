@@ -113,8 +113,8 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
             if (savedInstanceState == null) {
                 isBusy = true
                 subscriptions.add(
-                        this.builderWrapper.makeAutoCompleteObservable(realmProvider, this).subscribe({ (attrLocalId, valueWithTimestamp) ->
-                            setValueOfAttribute(attrLocalId, valueWithTimestamp)
+                        this.builderWrapper.makeAutoCompleteObservable(realmProvider, this).subscribe({ (fieldLocalId, valueWithTimestamp) ->
+                            setValueOfAttribute(fieldLocalId, valueWithTimestamp)
                         }, {
 
                         }, {
@@ -128,14 +128,14 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         }
     }
 
-    override fun setValueOfAttribute(attributeLocalId: String, valueWithTimestamp: AnyValueWithTimestamp) {
-        itemBuilderDao.setValue(attributeLocalId, valueWithTimestamp)
-        super.setValueOfAttribute(attributeLocalId, valueWithTimestamp)
+    override fun setValueOfAttribute(fieldLocalId: String, valueWithTimestamp: AnyValueWithTimestamp) {
+        itemBuilderDao.setValue(fieldLocalId, valueWithTimestamp)
+        super.setValueOfAttribute(fieldLocalId, valueWithTimestamp)
     }
 
     override fun isViewModelsDirty(): Boolean {
         for (viewModel in currentAttributeViewModelList) {
-            val match = itemBuilderDao.data.find { it.attributeLocalId == viewModel.attributeLocalId }
+            val match = itemBuilderDao.data.find { it.fieldLocalId == viewModel.fieldLocalId }
             if (match != null) {
                 val vmValue = viewModel.value
                 if (vmValue == null) {
@@ -155,7 +155,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         realm.executeTransaction {
             currentAttributeViewModelList.forEach { attrViewModel ->
                 val value = attrViewModel.value
-                itemBuilderDao.setValue(attrViewModel.attributeLocalId, value)
+                itemBuilderDao.setValue(attrViewModel.fieldLocalId, value)
             }
         }
     }
