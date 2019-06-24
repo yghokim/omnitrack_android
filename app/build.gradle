@@ -114,13 +114,9 @@ android {
 
     applicationVariants.all { variant ->
         if (variant.name.toLowerCase().contains("minapi") && variant.name.toLowerCase().contains("release")) {
-            variant.generateBuildConfigProvider.configure{
-                it.dependsOn("refreshVersionsByIncreasingVersionCode")
-            }
+            variant.generateBuildConfig.dependsOn("refreshVersionsByIncreasingVersionCode")
         } else
-            variant.generateBuildConfigProvider.configure{
-                it.dependsOn("refreshVersionsNotRelease")
-            }
+            variant.generateBuildConfig.dependsOn("refreshVersionsNotRelease")
     }
 
     dataBinding.enabled = false
