@@ -14,7 +14,7 @@ import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
@@ -39,7 +39,7 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
     override val usedAPI: Api<out Api.ApiOptions.NotRequiredOptions> = Fitness.HISTORY_API
     override val usedScope: Scope = Fitness.SCOPE_ACTIVITY_READ
 
-    override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
+    override fun getAttributeType() = OTFieldManager.TYPE_NUMBER
 
     override fun makeMeasure(): OTMeasure {
         return Measure(this)

@@ -58,9 +58,9 @@ open class OTItemDAO : RealmObject() {
         return table
     }
 
-    fun setValueOf(attributeLocalId: String, serializedValue: String?): Boolean {
+    fun setValueOf(fieldLocalId: String, serializedValue: String?): Boolean {
 
-        val match = fieldValueEntries.find { it.key == attributeLocalId }
+        val match = fieldValueEntries.find { it.key == fieldLocalId }
         return if (match != null) {
             if (match.value != serializedValue) {
                 match.value = serializedValue
@@ -70,15 +70,15 @@ open class OTItemDAO : RealmObject() {
             fieldValueEntries.add(
                     OTItemValueEntryDAO().apply {
                         id = UUID.randomUUID().toString()
-                        key = attributeLocalId
+                        key = fieldLocalId
                         value = serializedValue
                     }
             )
         }
     }
 
-    fun getValueOf(attributeLocalId: String): Any? {
-        return fieldValueEntries.find { it.key == attributeLocalId }?.value?.let { TypeStringSerializationHelper.deserialize(it) }
+    fun getValueOf(fieldLocalId: String): Any? {
+        return fieldValueEntries.find { it.key == fieldLocalId }?.value?.let { TypeStringSerializationHelper.deserialize(it) }
     }
 }
 

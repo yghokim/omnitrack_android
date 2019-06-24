@@ -9,7 +9,7 @@ import androidx.core.content.res.ResourcesCompat
 import io.reactivex.disposables.Disposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 
 /**
  * Created by Young-Ho Kim on 2016-11-04.
@@ -38,7 +38,7 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : View.OnAttac
         connectionIndicatorView?.visibility = visibility
     }
 
-    fun onBind(attribute: OTAttributeDAO, connection: OTConnection?) {
+    fun onBind(field: OTFieldDAO, connection: OTConnection?) {
         println("Bind connection")
         if (connection != null) {
             val connectionSource = connection.source
@@ -56,7 +56,7 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : View.OnAttac
 
             /*
             connectionInvalidMessages?.clear()
-            if (connection.isAvailableToRequestValue(attribute, connectionInvalidMessages)) {
+            if (connection.isAvailableToRequestValue(field, connectionInvalidMessages)) {
                 connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorPointed, null))
                 connectionIndicatorErrorMark?.visibility = View.GONE
                 connectionIndicatorLinkIconView?.setImageResource(R.drawable.link)
@@ -70,7 +70,7 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : View.OnAttac
                 connectionAvailabilitySubscription?.dispose()
             }
 
-            connectionAvailabilitySubscription = connection.makeAvailabilityCheckObservable(attribute).subscribe { (valid, invalidMessages) ->
+            connectionAvailabilitySubscription = connection.makeAvailabilityCheckObservable(field).subscribe { (valid, invalidMessages) ->
                 if (valid) {
                     connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorPointed, null))
                     connectionIndicatorErrorMark?.visibility = View.GONE

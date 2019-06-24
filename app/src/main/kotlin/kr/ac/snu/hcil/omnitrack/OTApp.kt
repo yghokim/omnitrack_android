@@ -48,7 +48,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
 
         const val INTENT_EXTRA_OBJECT_ID_TRACKER = "trackerId"
         const val INTENT_EXTRA_OBJECT_ID_ATTRIBUTE = "attributeObjectId"
-        const val INTENT_EXTRA_LOCAL_ID_ATTRIBUTE = "attributeLocalId"
+        const val INTENT_EXTRA_LOCAL_ID_ATTRIBUTE = "fieldLocalId"
 
         const val INTENT_EXTRA_OBJECT_ID_TRACKER_ARRAY = "trackerIds"
 

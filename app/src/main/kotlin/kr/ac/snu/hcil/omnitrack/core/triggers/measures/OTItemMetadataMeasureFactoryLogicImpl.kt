@@ -7,7 +7,7 @@ import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import javax.inject.Inject
@@ -26,8 +26,8 @@ abstract class OTItemMetadataMeasureFactoryLogicImpl(protected val context: Cont
 
     protected abstract fun checkAvailability(tracker: OTTrackerDAO, invalidMessages: MutableList<CharSequence>?): Boolean
 
-    fun isAvailableToRequestValue(attribute: OTAttributeDAO, invalidMessages: MutableList<CharSequence>? = null): Boolean {
-        val trackerId = attribute.trackerId
+    fun isAvailableToRequestValue(field: OTFieldDAO, invalidMessages: MutableList<CharSequence>? = null): Boolean {
+        val trackerId = field.trackerId
         if (trackerId != null) {
             val realm = realmProvider.get()
             val tracker = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirst()

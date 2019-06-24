@@ -167,7 +167,7 @@ class NewItemActivity : AItemDetailActivity<NewItemCreationViewModel>(NewItemCre
         val needToStoreBuilder = if (viewModel.isValid) {
             if (viewModel.isViewModelsDirty()) {
                 true
-            } else currentAttributeViewModelList.any { it.attributeDAO.getHelper(this@NewItemActivity).isAttributeValueVolatile(it.attributeDAO) }
+            } else currentAttributeViewModelList.any { it.fieldDAO.getHelper(this@NewItemActivity).isAttributeValueVolatile(it.fieldDAO) }
         } else {
             false
         }

@@ -100,9 +100,9 @@ class OTUsageLoggingManager(val app: OTAndroidApp, val context: Context) : IEven
         logEvent(TRIGGER_FIRED, null, content, triggerFiredTime)
     }
 
-    override fun logAttributeChangeEvent(sub: String?, attributeLocalId: String, trackerId: String?, inject: ((JsonObject) -> Unit)?) {
+    override fun logAttributeChangeEvent(sub: String?, fieldLocalId: String, trackerId: String?, inject: ((JsonObject) -> Unit)?) {
         val content = jsonObject(
-                "localId" to attributeLocalId,
+                "localId" to fieldLocalId,
                 "tracker" to (trackerId ?: "unmanaged")
         )
 

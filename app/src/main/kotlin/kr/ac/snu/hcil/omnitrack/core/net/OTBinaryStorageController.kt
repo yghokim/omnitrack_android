@@ -39,8 +39,8 @@ class OTBinaryStorageController(
         WorkManager.getInstance().enqueueUniqueWork(OTBinaryUploadWorker.TAG, ExistingWorkPolicy.KEEP, uploadRequest.get())
     }
 
-    fun makeServerPath(userId: String, trackerId: String, itemId: String, attributeLocalId: String, fileIdentifier: String): String {
-        return core.makeServerPath(userId, trackerId, itemId, attributeLocalId, fileIdentifier)
+    fun makeServerPath(userId: String, trackerId: String, itemId: String, fieldLocalId: String, fileIdentifier: String): String {
+        return core.makeServerPath(userId, trackerId, itemId, fieldLocalId, fileIdentifier)
     }
 
     fun downloadFileTo(pathString: String, localUri: Uri): Single<Uri> {

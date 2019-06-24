@@ -154,12 +154,12 @@ class OTLocalMediaCacheManager(val context: Context, val authManager: Lazy<OTAut
         }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun replaceTemporalServerPath(oldServerPath: String, trackerId: String, itemId: String, attributeLocalId: String): String? {
+    fun replaceTemporalServerPath(oldServerPath: String, trackerId: String, itemId: String, fieldLocalId: String): String? {
 
         binaryStorageController.get().realmProvider.get().use { realm ->
             val entry = realm.where(LocalMediaCacheEntry::class.java).equalTo("serverPath", oldServerPath).findFirst()
             if (entry != null) {
-                val newServerPath = binaryStorageController.get().makeServerPath(authManager.get().userId!!, trackerId, itemId, attributeLocalId, "0")
+                val newServerPath = binaryStorageController.get().makeServerPath(authManager.get().userId!!, trackerId, itemId, fieldLocalId, "0")
                 realm.executeTransaction {
                     realm.where(LocalMediaCacheEntry::class.java).equalTo("serverPath", newServerPath).findAll().deleteAllFromRealm()
                     entry.serverPath = newServerPath

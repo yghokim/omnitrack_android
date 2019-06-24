@@ -60,7 +60,7 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
             if (value != null && value.value != null) {
                 valueArray.add(
                         jsonObject(
-                                "localId" to it.attributeLocalId,
+                                "localId" to it.fieldLocalId,
                                 "value" to TypeStringSerializationHelper.serialize(value.value!!),
                                 "timestamp" to value.timestamp
                         )
@@ -72,7 +72,7 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
 
     override fun isViewModelsDirty(): Boolean {
         for (viewModel in currentAttributeViewModelList) {
-            val match = originalUnmanagedItemDao.fieldValueEntries.find { it.key == viewModel.attributeLocalId }
+            val match = originalUnmanagedItemDao.fieldValueEntries.find { it.key == viewModel.fieldLocalId }
             if (match != null) {
                 val vmValue = viewModel.value
                 if (vmValue != null && match.value != null) {
@@ -94,9 +94,9 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
                     return@flatMapMaybe Maybe.defer {
                         val originalItemFieldKeys = originalUnmanagedItemDao.fieldValueEntries.asSequence().map { it.key }.toMutableList()
                         for (viewModel in currentAttributeViewModelList) {
-                            if (originalUnmanagedItemDao.setValueOf(viewModel.attributeLocalId, viewModel.value?.value?.let { TypeStringSerializationHelper.serialize(it) })) {
+                            if (originalUnmanagedItemDao.setValueOf(viewModel.fieldLocalId, viewModel.value?.value?.let { TypeStringSerializationHelper.serialize(it) })) {
                                 //changed value
-                                originalItemFieldKeys -= viewModel.attributeLocalId
+                                originalItemFieldKeys -= viewModel.fieldLocalId
                             }
                         }
                         originalUnmanagedItemDao.synchronizedAt = null

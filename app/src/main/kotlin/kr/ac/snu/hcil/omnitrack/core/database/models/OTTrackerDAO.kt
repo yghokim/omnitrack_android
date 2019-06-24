@@ -13,7 +13,7 @@ import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
-import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTFieldHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTStringStringEntryDAO
@@ -45,10 +45,10 @@ open class OTTrackerDAO : RealmObject() {
     var color: Int = 0
     var isBookmarked: Boolean = false
 
-    var attributes = RealmList<OTAttributeDAO>()
+    var fields = RealmList<OTFieldDAO>()
 
-    fun makeAttributesQuery(inTrashcan: Boolean? = false, hidden: Boolean? = false): RealmQuery<OTAttributeDAO> {
-        var query = attributes.where()
+    fun makeAttributesQuery(inTrashcan: Boolean? = false, hidden: Boolean? = false): RealmQuery<OTFieldDAO> {
+        var query = fields.where()
         if (inTrashcan != null) {
             query = query.equalTo(BackendDbManager.FIELD_IS_IN_TRASHCAN, inTrashcan)
         }
@@ -107,20 +107,20 @@ open class OTTrackerDAO : RealmObject() {
     }
 
     fun isExternalFilesInvolved(context: Context): Boolean {
-        return getLiveAttributesSync().find { it.getHelper(context).isExternalFile(it) } != null
+        return getLiveFieldsSync().find { it.getHelper(context).isExternalFile(it) } != null
     }
 
-    fun getLiveAttributesSync(): List<OTAttributeDAO> {
+    fun getLiveFieldsSync(): List<OTFieldDAO> {
         return if (isManaged) {
             makeAttributesQuery(false, false).findAll()
         } else {
-            attributes.filter { !it.isInTrashcan && !it.isHidden }
+            fields.filter { !it.isInTrashcan && !it.isHidden }
         }
     }
 
     fun getRequiredPermissions(context: Context): Array<String> {
         val list = ArrayList<String>()
-        getLiveAttributesSync().forEach {
+        getLiveFieldsSync().forEach {
             try {
                 val perms = it.getHelper(context).getRequiredPermissions(it)
                 if (perms != null) {
@@ -176,9 +176,9 @@ open class OTTrackerDAO : RealmObject() {
     }
 
     fun isInstantLoggingAvailable(): Boolean {
-        for (attribute in getLiveAttributesSync()) {
-            if (attribute.isRequired) {
-                if (attribute.serializedConnection != null || attribute.fallbackValuePolicy != OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL) {
+        for (field in getLiveFieldsSync()) {
+            if (field.isRequired) {
+                if (field.serializedConnection != null || field.fallbackValuePolicy != OTFieldDAO.DEFAULT_VALUE_POLICY_NULL) {
                     continue
                 } else return false
             }
@@ -189,7 +189,7 @@ open class OTTrackerDAO : RealmObject() {
 }
 
 
-open class OTAttributeDAO : RealmObject() {
+open class OTFieldDAO : RealmObject() {
 
     @Suppress("PropertyName")
     @PrimaryKey
@@ -271,7 +271,7 @@ open class OTAttributeDAO : RealmObject() {
         return LockedPropertiesHelper.flag(LockFlagLevel.Field, F.ToggleVisibility, getParsedLockedPropertyInfo())
     }
 
-    fun getHelper(context: Context): OTAttributeHelper {
+    fun getHelper(context: Context): OTFieldHelper {
         return (context.applicationContext as OTAndroidApp).applicationComponent.getAttributeManager().get(type)
     }
 
@@ -281,9 +281,9 @@ open class OTAttributeDAO : RealmObject() {
     }
 
     fun initializePropertiesWithDefaults(context: Context) {
-        val attributeHelper = getHelper(context)
-        attributeHelper.propertyKeys.forEach { key ->
-            setPropertySerializedValue(key, attributeHelper.getPropertyHelper<Any>(key).getSerializedValue(attributeHelper.getPropertyInitialValue(key)!!))
+        val fieldHelper = getHelper(context)
+        fieldHelper.propertyKeys.forEach { key ->
+            setPropertySerializedValue(key, fieldHelper.getPropertyHelper<Any>(key).getSerializedValue(fieldHelper.getPropertyInitialValue(key)!!))
         }
     }
 

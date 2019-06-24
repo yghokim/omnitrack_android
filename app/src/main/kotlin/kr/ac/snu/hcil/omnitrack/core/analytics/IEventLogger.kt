@@ -63,7 +63,7 @@ interface IEventLogger {
 
     fun logEvent(name: String, sub: String?, content: JsonObject? = null, timestamp: Long = System.currentTimeMillis())
 
-    fun logAttributeChangeEvent(sub: String?, attributeLocalId: String, trackerId: String?, inject: ((JsonObject) -> Unit)? = null)
+    fun logAttributeChangeEvent(sub: String?, fieldLocalId: String, trackerId: String?, inject: ((JsonObject) -> Unit)? = null)
     fun logTrackerChangeEvent(sub: String?, trackerId: String?, inject: ((JsonObject) -> Unit)? = null)
     fun logTrackerOnShortcutChangeEvent(trackerId: String?, isOnShortcut: Boolean)
     fun logTriggerChangeEvent(sub: String?, triggerId: String?, inject: ((JsonObject) -> Unit)? = null)

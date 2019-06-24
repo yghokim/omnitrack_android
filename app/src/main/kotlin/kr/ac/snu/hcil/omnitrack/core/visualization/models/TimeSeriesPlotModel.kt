@@ -5,9 +5,9 @@ import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.ISingleNumberAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.ISingleNumberFieldHelper
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.types.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.visualization.IWebBasedChartModel
@@ -17,13 +17,13 @@ import javax.inject.Inject
 /**
  * Created by younghokim on 2017. 11. 24..
  */
-class TimeSeriesPlotModel(tracker: OTTrackerDAO, protected val timeAttribute: OTAttributeDAO, protected val yAttribute: OTAttributeDAO, realm: Realm, val context: Context) : TrackerChartModel<Pair<Long, Double>>(tracker, realm), IWebBasedChartModel {
+class TimeSeriesPlotModel(tracker: OTTrackerDAO, protected val timeField: OTFieldDAO, protected val yField: OTFieldDAO, realm: Realm, val context: Context) : TrackerChartModel<Pair<Long, Double>>(tracker, realm), IWebBasedChartModel {
 
-    private val timeAttributeLocalId = timeAttribute.localId
-    private val yValueAttributeLocalId = yAttribute.localId
+    private val timeAttributeLocalId = timeField.localId
+    private val yValueAttributeLocalId = yField.localId
 
-    protected val timeAttributeName: String = timeAttribute.name
-    protected val yAttributeName: String = yAttribute.name
+    protected val timeAttributeName: String = timeField.name
+    protected val yAttributeName: String = yField.name
 
     override val name: String
         get() {
@@ -31,7 +31,7 @@ class TimeSeriesPlotModel(tracker: OTTrackerDAO, protected val timeAttribute: OT
         }
 
     @Inject
-    protected lateinit var attributeManager: OTAttributeManager
+    protected lateinit var fieldManager: OTFieldManager
 
     init {
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
@@ -39,14 +39,14 @@ class TimeSeriesPlotModel(tracker: OTTrackerDAO, protected val timeAttribute: OT
 
     override fun reloadData(): Single<List<Pair<Long, Double>>> {
         return Single.defer {
-            val yAttributeHelper = yAttribute.let { attributeManager.get(it.type) }
-            if (yAttributeHelper is ISingleNumberAttributeHelper) {
+            val yAttributeHelper = yField.let { fieldManager.get(it.type) }
+            if (yAttributeHelper is ISingleNumberFieldHelper) {
                 val items = dbManager.getItemsQueriedWithTimeAttribute(tracker._id, getTimeScope(), timeAttributeLocalId, realm)
                 return@defer Single.just(
                         items.asSequence().filter { it.getValueOf(yValueAttributeLocalId) != null }.map {
                             Pair(
                                     (it.getValueOf(timeAttributeLocalId) as TimePoint).timestamp,
-                                    yAttributeHelper.convertValueToSingleNumber(it.getValueOf(yValueAttributeLocalId)!!, yAttribute))
+                                    yAttributeHelper.convertValueToSingleNumber(it.getValueOf(yValueAttributeLocalId)!!, yField))
                         }.toList()
                 )
             } else return@defer Single.just<List<Pair<Long, Double>>>(emptyList())

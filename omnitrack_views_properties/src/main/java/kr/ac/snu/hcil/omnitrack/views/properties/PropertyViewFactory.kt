@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.views.properties
 
 import android.content.Context
-import kr.ac.snu.hcil.omnitrack.core.attributes.properties.*
+import kr.ac.snu.hcil.omnitrack.core.fields.properties.*
 
 object PropertyViewFactory {
     fun <T> makeView(propertyHelper: OTPropertyHelper<T>, context: Context): APropertyView<T> {

@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.android.common.view.wizard.WizardView
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
@@ -41,7 +41,7 @@ class ServiceWizardView: WizardView {
     val currentMeasureFactory: OTMeasureFactory
     lateinit var trackerDao: OTTrackerDAO
 
-    private var attributeDAO: OTAttributeDAO? = null
+    private var fieldDAO: OTFieldDAO? = null
 
     private val adapter = Adapter(context)
 
@@ -64,7 +64,7 @@ class ServiceWizardView: WizardView {
             PAGE_TRACKER_SELECTION ->
                     trackerDao = (page as TrackerSelectionPage).selectedTrackerDAO
             PAGE_ATTRIBUTE_SELECTION ->
-                    attributeDAO = (page as AttributeSelectionPage).attributeDAO
+                    fieldDAO = (page as AttributeSelectionPage).fieldDAO
             PAGE_QUERY_RANGE_SELECTION -> {
 
             }
@@ -78,9 +78,9 @@ class ServiceWizardView: WizardView {
         val realm = realmProvider.get()
         realm.executeTransactionIfNotIn {
 
-            attributeDAO?.serializedConnection = connection.getSerializedString(context)
-            if (attributeDAO?.isManaged == false) {
-                trackerDao.attributes.add(attributeDAO)
+            fieldDAO?.serializedConnection = connection.getSerializedString(context)
+            if (fieldDAO?.isManaged == false) {
+                trackerDao.fields.add(fieldDAO)
             }
 
             trackerDao.synchronizedAt = null

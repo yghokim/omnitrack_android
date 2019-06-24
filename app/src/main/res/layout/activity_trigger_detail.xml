@@ -9,7 +9,7 @@
     android:fitsSystemWindows="true"
     android:focusableInTouchMode="true"
 
-    tools:context=".ui.pages.attribute.AttributeDetailActivity">
+    tools:context=".ui.pages.field.AttributeDetailActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"

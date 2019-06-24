@@ -4,8 +4,8 @@ import android.content.Context
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
+import kr.ac.snu.hcil.omnitrack.core.fields.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import javax.inject.Singleton
 
@@ -17,8 +17,8 @@ class InformationHelpersModule {
 
     @Provides
     @Singleton
-    fun getAttributeManager(context: Context, authManager: Lazy<OTAuthManager>): OTAttributeManager {
-        return OTAttributeManager(context, authManager)
+    fun getAttributeManager(context: Context, authManager: Lazy<OTAuthManager>): OTFieldManager {
+        return OTFieldManager(context, authManager)
     }
 
     @Provides

@@ -5,7 +5,7 @@ import com.google.gson.stream.JsonReader
 import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
@@ -18,7 +18,7 @@ class FitbitHeartRateMeasureFactory(context: Context, service: FitbitService) : 
 
     override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 
-    override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
+    override fun getAttributeType() = OTFieldManager.TYPE_NUMBER
 
     override val isRangedQueryAvailable: Boolean = true
     override val minimumGranularity: OTTimeRangeQuery.Granularity? = OTTimeRangeQuery.Granularity.Hour

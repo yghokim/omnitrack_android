@@ -19,11 +19,11 @@ import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.typeadapters.ServerCompatibleTypeAdapter
@@ -52,7 +52,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     }
 
     @Inject
-    protected lateinit var attributeManager: Lazy<OTAttributeManager>
+    protected lateinit var fieldManager: Lazy<OTFieldManager>
 
     @Inject
     protected lateinit var authManager: Lazy<OTAuthManager>
@@ -220,7 +220,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                                                 if (changeset == null) {
                                                     //initial
                                                     clearCurrentAttributeList()
-                                                    currentAttributeViewModelList.addAll(changes.collection.map { AttributeInformationViewModel(it, realm, attributeManager.get(), connectionTypeAdapter.get()) })
+                                                    currentAttributeViewModelList.addAll(changes.collection.map { AttributeInformationViewModel(it, realm, fieldManager.get(), connectionTypeAdapter.get()) })
                                                 } else {
                                                     currentAttributeViewModelList.removeAll(
                                                             changeset.deletions.map { currentAttributeViewModelList[it].apply { this.unregister() } }
@@ -228,7 +228,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
                                                     changeset.insertions.forEach {
                                                         currentAttributeViewModelList.add(it,
-                                                                AttributeInformationViewModel(changes.collection[it]!!, realm, attributeManager.get(), connectionTypeAdapter.get())
+                                                                AttributeInformationViewModel(changes.collection[it]!!, realm, fieldManager.get(), connectionTypeAdapter.get())
                                                         )
                                                     }
                                                 }
@@ -284,8 +284,8 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                     isInjectedObservable.onNextIfDifferAndNotNull(CreationFlagsHelper.isInjected(stateDao.getParsedCreationFlags()))
                     experimentIdObservable.onNextIfDifferAndNotNull(Nullable(CreationFlagsHelper.getExperimentId(stateDao.getParsedCreationFlags())))
 
-                    val newList = stateDao.attributes.map {
-                        AttributeInformationViewModel(it, realm, attributeManager.get(), connectionTypeAdapter.get())
+                    val newList = stateDao.fields.map {
+                        AttributeInformationViewModel(it, realm, fieldManager.get(), connectionTypeAdapter.get())
                     }
                     currentAttributeViewModelList.addAll(
                             newList
@@ -307,8 +307,8 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         out.putString("currentDao", trackerTypeAdapter.get().toJson(currentDao))
     }
 
-    fun addNewAttribute(name: String, type: Int, processor: ((OTAttributeDAO, Realm) -> OTAttributeDAO)? = null) {
-        val newDao = OTAttributeDAO()
+    fun addNewAttribute(name: String, type: Int, processor: ((OTFieldDAO, Realm) -> OTFieldDAO)? = null) {
+        val newDao = OTFieldDAO()
         newDao._id = UUID.randomUUID().toString()
         newDao.name = name
         newDao.type = type
@@ -317,27 +317,27 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         processor?.invoke(newDao, realm)
 
         if (trackerDao != null) {
-            newDao.localId = attributeManager.get().makeNewAttributeLocalId(newDao.userCreatedAt)
+            newDao.localId = fieldManager.get().makeNewAttributeLocalId(newDao.userCreatedAt)
             newDao.trackerId = trackerDao?._id
 
             realm.executeTransactionIfNotIn {
-                trackerDao?.attributes?.add(newDao)
+                trackerDao?.fields?.add(newDao)
                 trackerDao?.synchronizedAt = null
             }
             registerSyncJob()
         } else {
-            currentAttributeViewModelList.add(AttributeInformationViewModel(newDao, realm, attributeManager.get(), connectionTypeAdapter.get()))
+            currentAttributeViewModelList.add(AttributeInformationViewModel(newDao, realm, fieldManager.get(), connectionTypeAdapter.get()))
             attributeViewModelListObservable.onNext(currentAttributeViewModelList)
         }
     }
 
     fun moveField(from: Int, to: Int) {
         if (trackerDao != null) {
-            val attributes = currentAttributeViewModelList.asSequence().map { it.attributeDAO }.toMutableList()
+            val attributes = currentAttributeViewModelList.asSequence().map { it.fieldDAO }.toMutableList()
             attributes.move(from, to)
             realm.executeTransactionIfNotIn {
-                trackerDao?.attributes?.removeAll(attributes)
-                trackerDao?.attributes?.addAll(0, attributes)
+                trackerDao?.fields?.removeAll(attributes)
+                trackerDao?.fields?.addAll(0, attributes)
                 trackerDao?.synchronizedAt = null
             }
             registerSyncJob()
@@ -351,7 +351,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         if (trackerDao != null) {
             lastRemovedAttributeId = attrViewModel._id
             realm.executeTransactionIfNotIn {
-                val attribute = trackerDao?.attributes?.find { it._id == attrViewModel._id }
+                val attribute = trackerDao?.fields?.find { it._id == attrViewModel._id }
                 if (attribute != null) {
                     attribute.isInTrashcan = true
                 }
@@ -372,7 +372,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 if (lastRemovedAttributeId != null) {
                     val trackerId = trackerId
                     return@defer realm.executeTransactionAsObservable { realm ->
-                        val removedItem = realm.where(OTAttributeDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, lastRemovedAttributeId!!).findFirst()
+                        val removedItem = realm.where(OTFieldDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, lastRemovedAttributeId!!).findFirst()
                         if (removedItem != null) {
                             removedItem.isInTrashcan = false
 
@@ -405,7 +405,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     private val areAttributesDirty: Boolean
         get() {
             return if (initialSnapshotDao == null) false else (currentAttributeViewModelList.find { it.isDirty == true } != null) ||
-                    !Arrays.equals(initialSnapshotDao?.attributes?.map { attr -> attr._id }?.toTypedArray(), currentAttributeViewModelList.map { it.attributeDAO._id }.toTypedArray())
+                    !Arrays.equals(initialSnapshotDao?.fields?.map { attr -> attr._id }?.toTypedArray(), currentAttributeViewModelList.map { it.fieldDAO._id }.toTypedArray())
         }
 
     val isDirty: Boolean
@@ -431,7 +431,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
         currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
             attrViewModel.applyChanges()
-            trackerDao.attributes.add(attrViewModel.attributeDAO)
+            trackerDao.fields.add(attrViewModel.fieldDAO)
         }
 
         return trackerDao
@@ -443,9 +443,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             val trackerDao = makeUnmanagedTrackerDaoFromSettings()
 
             currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
-                attrViewModel.attributeDAO.localId = attributeManager.get().makeNewAttributeLocalId(attrViewModel.attributeDAO.userCreatedAt)
-                attrViewModel.attributeDAO.trackerId = trackerDao._id
-                attrViewModel.attributeDAO.position = index
+                attrViewModel.fieldDAO.localId = fieldManager.get().makeNewAttributeLocalId(attrViewModel.fieldDAO.userCreatedAt)
+                attrViewModel.fieldDAO.trackerId = trackerDao._id
+                attrViewModel.fieldDAO.position = index
             }
 
             realm.executeTransaction {
@@ -490,13 +490,13 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         }
     }
 
-    class AttributeInformationViewModel(_attributeDAO: OTAttributeDAO, val realm: Realm, val attributeManager: OTAttributeManager, val connectionTypeAdapter: OTConnection.ConnectionTypeAdapter) : IReadonlyObjectId, RealmChangeListener<OTAttributeDAO> {
-        override val _id: String? = _attributeDAO._id
+    class AttributeInformationViewModel(_fieldDAO: OTFieldDAO, val realm: Realm, val fieldManager: OTFieldManager, val connectionTypeAdapter: OTConnection.ConnectionTypeAdapter) : IReadonlyObjectId, RealmChangeListener<OTFieldDAO> {
+        override val _id: String? = _fieldDAO._id
 
-        var attributeDAO: OTAttributeDAO = _attributeDAO
+        var fieldDAO: OTFieldDAO = _fieldDAO
             private set
 
-        val isInDatabase: Boolean get() = attributeDAO.isManaged
+        val isInDatabase: Boolean get() = fieldDAO.isManaged
 
 
         val isEditable = BehaviorSubject.createDefault<Boolean>(true)
@@ -509,7 +509,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         val typeObservable = BehaviorSubject.createDefault(-1)
         val iconObservable = BehaviorSubject.createDefault<Int>(R.drawable.icon_small_longtext)
         val connectionObservable = BehaviorSubject.create<Nullable<OTConnection>>()
-        val defaultValuePolicyObservable = BehaviorSubject.createDefault<Int>(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL)
+        val defaultValuePolicyObservable = BehaviorSubject.createDefault<Int>(OTFieldDAO.DEFAULT_VALUE_POLICY_NULL)
         val defaultValuePresetObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable(null))
 
         val isHiddenObservable = BehaviorSubject.createDefault(false)
@@ -554,7 +554,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             }
 
         var defaultValuePolicy: Int
-            get() = defaultValuePolicyObservable.value ?: OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL
+            get() = defaultValuePolicyObservable.value ?: OTFieldDAO.DEFAULT_VALUE_POLICY_NULL
             set(value) {
                 if (value != defaultValuePolicyObservable.value) {
                     defaultValuePolicyObservable.onNext(value)
@@ -569,20 +569,20 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
         init {
             if (isInDatabase)
-                attributeDAO.addChangeListener(this)
+                fieldDAO.addChangeListener(this)
 
-            onChange(attributeDAO)
+            onChange(fieldDAO)
 
         }
 
         fun unregister() {
             if (isInDatabase)
-                attributeDAO.removeChangeListener(this)
+                fieldDAO.removeChangeListener(this)
 
             internalSubscription.clear()
         }
 
-        override fun onChange(snapshot: OTAttributeDAO) {
+        override fun onChange(snapshot: OTFieldDAO) {
             if (snapshot.isValid) {
                 applyDaoChangesToFront(snapshot)
             }
@@ -590,7 +590,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
         private fun arePropertiesDirty(): Boolean {
             for (entry in propertyTable) {
-                if (attributeDAO.getPropertySerializedValue(entry.key) != entry.value.second)
+                if (fieldDAO.getPropertySerializedValue(entry.key) != entry.value.second)
                     return true
             }
             return false
@@ -598,24 +598,24 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
         val isDirty: Boolean
             get() {
-                return attributeDAO.localId.isBlank()
-                        || attributeDAO.name != name
-                        || attributeDAO.isRequired != isRequired
-                        || attributeDAO.fallbackValuePolicy != defaultValuePolicy
-                        || attributeDAO.fallbackPresetSerializedValue != defaultValuePreset
-                        || attributeDAO.serializedConnection != connectionObservable.value?.datum?.getSerializedString(connectionTypeAdapter)
-                        || attributeDAO.isHidden != isHidden
+                return fieldDAO.localId.isBlank()
+                        || fieldDAO.name != name
+                        || fieldDAO.isRequired != isRequired
+                        || fieldDAO.fallbackValuePolicy != defaultValuePolicy
+                        || fieldDAO.fallbackPresetSerializedValue != defaultValuePreset
+                        || fieldDAO.serializedConnection != connectionObservable.value?.datum?.getSerializedString(connectionTypeAdapter)
+                        || fieldDAO.isHidden != isHidden
                         || arePropertiesDirty()
             }
 
-        fun makeFrontalChangesToDao(): OTAttributeDAO {
-            val dao = OTAttributeDAO()
-            dao._id = attributeDAO._id
-            dao.type = attributeDAO.type
-            dao.localId = attributeDAO.localId
-            dao.position = attributeDAO.position
-            dao.trackerId = attributeDAO.trackerId
-            dao.userUpdatedAt = attributeDAO.userUpdatedAt
+        fun makeFrontalChangesToDao(): OTFieldDAO {
+            val dao = OTFieldDAO()
+            dao._id = fieldDAO._id
+            dao.type = fieldDAO.type
+            dao.localId = fieldDAO.localId
+            dao.position = fieldDAO.position
+            dao.trackerId = fieldDAO.trackerId
+            dao.userUpdatedAt = fieldDAO.userUpdatedAt
 
             dao.isRequired = this.isRequired
             dao.fallbackValuePolicy = this.defaultValuePolicy
@@ -628,13 +628,13 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
             dao.serializedConnection = connectionObservable.value?.datum?.getSerializedString(connectionTypeAdapter)
 
-            dao.serializedLockedPropertyInfo = attributeDAO.serializedLockedPropertyInfo
-            dao.serializedCreationFlags = attributeDAO.serializedCreationFlags
+            dao.serializedLockedPropertyInfo = fieldDAO.serializedLockedPropertyInfo
+            dao.serializedCreationFlags = fieldDAO.serializedCreationFlags
 
             return dao
         }
 
-        fun applyDaoChangesToFront(editedDao: OTAttributeDAO) {
+        fun applyDaoChangesToFront(editedDao: OTFieldDAO) {
             name = editedDao.name
 
             isRequired = editedDao.isRequired
@@ -668,7 +668,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 }
             }
 
-            val helper = attributeManager.get(editedDao.type)
+            val helper = fieldManager.get(editedDao.type)
             icon = helper.getTypeSmallIconResourceId(editedDao)
             if (changed) {
                 onPropertyChanged.onNext(System.currentTimeMillis())
@@ -681,28 +681,28 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
         fun applyChanges() {
             realm.executeTransactionIfNotIn {
-                attributeDAO.name = name
-                attributeDAO.isHidden = isHidden
-                attributeDAO.isRequired = isRequired
-                attributeDAO.userUpdatedAt = System.currentTimeMillis()
-                attributeDAO.fallbackValuePolicy = defaultValuePolicy
-                attributeDAO.fallbackPresetSerializedValue = defaultValuePreset
+                fieldDAO.name = name
+                fieldDAO.isHidden = isHidden
+                fieldDAO.isRequired = isRequired
+                fieldDAO.userUpdatedAt = System.currentTimeMillis()
+                fieldDAO.fallbackValuePolicy = defaultValuePolicy
+                fieldDAO.fallbackPresetSerializedValue = defaultValuePreset
                 for (entry in propertyTable) {
                     println("set new serialized value: $entry")
-                    attributeDAO.setPropertySerializedValue(entry.key, entry.value.second)
-                    println("get serialized value: ${attributeDAO.getPropertySerializedValue(entry.key)}")
+                    fieldDAO.setPropertySerializedValue(entry.key, entry.value.second)
+                    println("get serialized value: ${fieldDAO.getPropertySerializedValue(entry.key)}")
                 }
-                attributeDAO.serializedConnection = connectionObservable.value?.datum?.getSerializedString(connectionTypeAdapter)
+                fieldDAO.serializedConnection = connectionObservable.value?.datum?.getSerializedString(connectionTypeAdapter)
             }
         }
 
         fun saveToRealm() {
-            this.attributeDAO = realm.copyToRealm(this.attributeDAO)
+            this.fieldDAO = realm.copyToRealm(this.fieldDAO)
         }
 
         fun register() {
             if (isInDatabase)
-                attributeDAO.addChangeListener(this)
+                fieldDAO.addChangeListener(this)
         }
     }
 }

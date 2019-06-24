@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.database
 
 import dagger.Lazy
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
@@ -16,11 +16,11 @@ import javax.inject.Singleton
 @Singleton
 class DaoSerializationManager @Inject constructor(
         @ForTrigger val triggerTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTTriggerDAO>>,
-        @ForAttribute val attributeTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTAttributeDAO>>,
+        @ForAttribute val fieldTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTFieldDAO>>,
         @ForTracker val trackerTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTTrackerDAO>>,
         @ForItem val itemTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTItemDAO>>,
         @ForServerTrigger val serverTriggerTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTTriggerDAO>>,
-        @ForServerAttribute val serverAttributeTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTAttributeDAO>>,
+        @ForServerAttribute val serverFieldTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTFieldDAO>>,
         @ForServerTracker val serverTrackerTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTTrackerDAO>>,
         @ForServerItem val serverItemTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTItemDAO>>
 ) {
@@ -33,12 +33,12 @@ class DaoSerializationManager @Inject constructor(
         return (if (isServerMode) serverTriggerTypeAdapter else triggerTypeAdapter).get().toJson(trigger)
     }
 
-    fun parseAttribute(attrJson: String): OTAttributeDAO {
-        return attributeTypeAdapter.get().fromJson(attrJson)
+    fun parseAttribute(attrJson: String): OTFieldDAO {
+        return fieldTypeAdapter.get().fromJson(attrJson)
     }
 
-    fun serializeAttribute(attribute: OTAttributeDAO, isServerMode: Boolean = false): String {
-        return (if (isServerMode) serverAttributeTypeAdapter else attributeTypeAdapter).get().toJson(attribute)
+    fun serializeAttribute(field: OTFieldDAO, isServerMode: Boolean = false): String {
+        return (if (isServerMode) serverFieldTypeAdapter else fieldTypeAdapter).get().toJson(field)
     }
 
     fun serializeTracker(tracker: OTTrackerDAO, isServerMode: Boolean = false): String {

@@ -8,7 +8,7 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.serialization.getBooleanCompat
@@ -20,7 +20,7 @@ import java.util.*
 /**
  * Created by younghokim on 2017. 11. 3..
  */
-class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTAttributeDAO>>, val gson: Lazy<Gson>) : ServerCompatibleTypeAdapter<OTTrackerDAO>(isServerMode) {
+class TrackerTypeAdapter(isServerMode: Boolean, val fieldTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTFieldDAO>>, val gson: Lazy<Gson>) : ServerCompatibleTypeAdapter<OTTrackerDAO>(isServerMode) {
 
     override fun read(reader: JsonReader, isServerMode: Boolean): OTTrackerDAO {
         val dao = OTTrackerDAO()
@@ -57,16 +57,16 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
                     dao.serializedCreationFlags = flagObject.toString()
                     dao.experimentIdInFlags = CreationFlagsHelper.getExperimentId(flagObject)
                 }
-                "attributes" -> {
+                "fields" -> {
                     reader.beginArray()
 
                     while(reader.hasNext())
                     {
-                        val attribute = attributeTypeAdapter.get().read(reader)
-                        if (isServerMode && attribute._id.isNullOrBlank()) {
-                            attribute._id = UUID.randomUUID().toString()
+                        val field = fieldTypeAdapter.get().read(reader)
+                        if (isServerMode && field._id.isNullOrBlank()) {
+                            field._id = UUID.randomUUID().toString()
                         }
-                        dao.attributes.add(attribute)
+                        dao.fields.add(field)
                     }
 
                     reader.endArray()
@@ -102,10 +102,10 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
         writer.name("isBookmarked").value(value.isBookmarked)
         writer.name(BackendDbManager.FIELD_LOCKED_PROPERTIES).jsonValue(value.serializedLockedPropertyInfo)
         writer.name("flags").jsonValue(value.serializedCreationFlags)
-        writer.name("attributes").beginArray()
-        for (attribute in value.attributes)
+        writer.name("fields").beginArray()
+        for (field in value.fields)
             {
-                attributeTypeAdapter.get().write(writer, attribute)
+                fieldTypeAdapter.get().write(writer, field)
             }
         writer.endArray()
 
@@ -138,12 +138,12 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
                         applyTo.serializedCreationFlags = "null"
                     }
                 }
-                "attributes"->{
+                "fields"->{
                     val jsonList = try{json[key]?.asJsonArray}catch(ex:Exception){null}
                     if(jsonList!=null)
                     {
-                        val copiedAttributes = ArrayList<OTAttributeDAO>(applyTo.attributes)
-                        applyTo.attributes.clear()
+                        val copiedAttributes = ArrayList<OTFieldDAO>(applyTo.fields)
+                        applyTo.fields.clear()
 
                         //synchronize
                         jsonList.forEach {
@@ -152,20 +152,20 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
                             val matchedDao = copiedAttributes.find { it.localId == attrJsonObj.getStringCompat("localId") }
                             if(matchedDao != null)
                             {
-                                //update attribute
-                                attributeTypeAdapter.get().applyToManagedDao(attrJsonObj, matchedDao)
-                                applyTo.attributes.add(matchedDao)
+                                //update field
+                                fieldTypeAdapter.get().applyToManagedDao(attrJsonObj, matchedDao)
+                                applyTo.fields.add(matchedDao)
                                 copiedAttributes.remove(matchedDao)
                             }
                             else{
-                                //add new attribute
-                                val newAttribute = applyTo.realm.createObject(OTAttributeDAO::class.java, UUID.randomUUID().toString())
-                                attributeTypeAdapter.get().applyToManagedDao(attrJsonObj, newAttribute)
-                                applyTo.attributes.add(newAttribute)
+                                //add new field
+                                val newAttribute = applyTo.realm.createObject(OTFieldDAO::class.java, UUID.randomUUID().toString())
+                                fieldTypeAdapter.get().applyToManagedDao(attrJsonObj, newAttribute)
+                                applyTo.fields.add(newAttribute)
                             }
                         }
 
-                        //deal with dangling attributes
+                        //deal with dangling fields
                         copiedAttributes.forEach{
                             it.properties.deleteAllFromRealm()
                             it.deleteFromRealm()

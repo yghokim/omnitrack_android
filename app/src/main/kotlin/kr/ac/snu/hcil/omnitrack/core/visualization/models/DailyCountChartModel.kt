@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.android.common.DataHelper
 import kr.ac.snu.hcil.android.common.dipSize
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.types.TimePoint
@@ -29,7 +29,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineCha
 /**
  * Created by younghokim on 2017. 5. 8..
  */
-class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, val context: Context, timeAttribute: OTAttributeDAO? = null) : TrackerChartModel<Pair<Long, Int>>(tracker, realm), INativeChartModel {
+class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, val context: Context, timeField: OTFieldDAO? = null) : TrackerChartModel<Pair<Long, Int>>(tracker, realm), INativeChartModel {
 
     override val name: String
         get() {
@@ -38,8 +38,8 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, val context: Con
             } else String.format(context.resources.getString(R.string.msg_vis_daily_count_title_format), tracker.name)
         }
 
-    val timeAttributeLocalId: String? = timeAttribute?.localId
-    val timeAttributeName: String? = timeAttribute?.name
+    val timeAttributeLocalId: String? = timeField?.localId
+    val timeAttributeName: String? = timeField?.name
 
     private fun getTimestampOfItem(item: OTItemDAO): Long? {
         return if (timeAttributeLocalId == null) {

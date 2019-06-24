@@ -96,7 +96,7 @@ class CalendarPickerDialogFragment : DialogFragment() {
             val calendarView = CalendarView(requireActivity())
             calendarView.setDate(cal.timeInMillis, false, true)
 
-            calendarView.setOnDateChangeListener { p0, p1, p2, p3 ->
+            calendarView.setOnDateChangeListener { _, p1, p2, p3 ->
                 year = p1
                 month = p2
                 day = p3

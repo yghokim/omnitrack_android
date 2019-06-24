@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.system
 
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.measures.OTDataDrivenConditionMetTimeMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.triggers.measures.OTDataDrivenConditionMetValueMeasureFactory
 
@@ -16,9 +16,9 @@ class OTItemDynamicMeasureFactoryManager(val context: Context) {
         )
     }
 
-    fun getAttachableMeasureFactories(attribute: OTAttributeDAO): List<OTMeasureFactory> {
+    fun getAttachableMeasureFactories(field: OTFieldDAO): List<OTMeasureFactory> {
         return supportedMeasureFactories.filter {
-            it.getAttributeType() == attribute.type && it.isAvailableToRequestValue(attribute, null)
+            it.getAttributeType() == field.type && it.isAvailableToRequestValue(field, null)
         }
     }
 

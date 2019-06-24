@@ -5,9 +5,9 @@ import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
 import io.reactivex.Observable
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTItemMetadataMeasureFactory
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataDrivenTriggerManager
 
@@ -16,12 +16,12 @@ class OTDataDrivenConditionMetValueMeasureFactory(context: Context) : OTItemMeta
 
     private val logicImpl = OTDataDrivenTriggerMetadataMeasureLogicImpl(context)
 
-    override fun getAttributeType(): Int = OTAttributeManager.TYPE_NUMBER
+    override fun getAttributeType(): Int = OTFieldManager.TYPE_NUMBER
 
     override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_BIGDECIMAL
 
-    override fun isAvailableToRequestValue(attribute: OTAttributeDAO, invalidMessages: MutableList<CharSequence>?): Boolean {
-        return logicImpl.isAvailableToRequestValue(attribute, invalidMessages)
+    override fun isAvailableToRequestValue(field: OTFieldDAO, invalidMessages: MutableList<CharSequence>?): Boolean {
+        return logicImpl.isAvailableToRequestValue(field, invalidMessages)
     }
 
     override fun extractValueFromMetadata(metadata: JsonObject): Any? {
@@ -49,7 +49,7 @@ class OTDataDrivenConditionMetValueMeasureFactory(context: Context) : OTItemMeta
     override val nameResourceId: Int = R.string.msg_trigger_data_measure_value_name
     override val descResourceId: Int = R.string.msg_trigger_data_measure_value_description
 
-    override fun makeAvailabilityCheckObservable(attribute: OTAttributeDAO): Observable<Pair<Boolean, List<CharSequence>?>> {
-        return logicImpl.makeAvailabilityCheckObservable(attribute)
+    override fun makeAvailabilityCheckObservable(field: OTFieldDAO): Observable<Pair<Boolean, List<CharSequence>?>> {
+        return logicImpl.makeAvailabilityCheckObservable(field)
     }
 }

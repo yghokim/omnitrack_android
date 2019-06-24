@@ -14,7 +14,7 @@ import kr.ac.snu.hcil.android.common.TextHelper
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.system.OTMeasureFactoryManager
 
 /**
@@ -128,10 +128,10 @@ class OTConnection {
     }
 
 
-    fun makeAvailabilityCheckObservable(attribute: OTAttributeDAO): Observable<Pair<Boolean, List<CharSequence>?>> {
+    fun makeAvailabilityCheckObservable(field: OTFieldDAO): Observable<Pair<Boolean, List<CharSequence>?>> {
         val source = source
         if (source != null) {
-            return source.getFactory<OTMeasureFactory>().makeAvailabilityCheckObservable(attribute)
+            return source.getFactory<OTMeasureFactory>().makeAvailabilityCheckObservable(field)
         } else {
             return Observable.just(Pair(false, listOf(TextHelper.fromHtml(
                     "<font color=\"blue\">This field is connected to the service that is not supported in this version of the app.</font>"
@@ -139,10 +139,10 @@ class OTConnection {
         }
     }
 
-    fun isAvailableToRequestValue(attribute: OTAttributeDAO, invalidMessages: MutableList<CharSequence>? = null): Boolean {
+    fun isAvailableToRequestValue(field: OTFieldDAO, invalidMessages: MutableList<CharSequence>? = null): Boolean {
         val source = source
         if (source != null) {
-            return source.getFactory<OTMeasureFactory>().isAvailableToRequestValue(attribute, invalidMessages)
+            return source.getFactory<OTMeasureFactory>().isAvailableToRequestValue(field, invalidMessages)
         } else {
             invalidMessages?.add(TextHelper.fromHtml(
                     "<font color=\"blue\">This field is connected to the service that is not supported in this version of the app.</font>"

@@ -7,9 +7,9 @@ import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTChoiceAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTChoiceFieldHelper
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.IWebBasedChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
@@ -19,7 +19,7 @@ import javax.inject.Inject
 /**
  * Created by younghokim on 16. 9. 7..
  */
-class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm, val context: Context) : AttributeChartModel<ICategoricalBarChart.Point>(attribute, realm), ICategoricalBarChart, IWebBasedChartModel {
+class ChoiceCategoricalBarChartModel(field: OTFieldDAO, realm: Realm, val context: Context) : AttributeChartModel<ICategoricalBarChart.Point>(field, realm), ICategoricalBarChart, IWebBasedChartModel {
 
     private val counterDictCache = SparseIntArray() // entry id : count
     private val categoriesCache = HashSet<Int>()
@@ -28,7 +28,7 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm, va
         get() = String.format(context.resources.getString(R.string.msg_vis_categorical_distribution_title_format), super.name)
 
     @Inject
-    protected lateinit var attributeManager: OTAttributeManager
+    protected lateinit var fieldManager: OTFieldManager
 
     init{
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
@@ -40,7 +40,7 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm, va
     }
 
     override fun reloadData(): Single<List<ICategoricalBarChart.Point>> {
-        val trackerId = attribute.trackerId
+        val trackerId = field.trackerId
         println("reload data for tracker $trackerId - ChoiceCategorical")
         if (trackerId != null) {
             return dbManager
@@ -59,7 +59,7 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm, va
 
                 var noResponseCount = 0
 
-                items.map { it.getValueOf(attribute.localId) as? IntArray }
+                items.map { it.getValueOf(field.localId) as? IntArray }
                         .forEach {
                             if (it != null && it.isNotEmpty()) {
                                 for (id in it) {
@@ -78,7 +78,7 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm, va
                 synchronized(data) {
                     data.clear()
                     for (categoryId in categoriesCache) {
-                        val entry = (attributeManager.get(OTAttributeManager.TYPE_CHOICE) as OTChoiceAttributeHelper).getChoiceEntries(attribute)?.findWithId(categoryId)
+                        val entry = (fieldManager.get(OTFieldManager.TYPE_CHOICE) as OTChoiceFieldHelper).getChoiceEntries(field)?.findWithId(categoryId)
                         println("entry: ${entry?.text}, count: ${counterDictCache[categoryId]}")
                         if (entry != null) {
                             println("entry add")

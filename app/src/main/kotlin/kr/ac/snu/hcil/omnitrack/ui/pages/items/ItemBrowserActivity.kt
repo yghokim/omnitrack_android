@@ -41,18 +41,18 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
-import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTTimeFieldHelper
+import kr.ac.snu.hcil.omnitrack.core.fields.logics.AFieldValueSorter
+import kr.ac.snu.hcil.omnitrack.core.fields.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AttributeViewFactoryManager
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.OTFieldViewFactoryManager
 import kr.ac.snu.hcil.omnitrack.views.IActivityLifeCycle
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.verticalMargin
@@ -77,10 +77,10 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
     }
 
     @Inject
-    lateinit var attributeManager: OTAttributeManager
+    lateinit var fieldManager: OTFieldManager
 
     @Inject
-    lateinit var attributeViewFactoryManager: Lazy<AttributeViewFactoryManager>
+    lateinit var fieldViewFactoryManager: Lazy<OTFieldViewFactoryManager>
 
     private lateinit var viewModel: ItemListViewModel
 
@@ -229,7 +229,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     }
 
-    override fun onOkAttributeEditDialog(changed: Boolean, value: Any?, trackerId: String, attributeLocalId: String, itemId: String?) {
+    override fun onOkAttributeEditDialog(changed: Boolean, value: Any?, trackerId: String, fieldLocalId: String, itemId: String?) {
         println("dismiss handler")
         Log.d(AttributeEditDialogFragment.TAG, "changed: $changed, value: $value")
 
@@ -238,17 +238,17 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             if (itemId != null) {
                 val item = items.find { item -> item._id == itemId }
                 if (item != null) {
-                    item.setValueOf(attributeLocalId, value?.let { TypeStringSerializationHelper.serialize(it) })
+                    item.setValueOf(fieldLocalId, value?.let { TypeStringSerializationHelper.serialize(it) })
 
                     creationSubscriptions.add(
-                            item.save(*(item.itemDao.fieldValueEntries.map { it.key } - attributeLocalId).toTypedArray()).observeOn(AndroidSchedulers.mainThread())
+                            item.save(*(item.itemDao.fieldValueEntries.map { it.key } - fieldLocalId).toTypedArray()).observeOn(AndroidSchedulers.mainThread())
                                     .subscribe { (resultCode, itemId) ->
                                         if (resultCode != BackendDbManager.SAVE_RESULT_FAIL) {
                                             println("item was modified successfully.")
                                             if (itemId != null) {
                                                 eventLogger.get().logItemEditEvent(itemId) { content ->
                                                     content[IEventLogger.CONTENT_IS_INDIVIDUAL] = true
-                                                    content[IEventLogger.CONTENT_KEY_PROPERTY] = attributeLocalId
+                                                    content[IEventLogger.CONTENT_KEY_PROPERTY] = fieldLocalId
                                                     content[IEventLogger.CONTENT_KEY_NEWVALUE] = value?.let { TypeStringSerializationHelper.serialize(it) }
                                                 }
                                             }
@@ -493,7 +493,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 monthView.text = String.format(Locale.US, "%tb", cal)
                 dayView.text = cal.getDayOfMonth().toString()
 
-                var text = "${itemVM.loggingSource.sourceText(this@ItemBrowserActivity)}\n${(attributeManager.get(OTAttributeManager.TYPE_TIME) as OTTimeAttributeHelper).formats[OTTimeAttributeHelper.GRANULARITY_MINUTE]!!.format(Date(itemVM.timestamp))}"
+                var text = "${itemVM.loggingSource.sourceText(this@ItemBrowserActivity)}\n${(fieldManager.get(OTFieldManager.TYPE_TIME) as OTTimeFieldHelper).formats[OTTimeFieldHelper.GRANULARITY_MINUTE]!!.format(Date(itemVM.timestamp))}"
 
                 if (itemVM.timezone != null) {
                     text += " (${cal.timeZone.displayName})"
@@ -504,7 +504,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 itemLevelSubscriptions.add(
                         viewModel.currentSorterObservable.subscribe { sort ->
                             if (sort is AFieldValueSorter) {
-                                val rowIndex = viewModel.attributes.indexOfFirst { it.localId == sort.attributeLocalId }
+                                val rowIndex = viewModel.fields.indexOfFirst { it.localId == sort.fieldLocalId }
                                 if (rowIndex != -1) {
                                     valueListAdapter.notifyItemChanged(rowIndex)
                                 }
@@ -524,9 +524,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                 /*
                 cal.timeInMillis =
-                        if (currentSorter is AFieldValueSorter && currentSorter.attribute is OTTimeAttribute) {
-                            if (item.hasValueOf(currentSorter.attribute)) {
-                                (item.getValueOf(currentSorter.attribute) as TimePoint).timestamp
+                        if (currentSorter is AFieldValueSorter && currentSorter.field is OTTimeAttribute) {
+                            if (item.hasValueOf(currentSorter.field)) {
+                                (item.getValueOf(currentSorter.field) as TimePoint).timestamp
                             } else item.timestamp
                         } else item.timestamp
 */
@@ -539,24 +539,24 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 }
 
                 override fun getItemViewType(position: Int): Int {
-                    if (this@ItemElementViewHolder.adapterPosition != -1 && getParent().getItemValueOf(viewModel.attributes[position].localId) != null)
-                        return attributeViewFactoryManager.get().get(viewModel.attributes[position].type).getViewForItemListContainerType()
+                    if (this@ItemElementViewHolder.adapterPosition != -1 && getParent().getItemValueOf(viewModel.fields[position].localId) != null)
+                        return fieldViewFactoryManager.get().get(viewModel.fields[position].type).getViewForItemListContainerType()
                     else return 5
                 }
 
                 override fun onBindViewHolder(holder: TableRowViewHolder, position: Int) {
-                    holder.bind(viewModel.attributes[position])
+                    holder.bind(viewModel.fields[position])
                 }
 
                 override fun getItemCount(): Int {
-                    return viewModel.attributes.size
+                    return viewModel.fields.size
                 }
 
                 override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TableRowViewHolder {
 
                     val view = LayoutInflater.from(parent.context).inflate(when (viewType) {
-                        OTAttributeManager.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE -> R.layout.item_attribute_row_singleline
-                        OTAttributeManager.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE -> R.layout.item_attribute_row_multiline
+                        OTFieldManager.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE -> R.layout.item_attribute_row_singleline
+                        OTFieldManager.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE -> R.layout.item_attribute_row_multiline
                         else -> R.layout.item_attribute_row_singleline
                     }, parent, false)
 
@@ -572,7 +572,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                     var valueApplySubscription = SerialDisposable()
 
-                    var attributeLocalId: String? = null
+                    var fieldLocalId: String? = null
 
                     init {
                         valueView = view.findViewById(R.id.ui_value_view_replace)
@@ -585,7 +585,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                         try {
 
                             val item = getParent()
-                            AttributeEditDialogFragment.makeInstance(item._id!!, attributeLocalId!!, viewModel.trackerId, this@ItemBrowserActivity)
+                            AttributeEditDialogFragment.makeInstance(item._id!!, fieldLocalId!!, viewModel.trackerId, this@ItemBrowserActivity)
                                     .show(this@ItemBrowserActivity.supportFragmentManager, "ValueModifyDialog")
                         } catch (e: Exception) {
                             e.printStackTrace()
@@ -607,20 +607,20 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                         newValueView.text = value
                     }
 
-                    open fun bind(attribute: OTAttributeDAO) {
-                        attributeNameView.text = attribute.name
-                        attributeLocalId = attribute.localId
+                    open fun bind(field: OTFieldDAO) {
+                        attributeNameView.text = field.name
+                        fieldLocalId = field.localId
 
                         val sort = viewModel.currentSorter
                         attributeNameView.setTextColor(
-                                if (sort is AFieldValueSorter && sort.attributeLocalId === attribute.localId) {
+                                if (sort is AFieldValueSorter && sort.fieldLocalId === field.localId) {
                                     ContextCompat.getColor(this@ItemBrowserActivity, R.color.colorAccent)
                                 } else ContextCompat.getColor(this@ItemBrowserActivity, R.color.textColorLight)
                         )
 
-                        val itemValue = getParent().getItemValueOf(attribute.localId)
+                        val itemValue = getParent().getItemValueOf(field.localId)
                         if (itemValue != null) {
-                            val newValueView = attributeViewFactoryManager.get().get(attribute.type).getViewForItemList(attribute, this@ItemBrowserActivity, valueView)
+                            val newValueView = fieldViewFactoryManager.get().get(field.type).getViewForItemList(field, this@ItemBrowserActivity, valueView)
                             if (newValueView is IActivityLifeCycle && newValueView !== valueView) {
                                 newValueView.onCreate(null)
                             }
@@ -631,7 +631,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                             changeNewValueView(newValueView)
 
-                            valueApplySubscription.set(attributeViewFactoryManager.get().get(attribute.type).applyValueToViewForItemList(this@ItemBrowserActivity, attribute, itemValue, valueView).subscribe({
+                            valueApplySubscription.set(fieldViewFactoryManager.get().get(field.type).applyValueToViewForItemList(this@ItemBrowserActivity, field, itemValue, valueView).subscribe({
 
                             }, {
                             }))
@@ -673,13 +673,13 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                         }
                     }
 
-                    override fun bind(attributeDao: OTAttributeDAO) {
-                        attributeLocalId = attributeDao.localId
-                        attributeNameView.text = attributeDao.name
+                    override fun bind(fieldDao: OTFieldDAO) {
+                        fieldLocalId = fieldDao.localId
+                        attributeNameView.text = fieldDao.name
 
                         val sort = viewModel.currentSorter
                         attributeNameView.setTextColor(
-                                if (sort is AFieldValueSorter && sort.attributeLocalId === attributeDao.localId) {
+                                if (sort is AFieldValueSorter && sort.fieldLocalId === fieldDao.localId) {
                                     ContextCompat.getColor(this@ItemBrowserActivity, R.color.colorAccent)
                                 } else ContextCompat.getColor(this@ItemBrowserActivity, R.color.textColorLight)
                         )
@@ -704,7 +704,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         lateinit var localCacheManager: OTLocalMediaCacheManager
 
         @Inject
-        lateinit var attributeManager: OTAttributeManager
+        lateinit var fieldManager: OTFieldManager
 
         private lateinit var viewModel: ItemListViewModel
 
@@ -841,13 +841,13 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     configDialog.show()
 
                     /*
-                    val extension = if (it.attributes.unObservedList.find { attr -> attr.isExternalFile } != null) {
+                    val extension = if (it.fields.unObservedList.find { attr -> attr.isExternalFile } != null) {
                         "zip"
                     } else "csv"
 
                     val intent = FileHelper.makeSaveLocationPickIntent("omnitrack_export_${it.name}_${SimpleDateFormat("yyyyMMddHHmmss").format(Date())}.$extension")
 
-                    if (it.attributes.unObservedList.find { it.isExternalFile == true } != null) {
+                    if (it.fields.unObservedList.find { it.isExternalFile == true } != null) {
                         val currentNetworkConnectionInfo = NetworkHelper.getCurrentNetworkConnectionInfo()
                         if (currentNetworkConnectionInfo.mobileConnected && !currentNetworkConnectionInfo.wifiConnected) {
                             DialogHelper.makeYesNoDialogBuilder(this@SettingsDialogFragment.context, "OmniTrack", getString(R.string.msg_export_warning_mobile_network), R.string.msg_export, onYes= {

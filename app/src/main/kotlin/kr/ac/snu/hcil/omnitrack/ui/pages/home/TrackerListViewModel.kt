@@ -20,7 +20,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
@@ -119,7 +119,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                 .map { trackers ->
                     val set = HashSet<String>()
                     for (tracker in trackers) {
-                        tracker.attributes
+                        tracker.fields
                                 .mapNotNull { it.getHelper(getApplication()).getRequiredPermissions(it) }
                                 .forEach { set.addAll(it) }
                     }
@@ -225,7 +225,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
         val isBookmarked: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
 
-        val attributesResult: RealmResults<OTAttributeDAO> = trackerDao.makeAttributesQuery(false, false).findAllAsync()
+        val attributesResult: RealmResults<OTFieldDAO> = trackerDao.makeAttributesQuery(false, false).findAllAsync()
         val trackerItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQuery(trackerDao._id, null, null, realm).findAllAsync()
         val todayItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQueryOfTheDay(trackerDao._id, realm).findAllAsync()
 

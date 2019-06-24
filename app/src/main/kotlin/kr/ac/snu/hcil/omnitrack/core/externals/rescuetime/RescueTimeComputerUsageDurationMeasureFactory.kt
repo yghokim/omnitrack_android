@@ -5,7 +5,7 @@ import com.google.gson.stream.JsonReader
 import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
@@ -17,7 +17,7 @@ import java.util.*
  */
 class RescueTimeComputerUsageDurationMeasureFactory(context: Context, service: RescueTimeService) : OTServiceMeasureFactory(context, service, "cud") {
 
-    override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
+    override fun getAttributeType() = OTFieldManager.TYPE_NUMBER
 
     override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_DOUBLE
     override val minimumGranularity: OTTimeRangeQuery.Granularity? = OTTimeRangeQuery.Granularity.Hour

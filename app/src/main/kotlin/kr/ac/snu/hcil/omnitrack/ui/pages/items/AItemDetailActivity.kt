@@ -35,7 +35,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.AFieldInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import java.util.*
 import kotlin.properties.Delegates
@@ -208,7 +208,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
         ) { zipped -> zipped }.flatMapCompletable {
             val incompleteFieldLocalIds = currentAttributeViewModelList.asSequence().filter { attributeViewModel ->
                 attributeViewModel.isRequired && attributeViewModel.value?.value == null
-            }.map { it.attributeLocalId }.toList()
+            }.map { it.fieldLocalId }.toList()
 
             if (incompleteFieldLocalIds.isNotEmpty()) {
                 throw RequiredFieldsNotCompleteException(incompleteFieldLocalIds.toTypedArray())
@@ -217,7 +217,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
             }
         }.doOnError { ex ->
             if (ex is RequiredFieldsNotCompleteException) {
-                val incompleteFields = currentAttributeViewModelList.asSequence().mapIndexed { index, attributeInputViewModel -> Pair(index, attributeInputViewModel) }.filter { ex.inCompleteFieldLocalIds.contains(it.second.attributeLocalId) }.toList()
+                val incompleteFields = currentAttributeViewModelList.asSequence().mapIndexed { index, attributeInputViewModel -> Pair(index, attributeInputViewModel) }.filter { ex.inCompleteFieldLocalIds.contains(it.second.fieldLocalId) }.toList()
 
                 val minPosition = incompleteFields.minBy { it.first }?.first
                 if (minPosition != null) {
@@ -246,23 +246,23 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
         if (!preOnActivityResult(requestCode, resultCode, data)) {
             if (resultCode == Activity.RESULT_OK && data != null) {
-                val attributePosition = AAttributeInputView.getPositionFromRequestCode(requestCode)
+                val attributePosition = AFieldInputView.getPositionFromRequestCode(requestCode)
                 val inputView = attributeListAdapter.inputViews.find { it.position == attributePosition }
-                inputView?.setValueFromActivityResult(data, AAttributeInputView.getRequestTypeFromRequestCode(requestCode))
+                inputView?.setValueFromActivityResult(data, AFieldInputView.getRequestTypeFromRequestCode(requestCode))
             }
         }
     }
 
     inner class AttributeListAdapter : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>() {
 
-        val inputViews = HashSet<AAttributeInputView<*>>()
+        val inputViews = HashSet<AFieldInputView<*>>()
 
         fun getItem(position: Int): ItemEditionViewModelBase.AttributeInputViewModel {
             return currentAttributeViewModelList[position]
         }
 
         override fun getItemViewType(position: Int): Int {
-            val attr = getItem(position).attributeDAO
+            val attr = getItem(position).fieldDAO
             return (applicationContext as OTAndroidApp).applicationComponent.getAttributeViewFactoryManager().get(attr.type).getInputViewType(false, attr)
         }
 
@@ -270,7 +270,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
             val frame = LayoutInflater.from(this@AItemDetailActivity).inflate(R.layout.attribute_input_frame, parent, false)
 
-            val inputView = AAttributeInputView.makeInstance(viewType, this@AItemDetailActivity)
+            val inputView = AFieldInputView.makeInstance(viewType, this@AItemDetailActivity)
             inputViews.add(inputView)
 
             inputView.onCreate(null)
@@ -287,7 +287,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
             return currentAttributeViewModelList.size
         }
 
-        inner class ViewHolder(val inputView: AAttributeInputView<out Any>, frame: View) : View.OnClickListener, RecyclerView.ViewHolder(frame) {
+        inner class ViewHolder(val inputView: AFieldInputView<out Any>, frame: View) : View.OnClickListener, RecyclerView.ViewHolder(frame) {
 
             private val columnNameView: TextView by bindView(R.id.ui_column_name)
             private val requiredMarker: View by bindView(R.id.ui_required_marker)
@@ -342,9 +342,9 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
                 optionButton.setOnClickListener {
                     /*
                     val tracker = tracker
-                    val attributeLocalId = attributeLocalId
-                    if (tracker != null && attributeLocalId != null) {
-                        val historyDialog = RecentItemValuePickerBottomSheetFragment.getInstance(tracker._id, attributeLocalId)
+                    val fieldLocalId = fieldLocalId
+                    if (tracker != null && fieldLocalId != null) {
+                        val historyDialog = RecentItemValuePickerBottomSheetFragment.getInstance(tracker._id, fieldLocalId)
                         historyDialog.show(supportFragmentManager, RecentItemValuePickerBottomSheetFragment.TAG)
                     }*/
                 }*/
@@ -378,7 +378,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
                 internalSubscriptions.clear()
 
-                (applicationContext as OTAndroidApp).applicationComponent.getAttributeViewFactoryManager().get(attributeViewModel.attributeDAO.type).refreshInputViewUI(inputView, attributeViewModel.attributeDAO)
+                (applicationContext as OTAndroidApp).applicationComponent.getAttributeViewFactoryManager().get(attributeViewModel.fieldDAO.type).refreshInputViewUI(inputView, attributeViewModel.fieldDAO)
                 internalSubscriptions.add(
                         attributeViewModel.columnNameObservable.subscribe { name ->
                             columnNameView.text = name
@@ -410,12 +410,12 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
                 internalSubscriptions.add(
                         attributeViewModel.onAttributeChanged.subscribe {
-                            (applicationContext as OTAndroidApp).applicationComponent.getAttributeViewFactoryManager().get(attributeViewModel.attributeDAO.type).refreshInputViewUI(inputView, attributeViewModel.attributeDAO)
+                            (applicationContext as OTAndroidApp).applicationComponent.getAttributeViewFactoryManager().get(attributeViewModel.fieldDAO.type).refreshInputViewUI(inputView, attributeViewModel.fieldDAO)
                         }
                 )
 
 
-                connectionIndicatorStubProxy.onBind(attributeViewModel.attributeDAO, attributeViewModel.attributeDAO.getParsedConnection(this@AItemDetailActivity))
+                connectionIndicatorStubProxy.onBind(attributeViewModel.fieldDAO, attributeViewModel.fieldDAO.getParsedConnection(this@AItemDetailActivity))
 
                 internalSubscriptions.add(
                         attributeViewModel.stateObservable.observeOn(AndroidSchedulers.mainThread()).subscribe { state ->
@@ -455,7 +455,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
                 creationSubscriptions.addAll(internalSubscriptions)
 
-                inputView.boundAttributeObjectId = attributeViewModel.attributeDAO._id
+                inputView.boundAttributeObjectId = attributeViewModel.fieldDAO._id
 
 
                 inputView.onResume()

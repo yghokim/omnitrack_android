@@ -19,15 +19,15 @@ import io.realm.Realm
 import kr.ac.snu.hcil.android.common.view.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.attributes.SimpleAttributePresetInfo
-import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTChoiceAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeSpanAttributeHelper
+import kr.ac.snu.hcil.omnitrack.core.fields.FieldPresetInfo
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
+import kr.ac.snu.hcil.omnitrack.core.fields.SimpleFieldPresetInfo
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTChoiceFieldHelper
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTTimeFieldHelper
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTTimeSpanFieldHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import org.jetbrains.anko.padding
@@ -44,7 +44,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
     override val getTitleResourceId: Int = R.string.msg_service_wizard_title_field_selection
 
     @Inject
-    lateinit var attributeManager: OTAttributeManager
+    lateinit var fieldManager: OTFieldManager
 
     @Inject
     lateinit var dbManager: Lazy<BackendDbManager>
@@ -52,7 +52,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
     @field:[Inject Backend]
     lateinit var realmProvider: Factory<Realm>
 
-    private var attributes: MutableList<OTAttributeDAO> = ArrayList()
+    private var fields: MutableList<OTFieldDAO> = ArrayList()
     private var attributeListView: RecyclerView? = null
 
     lateinit var trackerId: String
@@ -60,7 +60,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
 
     var attributeCreationEnabled = true
 
-    var attributeDAO: OTAttributeDAO? = null
+    var fieldDAO: OTFieldDAO? = null
 
     private val subscriptions = CompositeDisposable()
 
@@ -69,7 +69,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
     }
 
     override fun onLeave() {
-        attributes.clear()
+        fields.clear()
         subscriptions.clear()
     }
 
@@ -81,15 +81,15 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
             subscriptions.add(
                     trackerDao.asFlowable<OTTrackerDAO>().filter { it.isValid && it.isLoaded }.subscribe { snapshot ->
                         attributeCreationEnabled = snapshot.isAddNewFieldsAllowed()
-                        val validAttributes = snapshot.attributes.filter { !it.isHidden && !it.isInTrashcan && it.isEditingAllowed() }
-                        attributes.clear()
-                        attributes.addAll(validAttributes)
-                        //attributes.removeAll { !currentMeasureFactory.isAttachableTo(it) || it.isEditingAllowed() }
+                        val validAttributes = snapshot.fields.filter { !it.isHidden && !it.isInTrashcan && it.isEditingAllowed() }
+                        fields.clear()
+                        fields.addAll(validAttributes)
+                        //fields.removeAll { !currentMeasureFactory.isAttachableTo(it) || it.isEditingAllowed() }
                         attributeListView?.adapter?.notifyDataSetChanged()
                     }
             )
         } else {
-            attributes.clear()
+            fields.clear()
             attributeCreationEnabled = parent.trackerDao.isAddNewFieldsAllowed()
             attributeListView?.adapter?.notifyDataSetChanged()
         }
@@ -124,7 +124,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             if (position >= 1 || !attributeCreationEnabled) {
-                (holder as AttributeListViewHolder).bind(attributes[position - indexShift])
+                (holder as AttributeListViewHolder).bind(fields[position - indexShift])
             }
         }
 
@@ -133,7 +133,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
                 return if (attributeCreationEnabled) 1 else 0
             }
 
-        override fun getItemCount(): Int = attributes.size + indexShift
+        override fun getItemCount(): Int = fields.size + indexShift
 
         override fun getItemViewType(position: Int): Int = if (position == 0 && attributeCreationEnabled) 0 else 1
 
@@ -172,32 +172,32 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
             itemView.setOnClickListener(this)
         }
 
-        lateinit var attributeDao: OTAttributeDAO
+        lateinit var fieldDao: OTFieldDAO
 
         override fun onClick(view: View?) {
             if(isAvailable) {
-                this@AttributeSelectionPage.attributeDAO = attributeDao
+                this@AttributeSelectionPage.fieldDAO = fieldDao
                 requestGoNextPage(ServiceWizardView.PAGE_QUERY_RANGE_SELECTION)
             }
         }
 
-        fun bind(attributeDao: OTAttributeDAO) {
-            val helper = attributeManager.get(attributeDao.type)
-            iconView.setImageResource(helper.getTypeSmallIconResourceId(attributeDao))
-            nameView.text = attributeDao.name
-            this.attributeDao = attributeDao
+        fun bind(fieldDao: OTFieldDAO) {
+            val helper = fieldManager.get(fieldDao.type)
+            iconView.setImageResource(helper.getTypeSmallIconResourceId(fieldDao))
+            nameView.text = fieldDao.name
+            this.fieldDao = fieldDao
 
-            if (parent.currentMeasureFactory.getAttributeType() != attributeDao.type) {
+            if (parent.currentMeasureFactory.getAttributeType() != fieldDao.type) {
                 descriptionView.visibility = View.VISIBLE
                 descriptionView.setText(R.string.msg_service_wizard_no_attachable_field)
                 isAvailable = false
-            } else if (!attributeDao.isEditingAllowed()) {
+            } else if (!fieldDao.isEditingAllowed()) {
                 descriptionView.visibility = View.VISIBLE
                 descriptionView.setText(R.string.msg_service_wizard_non_modifiable_field)
                 isAvailable = false
             }
             else {
-                val connection = attributeDao.getParsedConnection(parent.context)
+                val connection = fieldDao.getParsedConnection(parent.context)
                 if (connection != null) {
                     descriptionView.visibility = View.VISIBLE
                     descriptionView.text = connection.source?.getFactory<OTMeasureFactory>()?.getCategoryName()?.let {
@@ -232,74 +232,74 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
                 .negativeText(R.string.msg_cancel)
     }
 
-    private fun getAttributePresets(): Array<AttributePresetInfo> {
+    private fun getAttributePresets(): Array<FieldPresetInfo> {
         val context = parent.context
         return arrayOf(
-                SimpleAttributePresetInfo(OTAttributeManager.TYPE_SHORT_TEXT, R.drawable.field_icon_shorttext, context.getString(R.string.type_shorttext_name), context.getString(R.string.type_shorttext_desc)),
-                SimpleAttributePresetInfo(OTAttributeManager.TYPE_LONG_TEXT, R.drawable.field_icon_longtext, context.getString(R.string.type_longtext_name), context.getString(R.string.type_longtext_desc)),
-                SimpleAttributePresetInfo(OTAttributeManager.TYPE_NUMBER, R.drawable.field_icon_number, context.getString(R.string.type_number_name), context.getString(R.string.type_number_desc)),
-                SimpleAttributePresetInfo(OTAttributeManager.TYPE_RATING, R.drawable.field_icon_rating, context.getString(R.string.type_rating_name), context.getString(R.string.type_rating_desc)),
+                SimpleFieldPresetInfo(OTFieldManager.TYPE_SHORT_TEXT, R.drawable.field_icon_shorttext, context.getString(R.string.type_shorttext_name), context.getString(R.string.type_shorttext_desc)),
+                SimpleFieldPresetInfo(OTFieldManager.TYPE_LONG_TEXT, R.drawable.field_icon_longtext, context.getString(R.string.type_longtext_name), context.getString(R.string.type_longtext_desc)),
+                SimpleFieldPresetInfo(OTFieldManager.TYPE_NUMBER, R.drawable.field_icon_number, context.getString(R.string.type_number_name), context.getString(R.string.type_number_desc)),
+                SimpleFieldPresetInfo(OTFieldManager.TYPE_RATING, R.drawable.field_icon_rating, context.getString(R.string.type_rating_name), context.getString(R.string.type_rating_desc)),
 
-                AttributePresetInfo(OTAttributeManager.TYPE_TIME, R.drawable.field_icon_time_hour, context.getString(R.string.type_timepoint_time_name), context.getString(R.string.type_timepoint_time_desc),
+                FieldPresetInfo(OTFieldManager.TYPE_TIME, R.drawable.field_icon_time_hour, context.getString(R.string.type_timepoint_time_name), context.getString(R.string.type_timepoint_time_desc),
                         { dao, realm ->
-                            attributeManager.get(OTAttributeManager.TYPE_TIME)
-                                    .setPropertyValue(OTTimeAttributeHelper.GRANULARITY, OTTimeAttributeHelper.GRANULARITY_MINUTE, dao, realm)
+                            fieldManager.get(OTFieldManager.TYPE_TIME)
+                                    .setPropertyValue(OTTimeFieldHelper.GRANULARITY, OTTimeFieldHelper.GRANULARITY_MINUTE, dao, realm)
                             dao
                         }),
 
-                AttributePresetInfo(OTAttributeManager.TYPE_TIME, R.drawable.field_icon_time_date, context.getString(R.string.type_timepoint_date_name), context.getString(R.string.type_timepoint_date_desc),
+                FieldPresetInfo(OTFieldManager.TYPE_TIME, R.drawable.field_icon_time_date, context.getString(R.string.type_timepoint_date_name), context.getString(R.string.type_timepoint_date_desc),
                         { dao, realm ->
-                            attributeManager.get(OTAttributeManager.TYPE_TIME)
-                                    .setPropertyValue(OTTimeAttributeHelper.GRANULARITY, OTTimeAttributeHelper.GRANULARITY_DAY, dao, realm)
+                            fieldManager.get(OTFieldManager.TYPE_TIME)
+                                    .setPropertyValue(OTTimeFieldHelper.GRANULARITY, OTTimeFieldHelper.GRANULARITY_DAY, dao, realm)
                             dao
                         }),
 
-                AttributePresetInfo(OTAttributeManager.TYPE_TIMESPAN, R.drawable.field_icon_timer, context.getString(R.string.type_timespan_name), context.getString(R.string.type_timespan_desc),
+                FieldPresetInfo(OTFieldManager.TYPE_TIMESPAN, R.drawable.field_icon_timer, context.getString(R.string.type_timespan_name), context.getString(R.string.type_timespan_desc),
                         { dao, realm ->
-                            attributeManager.get(OTAttributeManager.TYPE_TIMESPAN)
-                                    .setPropertyValue(OTTimeSpanAttributeHelper.PROPERTY_GRANULARITY, OTTimeSpanAttributeHelper.GRANULARITY_MINUTE, dao, realm)
+                            fieldManager.get(OTFieldManager.TYPE_TIMESPAN)
+                                    .setPropertyValue(OTTimeSpanFieldHelper.PROPERTY_GRANULARITY, OTTimeSpanFieldHelper.GRANULARITY_MINUTE, dao, realm)
                             dao
                         }),
-                AttributePresetInfo(OTAttributeManager.TYPE_TIMESPAN, R.drawable.field_icon_time_range_date, context.getString(R.string.type_timespan_date_name), context.getString(R.string.type_timespan_date_desc),
+                FieldPresetInfo(OTFieldManager.TYPE_TIMESPAN, R.drawable.field_icon_time_range_date, context.getString(R.string.type_timespan_date_name), context.getString(R.string.type_timespan_date_desc),
                         { dao, realm ->
-                            attributeManager.get(OTAttributeManager.TYPE_TIMESPAN)
-                                    .setPropertyValue(OTTimeSpanAttributeHelper.PROPERTY_GRANULARITY, OTTimeSpanAttributeHelper.GRANULARITY_DAY, dao, realm)
+                            fieldManager.get(OTFieldManager.TYPE_TIMESPAN)
+                                    .setPropertyValue(OTTimeSpanFieldHelper.PROPERTY_GRANULARITY, OTTimeSpanFieldHelper.GRANULARITY_DAY, dao, realm)
                             dao
                         }),
-                SimpleAttributePresetInfo(OTAttributeManager.TYPE_LOCATION, R.drawable.field_icon_location, context.getString(R.string.type_location_name), context.getString(R.string.type_location_desc)),
-                SimpleAttributePresetInfo(OTAttributeManager.TYPE_IMAGE, R.drawable.field_icon_image, context.getString(R.string.type_image_name), context.getString(R.string.type_image_desc)),
-                SimpleAttributePresetInfo(OTAttributeManager.TYPE_AUDIO, R.drawable.field_icon_audio, context.getString(R.string.type_audio_record_name), context.getString(R.string.type_audio_record_desc)),
+                SimpleFieldPresetInfo(OTFieldManager.TYPE_LOCATION, R.drawable.field_icon_location, context.getString(R.string.type_location_name), context.getString(R.string.type_location_desc)),
+                SimpleFieldPresetInfo(OTFieldManager.TYPE_IMAGE, R.drawable.field_icon_image, context.getString(R.string.type_image_name), context.getString(R.string.type_image_desc)),
+                SimpleFieldPresetInfo(OTFieldManager.TYPE_AUDIO, R.drawable.field_icon_audio, context.getString(R.string.type_audio_record_name), context.getString(R.string.type_audio_record_desc)),
 
-                AttributePresetInfo(OTAttributeManager.TYPE_CHOICE, R.drawable.field_icon_singlechoice, context.getString(R.string.type_single_choice_name), context.getString(R.string.type_single_choice_desc),
+                FieldPresetInfo(OTFieldManager.TYPE_CHOICE, R.drawable.field_icon_singlechoice, context.getString(R.string.type_single_choice_name), context.getString(R.string.type_single_choice_desc),
                         { dao, realm ->
-                            attributeManager.get(OTAttributeManager.TYPE_CHOICE)
-                                    .setPropertyValue(OTChoiceAttributeHelper.PROPERTY_MULTISELECTION, false, dao, realm)
+                            fieldManager.get(OTFieldManager.TYPE_CHOICE)
+                                    .setPropertyValue(OTChoiceFieldHelper.PROPERTY_MULTISELECTION, false, dao, realm)
                             dao
                         }),
 
-                AttributePresetInfo(OTAttributeManager.TYPE_CHOICE, R.drawable.field_icon_multiplechoice, context.getString(R.string.type_multiple_choices_name), context.getString(R.string.type_multiple_choices_desc),
+                FieldPresetInfo(OTFieldManager.TYPE_CHOICE, R.drawable.field_icon_multiplechoice, context.getString(R.string.type_multiple_choices_name), context.getString(R.string.type_multiple_choices_desc),
                         { dao, realm ->
-                            attributeManager.get(OTAttributeManager.TYPE_CHOICE)
-                                    .setPropertyValue(OTChoiceAttributeHelper.PROPERTY_MULTISELECTION, true, dao, realm)
+                            fieldManager.get(OTFieldManager.TYPE_CHOICE)
+                                    .setPropertyValue(OTChoiceFieldHelper.PROPERTY_MULTISELECTION, true, dao, realm)
                             dao
                         })
 
         )
     }
 
-    fun createNewAttribute(name: String, type: Int, realm: Realm, processor: ((OTAttributeDAO, Realm) -> OTAttributeDAO)? = null) {
+    fun createNewAttribute(name: String, type: Int, realm: Realm, processor: ((OTFieldDAO, Realm) -> OTFieldDAO)? = null) {
         val trackerDao = parent.trackerDao
-        val newDao = OTAttributeDAO()
+        val newDao = OTFieldDAO()
         newDao._id = UUID.randomUUID().toString()
         newDao.name = name
         newDao.type = type
         newDao.trackerId = trackerId
         newDao.initialize(parent.context)
         processor?.invoke(newDao, realm)
-        newDao.localId = attributeManager.makeNewAttributeLocalId(newDao.userCreatedAt)
+        newDao.localId = fieldManager.makeNewAttributeLocalId(newDao.userCreatedAt)
         newDao.trackerId = trackerDao._id
 
 
-        this@AttributeSelectionPage.attributeDAO = newDao
+        this@AttributeSelectionPage.fieldDAO = newDao
     }
 }
