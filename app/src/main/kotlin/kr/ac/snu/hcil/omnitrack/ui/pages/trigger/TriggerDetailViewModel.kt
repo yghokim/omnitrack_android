@@ -250,17 +250,6 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
                         } else {
                             dao.trackers.addAll(realm.copyFromRealm(trackers))
                         }
-
-                        if (dao.actionType == OTTriggerDAO.ACTION_TYPE_REMIND &&
-                                trackers.firstOrNull()?.experimentIdInFlags != null &&
-                                trackers.firstOrNull()?.experimentIdInFlags != dao.experimentIdInFlags) {
-                            //if the trigger is a reminder, set experiment flag following the tracker.
-                            dao.experimentIdInFlags = trackers.first()?.experimentIdInFlags
-                            dao.serializedCreationFlags = CreationFlagsHelper.Builder(trackers.first()?.experimentIdInFlags
-                                    ?: "{}")
-                                    .setExperiment(trackers.first()!!.experimentIdInFlags!!)
-                                    .build()
-                        }
                     }
 
                 }

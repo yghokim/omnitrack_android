@@ -64,9 +64,6 @@ open class OTTrackerDAO : RealmObject() {
 
     var serializedCreationFlags: String = "{}"
 
-    @Index
-    var experimentIdInFlags: String? = null
-
     var serializedLockedPropertyInfo: String = "{}"
 
     var userCreatedAt: Long = System.currentTimeMillis()
@@ -104,7 +101,6 @@ open class OTTrackerDAO : RealmObject() {
 
 
         if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
-            this.experimentIdInFlags = BuildConfig.DEFAULT_EXPERIMENT_ID
             this.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(BuildConfig.DEFAULT_EXPERIMENT_ID).build()
         }
     }

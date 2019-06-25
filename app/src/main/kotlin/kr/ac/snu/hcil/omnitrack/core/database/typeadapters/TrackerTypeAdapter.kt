@@ -10,7 +10,6 @@ import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.serialization.getBooleanCompat
 import kr.ac.snu.hcil.omnitrack.core.serialization.getIntCompat
 import kr.ac.snu.hcil.omnitrack.core.serialization.getLongCompat
@@ -55,7 +54,6 @@ class TrackerTypeAdapter(isServerMode: Boolean, val fieldTypeAdapter: Lazy<Serve
                 "flags" -> {
                     val flagObject = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java)
                     dao.serializedCreationFlags = flagObject.toString()
-                    dao.experimentIdInFlags = CreationFlagsHelper.getExperimentId(flagObject)
                 }
                 "fields" -> {
                     reader.beginArray()
@@ -132,7 +130,6 @@ class TrackerTypeAdapter(isServerMode: Boolean, val fieldTypeAdapter: Lazy<Serve
                     try {
                         val flagObject = json.getAsJsonObject(key)
                         applyTo.serializedCreationFlags = flagObject.toString()
-                        applyTo.experimentIdInFlags = CreationFlagsHelper.getExperimentId(flagObject)
                     } catch (ex: Exception) {
                         ex.printStackTrace()
                         applyTo.serializedCreationFlags = "null"

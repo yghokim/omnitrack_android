@@ -15,7 +15,6 @@ import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.move
 import kr.ac.snu.hcil.android.common.onNextIfDifferAndNotNull
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
-import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -402,11 +401,6 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         trackerDao.name = nameObservable.value ?: ""
         trackerDao.isBookmarked = isBookmarkedObservable.value ?: false
         trackerDao.color = colorObservable.value ?: 0
-
-        if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
-            trackerDao.experimentIdInFlags = BuildConfig.DEFAULT_EXPERIMENT_ID
-            trackerDao.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(BuildConfig.DEFAULT_EXPERIMENT_ID).build()
-        }
 
         currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
             attrViewModel.applyChanges()

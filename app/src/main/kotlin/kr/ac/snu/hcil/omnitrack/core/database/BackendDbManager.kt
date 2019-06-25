@@ -10,7 +10,6 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
 import io.realm.*
-import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.models.*
@@ -55,8 +54,6 @@ class BackendDbManager @Inject constructor(
         const val FIELD_TIMESTAMP_LONG = "timestamp"
         const val FIELD_TIMEZONE = "timezone"
 
-        const val FIELD_EXPERIMENT_ID_IN_FLAGS = "experimentIdInFlags"
-
         const val FIELD_IS_IN_TRASHCAN = "isInTrashcan"
         const val FIELD_IS_HIDDEN = "isHidden"
 
@@ -78,12 +75,6 @@ class BackendDbManager @Inject constructor(
         const val SAVE_RESULT_EDIT = 2
         const val SAVE_RESULT_FAIL = 0
 
-
-        fun <T> branchCheckDefaultExperimentId(query: RealmQuery<T>): RealmQuery<T> {
-            return if (BuildConfig.DEFAULT_EXPERIMENT_ID != null) {
-                query.equalTo(FIELD_EXPERIMENT_ID_IN_FLAGS, BuildConfig.DEFAULT_EXPERIMENT_ID)
-            } else query
-        }
 
         fun <T> filterVisibleInAppFlag(query: RealmQuery<T>): RealmQuery<T> {
             return query
@@ -112,7 +103,7 @@ class BackendDbManager @Inject constructor(
         return realm.where(OTTrackerDAO::class.java)
                 .equalTo(FIELD_REMOVED_BOOLEAN, false)
                 .run {
-                    filterVisibleInAppFlag(branchCheckDefaultExperimentId(this))
+                    filterVisibleInAppFlag(this)
                 }
                 .equalTo(FIELD_USER_ID, userId).equalTo("isBookmarked", true)
                 .sort("position", Sort.ASCENDING).findAllAsync()
@@ -278,7 +269,7 @@ class BackendDbManager @Inject constructor(
                 .equalTo(FIELD_REMOVED_BOOLEAN, false)
                 .equalTo(FIELD_USER_ID, userId)
                 .run {
-                    filterVisibleInAppFlag(branchCheckDefaultExperimentId(this))
+                    filterVisibleInAppFlag(this)
                 }
     }
 
@@ -288,7 +279,7 @@ class BackendDbManager @Inject constructor(
                 .equalTo(FIELD_USER_ID, userId)
                 .sort(arrayOf(BackendDbManager.FIELD_POSITION, BackendDbManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
                 .run {
-                    filterVisibleInAppFlag(branchCheckDefaultExperimentId(this))
+                    filterVisibleInAppFlag(this)
                 }
     }
 
