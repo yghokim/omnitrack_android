@@ -8,14 +8,14 @@ import io.realm.Sort
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.fields.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.fields.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.core.fields.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.fields.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.fields.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kotlin.collections.set
 
@@ -78,7 +78,7 @@ abstract class OTFieldHelper(protected val context: Context) {
 
     abstract val typeNameForSerialization: String
 
-    open val supportedFallbackPolicies = LinkedHashMap<Int, FallbackPolicyResolver>().apply{
+    open val supportedFallbackPolicies: LinkedHashMap<String, FallbackPolicyResolver> = LinkedHashMap<String, FallbackPolicyResolver>().apply {
         put(OTFieldDAO.DEFAULT_VALUE_POLICY_NULL, FALLBACK_POLICY_RESOLVER_EMPTY_VALUE)
         put(OTFieldDAO.DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM, FALLBACK_POLICY_RESOLVER_PREVIOUS_VALUE)
     }

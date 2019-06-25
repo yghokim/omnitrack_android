@@ -11,9 +11,9 @@ import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.fields.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.fields.NumericCharacteristics
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import java.util.concurrent.TimeUnit
 
@@ -53,7 +53,7 @@ class OTLocationFieldHelper(context: Context) : OTFieldHelper(context) {
 
     private val permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
 
-    override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver> by lazy {
+    override val supportedFallbackPolicies: LinkedHashMap<String, FallbackPolicyResolver> by lazy {
         val original = super.supportedFallbackPolicies
         original[OTFieldDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = CurrentLocationFallbackResolver(context)
         original.remove(OTFieldDAO.DEFAULT_VALUE_POLICY_NULL)

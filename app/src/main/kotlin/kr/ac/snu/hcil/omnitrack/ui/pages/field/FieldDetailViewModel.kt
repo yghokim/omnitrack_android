@@ -11,11 +11,11 @@ import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.onNextIfDifferAndNotNull
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
-import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTFieldHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTFieldHelper
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import java.util.*
 import javax.inject.Inject
@@ -44,7 +44,7 @@ class FieldDetailViewModel(app: Application) : RealmViewModel(app) {
 
     val typeObservable = BehaviorSubject.create<Int>()
 
-    val defaultValuePolicyObservable = BehaviorSubject.createDefault(-1)
+    val defaultValuePolicyObservable = BehaviorSubject.createDefault(OTFieldDAO.DEFAULT_VALUE_POLICY_NULL)
     val defaultValuePresetObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable(null))
 
     val isRequiredObservable = BehaviorSubject.createDefault<Boolean>(false)
@@ -71,8 +71,8 @@ class FieldDetailViewModel(app: Application) : RealmViewModel(app) {
             isRequiredObservable.onNextIfDifferAndNotNull(value)
         }
 
-    var defaultValuePolicy: Int
-        get() = defaultValuePolicyObservable.value ?: -1
+    var defaultValuePolicy: String
+        get() = defaultValuePolicyObservable.value ?: OTFieldDAO.DEFAULT_VALUE_POLICY_NULL
         set(value) {
             defaultValuePolicyObservable.onNextIfDifferAndNotNull(value)
         }

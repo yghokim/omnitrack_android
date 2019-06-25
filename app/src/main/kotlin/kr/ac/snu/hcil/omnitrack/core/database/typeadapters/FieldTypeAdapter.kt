@@ -34,7 +34,7 @@ class FieldTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerComp
                     BackendDbManager.FIELD_NAME -> dao.name = reader.nextString()
                     "isRequired" -> dao.isRequired = reader.nextBoolean()
                     "type" -> dao.type = reader.nextInt()
-                    "fallbackPolicy" -> dao.fallbackValuePolicy = reader.nextInt()
+                    "fallbackPolicy" -> dao.fallbackValuePolicy = reader.nextString()
                     "fallbackPreset" -> dao.fallbackPresetSerializedValue = reader.nextString()
                     BackendDbManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
                     BackendDbManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
@@ -134,7 +134,8 @@ class FieldTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerComp
                 BackendDbManager.FIELD_POSITION -> applyTo.position = json.getIntCompat(key) ?: 0
                 "connection" -> applyTo.serializedConnection = json.getStringCompat(key)
                 "type" -> json.getIntCompat(key)?.let { applyTo.type = it }
-                "fallbackPolicy" -> applyTo.fallbackValuePolicy = json[key].asInt
+                "fallbackPolicy" -> applyTo.fallbackValuePolicy = json.getStringCompat(key)
+                        ?: OTFieldDAO.DEFAULT_VALUE_POLICY_NULL
                 "fallbackPreset" -> applyTo.fallbackPresetSerializedValue = json.getStringCompat(key)
 
                 BackendDbManager.FIELD_IS_IN_TRASHCAN -> applyTo.isInTrashcan = json.getBooleanCompat(key) ?: false

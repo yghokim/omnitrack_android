@@ -13,13 +13,13 @@ import io.realm.Realm
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.fields.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.fields.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.core.fields.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.fields.logics.TimePointSorter
 import kr.ac.snu.hcil.omnitrack.core.fields.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.fields.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.core.types.TimePoint
 import java.text.SimpleDateFormat
@@ -36,8 +36,6 @@ class OTTimeFieldHelper(context: Context) : OTFieldHelper(context) {
         const val GRANULARITY_DAY = 0
         const val GRANULARITY_MINUTE = 1
         const val GRANULARITY_SECOND = 2
-
-
     }
 
 
@@ -64,7 +62,7 @@ class OTTimeFieldHelper(context: Context) : OTFieldHelper(context) {
         return R.drawable.icon_small_time
     }
 
-    override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
+    override val supportedFallbackPolicies: LinkedHashMap<String, FallbackPolicyResolver>
         get() = super.supportedFallbackPolicies.apply {
             this[OTFieldDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(context.applicationContext, R.string.msg_intrinsic_time, isValueVolatile = true) {
                 override fun getFallbackValue(field: OTFieldDAO, realm: Realm): Single<Nullable<out Any>> {

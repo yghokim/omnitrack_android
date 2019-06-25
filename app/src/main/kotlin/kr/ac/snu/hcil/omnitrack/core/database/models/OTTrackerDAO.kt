@@ -228,7 +228,7 @@ open class OTFieldDAO : RealmObject() {
     var properties = RealmList<OTStringStringEntryDAO>()
 
     //If connection is specified, this policy is overriden.
-    var fallbackValuePolicy: Int = DEFAULT_VALUE_POLICY_NULL
+    var fallbackValuePolicy: String = DEFAULT_VALUE_POLICY_NULL
     var fallbackPresetSerializedValue: String? = null
 
     var userCreatedAt: Long = System.currentTimeMillis()
@@ -334,9 +334,9 @@ open class OTFieldDAO : RealmObject() {
 
     companion object {
 
-        const val DEFAULT_VALUE_POLICY_NULL = 0
-        const val DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE = 1
-        const val DEFAULT_VALUE_POLICY_FILL_WITH_PRESET = 2
-        const val DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM = 3
+        const val DEFAULT_VALUE_POLICY_NULL = "null"
+        const val DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE = "intrinsic"
+        const val DEFAULT_VALUE_POLICY_FILL_WITH_PRESET = "preset"
+        const val DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM = "last"
     }
 }

@@ -489,7 +489,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         val typeObservable = BehaviorSubject.createDefault(-1)
         val iconObservable = BehaviorSubject.createDefault<Int>(R.drawable.icon_small_longtext)
         val connectionObservable = BehaviorSubject.create<Nullable<OTConnection>>()
-        val defaultValuePolicyObservable = BehaviorSubject.createDefault<Int>(OTFieldDAO.DEFAULT_VALUE_POLICY_NULL)
+        val defaultValuePolicyObservable = BehaviorSubject.createDefault<String>(OTFieldDAO.DEFAULT_VALUE_POLICY_NULL)
         val defaultValuePresetObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable(null))
 
         val isHiddenObservable = BehaviorSubject.createDefault(false)
@@ -533,7 +533,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 }
             }
 
-        var defaultValuePolicy: Int
+        var defaultValuePolicy: String
             get() = defaultValuePolicyObservable.value ?: OTFieldDAO.DEFAULT_VALUE_POLICY_NULL
             set(value) {
                 if (value != defaultValuePolicyObservable.value) {

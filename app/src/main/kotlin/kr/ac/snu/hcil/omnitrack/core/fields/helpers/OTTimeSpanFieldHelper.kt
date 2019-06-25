@@ -8,6 +8,8 @@ import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemValueEntryDAO
 import kr.ac.snu.hcil.omnitrack.core.fields.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.fields.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.core.fields.logics.AFieldValueSorter
@@ -15,8 +17,6 @@ import kr.ac.snu.hcil.omnitrack.core.fields.logics.TimeSpanIntervalSorter
 import kr.ac.snu.hcil.omnitrack.core.fields.logics.TimeSpanPivotalSorter
 import kr.ac.snu.hcil.omnitrack.core.fields.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.fields.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemValueEntryDAO
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.core.types.TimeSpan
 import java.text.SimpleDateFormat
@@ -31,7 +31,7 @@ class OTTimeSpanFieldHelper(context: Context) : OTFieldHelper(context) {
         const val PROPERTY_GRANULARITY = "granularity"
         const val PROPERTY_TYPE = "type"
 
-        const val FALLBACK_POLICY_ID_TIMESPAN_CONNECT_PREVIOUS = 11
+        const val FALLBACK_POLICY_ID_TIMESPAN_CONNECT_PREVIOUS = "connect"
 
         const val GRANULARITY_DAY = 0
         const val GRANULARITY_MINUTE = 1
@@ -93,7 +93,7 @@ class OTTimeSpanFieldHelper(context: Context) : OTFieldHelper(context) {
         }
     }
 
-    override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
+    override val supportedFallbackPolicies: LinkedHashMap<String, FallbackPolicyResolver>
         get() = super.supportedFallbackPolicies.apply {
             this[OTFieldDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(context.applicationContext, R.string.msg_intrinsic_time, isValueVolatile = true) {
                 override fun getFallbackValue(field: OTFieldDAO, realm: Realm): Single<Nullable<out Any>> {

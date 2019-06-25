@@ -25,10 +25,10 @@ import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
-import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
-import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTFieldHelper
 import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTFieldHelper
 import kr.ac.snu.hcil.omnitrack.core.system.OTMeasureFactoryManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.OTFieldViewFactoryManager
@@ -547,7 +547,7 @@ class FieldDetailActivity : MultiButtonActionBarActivity(R.layout.activity_field
         currentSpinnerEntries.clear()
     }
 
-    data class FallbackSpinnerEntry(val id: Int, val text: String) {
+    data class FallbackSpinnerEntry(val id: String, val text: String) {
         override fun toString(): String {
             return text
         }

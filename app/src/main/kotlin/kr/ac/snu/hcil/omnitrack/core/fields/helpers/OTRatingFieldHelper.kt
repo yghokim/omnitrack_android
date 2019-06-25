@@ -5,13 +5,13 @@ import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.fields.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.fields.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.core.fields.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.fields.logics.NumericSorter
 import kr.ac.snu.hcil.omnitrack.core.fields.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.fields.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.core.types.Fraction
 import kr.ac.snu.hcil.omnitrack.core.types.RatingOptions
@@ -73,9 +73,7 @@ class OTRatingFieldHelper(context: Context) : OTFieldHelper(context), ISingleNum
     }
 
 
-
-
-    override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
+    override val supportedFallbackPolicies: LinkedHashMap<String, FallbackPolicyResolver>
         get() = super.supportedFallbackPolicies.apply{
             this[OTFieldDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = MiddleValueFallbackPolicyResolver()
         }
