@@ -17,11 +17,13 @@ import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.ExpressionEvaluator
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerMeasureEntry
+import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.flags.F
 import kr.ac.snu.hcil.omnitrack.core.flags.LockFlagLevel
 import kr.ac.snu.hcil.omnitrack.core.flags.LockedPropertiesHelper
@@ -226,6 +228,22 @@ open class OTTriggerDAO : RealmObject() {
 
     fun invalidateConditionCache() {
         _condition = null
+    }
+
+    fun initializeUserCreated() {
+
+        @Suppress("SENSELESS_COMPARISON")
+        if (BuildConfig.DEFAULT_EXPERIMENT_ID != null) {
+            experimentIdInFlags = BuildConfig.DEFAULT_EXPERIMENT_ID
+            serializedCreationFlags = CreationFlagsHelper.Builder(serializedCreationFlags)
+                    .setInjected(false)
+                    .setExperiment(BuildConfig.DEFAULT_EXPERIMENT_ID)
+                    .build()
+        }
+
+        val flags = LockedPropertiesHelper.generateDefaultFlags(lockFlagLevel, true)
+        serializedLockedPropertyInfo = flags.toString()
+        _parsedLockedPropertyInfo = flags
     }
 
     fun initialize(forceRefresh: Boolean = false) {

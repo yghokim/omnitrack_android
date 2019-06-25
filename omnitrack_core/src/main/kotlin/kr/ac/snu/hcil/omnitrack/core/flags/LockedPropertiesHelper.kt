@@ -71,4 +71,14 @@ object LockedPropertiesHelper : AFlagsHelperBase() {
             } else getDefaultValue(level, flag)
         }
     }
+
+    fun generateDefaultFlags(level: String, fillWith: Boolean?): JsonObject {
+        val obj = JsonObject()
+        val map = defaultValueDict.getWithFirstKey(level)
+        map?.keys?.forEach { flag ->
+            obj.addProperty(flag, fillWith ?: map[flag])
+        }
+
+        return obj
+    }
 }

@@ -19,7 +19,6 @@ import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
@@ -28,6 +27,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.typeadapters.ServerCompatibleTypeAdapter
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForTracker
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
@@ -148,25 +148,6 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 registerSyncJob()
             } else if (value != colorObservable.value) {
                 colorObservable.onNext(value)
-            }
-        }
-
-    var assignedExperimentId: String?
-        get() = experimentIdObservable.value?.datum
-        set(value) {
-            if (trackerDao != null) {
-                if (!CreationFlagsHelper.isInjected(trackerDao!!.getParsedCreationFlags())) {
-                    realm.executeTransactionIfNotIn {
-                        trackerDao?.serializedCreationFlags = CreationFlagsHelper.Builder(trackerDao?.serializedCreationFlags
-                                ?: "{}").setExperiment(value).build()
-                        trackerDao?.experimentIdInFlags = value
-                        trackerDao?.clearCreationFlagsCache()
-                        trackerDao?.synchronizedAt = null
-                    }
-                    registerSyncJob()
-                }
-            } else {
-                experimentIdObservable.onNextIfDifferAndNotNull(Nullable(value))
             }
         }
 
@@ -307,17 +288,17 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         out.putString("currentDao", trackerTypeAdapter.get().toJson(currentDao))
     }
 
-    fun addNewAttribute(name: String, type: Int, processor: ((OTFieldDAO, Realm) -> OTFieldDAO)? = null) {
+    fun addNewField(name: String, type: Int, processor: ((OTFieldDAO, Realm) -> OTFieldDAO)? = null) {
         val newDao = OTFieldDAO()
         newDao._id = UUID.randomUUID().toString()
         newDao.name = name
         newDao.type = type
         newDao.trackerId = trackerId
-        newDao.initialize(getApplication<OTApp>())
+        newDao.initializeUserCreated(getApplication<OTApp>())
         processor?.invoke(newDao, realm)
 
         if (trackerDao != null) {
-            newDao.localId = fieldManager.get().makeNewAttributeLocalId(newDao.userCreatedAt)
+            newDao.localId = fieldManager.get().makeNewFieldLocalId(newDao.userCreatedAt)
             newDao.trackerId = trackerDao?._id
 
             realm.executeTransactionIfNotIn {
@@ -425,8 +406,6 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
             trackerDao.experimentIdInFlags = BuildConfig.DEFAULT_EXPERIMENT_ID
             trackerDao.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(BuildConfig.DEFAULT_EXPERIMENT_ID).build()
-        } else if (isInjectedObservable.value != true) {
-            trackerDao.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(assignedExperimentId).build()
         }
 
         currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
@@ -441,9 +420,10 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         if (trackerDao == null) {
             removedAttributes.clear()
             val trackerDao = makeUnmanagedTrackerDaoFromSettings()
+            trackerDao.initializeUserCreatedTracker()
 
             currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
-                attrViewModel.fieldDAO.localId = fieldManager.get().makeNewAttributeLocalId(attrViewModel.fieldDAO.userCreatedAt)
+                attrViewModel.fieldDAO.localId = fieldManager.get().makeNewFieldLocalId(attrViewModel.fieldDAO.userCreatedAt)
                 attrViewModel.fieldDAO.trackerId = trackerDao._id
                 attrViewModel.fieldDAO.position = index
             }

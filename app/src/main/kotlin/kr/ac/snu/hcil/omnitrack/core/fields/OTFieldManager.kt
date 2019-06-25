@@ -11,8 +11,8 @@ import kr.ac.snu.hcil.android.common.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.android.common.containers.CachedObjectPoolWithIntegerKey
 import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.fields.helpers.*
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -57,7 +57,7 @@ class OTFieldManager @Inject constructor(val context: Context, val authManager: 
 
     private val fieldLocalIdGenerator = ConcurrentUniqueLongGenerator()
 
-    fun makeNewAttributeLocalId(createdAt: Long = System.currentTimeMillis()): String {
+    fun makeNewFieldLocalId(createdAt: Long = System.currentTimeMillis()): String {
         val nanoStamp = fieldLocalIdGenerator.getNewUniqueLong(createdAt)
 
         val id = authManager.get().deviceLocalKey + "_" + nanoStamp.toString(36)

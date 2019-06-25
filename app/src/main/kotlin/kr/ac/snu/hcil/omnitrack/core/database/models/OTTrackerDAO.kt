@@ -12,11 +12,12 @@ import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
-import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTFieldHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTStringStringEntryDAO
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTFieldHelper
 import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.flags.F
 import kr.ac.snu.hcil.omnitrack.core.flags.LockFlagLevel
@@ -94,6 +95,18 @@ open class OTTrackerDAO : RealmObject() {
             _parsedCreationFlags = CreationFlagsHelper.parseFlags(serializedCreationFlags)
         }
         return _parsedCreationFlags!!
+    }
+
+    fun initializeUserCreatedTracker() {
+        val flags = LockedPropertiesHelper.generateDefaultFlags(LockFlagLevel.Tracker, true)
+        this._parsedLockedPropertyInfo = flags
+        this.serializedLockedPropertyInfo = flags.toString()
+
+
+        if (!BuildConfig.DEFAULT_EXPERIMENT_ID.isNullOrBlank()) {
+            this.experimentIdInFlags = BuildConfig.DEFAULT_EXPERIMENT_ID
+            this.serializedCreationFlags = CreationFlagsHelper.Builder().setExperiment(BuildConfig.DEFAULT_EXPERIMENT_ID).build()
+        }
     }
 
     @Ignore
@@ -275,7 +288,10 @@ open class OTFieldDAO : RealmObject() {
         return (context.applicationContext as OTAndroidApp).applicationComponent.getAttributeManager().get(type)
     }
 
-    fun initialize(context: Context) {
+    fun initializeUserCreated(context: Context) {
+        val lockedFlags = LockedPropertiesHelper.generateDefaultFlags(LockFlagLevel.Field, true)
+        serializedLockedPropertyInfo = lockedFlags.toString()
+        _parsedLockedPropertyInfo = lockedFlags
         initializePropertiesWithDefaults(context)
         getHelper(context).initialize(this)
     }

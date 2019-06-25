@@ -284,7 +284,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
 
         OTApp.applicationComponent = this.applicationComponent
 
-        //initialize modules===============================================
+        //initializeUserCreated modules===============================================
 
         logger = LoggingDbHelper(this)
         logger.writeSystemLog("Application creates.", "OTApp")

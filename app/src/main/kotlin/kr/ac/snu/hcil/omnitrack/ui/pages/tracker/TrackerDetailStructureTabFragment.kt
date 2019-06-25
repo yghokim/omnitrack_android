@@ -30,8 +30,8 @@ import kr.ac.snu.hcil.android.common.view.container.AdapterLinearLayout
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
-import kr.ac.snu.hcil.omnitrack.core.fields.FieldPresetInfo
 import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
+import kr.ac.snu.hcil.omnitrack.core.fields.FieldPresetInfo
 import kr.ac.snu.hcil.omnitrack.core.flags.F
 import kr.ac.snu.hcil.omnitrack.core.flags.LockFlagLevel
 import kr.ac.snu.hcil.omnitrack.core.flags.LockedPropertiesHelper
@@ -648,7 +648,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         val newAttributeName = DefaultNameGenerator.generateName(typeInfo.name, currentAttributeViewModelList.map {
             it.nameObservable.value ?: ""
         }, true)
-        this.viewModel.addNewAttribute(newAttributeName, typeInfo.typeId, typeInfo.processor)
+        this.viewModel.addNewField(newAttributeName, typeInfo.typeId, typeInfo.processor)
         scrollToBottomReserved = true
         eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_ADD, "", viewModel.trackerId) { content ->
             content["type"] = typeInfo.typeId

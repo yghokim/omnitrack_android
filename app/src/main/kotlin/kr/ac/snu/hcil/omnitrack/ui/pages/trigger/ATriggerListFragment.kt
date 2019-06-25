@@ -45,7 +45,6 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
-import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.TriggerFireBroadcastReceiver
@@ -174,19 +173,10 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
     protected open fun makeNewDefaultTrigger(conditionType: Byte): OTTriggerDAO {
         val newDao = OTTriggerDAO()
-
-        @Suppress("SENSELESS_COMPARISON")
-        if (BuildConfig.DEFAULT_EXPERIMENT_ID != null) {
-            newDao.experimentIdInFlags = BuildConfig.DEFAULT_EXPERIMENT_ID
-            newDao.serializedCreationFlags = CreationFlagsHelper.Builder(newDao.serializedCreationFlags)
-                    .setInjected(false)
-                    .setExperiment(BuildConfig.DEFAULT_EXPERIMENT_ID)
-                    .build()
-        }
-
         newDao.conditionType = conditionType
         onProcessNewDefaultTrigger(newDao)
         newDao.initialize()
+        newDao.initializeUserCreated()
         return newDao
     }
 

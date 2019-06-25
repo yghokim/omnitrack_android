@@ -19,17 +19,17 @@ import io.realm.Realm
 import kr.ac.snu.hcil.android.common.view.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.fields.FieldPresetInfo
 import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.fields.SimpleFieldPresetInfo
 import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTChoiceFieldHelper
 import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTTimeFieldHelper
 import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTTimeSpanFieldHelper
-import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import org.jetbrains.anko.padding
 import java.util.*
 import javax.inject.Inject
@@ -294,9 +294,9 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
         newDao.name = name
         newDao.type = type
         newDao.trackerId = trackerId
-        newDao.initialize(parent.context)
+        newDao.initializeUserCreated(parent.context)
         processor?.invoke(newDao, realm)
-        newDao.localId = fieldManager.makeNewAttributeLocalId(newDao.userCreatedAt)
+        newDao.localId = fieldManager.makeNewFieldLocalId(newDao.userCreatedAt)
         newDao.trackerId = trackerDao._id
 
 

@@ -25,4 +25,8 @@ class TwoKeyDictionary<Key1Type, Key2Type, ValueType> {
             return null
         }
     }
+
+    fun getWithFirstKey(key1: Key1Type): Map<Key2Type, ValueType>? {
+        return key1Pivots[key1]?.toMap()
+    }
 }
