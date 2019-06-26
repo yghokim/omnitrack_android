@@ -4,6 +4,7 @@ import androidx.work.*
 import dagger.Module
 import dagger.Provides
 import dagger.internal.Factory
+import kr.ac.snu.hcil.omnitrack.core.synchronization.OTBinaryUploadCommands
 import kr.ac.snu.hcil.omnitrack.core.workers.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
@@ -69,7 +70,7 @@ class ScheduledJobModule {
         return OneTimeWorkRequest.Builder(OTBinaryUploadWorker::class.java)
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
                 .setConstraints(networkConstraints)
-                .addTag(OTBinaryUploadWorker.TAG)
+                .addTag(OTBinaryUploadCommands.TAG)
                 .build()
     }
 
@@ -77,7 +78,6 @@ class ScheduledJobModule {
     @Singleton
     @UsageLogger
     fun providesUsageLogUploadRequest(): OneTimeWorkRequest {
-
         return OneTimeWorkRequest.Builder(OTUsageLogUploadWorker::class.java)
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, OneTimeWorkRequest.DEFAULT_BACKOFF_DELAY_MILLIS, TimeUnit.SECONDS)
                 .setInitialDelay(3, TimeUnit.SECONDS)

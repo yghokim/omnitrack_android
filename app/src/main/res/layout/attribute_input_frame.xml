@@ -121,7 +121,7 @@
         android:layout_marginBottom="12dp"
 
         app:layout_constraintTop_toTopOf="@id/sidebar"
-        app:layout_constraintBottom_toTopOf="@id/ui_connection_indicator"
+        app:layout_constraintBottom_toTopOf="@+id/ui_connection_indicator"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/sidebar"
 

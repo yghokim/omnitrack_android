@@ -15,6 +15,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
@@ -35,6 +36,9 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : Lifecycle
 
     @Inject
     lateinit var syncManager: Lazy<OTSyncManager>
+
+    @Inject
+    lateinit var binaryUploadManager: Lazy<OTBinaryStorageController>
 
     @Inject
     lateinit var eventLogger: Lazy<IEventLogger>
@@ -66,11 +70,6 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : Lifecycle
     fun onCreate() {
         refreshUsername()
 
-        userWatchDisposable.set(
-                authManager.authTokenChanged.subscribe { token ->
-                    refreshUsername()
-                }
-        )
         /*
 parentActivity.signedInUserObservable.toFlowable(BackpressureStrategy.LATEST).flatMap { userId ->
     backendRealm = realmFactory.get()
@@ -132,41 +131,46 @@ parentActivity.signedInUserObservable.toFlowable(BackpressureStrategy.LATEST).fl
     }
 
     fun onDestroy() {
-        userWatchDisposable.set(null)
         subscriptions.clear()
     }
 
     fun onShowSidebar() {
         println("sidebar showed")
+        userWatchDisposable.set(
+                authManager.authTokenChanged.subscribe { token ->
+                    refreshUsername()
+                }
+        )
     }
 
     fun onHideSidebar() {
         println("sidebar hidden")
+        userWatchDisposable.set(null)
     }
 
     inner class SidebarMenuAdapter : RecyclerViewMenuAdapter() {
 
         private val menus = arrayListOf(
 
-                RecyclerViewMenuAdapter.MenuItem(R.drawable.ic_person_black_24dp, parentActivity.getString(R.string.activity_title_my_account), null, {
+                MenuItem(R.drawable.ic_person_black_24dp, parentActivity.getString(R.string.activity_title_my_account), null, {
                     val intent = Intent(parentActivity, MyAccountActivity::class.java)
                     parentActivity.startActivity(intent)
                 }, true),
 
-                RecyclerViewMenuAdapter.MenuItem(R.drawable.settings_dark, parentActivity.getString(R.string.msg_settings), null, {
+                MenuItem(R.drawable.settings_dark, parentActivity.getString(R.string.msg_settings), null, {
                     val intent = Intent(parentActivity, SettingsActivity::class.java)
                     parentActivity.startActivity(intent)
                 }, true),
 
-                RecyclerViewMenuAdapter.MenuItem(R.drawable.help_dark, parentActivity.getString(R.string.msg_about), null, {
+                MenuItem(R.drawable.help_dark, parentActivity.getString(R.string.msg_about), null, {
                     val intent = Intent(parentActivity, AboutActivity::class.java)
                     parentActivity.startActivity(intent)
                 }, true),
 
-                RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_refresh, "Refresh", null, {
-                    //OTApp.instance.syncManager.performSynchronizationOf(ESyncDataType.ITEM)
+                MenuItem(R.drawable.icon_refresh, "Refresh", null, {
                     syncManager.get().queueFullSync(ignoreFlags = false)
-                    syncManager.get().reserveSyncServiceNow()
+                    syncManager.get().refreshWorkers()
+                    binaryUploadManager.get().refreshWorkers()
                 }, true)
         ).apply {
 
@@ -180,7 +184,7 @@ parentActivity.signedInUserObservable.toFlowable(BackpressureStrategy.LATEST).fl
                 )*/
 
                 add(
-                        RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_package_dark, parentActivity.getString(R.string.msg_export_tracking_plan), null, {
+                        MenuItem(R.drawable.icon_package_dark, parentActivity.getString(R.string.msg_export_tracking_plan), null, {
                             val intent = Intent(parentActivity, PackageExportActivity::class.java)
                             parentActivity.startActivity(intent)
                         }, true)
@@ -189,7 +193,7 @@ parentActivity.signedInUserObservable.toFlowable(BackpressureStrategy.LATEST).fl
 
             if (BuildConfig.ENABLE_DYNAMIC_API_KEY_MODIFICATION == true) {
                 add(
-                        RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_key, "API Keys", null, {
+                        MenuItem(R.drawable.icon_key, "API Keys", null, {
                             val intent = Intent(parentActivity, ApiKeySettingsActivity::class.java)
                             parentActivity.startActivity(intent)
                         }, true)
@@ -200,7 +204,7 @@ parentActivity.signedInUserObservable.toFlowable(BackpressureStrategy.LATEST).fl
             if (BuildConfig.BUILD_TYPE.toLowerCase() == "debug") {
                 //get access to the console log screen on debug mode
                 add(
-                        RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_clipnote, "Debug Logs", null, {
+                        MenuItem(R.drawable.icon_clipnote, "Debug Logs", null, {
                             val intent = Intent(parentActivity, SystemLogActivity::class.java)
                             parentActivity.startActivity(intent)
                         }, true))

@@ -5,5 +5,5 @@
             <solid android:color="@color/frontalBackground" />
         </shape>
     </item>
-    <item android:drawable="@drawable/expanded_view_inner_shadow"></item>
+    <item android:drawable="@drawable/expanded_view_inner_shadow" />
 </layer-list>

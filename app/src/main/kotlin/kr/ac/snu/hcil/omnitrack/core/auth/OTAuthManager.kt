@@ -21,8 +21,10 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.BinaryStorageServer
 import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.di.global.UserInfo
+import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
 import kr.ac.snu.hcil.omnitrack.core.serialization.getStringCompat
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTAppFlagManager
@@ -42,11 +44,13 @@ class OTAuthManager @Inject constructor(
         private val context: Context,
         @UserInfo private val sharedPreferences: SharedPreferences,
         @Backend private val realmFactory: Factory<Realm>,
+        @BinaryStorageServer private val binaryUploadTaskRealmFactory: Factory<Realm>,
         @ForGeneric private val gson: Lazy<Gson>,
         private val syncManager: OTSyncManager,
         private val triggerSystemManager: Lazy<OTTriggerSystemManager>,
         private val shortcutPanelManager: OTShortcutPanelManager,
         private val authApiController: Lazy<IAuthServerAPI>,
+        private val binaryStorageController: Lazy<OTBinaryStorageController>,
         private val appFlagManager: OTAppFlagManager) {
 
     companion object {
@@ -213,8 +217,15 @@ class OTAuthManager @Inject constructor(
                 triggerSystemManager.get().checkOutAllFromSystem(lastUserId)
                 shortcutPanelManager.disposeShortcutPanel()
                 syncManager.clearSynchronizationOnDevice()
+                binaryStorageController.get().clearWorkersOnDevice()
 
                 realmFactory.get().use { realm ->
+                    realm.executeTransactionIfNotIn {
+                        realm.deleteAll()
+                    }
+                }
+
+                binaryUploadTaskRealmFactory.get().use { realm ->
                     realm.executeTransactionIfNotIn {
                         realm.deleteAll()
                     }

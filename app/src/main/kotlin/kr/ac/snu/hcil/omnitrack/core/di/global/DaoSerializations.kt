@@ -104,10 +104,6 @@ class DaoSerializationModule {
 @Retention(AnnotationRetention.RUNTIME) annotation class ForItem
 
 @Qualifier
-@Retention(AnnotationRetention.RUNTIME)
-annotation class ForValueConnection
-
-@Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class ForServerTrigger
 
 @Qualifier

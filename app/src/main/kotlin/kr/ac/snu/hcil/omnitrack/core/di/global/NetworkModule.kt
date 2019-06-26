@@ -142,7 +142,7 @@ class NetworkModule {
     fun provideBinaryStorageController(
             @BinaryStorageServer workRequest: Provider<OneTimeWorkRequest>,
             core: IBinaryStorageCore): OTBinaryStorageController {
-        return OTBinaryStorageController(workRequest, core, provideRealm())
+        return OTBinaryStorageController(workRequest, core, provideRealmFactory())
     }
 
     /**
@@ -189,7 +189,10 @@ class NetworkModule {
         RealmConfiguration.Builder().name("media_storage.db").modules(UploadTaskQueueRealmModule()).deleteRealmIfMigrationNeeded().build()
     }
 
-    private fun provideRealm(): Factory<Realm> {
+    @Provides
+    @Singleton
+    @BinaryStorageServer
+    fun provideRealmFactory(): Factory<Realm> {
         return object : Factory<Realm> {
             override fun get(): Realm {
                 return Realm.getInstance(realmConfiguration)

@@ -181,7 +181,6 @@
             android:name=".services.OTItemLoggingService"
             android:exported="false" />
         <service android:name=".services.OTReminderService" />
-        <service android:name=".services.OTBinaryLocalCacheService" />
 
         <service android:name="com.github.javiersantos.appupdater.services.AppUpdateService" />
         <service android:name=".services.OTDeviceStatusService" />

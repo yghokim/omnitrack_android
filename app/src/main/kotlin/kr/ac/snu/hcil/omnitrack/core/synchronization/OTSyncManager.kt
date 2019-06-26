@@ -64,6 +64,17 @@ class OTSyncManager @Inject constructor(
         }
     }
 
+    @Synchronized
+    fun refreshWorkers() {
+        WorkManager.getInstance().let {
+            it.cancelUniqueWork(OTSynchronizationWorker.TAG)
+            it.cancelAllWorkByTag(OTSynchronizationWorker.TAG)
+        }
+
+        reserveSyncServiceNow()
+        reservePeriodicSyncWorker()
+    }
+
 
     fun makeSynchronizationTask(batchData: SyncQueueDbHelper.AggregatedSyncQueue): Completable {
         val downDirection = Completable.defer {

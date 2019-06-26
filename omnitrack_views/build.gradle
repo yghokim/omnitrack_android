@@ -45,7 +45,7 @@ dependencies {
 
     implementation "androidx.vectordrawable:vectordrawable:1.0.1"
     implementation "androidx.vectordrawable:vectordrawable-animated:$rootProject.ext.android_support_version"
-    implementation "androidx.core:core-ktx:1.0.1"
+    implementation "androidx.core:core-ktx:1.0.2"
 
     implementation "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttp_version"
 

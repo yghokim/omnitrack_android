@@ -503,11 +503,11 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
         Intent galleryIntent;
         Uri uri;
         if (builder.mediaType == Builder.MediaType.IMAGE) {
-            galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            galleryIntent.setType("image/*");
+            galleryIntent = new Intent(Intent.ACTION_PICK);
+            galleryIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
         } else {
-            galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-            galleryIntent.setType("video/*");
+            galleryIntent = new Intent(Intent.ACTION_PICK);
+            galleryIntent.setDataAndType(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, "video/*");
 
         }
 

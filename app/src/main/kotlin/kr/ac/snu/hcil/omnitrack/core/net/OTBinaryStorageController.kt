@@ -8,8 +8,8 @@ import dagger.internal.Factory
 import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.UploadTaskInfo
+import kr.ac.snu.hcil.omnitrack.core.synchronization.OTBinaryUploadCommands
 import kr.ac.snu.hcil.omnitrack.core.types.OTServerFile
-import kr.ac.snu.hcil.omnitrack.core.workers.OTBinaryUploadWorker
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import java.util.*
 import javax.inject.Provider
@@ -36,7 +36,26 @@ class OTBinaryStorageController(
                 }
             }
         }
-        WorkManager.getInstance().enqueueUniqueWork(OTBinaryUploadWorker.TAG, ExistingWorkPolicy.KEEP, uploadRequest.get())
+
+        registerWorker()
+    }
+
+    @Synchronized
+    fun registerWorker() {
+        WorkManager.getInstance().enqueueUniqueWork(OTBinaryUploadCommands.TAG, ExistingWorkPolicy.KEEP, uploadRequest.get())
+    }
+
+    @Synchronized
+    fun refreshWorkers() {
+        clearWorkersOnDevice()
+        registerWorker()
+    }
+
+    fun clearWorkersOnDevice() {
+        WorkManager.getInstance().let {
+            it.cancelUniqueWork(OTBinaryUploadCommands.TAG)
+            it.cancelAllWorkByTag(OTBinaryUploadCommands.TAG)
+        }
     }
 
     fun makeServerPath(userId: String, trackerId: String, itemId: String, fieldLocalId: String, fileIdentifier: String): String {

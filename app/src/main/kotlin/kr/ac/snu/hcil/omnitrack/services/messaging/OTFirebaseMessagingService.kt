@@ -26,6 +26,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.di.global.InformationUpload
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.synchronization.OTBinaryUploadCommands
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSynchronizationCommands
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
@@ -162,6 +163,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
 
     private fun handleSyncUploadCommand(data: Map<String, String>) {
         OTSynchronizationCommands(this).createSynchronizationTask(true).blockingAwait()
+        OTBinaryUploadCommands(this).createWork(false).blockingAwait()
     }
 
     private fun handleDumpCommand(data: Map<String, String>) {

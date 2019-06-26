@@ -16,11 +16,6 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.analytics.OTUsageLoggingManager
-import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
-import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTAudioRecordFieldHelper
-import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTFileInvolvedFieldHelper
-import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTImageFieldHelper
-import kr.ac.snu.hcil.omnitrack.core.fields.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions.RealmLazyFunction
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
@@ -28,7 +23,13 @@ import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitApi
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTAudioRecordFieldHelper
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTFileInvolvedFieldHelper
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTImageFieldHelper
+import kr.ac.snu.hcil.omnitrack.core.fields.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
+import kr.ac.snu.hcil.omnitrack.core.synchronization.OTBinaryUploadCommands
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSynchronizationCommands
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
@@ -38,7 +39,6 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.measures.OTItemMetadataMeasureFactoryLogicImpl
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
-import kr.ac.snu.hcil.omnitrack.core.workers.OTBinaryUploadWorker
 import kr.ac.snu.hcil.omnitrack.core.workers.OTInformationUploadWorker
 import kr.ac.snu.hcil.omnitrack.core.workers.OTUsageLogUploadWorker
 import kr.ac.snu.hcil.omnitrack.receivers.DataDrivenTriggerCheckReceiver
@@ -53,16 +53,13 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioItemListView
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.OTFieldViewFactoryManager
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.AudioRecordInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.ChoiceInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.ImageInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.OTFieldViewFactoryManager
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.MultiLineChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.pages.SendReportActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.field.FieldDetailActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.field.FieldDetailViewModel
-import kr.ac.snu.hcil.omnitrack.ui.pages.field.wizard.pages.SourceSelectionPage
 import kr.ac.snu.hcil.omnitrack.ui.pages.auth.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.auth.SignUpActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.auth.SignUpCredentialSlideFragment
@@ -71,6 +68,9 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.export.PackageExportViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.export.UploadTemporaryPackageDialogFragment
+import kr.ac.snu.hcil.omnitrack.ui.pages.field.FieldDetailActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.field.FieldDetailViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.field.wizard.pages.SourceSelectionPage
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.*
@@ -286,10 +286,10 @@ interface ApplicationComponent {
 
     fun inject(expression: RealmLazyFunction)
 
-    fun inject(worker: OTBinaryUploadWorker)
     fun inject(worker: OTUsageLogUploadWorker)
     fun inject(worker: OTInformationUploadWorker)
     fun inject(commands: OTSynchronizationCommands)
+    fun inject(commands: OTBinaryUploadCommands)
 
     fun inject(task: OTReminderCommands)
 

@@ -26,7 +26,7 @@ static def fallbackUrl(String url){
         {
             return url
         }else throw new Exception("The URI does not have an HTTP or HTTPS scheme.")
-    }catch(Exception ex) {
+    }catch(Exception ignored) {
         return new URIBuilder().setPath(url).setScheme("http").build().toString()
     }
 }
@@ -261,11 +261,13 @@ dependencies {
     implementation "androidx.vectordrawable:vectordrawable-animated:$rootProject.ext.android_support_version"
     implementation "androidx.exifinterface:exifinterface:$rootProject.ext.android_support_version"
 
-    implementation 'com.google.android.gms:play-services-maps:16.1.0'
-    implementation 'com.google.android.gms:play-services-fitness:16.0.1'
 
-    implementation 'com.google.firebase:firebase-core:16.0.9'
-    implementation 'com.google.firebase:firebase-messaging:18.0.0'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.android.gms:play-services-fitness:17.0.0'
+
+    implementation 'com.google.firebase:firebase-core:17.0.0'
+    implementation 'com.google.firebase:firebase-messaging:19.0.1'
 
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     def work_version = "2.0.1"
