@@ -29,8 +29,7 @@ class OTFieldManager @Inject constructor(val context: Context, val authManager: 
         const val TYPE_NUMBER = 0
         const val TYPE_TIME = 1
         const val TYPE_TIMESPAN = 2
-        const val TYPE_SHORT_TEXT = 3
-        const val TYPE_LONG_TEXT = 4
+        const val TYPE_TEXT = 3
         const val TYPE_LOCATION = 5
         const val TYPE_CHOICE = 6
         const val TYPE_RATING = 7
@@ -44,8 +43,7 @@ class OTFieldManager @Inject constructor(val context: Context, val authManager: 
             TYPE_NUMBER -> OTNumberFieldHelper(context)
             TYPE_TIME -> OTTimeFieldHelper(context)
             TYPE_TIMESPAN -> OTTimeSpanFieldHelper(context)
-            TYPE_SHORT_TEXT -> OTShortTextFieldHelper(context)
-            TYPE_LONG_TEXT -> OTLongTextFieldHelper(context)
+            TYPE_TEXT -> OTTextFieldHelper(context)
             TYPE_LOCATION -> OTLocationFieldHelper(context)
             TYPE_CHOICE -> OTChoiceFieldHelper(context)
             TYPE_RATING -> OTRatingFieldHelper(context)

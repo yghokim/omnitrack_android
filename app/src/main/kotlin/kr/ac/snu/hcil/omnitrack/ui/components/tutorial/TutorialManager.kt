@@ -40,7 +40,7 @@ class TutorialManager(val context: Context) {
     }
 
     fun checkAndShowSequence(tag: String, closeFlagAfterClose: Boolean, activity: Activity, stopWhenTappedTarget: Boolean, sequenceList: List<TapTargetInfo>): Boolean {
-        if ((DEBUG_ALWAYS_SHOW_TUTORIAL || !hasShownTutorials(tag)) && BuildConfig.SHOW_TUTORIALS) {
+        if ((DEBUG_ALWAYS_SHOW_TUTORIAL || !hasShownTutorials(tag)) && BuildConfig.SHOW_TUTORIALS && sequenceList.isNotEmpty()) {
 
             val list = sequenceList.asSequence().mapIndexed { index, sequence ->
                 val sequenceFlagKey = "${tag}_seq_$index"
@@ -79,8 +79,10 @@ class TutorialManager(val context: Context) {
                 })
             }
 
-            list.first().first.show()
-            return true
+            if (list.isNotEmpty()) {
+                list.first().first.show()
+                return true
+            } else return false
         } else return false
     }
 

@@ -20,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.core.fields.FieldPresetInfo
 import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.fields.SimpleFieldPresetInfo
 import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTChoiceFieldHelper
+import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTTextFieldHelper
 import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTTimeFieldHelper
 import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTTimeSpanFieldHelper
 import javax.inject.Inject
@@ -81,55 +82,63 @@ class FieldPresetSelectionBottomSheetFragment : DismissingBottomSheetDialogFragm
 
     private fun makeAttributePresets(): Array<FieldPresetInfo> {
         return arrayOf(
-                SimpleFieldPresetInfo(OTFieldManager.TYPE_SHORT_TEXT, R.drawable.field_icon_shorttext, this.getString(R.string.type_shorttext_name), this.getString(R.string.type_shorttext_desc)),
-                SimpleFieldPresetInfo(OTFieldManager.TYPE_LONG_TEXT, R.drawable.field_icon_longtext, this.getString(R.string.type_longtext_name), this.getString(R.string.type_longtext_desc)),
+                FieldPresetInfo(OTFieldManager.TYPE_TEXT, R.drawable.field_icon_shorttext, this.getString(R.string.type_shorttext_name), this.getString(R.string.type_shorttext_desc)) { dao, realm ->
+                    fieldManager.get(OTFieldManager.TYPE_TEXT)
+                            .setPropertyValue(OTTextFieldHelper.PROPERTY_INPUT_TYPE, OTTextFieldHelper.INPUT_TYPE_SHORT, dao, realm)
+                    dao
+                },
+                FieldPresetInfo(OTFieldManager.TYPE_TEXT, R.drawable.field_icon_longtext, this.getString(R.string.type_longtext_name), this.getString(R.string.type_longtext_desc)) { dao, realm ->
+                    fieldManager.get(OTFieldManager.TYPE_TEXT)
+                            .setPropertyValue(OTTextFieldHelper.PROPERTY_INPUT_TYPE, OTTextFieldHelper.INPUT_TYPE_LONG, dao, realm)
+                    dao
+                },
                 SimpleFieldPresetInfo(OTFieldManager.TYPE_NUMBER, R.drawable.field_icon_number, this.getString(R.string.type_number_name), this.getString(R.string.type_number_desc)),
                 SimpleFieldPresetInfo(OTFieldManager.TYPE_RATING, R.drawable.field_icon_rating, this.getString(R.string.type_rating_name), this.getString(R.string.type_rating_desc)),
                 //                SimpleFieldPresetInfo(OTFieldManager.TYPE_TIME, R.drawable.field_icon_time, this.getString(R.string.type_timepoint_name), this.getString(R.string.type_timepoint_desc)),
 
-                FieldPresetInfo(OTFieldManager.TYPE_TIME, R.drawable.field_icon_time_hour, this.getString(R.string.type_timepoint_time_name), this.getString(R.string.type_timepoint_time_desc),
-                        { dao, realm ->
-                            fieldManager.get(OTFieldManager.TYPE_TIME)
-                                    .setPropertyValue(OTTimeFieldHelper.GRANULARITY, OTTimeFieldHelper.GRANULARITY_MINUTE, dao, realm)
-                            dao
-                        }),
+                FieldPresetInfo(OTFieldManager.TYPE_TIME, R.drawable.field_icon_time_hour, this.getString(R.string.type_timepoint_time_name), this.getString(R.string.type_timepoint_time_desc)
+                ) { dao, realm ->
+                    fieldManager.get(OTFieldManager.TYPE_TIME)
+                            .setPropertyValue(OTTimeFieldHelper.GRANULARITY, OTTimeFieldHelper.GRANULARITY_MINUTE, dao, realm)
+                    dao
+                },
 
-                FieldPresetInfo(OTFieldManager.TYPE_TIME, R.drawable.field_icon_time_date, this.getString(R.string.type_timepoint_date_name), this.getString(R.string.type_timepoint_date_desc),
-                        { dao, realm ->
-                            fieldManager.get(OTFieldManager.TYPE_TIME)
-                                    .setPropertyValue(OTTimeFieldHelper.GRANULARITY, OTTimeFieldHelper.GRANULARITY_DAY, dao, realm)
-                            dao
-                        }),
+                FieldPresetInfo(OTFieldManager.TYPE_TIME, R.drawable.field_icon_time_date, this.getString(R.string.type_timepoint_date_name), this.getString(R.string.type_timepoint_date_desc)
+                ) { dao, realm ->
+                    fieldManager.get(OTFieldManager.TYPE_TIME)
+                            .setPropertyValue(OTTimeFieldHelper.GRANULARITY, OTTimeFieldHelper.GRANULARITY_DAY, dao, realm)
+                    dao
+                },
 
-                FieldPresetInfo(OTFieldManager.TYPE_TIMESPAN, R.drawable.field_icon_timer, this.getString(R.string.type_timespan_name), this.getString(R.string.type_timespan_desc),
-                        { dao, realm ->
-                            fieldManager.get(OTFieldManager.TYPE_TIMESPAN)
-                                    .setPropertyValue(OTTimeSpanFieldHelper.PROPERTY_GRANULARITY, OTTimeSpanFieldHelper.GRANULARITY_MINUTE, dao, realm)
-                            dao
-                        }),
-                FieldPresetInfo(OTFieldManager.TYPE_TIMESPAN, R.drawable.field_icon_time_range_date, this.getString(R.string.type_timespan_date_name), this.getString(R.string.type_timespan_date_desc),
-                        { dao, realm ->
-                            fieldManager.get(OTFieldManager.TYPE_TIMESPAN)
-                                    .setPropertyValue(OTTimeSpanFieldHelper.PROPERTY_GRANULARITY, OTTimeSpanFieldHelper.GRANULARITY_DAY, dao, realm)
-                            dao
-                        }),
+                FieldPresetInfo(OTFieldManager.TYPE_TIMESPAN, R.drawable.field_icon_timer, this.getString(R.string.type_timespan_name), this.getString(R.string.type_timespan_desc)
+                ) { dao, realm ->
+                    fieldManager.get(OTFieldManager.TYPE_TIMESPAN)
+                            .setPropertyValue(OTTimeSpanFieldHelper.PROPERTY_GRANULARITY, OTTimeSpanFieldHelper.GRANULARITY_MINUTE, dao, realm)
+                    dao
+                },
+                FieldPresetInfo(OTFieldManager.TYPE_TIMESPAN, R.drawable.field_icon_time_range_date, this.getString(R.string.type_timespan_date_name), this.getString(R.string.type_timespan_date_desc)
+                ) { dao, realm ->
+                    fieldManager.get(OTFieldManager.TYPE_TIMESPAN)
+                            .setPropertyValue(OTTimeSpanFieldHelper.PROPERTY_GRANULARITY, OTTimeSpanFieldHelper.GRANULARITY_DAY, dao, realm)
+                    dao
+                },
                 SimpleFieldPresetInfo(OTFieldManager.TYPE_LOCATION, R.drawable.field_icon_location, this.getString(R.string.type_location_name), this.getString(R.string.type_location_desc)),
                 SimpleFieldPresetInfo(OTFieldManager.TYPE_IMAGE, R.drawable.field_icon_image, this.getString(R.string.type_image_name), this.getString(R.string.type_image_desc)),
                 SimpleFieldPresetInfo(OTFieldManager.TYPE_AUDIO, R.drawable.field_icon_audio, this.getString(R.string.type_audio_record_name), this.getString(R.string.type_audio_record_desc)),
 
-                FieldPresetInfo(OTFieldManager.TYPE_CHOICE, R.drawable.field_icon_singlechoice, this.getString(R.string.type_single_choice_name), this.getString(R.string.type_single_choice_desc),
-                        { dao, realm ->
-                            fieldManager.get(OTFieldManager.TYPE_CHOICE)
-                                    .setPropertyValue(OTChoiceFieldHelper.PROPERTY_MULTISELECTION, false, dao, realm)
-                            dao
-                        }),
+                FieldPresetInfo(OTFieldManager.TYPE_CHOICE, R.drawable.field_icon_singlechoice, this.getString(R.string.type_single_choice_name), this.getString(R.string.type_single_choice_desc)
+                ) { dao, realm ->
+                    fieldManager.get(OTFieldManager.TYPE_CHOICE)
+                            .setPropertyValue(OTChoiceFieldHelper.PROPERTY_MULTISELECTION, false, dao, realm)
+                    dao
+                },
 
-                FieldPresetInfo(OTFieldManager.TYPE_CHOICE, R.drawable.field_icon_multiplechoice, this.getString(R.string.type_multiple_choices_name), this.getString(R.string.type_multiple_choices_desc),
-                        { dao, realm ->
-                            fieldManager.get(OTFieldManager.TYPE_CHOICE)
-                                    .setPropertyValue(OTChoiceFieldHelper.PROPERTY_MULTISELECTION, true, dao, realm)
-                            dao
-                        })
+                FieldPresetInfo(OTFieldManager.TYPE_CHOICE, R.drawable.field_icon_multiplechoice, this.getString(R.string.type_multiple_choices_name), this.getString(R.string.type_multiple_choices_desc)
+                ) { dao, realm ->
+                    fieldManager.get(OTFieldManager.TYPE_CHOICE)
+                            .setPropertyValue(OTChoiceFieldHelper.PROPERTY_MULTISELECTION, true, dao, realm)
+                    dao
+                }
 
         )
     }

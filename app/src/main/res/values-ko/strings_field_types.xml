@@ -70,5 +70,8 @@
     <string name="msg_intrinsic_number">0으로 채우기</string>
     <string name="msg_intrinsic_rating">중간점수로 자동입력</string>
     <string name="msg_intrinsic_time">현재 시점으로 입력</string>
+    <string name="msg_text_field_property_input_type">입력 방식</string>
+    <string name="msg_text_field_input_type_short">단문</string>
+    <string name="msg_text_field_input_type_long">장문</string>
 
 </resources>

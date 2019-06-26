@@ -68,6 +68,9 @@
     <string name="msg_intrinsic_number">Insert zero</string>
     <string name="msg_intrinsic_rating">The midpoint score</string>
     <string name="msg_intrinsic_time">Present</string>
+    <string name="msg_text_field_property_input_type">Input Type</string>
+    <string name="msg_text_field_input_type_short">Short Text</string>
+    <string name="msg_text_field_input_type_long">Long Text</string>
 
 
 </resources>
