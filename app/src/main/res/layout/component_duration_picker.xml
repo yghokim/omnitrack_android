@@ -100,9 +100,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
+        tools:visibility="visible"
         app:constraint_referenced_ids="ui_keypad_1,ui_keypad_2,ui_keypad_3,ui_keypad_4,ui_keypad_5,ui_keypad_6,ui_keypad_7,ui_keypad_8,ui_keypad_9,ui_keypad_0,ui_keypad_00,ui_keypad_up" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/ui_keypad_1"
         style="@style/durationPickerKeyPadStyle"
         android:layout_width="0dp"
@@ -112,7 +113,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ui_digit_area" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/ui_keypad_2"
         style="@style/durationPickerKeyPadStyle"
         android:layout_width="0dp"
@@ -122,7 +123,7 @@
         app:layout_constraintStart_toEndOf="@id/ui_keypad_1"
         app:layout_constraintTop_toTopOf="@id/ui_keypad_1" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/ui_keypad_3"
         style="@style/durationPickerKeyPadStyle"
         android:layout_width="0dp"
@@ -132,7 +133,7 @@
         app:layout_constraintStart_toEndOf="@id/ui_keypad_2"
         app:layout_constraintTop_toTopOf="@id/ui_keypad_1" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/ui_keypad_4"
         style="@style/durationPickerKeyPadStyle"
         android:layout_width="0dp"
@@ -142,7 +143,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ui_keypad_1" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/ui_keypad_5"
         style="@style/durationPickerKeyPadStyle"
         android:layout_width="0dp"
@@ -153,7 +154,7 @@
         app:layout_constraintStart_toEndOf="@id/ui_keypad_4"
         app:layout_constraintTop_toTopOf="@id/ui_keypad_4" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/ui_keypad_6"
         style="@style/durationPickerKeyPadStyle"
         android:layout_width="0dp"
@@ -164,7 +165,7 @@
         app:layout_constraintTop_toTopOf="@id/ui_keypad_4" />
 
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/ui_keypad_7"
         style="@style/durationPickerKeyPadStyle"
         android:layout_width="0dp"
@@ -174,7 +175,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ui_keypad_4" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/ui_keypad_8"
         style="@style/durationPickerKeyPadStyle"
         android:layout_width="0dp"
@@ -184,7 +185,7 @@
         app:layout_constraintStart_toEndOf="@id/ui_keypad_7"
         app:layout_constraintTop_toTopOf="@id/ui_keypad_7" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/ui_keypad_9"
         style="@style/durationPickerKeyPadStyle"
         android:layout_width="0dp"
@@ -194,7 +195,7 @@
         app:layout_constraintStart_toEndOf="@id/ui_keypad_8"
         app:layout_constraintTop_toTopOf="@id/ui_keypad_7" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/ui_keypad_00"
         style="@style/durationPickerKeyPadStyle"
         android:layout_width="0dp"
@@ -204,12 +205,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ui_keypad_7" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/ui_keypad_0"
         style="@style/durationPickerKeyPadStyle"
         android:layout_width="0dp"
-        android:text="0"
-
+        android:foregroundGravity="center"
+        android:text="00"
+        android:textAlignment="center"
         app:layout_constraintEnd_toStartOf="@id/ui_keypad_up"
         app:layout_constraintStart_toEndOf="@id/ui_keypad_00"
         app:layout_constraintTop_toTopOf="@id/ui_keypad_00" />

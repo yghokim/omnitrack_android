@@ -28,18 +28,18 @@
         android:layout_height="@dimen/button_height_tall"
         android:orientation="horizontal">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/ui_button_cancel"
-            style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/msg_cancel"
             android:textColor="@color/colorRed_Light" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/ui_button_previous"
-            style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -48,7 +48,8 @@
             android:visibility="gone" />
 
 
-        <Button
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:id="@+id/ui_button_ok"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
