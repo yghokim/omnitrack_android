@@ -54,27 +54,58 @@ class FieldTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerComp
                     }
                     "properties" -> {
                         val list = ArrayList<OTStringStringEntryDAO>()
-                        reader.beginArray()
-                        while (reader.hasNext()) {
-                            val entry = OTStringStringEntryDAO()
-                            reader.beginObject()
-                            while (reader.hasNext()) {
-                                when (reader.nextName()) {
-                                    "id" -> entry.id = reader.nextString()
-                                    "key" -> entry.key = reader.nextString()
-                                    "sVal" -> entry.value = reader.nextString()
-                                    else -> reader.skipValue()
+
+                        when (reader.peek()) {
+
+                            JsonToken.BEGIN_ARRAY -> {
+                                reader.beginArray()
+                                while (reader.hasNext()) {
+                                    val entry = OTStringStringEntryDAO()
+                                    reader.beginObject()
+                                    while (reader.hasNext()) {
+                                        when (reader.nextName()) {
+                                            "id" -> entry.id = reader.nextString()
+                                            "key" -> entry.key = reader.nextString()
+                                            "sVal" -> entry.value = reader.nextString()
+                                            else -> reader.skipValue()
+                                        }
+                                    }
+                                    reader.endObject()
+
+                                    if (isServerMode || entry.id.isBlank()) {
+                                        entry.id = UUID.randomUUID().toString()
+                                    }
+
+                                    list.add(entry)
                                 }
+                                reader.endArray()
                             }
-                            reader.endObject()
+                            JsonToken.BEGIN_OBJECT -> {
+                                //new version
+                                reader.beginObject()
+                                while (reader.hasNext()) {
+                                    val propertyKey = reader.nextName()
+                                    val sVal: String? = when (reader.peek()) {
+                                        JsonToken.BEGIN_OBJECT -> gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
+                                        JsonToken.BOOLEAN -> reader.nextBoolean().toString()
+                                        JsonToken.NULL -> {
+                                            reader.nextNull()
+                                            null
+                                        }
+                                        else -> reader.nextString()
+                                    }
 
-                            if (isServerMode || entry.id.isBlank()) {
-                                entry.id = UUID.randomUUID().toString()
+                                    val entry = OTStringStringEntryDAO().apply {
+                                        this.key = propertyKey
+                                        this.value = sVal
+                                        this.id = UUID.randomUUID().toString()
+                                    }
+                                    list.add(entry)
+                                }
+                                reader.endObject()
                             }
-
-                            list.add(entry)
                         }
-                        reader.endArray()
+
                         dao.properties.addAll(list)
                     }
                     else -> reader.skipValue()
@@ -108,20 +139,32 @@ class FieldTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerComp
         writer.name(BackendDbManager.FIELD_USER_CREATED_AT).value(value.userCreatedAt)
         writer.name("connection").jsonValue(value.serializedConnection)
         writer.name(BackendDbManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
-        writer.name("properties").beginArray()
 
-        value.properties.forEach { prop ->
-            writer.beginObject()
+        if (isServerMode) {
+            //object-based properties for server JSON
+            writer.name("properties").beginObject()
 
-            if (!isServerMode)
+            value.properties.forEach { prop ->
+                writer.name(prop.key).jsonValue(prop.value)
+            }
+
+            writer.endObject()
+        } else {
+            //array-based properties
+            writer.name("properties").beginArray()
+
+            value.properties.forEach { prop ->
+                writer.beginObject()
+
                 writer.name("id").value(prop.id)
 
-            writer.name("key").value(prop.key)
-            writer.name("sVal").value(prop.value)
-            writer.endObject()
-        }
+                writer.name("key").value(prop.key)
+                writer.name("sVal").value(prop.value)
+                writer.endObject()
+            }
 
-        writer.endArray()
+            writer.endArray()
+        }
 
         writer.endObject()
     }
@@ -138,8 +181,10 @@ class FieldTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerComp
                         ?: OTFieldDAO.DEFAULT_VALUE_POLICY_NULL
                 "fallbackPreset" -> applyTo.fallbackPresetSerializedValue = json.getStringCompat(key)
 
-                BackendDbManager.FIELD_IS_IN_TRASHCAN -> applyTo.isInTrashcan = json.getBooleanCompat(key) ?: false
-                BackendDbManager.FIELD_IS_HIDDEN -> applyTo.isHidden = json.getBooleanCompat(key) ?: false
+                BackendDbManager.FIELD_IS_IN_TRASHCAN -> applyTo.isInTrashcan = json.getBooleanCompat(key)
+                        ?: false
+                BackendDbManager.FIELD_IS_HIDDEN -> applyTo.isHidden = json.getBooleanCompat(key)
+                        ?: false
 
                 "properties" -> {
                     if (json[key].isJsonArray) {
