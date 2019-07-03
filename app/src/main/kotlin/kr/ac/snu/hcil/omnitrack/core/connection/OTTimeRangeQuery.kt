@@ -21,12 +21,12 @@ class OTTimeRangeQuery {
             out.name("mode").value(value.mode)
             out.name("anchored").value(value.anchorToNow)
             if (value.isBinAndOffsetAvailable) {
-                out.name("bin_size").value(value.binSize)
-                out.name("bin_offset").value(value.binOffset)
+                out.name("binSize").value(value.binSize)
+                out.name("binOffset").value(value.binOffset)
             }
 
             if (value.needsLinkedAttribute) {
-                out.name("linked_attr").value(value.linkedAttributeId)
+                out.name("linkedFieldId").value(value.linkedAttributeId)
             }
 
             out.endObject()
@@ -41,9 +41,9 @@ class OTTimeRangeQuery {
                 when (reader.nextName()) {
                     "mode" -> out.mode = reader.nextInt()
                     "anchored" -> out.anchorToNow = reader.nextBoolean()
-                    "bin_size" -> out.binSize = reader.nextInt()
-                    "bin_offset" -> out.binOffset = reader.nextInt()
-                    "linked_attr" -> out.linkedAttributeId = reader.nextString()
+                    "binSize" -> out.binSize = reader.nextInt()
+                    "binOffset" -> out.binOffset = reader.nextInt()
+                    "linkedFieldId" -> out.linkedAttributeId = reader.nextString()
                 }
             }
 
