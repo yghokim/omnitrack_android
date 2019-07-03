@@ -20,7 +20,6 @@ import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
@@ -50,7 +49,7 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
         const val REQUEST_CODE = 5244
 
         const val FIELD_FACTORY_CODE = "factoryCode"
-        const val FIELD_SERIALIZED_MEASURE = "serializedMeasure"
+        const val FIELD_SERIALIZED_MEASURE = "serializedMeasureArguments"
         const val FIELD_MEASURE_HISTORY = "measureHistory"
 
         const val FIELD_TRIGGERS = "triggers"
@@ -88,7 +87,7 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
             if (condition.timeQuery.equals(timeQueryTypeAdapter.get().fromJson(measureEntry.serializedTimeQuery))) {
                 val measureFactory = externalServiceManager.get().getMeasureFactoryByCode(conditionMeasure.factoryCode)
                 if (measureFactory != null) {
-                    return conditionMeasure.equals(measureFactory.makeMeasure(measureEntry.serializedMeasure!!))
+                    return conditionMeasure.equals(measureFactory.makeMeasure(measureEntry.serializedMeasureArguments))
                 } else return false
             } else return false
         } else return false
@@ -214,7 +213,7 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
                     val newMeasureEntry = realm.createObject(OTTriggerMeasureEntry::class.java, measureEntryIdGenerator.getNewUniqueLong())
                     newMeasureEntry.triggers.add(trigger)
                     newMeasureEntry.factoryCode = measure.factoryCode
-                    newMeasureEntry.serializedMeasure = measure.getFactory<OTMeasureFactory>().serializeMeasure(measure)
+                    newMeasureEntry.serializedMeasureArguments = (context.applicationContext as OTAndroidApp).applicationComponent.genericGson().toJson(measure.arguments)
                     newMeasureEntry.serializedTimeQuery = timeQueryTypeAdapter.get().toJson(condition.timeQuery)
                     newMeasureEntry.isActive = true
                 }

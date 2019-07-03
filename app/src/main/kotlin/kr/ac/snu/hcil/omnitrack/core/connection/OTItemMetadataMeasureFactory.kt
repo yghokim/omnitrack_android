@@ -18,7 +18,7 @@ abstract class OTItemMetadataMeasureFactory(context: Context, factoryTypeName: S
 
     protected abstract fun extractValueFromMetadata(metadata: JsonObject): Any?
 
-    open class OTMetaDataMeasure(factory: OTItemMetadataMeasureFactory) : OTMeasure(factory) {
+    open class OTMetaDataMeasure(factory: OTItemMetadataMeasureFactory, arguments: JsonObject?) : OTMeasure(factory, arguments) {
         override fun getValueRequest(builder: OTItemBuilderWrapperBase?, query: OTTimeRangeQuery?): Single<Nullable<out Any>> {
             val serializedMetadata = builder?.dao?.serializedMetadata
             if (serializedMetadata != null) {

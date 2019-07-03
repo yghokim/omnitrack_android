@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.google.gson.stream.JsonReader
+import com.google.gson.JsonObject
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -28,6 +28,7 @@ class OTUnSupportedDummyService(context: Context, pref: SharedPreferences) : OTE
     override val descResourceId: Int = 0
 
     class OTUnSupportedDummyMeasureFactory(context: Context, parentService: OTUnSupportedDummyService) : OTServiceMeasureFactory(context, parentService, "Dummy") {
+
         override fun getAttributeType(): Int = -1
 
         override val isRangedQueryAvailable: Boolean = false
@@ -37,28 +38,13 @@ class OTUnSupportedDummyService(context: Context, pref: SharedPreferences) : OTE
         override val minimumGranularity: OTTimeRangeQuery.Granularity? = null
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_STRING
 
-        override fun makeMeasure(): OTMeasure {
+
+        override fun makeMeasure(arguments: JsonObject?): OTMeasure {
             throw UnsupportedOperationException("This method is unused for UnSupportedDummyMeasure.")
         }
 
-        override fun makeMeasure(reader: JsonReader): OTMeasure {
-            throw UnsupportedOperationException("This method is unused for UnSupportedDummyMeasure.")
-        }
-
-        override fun makeMeasure(serialized: String): OTMeasure {
-            throw UnsupportedOperationException("This method is unused for UnSupportedDummyMeasure.")
-        }
-
-        override fun serializeMeasure(measure: OTMeasure): String {
-            if (measure is DummyMeasure) {
-                return measure.originalJson
-            } else {
-                return "{}"
-            }
-        }
-
-        fun makeMeasure(factoryCode: String, originalJson: String): DummyMeasure {
-            return DummyMeasure(this, factoryCode, originalJson)
+        fun makeMeasure(factoryCode: String, arguments: JsonObject?): DummyMeasure {
+            return DummyMeasure(this, factoryCode, arguments)
         }
 
         override val nameResourceId: Int = R.string.msg_external_service_unsupported_measure
@@ -78,7 +64,7 @@ class OTUnSupportedDummyService(context: Context, pref: SharedPreferences) : OTE
         }
     }
 
-    class DummyMeasure(factory: OTUnSupportedDummyMeasureFactory, val originalFactoryCode: String, val originalJson: String) : OTMeasureFactory.OTMeasure(factory) {
+    class DummyMeasure(factory: OTUnSupportedDummyMeasureFactory, val originalFactoryCode: String, arguments: JsonObject?) : OTMeasureFactory.OTMeasure(factory, arguments) {
         override val factoryCode: String
             get() = originalFactoryCode
 
@@ -92,9 +78,9 @@ class OTUnSupportedDummyService(context: Context, pref: SharedPreferences) : OTE
 
         override fun equals(other: Any?): Boolean {
             return if (other is DummyMeasure) {
-                other.originalFactoryCode == originalFactoryCode && other.originalJson == originalJson
+                other.originalFactoryCode == originalFactoryCode && other.arguments == arguments
             } else if (other is OTMeasureFactory.OTMeasure) {
-                other.factoryCode == originalFactoryCode && other.getFactory<OTMeasureFactory>().serializeMeasure(other) == originalJson
+                other.factoryCode == originalFactoryCode && other.arguments == arguments
             } else false
         }
     }

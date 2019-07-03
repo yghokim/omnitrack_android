@@ -2,11 +2,12 @@ package kr.ac.snu.hcil.omnitrack.core.connection
 
 import android.content.Context
 import android.text.Html
-import com.google.gson.stream.JsonReader
+import com.google.gson.JsonObject
 import io.reactivex.Observable
 import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.INameDescriptionResourceProvider
 import kr.ac.snu.hcil.android.common.containers.Nullable
+import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 
@@ -30,10 +31,12 @@ abstract class OTMeasureFactory(val context: Context, val factoryTypeName: Strin
      */
     abstract val dataTypeName: String
 
-    abstract fun makeMeasure(): OTMeasure
-    abstract fun makeMeasure(reader: JsonReader): OTMeasure
-    abstract fun makeMeasure(serialized: String): OTMeasure
-    abstract fun serializeMeasure(measure: OTMeasure): String
+    abstract fun makeMeasure(arguments: JsonObject? = null): OTMeasure
+
+    fun makeMeasure(serializedArguments: String?): OTMeasure {
+        val args = (context.applicationContext as OTAndroidApp).applicationComponent.genericGson().fromJson(serializedArguments, JsonObject::class.java)
+        return makeMeasure(args)
+    }
 
     fun getFormattedName(): CharSequence {
         //val html = "<b>${context.resources.getString(nameResourceId)}</b> | ${context.resources.getString(parentService.nameResourceId)}"
@@ -55,7 +58,7 @@ abstract class OTMeasureFactory(val context: Context, val factoryTypeName: Strin
         return "<b>${context.resources.getString(nameResourceId)}</b>"
     }
 
-    abstract class OTMeasure(private val factory: OTMeasureFactory) {
+    abstract class OTMeasure(private val factory: OTMeasureFactory, val arguments: JsonObject?) {
 
         open val factoryCode: String get() = this.factory.typeCode
 
@@ -71,7 +74,7 @@ abstract class OTMeasureFactory(val context: Context, val factoryTypeName: Strin
         }
     }
 
-    abstract class OTRangeQueriedMeasure(factory: OTMeasureFactory) : OTMeasure(factory) {
+    abstract class OTRangeQueriedMeasure(factory: OTMeasureFactory, arguments: JsonObject?) : OTMeasure(factory, arguments) {
 
         abstract fun getValueRequest(start: Long, end: Long): Single<Nullable<out Any>>
 

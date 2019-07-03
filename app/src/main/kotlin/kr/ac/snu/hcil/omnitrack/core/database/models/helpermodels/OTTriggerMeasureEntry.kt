@@ -17,7 +17,7 @@ open class OTTriggerMeasureEntry : RealmObject() {
     var factoryCode: String? = null
 
     @Required
-    var serializedMeasure: String? = null
+    var serializedMeasureArguments: String? = null
 
     @Required
     var serializedTimeQuery: String? = null

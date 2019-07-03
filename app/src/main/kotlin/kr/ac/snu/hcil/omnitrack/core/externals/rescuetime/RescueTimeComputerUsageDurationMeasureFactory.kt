@@ -1,13 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 
 import android.content.Context
-import com.google.gson.stream.JsonReader
+import com.google.gson.JsonObject
 import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
 import java.util.*
@@ -24,20 +24,8 @@ class RescueTimeComputerUsageDurationMeasureFactory(context: Context, service: R
     override val isRangedQueryAvailable: Boolean = true
     override val isDemandingUserInput: Boolean = false
 
-    override fun makeMeasure(): OTMeasure {
-        return ComputerUsageDurationMeasure(this)
-    }
-
-    override fun makeMeasure(reader: JsonReader): OTMeasure {
-        return ComputerUsageDurationMeasure(this)
-    }
-
-    override fun makeMeasure(serialized: String): OTMeasure {
-        return ComputerUsageDurationMeasure(this)
-    }
-
-    override fun serializeMeasure(measure: OTMeasure): String {
-        return "{}"
+    override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+        return ComputerUsageDurationMeasure(this, arguments)
     }
 
     override val nameResourceId: Int = R.string.measure_rescuetime_computer_usage_name
@@ -52,7 +40,7 @@ class RescueTimeComputerUsageDurationMeasureFactory(context: Context, service: R
 
     }
 
-    class ComputerUsageDurationMeasure(factory: RescueTimeComputerUsageDurationMeasureFactory) : OTRangeQueriedMeasure(factory) {
+    class ComputerUsageDurationMeasure(factory: RescueTimeComputerUsageDurationMeasureFactory, arguments: JsonObject?) : OTRangeQueriedMeasure(factory, arguments) {
 
         override fun getValueRequest(start: Long, end: Long): Single<Nullable<out Any>> {
             val factory = getFactory<RescueTimeComputerUsageDurationMeasureFactory>()

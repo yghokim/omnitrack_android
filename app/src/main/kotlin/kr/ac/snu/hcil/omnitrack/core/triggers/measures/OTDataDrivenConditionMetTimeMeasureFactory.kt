@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers.measures
 
 import android.content.Context
-import com.google.gson.stream.JsonReader
+import com.google.gson.JsonObject
 import io.reactivex.Observable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimePointMetadataMeasureFactory
@@ -18,20 +18,8 @@ class OTDataDrivenConditionMetTimeMeasureFactory(context: Context) : OTTimePoint
         return logicImpl.isAvailableToRequestValue(field, invalidMessages)
     }
 
-    override fun makeMeasure(): OTMeasure {
-        return OTMetaDataMeasure(this)
-    }
-
-    override fun makeMeasure(reader: JsonReader): OTMeasure {
-        return OTMetaDataMeasure(this)
-    }
-
-    override fun makeMeasure(serialized: String): OTMeasure {
-        return OTMetaDataMeasure(this)
-    }
-
-    override fun serializeMeasure(measure: OTMeasure): String {
-        return "{}"
+    override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+        return OTMetaDataMeasure(this, arguments)
     }
 
     override fun getCategoryName(): String = context.getString(R.string.msg_trigger_data_measure_category)

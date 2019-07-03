@@ -1,13 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
 import android.content.Context
-import com.google.gson.stream.JsonReader
+import com.google.gson.JsonObject
 import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import java.util.*
 
@@ -24,27 +24,15 @@ class MisfitStepMeasureFactory(context: Context, service: MisfitService) : OTSer
     override val minimumGranularity: OTTimeRangeQuery.Granularity? = OTTimeRangeQuery.Granularity.Day
     override val isDemandingUserInput: Boolean = false
 
-    override fun makeMeasure(): OTMeasure {
-        return MisfitStepMeasure(this)
-    }
-
-    override fun makeMeasure(reader: JsonReader): OTMeasure {
-        return MisfitStepMeasure(this)
-    }
-
-    override fun makeMeasure(serialized: String): OTMeasure {
-        return MisfitStepMeasure(this)
-    }
-
-    override fun serializeMeasure(measure: OTMeasure): String {
-        return "{}"
+    override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+        return MisfitStepMeasure(this, arguments)
     }
 
     override val nameResourceId: Int = R.string.measure_steps_name
     override val descResourceId: Int = R.string.measure_steps_desc
 
 
-    class MisfitStepMeasure(factory: MisfitStepMeasureFactory) : OTRangeQueriedMeasure(factory) {
+    class MisfitStepMeasure(factory: MisfitStepMeasureFactory, arguments: JsonObject?) : OTRangeQueriedMeasure(factory, arguments) {
 
         override fun getValueRequest(start: Long, end: Long): Single<Nullable<out Any>> {
             return Single.defer {

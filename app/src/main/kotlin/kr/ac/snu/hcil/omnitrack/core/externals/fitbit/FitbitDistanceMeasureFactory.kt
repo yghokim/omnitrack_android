@@ -1,15 +1,15 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
 import android.content.Context
-import com.google.gson.stream.JsonReader
+import com.google.gson.JsonObject
 import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.net.OAuth2Client
 import kr.ac.snu.hcil.android.common.time.TimeHelper
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
 import java.util.*
@@ -27,28 +27,15 @@ class FitbitDistanceMeasureFactory(context: Context, parentService: FitbitServic
 
     override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_FLOAT
 
-    override fun makeMeasure(): OTMeasure {
-        return FitbitDistanceMeasure(this)
-    }
-
-    override fun makeMeasure(reader: JsonReader): OTMeasure {
-        return FitbitDistanceMeasure(this)
-    }
-
-    override fun makeMeasure(serialized: String): OTMeasure {
-        return FitbitDistanceMeasure(this)
-    }
-
-
-    override fun serializeMeasure(measure: OTMeasure): String {
-        return "{}"
+    override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+        return FitbitDistanceMeasure(this, arguments)
     }
 
     override val descResourceId: Int = R.string.measure_fitbit_distance_desc
     override val nameResourceId: Int = R.string.measure_fitbit_distance_name
 
 
-    class FitbitDistanceMeasure(factory: FitbitDistanceMeasureFactory) : OTRangeQueriedMeasure(factory) {
+    class FitbitDistanceMeasure(factory: FitbitDistanceMeasureFactory, arguments: JsonObject?) : OTRangeQueriedMeasure(factory, arguments) {
 
         val dailyConverter = object : OAuth2Client.OAuth2RequestConverter<Float?> {
             override fun process(requestResultStrings: Array<String>): Float? {

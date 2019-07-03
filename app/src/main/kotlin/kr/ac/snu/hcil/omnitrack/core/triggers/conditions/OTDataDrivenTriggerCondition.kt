@@ -32,12 +32,14 @@ class OTDataDrivenTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TY
     class ConditionTypeAdapter(val externalServiceManager: OTExternalServiceManager, val timeRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>, val gson: Lazy<Gson>) : TypeAdapter<OTDataDrivenTriggerCondition>() {
         override fun write(out: JsonWriter, value: OTDataDrivenTriggerCondition) {
             out.beginObject()
-            out.name("factory")
+            out.name("measure")
             value.measure?.let {
-                out.beginArray()
+                out.beginObject()
+                        .name("code")
                         .value(it.factoryCode)
-                        .jsonValue(it.getFactory<OTMeasureFactory>().serializeMeasure(it))
-                        .endArray()
+                        .name("args")
+                        .jsonValue(it.arguments.toString())
+                        .endObject()
             } ?: out.nullValue()
 
             out.name("query")
@@ -62,25 +64,42 @@ class OTDataDrivenTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TY
                                 ?: ComparisonMethod.Exceed
                     }
                     "query" -> condition.timeQuery = timeRangeQueryTypeAdapter.get().read(reader)
-                    "factory" -> {
+                    "measure" -> {
                         if (reader.peek() == JsonToken.NULL) {
                             reader.skipValue()
                         } else {
-                            reader.beginArray()
-                            val factoryCode = reader.nextString()
-                            val factory = externalServiceManager.getMeasureFactoryByCode(typeCode = factoryCode)
-                            if (factory == null) {
-                                println("$factoryCode is not supported in System.")
-                                condition.measure = externalServiceManager.unSupportedDummyMeasureFactory.makeMeasure(factoryCode, gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString())
-                            } else {
-                                condition.measure = factory.makeMeasure(reader)
+                            var factoryCode: String? = null
+                            var arguments: JsonObject? = null
+                            reader.beginObject()
+                            while (reader.hasNext()) {
+                                when (reader.nextName()) {
+                                    "code" -> {
+                                        if (reader.peek() == JsonToken.NULL) {
+                                            reader.nextNull()
+                                        } else {
+                                            factoryCode = reader.nextString()
+                                        }
+                                    }
+                                    "args" -> {
+                                        if (reader.peek() == JsonToken.NULL) {
+                                            reader.nextNull()
+                                        } else {
+                                            arguments = gson.get().fromJson(reader, JsonObject::class.java)
+                                        }
+                                    }
+                                }
                             }
+                            reader.endObject()
 
-                            while (reader.peek() != JsonToken.END_ARRAY) {
-                                reader.skipValue()
+                            if (factoryCode != null) {
+                                val factory = externalServiceManager.getMeasureFactoryByCode(typeCode = factoryCode)
+                                if (factory == null) {
+                                    println("$factoryCode is not supported in System.")
+                                    condition.measure = externalServiceManager.unSupportedDummyMeasureFactory.makeMeasure(factoryCode, arguments)
+                                } else {
+                                    condition.measure = factory.makeMeasure(arguments)
+                                }
                             }
-
-                            reader.endArray()
                         }
                     }
                     else -> reader.skipValue()

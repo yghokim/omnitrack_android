@@ -2,12 +2,11 @@ package kr.ac.snu.hcil.omnitrack.core.triggers.measures
 
 import android.content.Context
 import com.google.gson.JsonObject
-import com.google.gson.stream.JsonReader
 import io.reactivex.Observable
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTItemMetadataMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataDrivenTriggerManager
 
@@ -28,20 +27,8 @@ class OTDataDrivenConditionMetValueMeasureFactory(context: Context) : OTItemMeta
         return metadata.get(OTDataDrivenTriggerManager.METADATA_KEY_VALUE)?.asBigDecimal
     }
 
-    override fun makeMeasure(): OTMeasure {
-        return OTMetaDataMeasure(this)
-    }
-
-    override fun makeMeasure(reader: JsonReader): OTMeasure {
-        return OTMetaDataMeasure(this)
-    }
-
-    override fun makeMeasure(serialized: String): OTMeasure {
-        return OTMetaDataMeasure(this)
-    }
-
-    override fun serializeMeasure(measure: OTMeasure): String {
-        return "{}"
+    override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+        return OTMetaDataMeasure(this, arguments)
     }
 
     override fun getCategoryName(): String = context.getString(R.string.msg_trigger_data_measure_category)

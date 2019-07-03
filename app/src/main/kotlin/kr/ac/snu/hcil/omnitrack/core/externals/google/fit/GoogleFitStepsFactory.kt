@@ -8,15 +8,15 @@ import com.google.android.gms.fitness.data.DataSource
 import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.fitness.request.DataReadRequest
-import com.google.gson.stream.JsonReader
+import com.google.gson.JsonObject
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import java.util.concurrent.TimeUnit
 
@@ -41,23 +41,11 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
 
     override fun getAttributeType() = OTFieldManager.TYPE_NUMBER
 
-    override fun makeMeasure(): OTMeasure {
-        return Measure(this)
+    override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+        return Measure(this, arguments)
     }
 
-    override fun makeMeasure(reader: JsonReader): OTMeasure {
-        return Measure(this)
-    }
-
-    override fun makeMeasure(serialized: String): OTMeasure {
-        return Measure(this)
-    }
-
-    override fun serializeMeasure(measure: OTMeasure): String {
-        return "{}"
-    }
-
-    class Measure(factory: GoogleFitStepsFactory) : OTRangeQueriedMeasure(factory) {
+    class Measure(factory: GoogleFitStepsFactory, arguments: JsonObject?) : OTRangeQueriedMeasure(factory, arguments) {
 
         override fun getValueRequest(start: Long, end: Long): Single<Nullable<out Any>> {
             println("Requested Google Fit Step Measure")

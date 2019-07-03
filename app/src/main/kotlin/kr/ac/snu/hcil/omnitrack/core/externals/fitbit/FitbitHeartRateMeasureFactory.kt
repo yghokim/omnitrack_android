@@ -1,13 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
 import android.content.Context
-import com.google.gson.stream.JsonReader
+import com.google.gson.JsonObject
 import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
 
@@ -24,26 +24,14 @@ class FitbitHeartRateMeasureFactory(context: Context, service: FitbitService) : 
     override val minimumGranularity: OTTimeRangeQuery.Granularity? = OTTimeRangeQuery.Granularity.Hour
     override val isDemandingUserInput: Boolean = false
 
-    override fun makeMeasure(): OTMeasure {
-        return FitbitHeartRateMeasure(this)
-    }
-
-    override fun makeMeasure(reader: JsonReader): OTMeasure {
-        return FitbitHeartRateMeasure(this)
-    }
-
-    override fun makeMeasure(serialized: String): OTMeasure {
-        return FitbitHeartRateMeasure(this)
-    }
-
-    override fun serializeMeasure(measure: OTMeasure): String {
-        return "{}"
+    override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+        return FitbitHeartRateMeasure(this, arguments)
     }
 
     override val nameResourceId: Int = R.string.measure_fitbit_heart_rate_name
     override val descResourceId: Int = R.string.measure_fitbit_heart_rate_desc
 
-    class FitbitHeartRateMeasure(factory: FitbitHeartRateMeasureFactory) : OTRangeQueriedMeasure(factory) {
+    class FitbitHeartRateMeasure(factory: FitbitHeartRateMeasureFactory, arguments: JsonObject?) : OTRangeQueriedMeasure(factory, arguments) {
         companion object {
             val converter = object : FitbitApi.AIntraDayConverter<Int, Int>("activities-heart-intraday") {
                 override fun extractValueFromDatum(datum: JSONObject): Int {

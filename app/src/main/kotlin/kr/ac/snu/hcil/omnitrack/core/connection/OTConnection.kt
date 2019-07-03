@@ -29,23 +29,43 @@ class OTConnection {
 
             while (reader.hasNext()) {
                 when (reader.nextName()) {
-                    "factory" -> {
-                        reader.beginArray()
-                        val factoryCode = reader.nextString()
-                        val factory = measureFactoryManager.getMeasureFactoryByCode(typeCode = factoryCode)
-                        if (factory == null) {
-                            println("$factoryCode is not supported in System.")
-
-                            connection.source = measureFactoryManager.serviceManager.unSupportedDummyMeasureFactory.makeMeasure(factoryCode, gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString())
-                        } else {
-                            connection.source = factory.makeMeasure(reader)
-                        }
-
-                        while (reader.peek() != JsonToken.END_ARRAY) {
+                    "measure" -> {
+                        if (reader.peek() == JsonToken.NULL) {
                             reader.skipValue()
-                        }
+                        } else {
+                            var factoryCode: String? = null
+                            var arguments: JsonObject? = null
+                            reader.beginObject()
+                            while (reader.hasNext()) {
+                                when (reader.nextName()) {
+                                    "code" -> {
+                                        if (reader.peek() == JsonToken.NULL) {
+                                            reader.nextNull()
+                                        } else {
+                                            factoryCode = reader.nextString()
+                                        }
+                                    }
+                                    "args" -> {
+                                        if (reader.peek() == JsonToken.NULL) {
+                                            reader.nextNull()
+                                        } else {
+                                            arguments = gson.get().fromJson(reader, JsonObject::class.java)
+                                        }
+                                    }
+                                }
+                            }
+                            reader.endObject()
+                            if (factoryCode != null) {
+                                val factory = measureFactoryManager.getMeasureFactoryByCode(typeCode = factoryCode)
+                                if (factory == null) {
+                                    println("$factoryCode is not supported in System.")
 
-                        reader.endArray()
+                                    connection.source = measureFactoryManager.serviceManager.unSupportedDummyMeasureFactory.makeMeasure(factoryCode, arguments)
+                                } else {
+                                    connection.source = factory.makeMeasure(arguments)
+                                }
+                            }
+                        }
                     }
 
                     "query" -> {
@@ -63,11 +83,11 @@ class OTConnection {
             out.beginObject()
 
             value.source?.let {
-                out.name("factory")
-                out.beginArray()
-                out.value(it.factoryCode)
-                out.jsonValue(it.getFactory<OTMeasureFactory>().serializeMeasure(it))
-                out.endArray()
+                out.name("measure")
+                out.beginObject()
+                        .name("code").value(it.factoryCode)
+                        .name("args").jsonValue(gson.get().toJson(it.arguments))
+                out.endObject()
             }
 
             value.rangedQuery?.let {

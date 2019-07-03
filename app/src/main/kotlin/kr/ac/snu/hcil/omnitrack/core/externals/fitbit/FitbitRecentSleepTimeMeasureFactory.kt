@@ -1,15 +1,15 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
 import android.content.Context
-import com.google.gson.stream.JsonReader
+import com.google.gson.JsonObject
 import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.net.AuthConstants
 import kr.ac.snu.hcil.android.common.net.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.core.types.TimeSpan
 import okhttp3.HttpUrl
@@ -29,26 +29,14 @@ class FitbitRecentSleepTimeMeasureFactory(context: Context, service: FitbitServi
     override val isDemandingUserInput: Boolean = false
 
 
-    override fun makeMeasure(): OTMeasure {
-        return FitbitRecentSleepTimeMeasure(this)
-    }
-
-    override fun makeMeasure(reader: JsonReader): OTMeasure {
-        return FitbitRecentSleepTimeMeasure(this)
-    }
-
-    override fun makeMeasure(serialized: String): OTMeasure {
-        return FitbitRecentSleepTimeMeasure(this)
-    }
-
-    override fun serializeMeasure(measure: OTMeasure): String {
-        return "{}"
+    override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+        return FitbitRecentSleepTimeMeasure(this, arguments)
     }
 
     override val descResourceId: Int = R.string.measure_fitbit_sleep_time_desc
     override val nameResourceId: Int = R.string.measure_fitbit_sleep_time_name
 
-    class FitbitRecentSleepTimeMeasure(factory: FitbitRecentSleepTimeMeasureFactory) : OTRangeQueriedMeasure(factory) {
+    class FitbitRecentSleepTimeMeasure(factory: FitbitRecentSleepTimeMeasureFactory, arguments: JsonObject?) : OTRangeQueriedMeasure(factory, arguments) {
 
 
         val converter = object : OAuth2Client.OAuth2RequestConverter<TimeSpan?> {
