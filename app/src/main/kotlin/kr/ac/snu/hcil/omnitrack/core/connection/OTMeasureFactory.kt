@@ -34,8 +34,12 @@ abstract class OTMeasureFactory(val context: Context, val factoryTypeName: Strin
     abstract fun makeMeasure(arguments: JsonObject? = null): OTMeasure
 
     fun makeMeasure(serializedArguments: String?): OTMeasure {
-        val args = (context.applicationContext as OTAndroidApp).applicationComponent.genericGson().fromJson(serializedArguments, JsonObject::class.java)
-        return makeMeasure(args)
+        if (serializedArguments == null || serializedArguments == "null") {
+            return makeMeasure(null as JsonObject?)
+        } else {
+            val args = (context.applicationContext as OTAndroidApp).applicationComponent.genericGson().fromJson(serializedArguments, JsonObject::class.java)
+            return makeMeasure(args)
+        }
     }
 
     fun getFormattedName(): CharSequence {
