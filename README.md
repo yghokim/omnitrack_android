@@ -12,9 +12,9 @@ For more information, Refer to the documentation of the OmniTrack Research Kit. 
 
 ## Author
 
-#### Young-Ho Kim (yhkim@hcil.snu.ac.kr)
+#### Young-Ho Kim (yghokim@umd.edu)
 http://younghokim.net
-Seoul National University
+University of Maryland, College Park
 
 ----
 
