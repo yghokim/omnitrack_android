@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.synchronization
 
 import android.content.Context
-import android.widget.Toast
 import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -46,7 +45,6 @@ class OTBinaryUploadCommands(val context: Context) {
                                         context.getString(R.string.msg_uploading_file_to_server), context.getString(R.string.msg_uploading), OTTaskNotificationManager.PROGRESS_INDETERMINATE,
                                         null, R.drawable.icon_cloud_upload).build())
 
-                        Toast.makeText(context, context.getString(R.string.msg_uploading_file_to_server), Toast.LENGTH_LONG).show()
                     }
                 }.doFinally {
                     context.runOnUiThread {
@@ -82,14 +80,15 @@ class OTBinaryUploadCommands(val context: Context) {
             realmFactory.get().use {
                 it.executeTransaction {
                     uploadTask.sessionUri = sessionUri
+                    it.copyToRealmOrUpdate(uploadTask)
                 }
             }
         }.observeOn(Schedulers.io()).doOnComplete {
             realmFactory.get().use {
                 val cacheEntry = it.where(LocalMediaCacheEntry::class.java).equalTo("serverPath", uploadTask.serverPath).findFirst()
-                it.executeTransaction {
+                it.executeTransaction { transactionRealm ->
                     cacheEntry?.synchronizedAt = System.currentTimeMillis()
-                    uploadTask.deleteFromRealm()
+                    transactionRealm.where(UploadTaskInfo::class.java).equalTo("id", uploadTask.id).findFirst()?.deleteFromRealm()
                 }
             }
         }.doOnError { err ->
@@ -107,11 +106,11 @@ class OTBinaryUploadCommands(val context: Context) {
                 println("continue with ${uploadTasks.count()} upload tasks...")
                 Single.zip(
                         uploadTasks.map { uploadTaskInfo -> convertUploadTask(uploadTaskInfo) }) { resultSet ->
-                    !resultSet.any { it == false }
-                }.flatMapCompletable {
-                    return@flatMapCompletable if (it == true) {
+                    Pair(resultSet.count { it == true }, resultSet.size)
+                }.flatMapCompletable { (success, total) ->
+                    return@flatMapCompletable if (success == total) {
                         crawlAndUpload(0)
-                    } else Completable.error(Exception("Some upload tasks were failed"))
+                    } else Completable.error(Exception("Some upload tasks were failed - ${total - success} of $total tasks failed."))
                 }
             }
         }
