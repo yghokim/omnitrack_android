@@ -148,7 +148,7 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
 
     fun activateOnSystem() {
 
-        WorkManager.getInstance().enqueueUniquePeriodicWork(
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 "CLEAR_INACTIVE_ENTRIES", ExistingPeriodicWorkPolicy.REPLACE,
                 PeriodicWorkRequest.Builder(InactiveMeasureEntryClearanceWorker::class.java,
                         1, TimeUnit.DAYS

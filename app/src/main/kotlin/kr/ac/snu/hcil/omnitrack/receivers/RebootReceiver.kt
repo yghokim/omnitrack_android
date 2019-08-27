@@ -48,7 +48,7 @@ class RebootReceiver : BroadcastReceiver() {
 
         triggerManager.onSystemRebooted()
 
-        WorkManager.getInstance().enqueue(OneTimeWorkRequest.Builder(OTReminderService.SystemRebootWorker::class.java)
+        WorkManager.getInstance(context).enqueue(OneTimeWorkRequest.Builder(OTReminderService.SystemRebootWorker::class.java)
                 .build())
 
         shortcutPanelManager.refreshNotificationShortcutViewsObservable(context).timeout(2, TimeUnit.SECONDS).doAfterTerminate {

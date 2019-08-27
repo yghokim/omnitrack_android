@@ -97,7 +97,7 @@ parentActivity.signedInUserObservable.toFlowable(BackpressureStrategy.LATEST).fl
                                         user.nameSynchronizedAt = null
                                     }
 
-                                    WorkManager.getInstance().enqueueUniqueWork(OTInformationUploadWorker.INFORMATION_USERNAME, ExistingWorkPolicy.APPEND,
+                                    WorkManager.getInstance(parentActivity.applicationContext).enqueueUniqueWork(OTInformationUploadWorker.INFORMATION_USERNAME, ExistingWorkPolicy.APPEND,
                                             informationUploadRequestBuilderFactory.get()
                                                     .addTag(OTInformationUploadWorker.INFORMATION_USERNAME)
                                                     .setInputData(Data.Builder().putString(OTInformationUploadWorker.KEY_TYPE, OTInformationUploadWorker.INFORMATION_USERNAME)

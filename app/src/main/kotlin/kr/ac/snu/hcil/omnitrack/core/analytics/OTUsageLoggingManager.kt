@@ -70,7 +70,7 @@ class OTUsageLoggingManager(val app: OTAndroidApp, val context: Context) : IEven
 
         if (Looper.myLooper() == Looper.getMainLooper()) {
             realm.executeTransactionAsync(transaction, {
-                WorkManager.getInstance().enqueueUniqueWork(OTUsageLogUploadWorker.TAG, ExistingWorkPolicy.REPLACE, uploadRequestProvider.get())
+                WorkManager.getInstance(context).enqueueUniqueWork(OTUsageLogUploadWorker.TAG, ExistingWorkPolicy.REPLACE, uploadRequestProvider.get())
                 realm.close()
             }, { ex ->
                 println("UsageLog save transaction was failed:")
@@ -79,7 +79,7 @@ class OTUsageLoggingManager(val app: OTAndroidApp, val context: Context) : IEven
             })
         } else {
             realm.executeTransaction(transaction)
-            WorkManager.getInstance().enqueueUniqueWork(OTUsageLogUploadWorker.TAG, ExistingWorkPolicy.REPLACE, uploadRequestProvider.get())
+            WorkManager.getInstance(context).enqueueUniqueWork(OTUsageLogUploadWorker.TAG, ExistingWorkPolicy.REPLACE, uploadRequestProvider.get())
             realm.close()
         }
     }

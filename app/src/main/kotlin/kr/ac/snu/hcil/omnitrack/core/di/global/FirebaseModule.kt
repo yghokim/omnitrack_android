@@ -45,7 +45,7 @@ class FirebaseModule {
     @FirebaseInstanceIdToken
     fun provideFirebaseInstanceIdToken(fbInstanceId: FirebaseInstanceId): Single<String> {
         return Single.defer {
-            return@defer Single.just(fbInstanceId.getToken(BuildConfig.FIREBASE_CLOUD_MESSAGING_SENDER_ID, "FCM"))
+            return@defer Single.just(fbInstanceId.getToken(BuildConfig.FIREBASE_CLOUD_MESSAGING_SENDER_ID, "FCM")!!)
         }.subscribeOn(Schedulers.io())
     }
 }

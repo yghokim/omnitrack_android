@@ -93,7 +93,7 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
                                                     .setInputData(Data.Builder().putString(OTInformationUploadWorker.KEY_TYPE, OTInformationUploadWorker.INFORMATION_DEVICE)
                                                             .build()
                                                     ).build()
-                                            WorkManager.getInstance().enqueueUniqueWork(OTInformationUploadWorker.INFORMATION_DEVICE, ExistingWorkPolicy.REPLACE, requestBuilder.build())
+                                            WorkManager.getInstance(applicationContext).enqueueUniqueWork(OTInformationUploadWorker.INFORMATION_DEVICE, ExistingWorkPolicy.REPLACE, requestBuilder.build())
                                         }
                                     }
                                 } catch (ex: IOException) {

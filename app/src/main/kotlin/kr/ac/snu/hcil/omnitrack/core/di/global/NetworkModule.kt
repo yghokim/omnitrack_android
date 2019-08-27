@@ -141,8 +141,9 @@ class NetworkModule {
     @Singleton
     fun provideBinaryStorageController(
             @BinaryStorageServer workRequest: Provider<OneTimeWorkRequest>,
-            core: IBinaryStorageCore): OTBinaryStorageController {
-        return OTBinaryStorageController(workRequest, core, provideRealmFactory())
+            core: IBinaryStorageCore,
+            context: Context): OTBinaryStorageController {
+        return OTBinaryStorageController(workRequest, core, provideRealmFactory(), context)
     }
 
     /**

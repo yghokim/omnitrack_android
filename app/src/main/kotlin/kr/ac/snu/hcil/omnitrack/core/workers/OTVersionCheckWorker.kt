@@ -30,17 +30,17 @@ class OTVersionCheckWorker(private val context: Context, workerParams: WorkerPar
     }
 
     @Singleton
-    class Controller @Inject constructor(@Default val pref: Lazy<SharedPreferences>, @VersionCheck val requestBuilder: Provider<OneTimeWorkRequest>) {
+    class Controller @Inject constructor(val context: Context, @Default val pref: Lazy<SharedPreferences>, @VersionCheck val requestBuilder: Provider<OneTimeWorkRequest>) {
 
         val versionCheckSwitchTurnedOn: Boolean
             get() = pref.get().getBoolean(PREF_CHECK_UPDATES, false)
 
         fun checkVersionOneTime() {
-            WorkManager.getInstance().enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, requestBuilder.get())
+            WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, requestBuilder.get())
         }
 
         fun cancelVersionCheckingWork() {
-            WorkManager.getInstance().cancelUniqueWork(TAG)
+            WorkManager.getInstance(context).cancelUniqueWork(TAG)
         }
     }
 

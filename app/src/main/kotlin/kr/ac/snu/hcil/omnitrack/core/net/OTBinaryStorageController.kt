@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.net
 
+import android.content.Context
 import android.net.Uri
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
@@ -19,7 +20,9 @@ import javax.inject.Provider
  */
 class OTBinaryStorageController(
         val uploadRequest: Provider<OneTimeWorkRequest>,
-        val core: IBinaryStorageCore, val realmProvider: Factory<Realm>) {
+        val core: IBinaryStorageCore,
+        val realmProvider: Factory<Realm>,
+        val context: Context) {
 
 
     fun registerNewUploadTask(localPath: String, serverFile: OTServerFile) {
@@ -42,7 +45,7 @@ class OTBinaryStorageController(
 
     @Synchronized
     fun registerWorker() {
-        WorkManager.getInstance().enqueueUniqueWork(OTBinaryUploadCommands.TAG, ExistingWorkPolicy.KEEP, uploadRequest.get())
+        WorkManager.getInstance(context).enqueueUniqueWork(OTBinaryUploadCommands.TAG, ExistingWorkPolicy.KEEP, uploadRequest.get())
     }
 
     @Synchronized
@@ -52,7 +55,7 @@ class OTBinaryStorageController(
     }
 
     fun clearWorkersOnDevice() {
-        WorkManager.getInstance().let {
+        WorkManager.getInstance(context).let {
             it.cancelUniqueWork(OTBinaryUploadCommands.TAG)
             it.cancelAllWorkByTag(OTBinaryUploadCommands.TAG)
         }

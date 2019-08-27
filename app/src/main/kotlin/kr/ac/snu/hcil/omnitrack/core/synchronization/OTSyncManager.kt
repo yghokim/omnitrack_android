@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.synchronization
 
+import android.content.Context
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
@@ -22,6 +23,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class OTSyncManager @Inject constructor(
+        private val context: Context,
         private val syncQueueDbHelper: SyncQueueDbHelper,
         private val syncClient: Lazy<ISynchronizationClientSideAPI>,
         private val syncServer: Lazy<ISynchronizationServerSideAPI>,
@@ -38,7 +40,7 @@ class OTSyncManager @Inject constructor(
     }
 
     fun clearSynchronizationOnDevice() {
-        WorkManager.getInstance().let {
+        WorkManager.getInstance(context).let {
             it.cancelUniqueWork(OTSynchronizationWorker.TAG)
             it.cancelAllWorkByTag(OTSynchronizationWorker.TAG)
         }
@@ -54,19 +56,19 @@ class OTSyncManager @Inject constructor(
     @Synchronized
     fun reserveSyncServiceNow() {
         println("reserve data synchronization from server.")
-        WorkManager.getInstance().enqueueUniqueWork(OTSynchronizationWorker.TAG, ExistingWorkPolicy.REPLACE, oneShotRequestProvider.get())
+        WorkManager.getInstance(context).enqueueUniqueWork(OTSynchronizationWorker.TAG, ExistingWorkPolicy.REPLACE, oneShotRequestProvider.get())
     }
 
     @Synchronized
     fun reservePeriodicSyncWorker() {
-        if (WorkManager.getInstance().getWorkInfosByTag(OTSynchronizationWorker.TAG).get().isEmpty()) {
-            WorkManager.getInstance().enqueue(periodicRequestProvider.get())
+        if (WorkManager.getInstance(context).getWorkInfosByTag(OTSynchronizationWorker.TAG).get().isEmpty()) {
+            WorkManager.getInstance(context).enqueue(periodicRequestProvider.get())
         }
     }
 
     @Synchronized
     fun refreshWorkers() {
-        WorkManager.getInstance().let {
+        WorkManager.getInstance(context).let {
             it.cancelUniqueWork(OTSynchronizationWorker.TAG)
             it.cancelAllWorkByTag(OTSynchronizationWorker.TAG)
         }

@@ -418,7 +418,7 @@ class OTReminderCommands(val context: Context) {
         if (Build.VERSION.SDK_INT < 26) {
             if (entry.timeoutDuration != null) {
                 /*
-            WorkManager.getInstance()!!.enqueue(OneTimeWorkRequestBuilder<ReminderDismissWorker>()
+            WorkManager.getInstance(context)!!.enqueue(OneTimeWorkRequestBuilder<ReminderDismissWorker>()
                     .setInitialDelay(entry.timeoutDuration!!.toLong(), TimeUnit.MILLISECONDS)
                     .setInputData(Data.Builder()
                             .putString(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER, entry.triggerId)
