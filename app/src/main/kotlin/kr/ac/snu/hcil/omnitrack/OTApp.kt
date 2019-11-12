@@ -19,7 +19,7 @@ import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
-import kr.ac.snu.hcil.omnitrack.core.di.global.*
+import kr.ac.snu.hcil.omnitrack.core.di.*
 import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.services.OTDeviceStatusService
@@ -111,7 +111,7 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
         val deviceUUID: UUID
         val cached = applicationComponent.defaultPreferences().getString("cached_device_id", null)
         if (!cached.isNullOrBlank()) {
-            return@lazy cached
+            return@lazy cached!!
         } else {
             val androidUUID = Settings.Secure.getString(this.contentResolver, Settings.Secure.ANDROID_ID)
             if (!androidUUID.isNullOrBlank()) {
@@ -147,86 +147,27 @@ class OTApp : Application(), LifecycleObserver, OTAndroidApp {
 
     //Dependency Injection
 
-    private val appModule: ApplicationModule by lazy {
-        ApplicationModule(this)
-    }
-
-    private val externalServiceModule: ExternalServiceModule by lazy {
-        ExternalServiceModule()
-    }
-
-    private val serializationModule: SerializationModule by lazy {
-        SerializationModule()
-    }
-
-    private val usageLoggingModule: UsageLoggingModule by lazy {
-        UsageLoggingModule()
-    }
-
-    private val uiHelperModule: UIHelperModule by lazy {
-        UIHelperModule()
-    }
-
-    private val firebaseModule: FirebaseModule by lazy {
-        FirebaseModule()
-    }
-
-    private val scheduledJobModule: ScheduledJobModule by lazy {
-        ScheduledJobModule()
-    }
-
-    private val systemIdentifierFactoryModule: SystemIdentifierFactoryModule by lazy {
-        SystemIdentifierFactoryModule()
-    }
-
-    private val authModule: AuthModule by lazy {
-        AuthModule()
-    }
-
-    private val backendDatabaseModule: BackendDatabaseModule by lazy {
-        BackendDatabaseModule()
-    }
-
-    private val networkModule: NetworkModule by lazy {
-        NetworkModule()
-    }
-
-    private val synchronizationModule: SynchronizationModule by lazy {
-        SynchronizationModule()
-    }
-
-    private val triggerSystemModule: TriggerSystemModule by lazy {
-        TriggerSystemModule()
-    }
-
-    private val daoSerializationModule: DaoSerializationModule by lazy {
-        DaoSerializationModule()
-    }
-
-    private val measureModule: MeasureModule by lazy {
-        MeasureModule()
-    }
-
 
     override val applicationComponent: ApplicationComponent by lazy {
         DaggerApplicationComponent.builder()
-                .authModule(authModule)
-                .applicationModule(appModule)
-                .firebaseModule(firebaseModule)
-                .usageLoggingModule(usageLoggingModule)
-                .uIHelperModule(uiHelperModule)
-                .scheduledJobModule(scheduledJobModule)
-                .externalServiceModule(externalServiceModule)
-                .serializationModule(serializationModule)
-                .measureModule(measureModule)
-                .systemIdentifierFactoryModule(systemIdentifierFactoryModule)
-                .backendDatabaseModule(backendDatabaseModule)
-                .daoSerializationModule(daoSerializationModule)
-                .networkModule(networkModule)
+                .authModule(AuthModule())
+                .applicationModule(ApplicationModule(this))
+                .firebaseModule(FirebaseModule())
+                .usageLoggingModule(UsageLoggingModule())
+                .uIHelperModule(UIHelperModule())
+                .scheduledJobModule(ScheduledJobModule())
+                .externalServiceModule(ExternalServiceModule())
+                .serializationModule(SerializationModule())
+                .measureModule(MeasureModule())
+                .systemIdentifierFactoryModule(SystemIdentifierFactoryModule())
+                .backendDatabaseModule(BackendDatabaseModule())
+                .daoSerializationModule(DaoSerializationModule())
+                .networkModule(NetworkModule())
                 .informationHelpersModule(InformationHelpersModule())
                 .scriptingModule(ScriptingModule())
-                .synchronizationModule(synchronizationModule)
-                .triggerSystemModule(triggerSystemModule)
+                .synchronizationModule(SynchronizationModule())
+                .triggerSystemModule(TriggerSystemModule())
+                .eventModule(EventModule())
                 .build()
     }
 

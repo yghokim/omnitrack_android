@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.di.global
+package kr.ac.snu.hcil.omnitrack.core.di
 
 import com.google.gson.Gson
 import dagger.Lazy
@@ -14,8 +14,10 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.typeadapters.*
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
+import kr.ac.snu.hcil.omnitrack.core.system.OTEventFactoryManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTMeasureFactoryManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
+import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTEventTriggerCondition
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -88,6 +90,11 @@ class DaoSerializationModule {
         return OTDataDrivenTriggerCondition.ConditionTypeAdapter(serviceManager, timeQueryRangeQueryTypeAdapter, gson)
     }
 
+    @Provides
+    @Singleton
+    fun provideEventConditionTypeAdapter(eventFactoryManager: OTEventFactoryManager, @ForGeneric gson: Lazy<Gson>): OTEventTriggerCondition.ConditionTypeAdapter{
+        return OTEventTriggerCondition.ConditionTypeAdapter(eventFactoryManager, gson)
+    }
 }
 
 

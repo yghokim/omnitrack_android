@@ -29,10 +29,10 @@ object NetworkHelper {
 
             networks.forEach { network ->
                 val caps = connectivityManager.getNetworkCapabilities(network)
-                if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                if (caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true) {
                     networkConnected = true
                 }
-                if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)) {
+                if (caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED) == true) {
                     unMetered = true
                 }
             }

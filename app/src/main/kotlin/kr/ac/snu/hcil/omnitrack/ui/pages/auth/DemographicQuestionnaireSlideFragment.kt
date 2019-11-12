@@ -14,7 +14,7 @@ import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.slide_demographic.view.*
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.serialization.getStringCompat
+import kr.ac.snu.hcil.android.common.getStringCompat
 
 class DemographicQuestionnaireSlideFragment : SignUpActivity.SlideFragment(SignUpActivity.ESlide.DEMOGRAPHIC_QUESTIONNAIRE) {
 

@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.di.global
+package kr.ac.snu.hcil.omnitrack.core.di
 
 import com.google.gson.Gson
 import dagger.Module

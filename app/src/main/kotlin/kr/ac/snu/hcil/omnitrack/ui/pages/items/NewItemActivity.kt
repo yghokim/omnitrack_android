@@ -21,8 +21,8 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerReminderEntry
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
-import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.ForGeneric
 import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import javax.inject.Inject
 import javax.inject.Provider

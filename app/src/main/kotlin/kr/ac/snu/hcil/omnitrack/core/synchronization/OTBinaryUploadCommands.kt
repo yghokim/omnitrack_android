@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.LocalMediaCacheEntry
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.UploadTaskInfo
-import kr.ac.snu.hcil.omnitrack.core.di.global.BinaryStorageServer
+import kr.ac.snu.hcil.omnitrack.core.di.BinaryStorageServer
 import kr.ac.snu.hcil.omnitrack.core.net.IBinaryStorageCore
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
 import org.jetbrains.anko.notificationManager
@@ -36,6 +36,7 @@ class OTBinaryUploadCommands(val context: Context) {
     }
 
     fun createWork(useProgressNotification: Boolean = true): Completable {
+        /*
         return crawlAndUpload().run {
             return@run if (useProgressNotification) {
                 this.doOnSubscribe {
@@ -52,7 +53,8 @@ class OTBinaryUploadCommands(val context: Context) {
                     }
                 }
             } else this
-        }
+        }*/
+        return crawlAndUpload()
     }
 
     private fun getUploadTaskAndIncreaseCount(maxTrialCount: Int): List<UploadTaskInfo> {

@@ -8,7 +8,7 @@ import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.core.workers.OTVersionCheckWorker

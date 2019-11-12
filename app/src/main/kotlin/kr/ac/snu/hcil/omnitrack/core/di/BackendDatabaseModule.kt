@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.di.global
+package kr.ac.snu.hcil.omnitrack.core.di
 
 import dagger.Module
 import dagger.Provides
@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.database.BackendRealmMigration
 import kr.ac.snu.hcil.omnitrack.core.database.models.*
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.*
+import kr.ac.snu.hcil.omnitrack.core.event.OTEventFactory
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -62,8 +63,8 @@ class BackendDatabaseModule {
         OTTriggerAlarmInstance::class,
         OTTriggerReminderEntry::class,
         OTTriggerSchedule::class,
-    OTTriggerMeasureEntry::class,
-    OTTriggerMeasureHistoryEntry::class,
+        OTTriggerMeasureEntry::class,
+        OTTriggerMeasureHistoryEntry::class,
         UploadTaskInfo::class
 ])
 class BackendRealmModule

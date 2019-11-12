@@ -26,8 +26,8 @@ class SourceConfigurationPanel : FrameLayout, IEventListener<Int> {
 
     private val queryPresetAdapter = PresetAdapter(OTTimeRangeQuery.Preset.values().toList())
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
     init {
         inflateContent(R.layout.connection_source_configuration_panel, true)
@@ -50,7 +50,7 @@ class SourceConfigurationPanel : FrameLayout, IEventListener<Int> {
     }
 
     fun applyConfiguration(connection: OTConnection) {
-        connection.rangedQuery = queryPresetAdapter.getItem(queryPresetSelectionView.value).makeQueryInstance()
+        connection.rangedQuery = queryPresetAdapter.getItem(queryPresetSelectionView.value)?.makeQueryInstance()
     }
 
     override fun onEvent(sender: Any, args: Int) {
@@ -71,8 +71,8 @@ class SourceConfigurationPanel : FrameLayout, IEventListener<Int> {
 
             val holder = view.tag as SimpleNameDescriptionViewHolder
 
-            holder.descriptionView.setText(getItem(position).descResId)
-            holder.nameView.setText(getItem(position).nameResId)
+            holder.descriptionView.setText(getItem(position)?.descResId?:0)
+            holder.nameView.setText(getItem(position)?.nameResId?:0)
 
             view.setBackgroundResource(R.drawable.bottom_separator_thin)
 
@@ -89,7 +89,7 @@ class SourceConfigurationPanel : FrameLayout, IEventListener<Int> {
 
             val holder = view.tag as SimpleTextViewHolder
 
-            holder.textView.setText(getItem(position).nameResId)
+            holder.textView.setText(getItem(position)?.nameResId?:0)
 
             view.background = null
 

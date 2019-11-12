@@ -55,7 +55,7 @@ class PackageHandlingBottomSheetFragment : DismissingBottomSheetDialogFragment(R
             if (resultCode == AppCompatActivity.RESULT_OK && data != null) {
                 val exportUri = data.data
                 val success = try {
-                    val outputStream = requireContext().contentResolver.openOutputStream(exportUri)
+                    val outputStream = requireContext().contentResolver.openOutputStream(exportUri!!)
                     outputStream?.write((arguments?.getString(KEY_JSON_CONTENT_STRING)
                             ?: "").toByteArray())
                     outputStream?.close()

@@ -4,10 +4,10 @@ import android.content.SharedPreferences
 import com.github.salomonbrys.kotson.keys
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.core.di.global.UserInfo
+import kr.ac.snu.hcil.omnitrack.core.di.UserInfo
 import kr.ac.snu.hcil.omnitrack.core.flags.LockFlagLevel
 import kr.ac.snu.hcil.omnitrack.core.flags.LockedPropertiesHelper
-import kr.ac.snu.hcil.omnitrack.core.serialization.getBooleanCompat
+import kr.ac.snu.hcil.android.common.getBooleanCompat
 import javax.inject.Inject
 import javax.inject.Singleton
 

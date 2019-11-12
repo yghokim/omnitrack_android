@@ -6,7 +6,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.typeadapters.ServerCompatibleTypeAdapter
-import kr.ac.snu.hcil.omnitrack.core.di.global.*
+import kr.ac.snu.hcil.omnitrack.core.di.*
 import javax.inject.Inject
 import javax.inject.Singleton
 

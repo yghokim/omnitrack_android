@@ -28,10 +28,10 @@ import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerReminderEntry
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
-import kr.ac.snu.hcil.omnitrack.core.di.global.Default
-import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
-import kr.ac.snu.hcil.omnitrack.core.di.global.ReminderNotification
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.Default
+import kr.ac.snu.hcil.omnitrack.core.di.ForGeneric
+import kr.ac.snu.hcil.omnitrack.core.di.ReminderNotification
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTrackingNotificationFactory
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction

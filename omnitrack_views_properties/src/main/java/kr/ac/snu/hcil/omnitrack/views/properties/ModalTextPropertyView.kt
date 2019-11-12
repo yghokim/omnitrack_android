@@ -131,7 +131,7 @@ class ModalTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
         var inputLengthMax: Int = 0
 
         constructor(source: Parcel) : super(source) {
-            dialogTitle = source.readString()
+            dialogTitle = source.readString() ?: ""
             emptyFallback = source.readString()
             inputLengthMin = source.readInt()
             inputLengthMax = source.readInt()

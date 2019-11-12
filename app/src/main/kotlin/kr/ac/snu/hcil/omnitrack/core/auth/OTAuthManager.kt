@@ -20,12 +20,12 @@ import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
-import kr.ac.snu.hcil.omnitrack.core.di.global.BinaryStorageServer
-import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
-import kr.ac.snu.hcil.omnitrack.core.di.global.UserInfo
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.BinaryStorageServer
+import kr.ac.snu.hcil.omnitrack.core.di.ForGeneric
+import kr.ac.snu.hcil.omnitrack.core.di.UserInfo
 import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
-import kr.ac.snu.hcil.omnitrack.core.serialization.getStringCompat
+import kr.ac.snu.hcil.android.common.getStringCompat
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTAppFlagManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager

@@ -27,7 +27,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.AFieldInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.OTFieldViewFactoryManager
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
@@ -105,8 +105,9 @@ class AttributeEditDialogFragment : DialogFragment() {
             val trackerId = arguments.getString(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
             val fieldLocalId = arguments.getString(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE)
             val itemId = arguments.getString(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM)
-
-            viewModel.init(trackerId, itemId, fieldLocalId)
+            if(trackerId!=null && fieldLocalId != null && itemId != null){
+                viewModel.init(trackerId, itemId, fieldLocalId)
+            }
         }
     }
 

@@ -11,10 +11,10 @@ import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
-import kr.ac.snu.hcil.omnitrack.core.serialization.getBooleanCompat
-import kr.ac.snu.hcil.omnitrack.core.serialization.getIntCompat
-import kr.ac.snu.hcil.omnitrack.core.serialization.getLongCompat
-import kr.ac.snu.hcil.omnitrack.core.serialization.getStringCompat
+import kr.ac.snu.hcil.android.common.getBooleanCompat
+import kr.ac.snu.hcil.android.common.getIntCompat
+import kr.ac.snu.hcil.android.common.getLongCompat
+import kr.ac.snu.hcil.android.common.getStringCompat
 import javax.inject.Provider
 
 /**

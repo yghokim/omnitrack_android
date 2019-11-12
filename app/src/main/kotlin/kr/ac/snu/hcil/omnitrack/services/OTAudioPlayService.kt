@@ -282,7 +282,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
             currentPlayer?.let {
                 it.setDataSource(file.path)
                 this.currentFile = file
-                val metadata = AudioRecordMetadata.readMetadata(file.path, this)
+                val metadata = AudioRecordMetadata.readMetadata(file.path!!, this)
                 if (metadata != null) {
                     description = String.format(resources.getString(R.string.msg_audio_record_player_description_recorded_at_format), metadata.recordedAt)
                 }

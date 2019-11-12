@@ -166,8 +166,8 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
 
     private val playerEventReceiver: PlayerEventReceiver = PlayerEventReceiver()
 
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context) : super(context)
 
     init {
         inflateContent(R.layout.component_audio_recorder_view, true)

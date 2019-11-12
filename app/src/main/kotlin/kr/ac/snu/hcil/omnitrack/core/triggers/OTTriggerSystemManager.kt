@@ -16,6 +16,7 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter
 class OTTriggerSystemManager(
         val triggerAlarmManager: Lazy<ITriggerAlarmController>,
         val dataDrivenTriggerManager: Lazy<OTDataDrivenTriggerManager>,
+        val eventTriggerManager: Lazy<OTEventTriggerManager>,
         val realmProvider: Factory<Realm>,
         val context: Context
 ) {
@@ -41,6 +42,9 @@ class OTTriggerSystemManager(
             OTTriggerDAO.CONDITION_TYPE_DATA -> {
                 dataDrivenTriggerManager.get().registerTrigger(managedTrigger)
             }
+            OTTriggerDAO.CONDITION_TYPE_EVENT -> {
+                eventTriggerManager.get().registerTrigger(managedTrigger)
+            }
         }
     }
 
@@ -52,6 +56,9 @@ class OTTriggerSystemManager(
             }
             OTTriggerDAO.CONDITION_TYPE_DATA -> {
                 dataDrivenTriggerManager.get().unregisterTrigger(managedTrigger)
+            }
+            OTTriggerDAO.CONDITION_TYPE_EVENT -> {
+                eventTriggerManager.get().unregisterTrigger(managedTrigger)
             }
         }
 
@@ -79,6 +86,9 @@ class OTTriggerSystemManager(
                     }
                     OTTriggerDAO.CONDITION_TYPE_DATA -> {
                         dataDrivenTriggerManager.get().registerTrigger(managedTrigger)
+                    }
+                    OTTriggerDAO.CONDITION_TYPE_EVENT -> {
+                        eventTriggerManager.get().registerTrigger(managedTrigger)
                     }
                 }
             } else {

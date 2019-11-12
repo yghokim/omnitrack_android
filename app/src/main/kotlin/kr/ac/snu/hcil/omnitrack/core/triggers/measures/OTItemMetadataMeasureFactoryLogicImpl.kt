@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import javax.inject.Inject
 
 abstract class OTItemMetadataMeasureFactoryLogicImpl(protected val context: Context) {

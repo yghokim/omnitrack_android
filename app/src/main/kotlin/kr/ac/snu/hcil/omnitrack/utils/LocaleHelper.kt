@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.utils
 
 import android.content.Context
 import android.os.Build
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import kr.ac.snu.hcil.omnitrack.R
 import java.util.*
 
@@ -43,13 +43,13 @@ object LocaleHelper {
             println("nearest device language is $nearestDeviceLanguage")
             return nearestDeviceLanguage
         } else {
-            return pref.getString(PREF_KEY_SELECTED_LANGUAGE, nearestDeviceLanguage)
+            return pref.getString(PREF_KEY_SELECTED_LANGUAGE, nearestDeviceLanguage)!!
         }
     }
 
     fun getNearestLanguageToDevice(context: Context): String {
         val pref = PreferenceManager.getDefaultSharedPreferences(context)
-        val deviceLanguage = pref.getString(PREF_KEY_SYSTEM_LANGUAGE, "en")
+        val deviceLanguage = pref.getString(PREF_KEY_SYSTEM_LANGUAGE, "en")!!
         val supportedLanguages = context.resources.getStringArray(R.array.supported_language_codes)
         if (supportedLanguages.contains(deviceLanguage)) {
             return deviceLanguage

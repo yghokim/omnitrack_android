@@ -33,6 +33,8 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
 
     private var listener: IWizardListener? = null
 
+    val currentPosition: Int get() = viewPager.currentItem
+
     fun setWizardListener(listener: IWizardListener) {
         this.listener = listener
     }

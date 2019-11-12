@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.net
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import kr.ac.snu.hcil.omnitrack.core.serialization.getStringCompat
+import kr.ac.snu.hcil.android.common.getStringCompat
 import retrofit2.HttpException
 
 object ServerError {

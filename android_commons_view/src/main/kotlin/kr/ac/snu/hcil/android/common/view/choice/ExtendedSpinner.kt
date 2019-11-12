@@ -369,7 +369,7 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
     }
 
     private interface SpinnerPopup {
-        fun setAdapter(adapter: ListAdapter)
+        fun setAdapter(adapter: ListAdapter?)
 
         /**
          * Show the popup
@@ -424,7 +424,7 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
             this.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.white_panel_with_shadow))
         }
 
-        override fun setAdapter(adapter: ListAdapter) {
+        override fun setAdapter(adapter: ListAdapter?) {
             super.setAdapter(adapter)
             mAdapter = adapter
         }

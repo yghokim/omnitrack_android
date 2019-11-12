@@ -11,7 +11,7 @@ import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import java.util.concurrent.Executors
 import javax.inject.Inject

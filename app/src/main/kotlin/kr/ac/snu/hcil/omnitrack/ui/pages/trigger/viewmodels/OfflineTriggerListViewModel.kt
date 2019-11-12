@@ -7,7 +7,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.typeadapters.ServerCompatibleTypeAdapter
-import kr.ac.snu.hcil.omnitrack.core.di.global.ForTrigger
+import kr.ac.snu.hcil.omnitrack.core.di.ForTrigger
 import javax.inject.Inject
 
 /**

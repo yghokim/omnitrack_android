@@ -32,7 +32,7 @@ import kr.ac.snu.hcil.omnitrack.core.fields.helpers.OTChoiceFieldHelper
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection

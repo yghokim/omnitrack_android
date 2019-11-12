@@ -112,7 +112,7 @@ class TimeQuerySettingPanel : LinearLayout, IEventListener<Int> {
                     offsetView.visibility = View.VISIBLE
                 }
 
-                pivotEntryAdapter.getItem(pivotTimeComboBox.value).applyToQuery(timeQuery)
+                pivotEntryAdapter.getItem(pivotTimeComboBox.value)?.applyToQuery(timeQuery)
             } else if (sender === scopeView) {
                 println("binSize value changed: $args")
                 timeQuery.binSize = scopeView.value

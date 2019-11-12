@@ -26,7 +26,7 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerMeasureEntry
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTriggerMeasureHistoryEntry
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTServiceMeasureFactory
@@ -131,7 +131,7 @@ class DataDrivenTriggerCheckReceiver : BroadcastReceiver() {
                                     val valueRequests = entries.map { entry ->
                                         val factory = externalServiceManager.get().getMeasureFactoryByCode(entry.factoryCode!!)
                                         if (factory != null) {
-                                            val measure = factory.makeMeasure(entry.serializedMeasureArguments!!)
+                                            val measure = factory.makeAttachable(entry.serializedMeasureArguments!!)
                                             return@map measure.getValueRequest(null, timeQueryTypeAdapter.get().fromJson(entry.serializedTimeQuery)).map {
                                                 Pair(entry, it)
                                             }.subscribeOn(Schedulers.io())

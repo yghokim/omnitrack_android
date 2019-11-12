@@ -47,5 +47,9 @@
     <string name="msg_auth_invitation_code_empty">Invitation Code should not be blank.</string>
     <string name="msg_gotit">Got it</string>
 
+    <string name="msg_event_wizard_source_title">Select an Event</string>
+    <string name="msg_event_wizard_permission_title">Approve Permissions</string>
+
+
 
 </resources>

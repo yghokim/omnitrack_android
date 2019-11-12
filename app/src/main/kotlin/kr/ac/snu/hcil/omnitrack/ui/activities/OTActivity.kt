@@ -29,8 +29,8 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.di.global.Default
-import kr.ac.snu.hcil.omnitrack.core.di.global.ServerResponsive
+import kr.ac.snu.hcil.omnitrack.core.di.Default
+import kr.ac.snu.hcil.omnitrack.core.di.ServerResponsive
 import kr.ac.snu.hcil.omnitrack.core.system.OTAppVersionCheckManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.pages.auth.SignInActivity

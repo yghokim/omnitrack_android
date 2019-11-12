@@ -18,7 +18,7 @@ class OTDataDrivenConditionMetTimeMeasureFactory(context: Context) : OTTimePoint
         return logicImpl.isAvailableToRequestValue(field, invalidMessages)
     }
 
-    override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+    override fun makeAttachable(arguments: JsonObject?): OTMeasure {
         return OTMetaDataMeasure(this, arguments)
     }
 

@@ -7,8 +7,12 @@
 
     <string name="trigger_name_time">Time-based</string>
     <string name="trigger_name_data">Data-driven</string>
+    <string name="trigger_name_event">Event</string>
+
     <string name="trigger_desc_time">Fires by time-related conditions</string>
     <string name="trigger_desc_data">Fires when the data passes the threshold</string>
+    <string name="trigger_desc_event">Fires when an event happens</string>
+
 
     <string name="msg_trigger_time_config_type">Condition Type</string>
 

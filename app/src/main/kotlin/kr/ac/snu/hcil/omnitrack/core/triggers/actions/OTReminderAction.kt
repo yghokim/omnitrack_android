@@ -156,27 +156,6 @@ class OTReminderAction : OTTriggerAction() {
             return if (expirySeconds == EXPIRY_INDEFINITE || expirySeconds < 0 || expirySeconds == Int.MAX_VALUE) null else (expirySeconds * 1000)
         }
 
-    /*
-    var localNotificationLevel: NotificationLevel?
-        get() {
-            val deviceSetting = localSettingsPreferences.getString("${KEY_NOTIFICATION_LEVEL}_${trigger._id}", null)
-            if (deviceSetting != null) {
-                try {
-                    return NotificationLevel.valueOf(deviceSetting)
-                } catch(ex: Exception) {
-                    ex.printStackTrace()
-                    return null
-                }
-            } else return null
-        }
-        set(value) {
-            if (value != null) {
-                localSettingsPreferences.edit().putString("${KEY_NOTIFICATION_LEVEL}_${trigger._id}", value.name).apply()
-            } else {
-                localSettingsPreferences.edit().remove("${KEY_NOTIFICATION_LEVEL}_${trigger._id}").apply()
-            }
-        }*/
-
 
     override fun performAction(trigger: OTTriggerDAO, triggerTime: Long, metadata: JsonObject, context: Context): Completable {
         return Completable.defer {

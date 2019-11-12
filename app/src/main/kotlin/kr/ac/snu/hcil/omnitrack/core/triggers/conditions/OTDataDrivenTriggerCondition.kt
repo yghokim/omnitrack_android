@@ -12,6 +12,7 @@ import dagger.Lazy
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTAttachableFactory
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
@@ -30,20 +31,26 @@ class OTDataDrivenTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TY
     }
 
     class ConditionTypeAdapter(val externalServiceManager: OTExternalServiceManager, val timeRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>, val gson: Lazy<Gson>) : TypeAdapter<OTDataDrivenTriggerCondition>() {
+
+        val measureTypeAdapter = OTAttachableFactory.OTAttachableTypeAdapter(gson){
+            factoryCode, arguments ->
+            val factory = externalServiceManager.getMeasureFactoryByCode(typeCode = factoryCode)
+            if (factory == null) {
+                println("$factoryCode is not supported in System.")
+                externalServiceManager.unSupportedDummyMeasureFactory.makeMeasure(factoryCode, arguments)
+            } else {
+                factory.makeAttachable(arguments)
+            }
+        }
+
         override fun write(out: JsonWriter, value: OTDataDrivenTriggerCondition) {
             out.beginObject()
             out.name("measure")
-            value.measure?.let {
-                out.beginObject()
-                        .name("code")
-                        .value(it.factoryCode)
-                        .name("args")
-                        .jsonValue(it.arguments.toString())
-                        .endObject()
-            } ?: out.nullValue()
+            measureTypeAdapter.write(out, value.measure)
 
             out.name("query")
             timeRangeQueryTypeAdapter.get().write(out, value.timeQuery)
+
 
             out.name("threshold").value(value.threshold)
             out.name("comparison").value(value.comparison.code)
@@ -68,38 +75,7 @@ class OTDataDrivenTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TY
                         if (reader.peek() == JsonToken.NULL) {
                             reader.skipValue()
                         } else {
-                            var factoryCode: String? = null
-                            var arguments: JsonObject? = null
-                            reader.beginObject()
-                            while (reader.hasNext()) {
-                                when (reader.nextName()) {
-                                    "code" -> {
-                                        if (reader.peek() == JsonToken.NULL) {
-                                            reader.nextNull()
-                                        } else {
-                                            factoryCode = reader.nextString()
-                                        }
-                                    }
-                                    "args" -> {
-                                        if (reader.peek() == JsonToken.NULL) {
-                                            reader.nextNull()
-                                        } else {
-                                            arguments = gson.get().fromJson(reader, JsonObject::class.java)
-                                        }
-                                    }
-                                }
-                            }
-                            reader.endObject()
-
-                            if (factoryCode != null) {
-                                val factory = externalServiceManager.getMeasureFactoryByCode(typeCode = factoryCode)
-                                if (factory == null) {
-                                    println("$factoryCode is not supported in System.")
-                                    condition.measure = externalServiceManager.unSupportedDummyMeasureFactory.makeMeasure(factoryCode, arguments)
-                                } else {
-                                    condition.measure = factory.makeMeasure(arguments)
-                                }
-                            }
+                            condition.measure = measureTypeAdapter.read(reader)
                         }
                     }
                     else -> reader.skipValue()

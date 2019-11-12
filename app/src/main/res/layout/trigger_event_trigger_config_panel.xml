@@ -1,40 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/linearLayoutWithHorizontalDivider"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bottom_separator_light"
-    android:orientation="vertical">
+    tools:parentTag="android.widget.LinearLayout">
 
-    <kr.ac.snu.hcil.omnitrack.views.properties.ComboBoxPropertyView
-        android:id="@+id/ui_event_trigger_measure_selection"
-        style="@style/propertyGroupSinglelineStyle"
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button"
+        android:id="@+id/ui_event_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:text="@string/msg_trigger_data_measure_selection" />
-
-    <LinearLayout
-        android:id="@+id/ui_alarm_group"
-        style="@style/propertyGroupMultilineStyle"
-        android:layout_gravity="center_horizontal">
-
-        <TextView
-            style="@style/propertyMultilineHeaderStyle"
-            android:layout_gravity="center_vertical"
-            android:layout_marginBottom="8dp"
-            android:text="@string/msg_trigger_data_comparison_method" />
+        android:minHeight="@dimen/button_height_tall"
+        android:text="Configure an Event"
+        app:icon="@drawable/link"
+        android:backgroundTint="@color/editTextFormBackground"
+        android:textColor="@color/colorAccent"
+        app:iconTint="@color/colorAccent"
 
 
-        <kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenComparisonSettingView
-            android:id="@+id/ui_condition_setting"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        />
 
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin" />
-
-    </LinearLayout>
-
-
-</LinearLayout>
+</merge>

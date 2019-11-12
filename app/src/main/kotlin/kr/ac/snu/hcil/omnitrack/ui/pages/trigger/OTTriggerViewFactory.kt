@@ -8,11 +8,15 @@ import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.android.common.time.Time
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
+import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTEventTriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.IConditionConfigurationView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenConditionViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenTriggerConfigurationPanel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenTriggerDisplayView
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.event.EventTriggerConditionViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.event.EventTriggerConfigurationPanel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.event.EventTriggerDisplayView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.time.SamplingTimeConditionDisplayView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.time.TimeConditionViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.time.TimeTriggerConfigurationPanel
@@ -140,6 +144,30 @@ object OTTriggerViewFactory {
                     }
                 }
 
+            })
+
+            this.append(OTTriggerDAO.CONDITION_TYPE_EVENT.toInt(), object: ITriggerConditionViewProvider{
+                override fun getTriggerConditionViewModel(trigger: OTTriggerDAO, context: Context): ATriggerConditionViewModel {
+                    return EventTriggerConditionViewModel(trigger, context)
+                }
+
+                override fun getTriggerDisplayView(original: View?, trigger: OTTriggerDAO, uiContext: Context): View {
+                    val displayView = if (original is EventTriggerDisplayView) original else EventTriggerDisplayView(uiContext)
+                    val condition = trigger.condition
+                    if (condition != null && condition is OTEventTriggerCondition) {
+                    } else {
+
+                    }
+
+                    return displayView
+                }
+
+                override fun getTriggerConfigurationPanel(original: View?, uiContext: Context): IConditionConfigurationView {
+                    return if (original is EventTriggerConfigurationPanel) original else EventTriggerConfigurationPanel(uiContext)
+                }
+
+                override fun connectViewModelToDisplayView(viewModel: ATriggerConditionViewModel, displayView: View, outSubscription: CompositeDisposable) {
+                }
             })
         }
     }

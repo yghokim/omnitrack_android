@@ -39,4 +39,8 @@ abstract class AWizardPage(protected open val parent: WizardView) {
     protected fun requestGoNextPage(nextPosition: Int) {
         goNextRequested.invoke(this, nextPosition)
     }
+
+    protected fun requestGoNextPage(){
+        goNextRequested.invoke(this, parent.currentPosition+1)
+    }
 }

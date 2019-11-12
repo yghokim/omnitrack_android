@@ -25,7 +25,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.typeadapters.ServerCompatibleTypeAdapter
-import kr.ac.snu.hcil.omnitrack.core.di.global.ForTracker
+import kr.ac.snu.hcil.omnitrack.core.di.ForTracker
 import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType

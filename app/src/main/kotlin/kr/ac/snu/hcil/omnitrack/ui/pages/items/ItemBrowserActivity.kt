@@ -756,7 +756,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             if (savedInstanceState != null) {
                 try {
                     exportConfigIncludeFile = savedInstanceState.getBoolean(OTTableExportService.EXTRA_EXPORT_CONFIG_INCLUDE_FILE, false)
-                    exportConfigTableFileType = OTTableExportService.TableFileType.valueOf(savedInstanceState.getString(OTTableExportService.EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE))
+                    exportConfigTableFileType = OTTableExportService.TableFileType.valueOf(savedInstanceState.getString(OTTableExportService.EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE)!!)
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                 }

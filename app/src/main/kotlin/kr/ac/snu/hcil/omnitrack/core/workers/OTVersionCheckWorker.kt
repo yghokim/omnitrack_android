@@ -10,8 +10,8 @@ import dagger.Lazy
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
 import io.reactivex.schedulers.Schedulers
-import kr.ac.snu.hcil.omnitrack.core.di.global.Default
-import kr.ac.snu.hcil.omnitrack.core.di.global.VersionCheck
+import kr.ac.snu.hcil.omnitrack.core.di.Default
+import kr.ac.snu.hcil.omnitrack.core.di.VersionCheck
 import kr.ac.snu.hcil.omnitrack.core.system.OTAppVersionCheckManager
 import javax.inject.Inject
 import javax.inject.Provider

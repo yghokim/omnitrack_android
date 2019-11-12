@@ -9,9 +9,9 @@ import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemValueEntryDAO
-import kr.ac.snu.hcil.omnitrack.core.serialization.getBooleanCompat
-import kr.ac.snu.hcil.omnitrack.core.serialization.getLongCompat
-import kr.ac.snu.hcil.omnitrack.core.serialization.getStringCompat
+import kr.ac.snu.hcil.android.common.getBooleanCompat
+import kr.ac.snu.hcil.android.common.getLongCompat
+import kr.ac.snu.hcil.android.common.getStringCompat
 import java.util.*
 
 /**

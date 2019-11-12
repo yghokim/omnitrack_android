@@ -51,7 +51,7 @@ class UploadTemporaryPackageDialogFragment : DialogFragment(), View.OnClickListe
             throw IllegalArgumentException("No content string argument passed before showing the dialog.")
         }
 
-        viewModel.tryShare(args.getString(PackageHandlingBottomSheetFragment.KEY_JSON_CONTENT_STRING))
+        viewModel.tryShare(args.getString(PackageHandlingBottomSheetFragment.KEY_JSON_CONTENT_STRING)!!)
 
         this.dialogView = LayoutInflater.from(activity).inflate(R.layout.dialog_temporary_package_upload, null, false)
 

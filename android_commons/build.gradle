@@ -53,6 +53,7 @@ dependencies {
     implementation "com.github.pwittchen:reactivenetwork-rx2:$rootProject.ext.reactive_network_version"
 
     implementation "com.google.code.gson:gson:$rootProject.ext.gson_version"
+    implementation 'com.github.salomonbrys.kotson:kotson:2.5.0'
 
 
     implementation 'com.opencsv:opencsv:4.5'

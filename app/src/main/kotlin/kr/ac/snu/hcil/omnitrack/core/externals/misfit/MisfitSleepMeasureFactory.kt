@@ -24,7 +24,7 @@ class MisfitSleepMeasureFactory(context: Context, service: MisfitService) : OTSe
     override val minimumGranularity: OTTimeRangeQuery.Granularity? = OTTimeRangeQuery.Granularity.Day
     override val isDemandingUserInput: Boolean = false
 
-    override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+    override fun makeAttachable(arguments: JsonObject?): OTMeasure {
         return MisfitSleepMeasure(this, arguments)
     }
 

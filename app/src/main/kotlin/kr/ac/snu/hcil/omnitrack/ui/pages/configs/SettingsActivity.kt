@@ -31,7 +31,7 @@ import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.flags.F
 import kr.ac.snu.hcil.omnitrack.core.system.OTAppFlagManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTExternalSettingsPrompter

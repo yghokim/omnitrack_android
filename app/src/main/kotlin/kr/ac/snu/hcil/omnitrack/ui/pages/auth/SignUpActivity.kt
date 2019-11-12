@@ -24,7 +24,7 @@ import kotlinx.android.synthetic.main.activity_sign_up.*
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
+import kr.ac.snu.hcil.omnitrack.core.di.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.net.ServerError
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import retrofit2.HttpException

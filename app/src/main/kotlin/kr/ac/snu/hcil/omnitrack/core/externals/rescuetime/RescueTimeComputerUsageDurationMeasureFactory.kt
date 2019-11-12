@@ -24,7 +24,7 @@ class RescueTimeComputerUsageDurationMeasureFactory(context: Context, service: R
     override val isRangedQueryAvailable: Boolean = true
     override val isDemandingUserInput: Boolean = false
 
-    override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+    override fun makeAttachable(arguments: JsonObject?): OTMeasure {
         return ComputerUsageDurationMeasure(this, arguments)
     }
 

@@ -22,10 +22,10 @@ class OTDeviceStatusService : Service() {
             IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         }
 
-        fun getBatteryStatus(context: Context): Intent = context.registerReceiver(null, batteryStatusIntentFilter)
+        fun getBatteryStatus(context: Context): Intent? = context.registerReceiver(null, batteryStatusIntentFilter)
 
-        fun isBatteryCharging(batteryStatus: Intent): Boolean {
-            val status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
+        fun isBatteryCharging(batteryStatus: Intent?): Boolean {
+            val status = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
             return status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
         }
 
@@ -117,19 +117,21 @@ class OTDeviceStatusService : Service() {
                 Intent.ACTION_BATTERY_LOW, Intent.ACTION_BATTERY_OKAY, Intent.ACTION_POWER_CONNECTED, Intent.ACTION_POWER_DISCONNECTED -> {
                     val eventLogger = (context.applicationContext as OTAndroidApp).applicationComponent.getEventLogger()
                     val batteryStatus = getBatteryStatus(context)
+                    if(batteryStatus!=null) {
 
-                    val batteryPercentage = getBatteryPercentage(batteryStatus)
-                    val isCharging = isBatteryCharging(batteryStatus)
+                        val batteryPercentage = getBatteryPercentage(batteryStatus)
+                        val isCharging = isBatteryCharging(batteryStatus)
 
-                    OTApp.logger.writeSystemLog("Battery percentage: $batteryPercentage, isCharging: $isCharging", TAG)
-                    eventLogger.logDeviceStatusChangeEvent(
-                            when (intent.action) {
-                                Intent.ACTION_BATTERY_LOW -> IEventLogger.SUB_DEVICE_BATTERY_LOW
-                                Intent.ACTION_BATTERY_OKAY -> IEventLogger.SUB_DEVICE_BATTERY_OKAY
-                                Intent.ACTION_POWER_CONNECTED -> IEventLogger.SUB_DEVICE_PLUGGED
-                                Intent.ACTION_POWER_DISCONNECTED -> IEventLogger.SUB_DEVICE_UNPLUGGED
-                                else -> intent.action
-                            }, batteryPercentage)
+                        OTApp.logger.writeSystemLog("Battery percentage: $batteryPercentage, isCharging: $isCharging", TAG)
+                        eventLogger.logDeviceStatusChangeEvent(
+                                when (intent.action) {
+                                    Intent.ACTION_BATTERY_LOW -> IEventLogger.SUB_DEVICE_BATTERY_LOW
+                                    Intent.ACTION_BATTERY_OKAY -> IEventLogger.SUB_DEVICE_BATTERY_OKAY
+                                    Intent.ACTION_POWER_CONNECTED -> IEventLogger.SUB_DEVICE_PLUGGED
+                                    Intent.ACTION_POWER_DISCONNECTED -> IEventLogger.SUB_DEVICE_UNPLUGGED
+                                    else -> intent.action.toString()
+                                }, batteryPercentage)
+                    }
                 }
             }
         }

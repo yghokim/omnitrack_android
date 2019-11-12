@@ -90,7 +90,7 @@ class SourceSelectionPage(override val parent: ConnectionWizardView, val field: 
 
     class MeasureFactoryInformation(val factory: OTMeasureFactory) : SourceInformation(factory.getCategoryName(), factory.nameResourceId, factory.descResourceId) {
         override fun getSource(): OTMeasureFactory.OTMeasure {
-            return factory.makeMeasure()
+            return factory.makeAttachable()
         }
 
     }

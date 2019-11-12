@@ -51,9 +51,9 @@ class LoadingIndicatorBar : FrameLayout {
         context.resources.getDimensionPixelSize(R.dimen.loading_indicator_bar_height)
     }
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     init {
         inflateContent(R.layout.component_loading_indicator_bar, true)

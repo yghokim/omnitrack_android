@@ -18,8 +18,8 @@ import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTItemBuilderDAO
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
-import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection

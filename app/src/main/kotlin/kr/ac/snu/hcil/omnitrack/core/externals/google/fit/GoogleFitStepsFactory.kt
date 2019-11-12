@@ -41,7 +41,7 @@ class GoogleFitStepsFactory(context: Context, service: GoogleFitService) : Googl
 
     override fun getAttributeType() = OTFieldManager.TYPE_NUMBER
 
-    override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+    override fun makeAttachable(arguments: JsonObject?): OTMeasure {
         return Measure(this, arguments)
     }
 

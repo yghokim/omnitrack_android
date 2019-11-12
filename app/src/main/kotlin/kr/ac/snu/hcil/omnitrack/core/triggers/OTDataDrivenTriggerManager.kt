@@ -87,7 +87,7 @@ class OTDataDrivenTriggerManager(private val context: Context, private val prefe
             if (condition.timeQuery.equals(timeQueryTypeAdapter.get().fromJson(measureEntry.serializedTimeQuery))) {
                 val measureFactory = externalServiceManager.get().getMeasureFactoryByCode(conditionMeasure.factoryCode)
                 if (measureFactory != null) {
-                    return conditionMeasure.equals(measureFactory.makeMeasure(measureEntry.serializedMeasureArguments))
+                    return conditionMeasure.equals(measureFactory.makeAttachable(measureEntry.serializedMeasureArguments))
                 } else return false
             } else return false
         } else return false

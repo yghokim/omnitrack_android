@@ -509,7 +509,7 @@ class FieldDetailActivity : MultiButtonActionBarActivity(R.layout.activity_field
             startActivityForResult(intent, 0)*/
             /*
             val newConnection = OTConnection()
-            newConnection.source = GoogleFitStepsFactory.makeMeasure()
+            newConnection.source = GoogleFitStepsFactory.makeAttachable()
             field?.valueConnection = newConnection
             refreshConnection(true)
             */

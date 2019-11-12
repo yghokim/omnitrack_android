@@ -34,7 +34,7 @@ object FileHelper {
 
     fun exists(path: String): Boolean {
         try {
-            val file = File(Uri.parse(path).path)
+            val file = File(Uri.parse(path).path!!)
             return file.exists()
         } catch (ex: Exception) {
             return false
@@ -87,12 +87,12 @@ object FileHelper {
             }
             ContentResolver.SCHEME_FILE -> {
                 try {
-                    val file = File(uri.path)
+                    val file = File(uri.path!!)
                     fun getSizeRecur(dir: File): Long {
                         var size = 0L
 
                         if (dir.isDirectory) {
-                            for (f in dir.listFiles()) {
+                            for (f in dir.listFiles()!!) {
                                 if (f.isFile) {
                                     size += f.length()
                                 } else {
@@ -124,7 +124,7 @@ object FileHelper {
             if (mimeTypeFromName != null) {
                 return mimeTypeFromName
             } else {
-                val fileStream = File(uri.path).inputStream()
+                val fileStream = File(uri.path!!).inputStream()
                 val mimeType = URLConnection.guessContentTypeFromStream(fileStream)
                 fileStream.close()
                 return mimeType

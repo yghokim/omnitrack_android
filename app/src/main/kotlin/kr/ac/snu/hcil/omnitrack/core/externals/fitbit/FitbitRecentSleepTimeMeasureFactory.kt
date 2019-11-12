@@ -29,7 +29,7 @@ class FitbitRecentSleepTimeMeasureFactory(context: Context, service: FitbitServi
     override val isDemandingUserInput: Boolean = false
 
 
-    override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+    override fun makeAttachable(arguments: JsonObject?): OTMeasure {
         return FitbitRecentSleepTimeMeasure(this, arguments)
     }
 

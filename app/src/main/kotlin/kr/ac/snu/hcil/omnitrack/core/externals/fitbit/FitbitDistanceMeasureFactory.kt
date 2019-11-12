@@ -27,7 +27,7 @@ class FitbitDistanceMeasureFactory(context: Context, parentService: FitbitServic
 
     override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_FLOAT
 
-    override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+    override fun makeAttachable(arguments: JsonObject?): OTMeasure {
         return FitbitDistanceMeasure(this, arguments)
     }
 

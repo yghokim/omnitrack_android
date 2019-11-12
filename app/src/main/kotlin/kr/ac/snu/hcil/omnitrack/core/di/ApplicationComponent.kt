@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.di.global
+package kr.ac.snu.hcil.omnitrack.core.di
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -37,6 +37,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataDrivenTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTReminderCommands
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
+import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTEventTriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.measures.OTItemMetadataMeasureFactoryLogicImpl
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
 import kr.ac.snu.hcil.omnitrack.core.workers.OTInformationUploadWorker
@@ -81,6 +82,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TrackerAssignPanel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TriggerDetailViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenConditionViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.data.DataDrivenTriggerConfigurationPanel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.event.EventTriggerWizardView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditions.time.TimeConditionViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
@@ -115,7 +117,8 @@ import javax.inject.Singleton
     TriggerSystemModule::class,
     InformationHelpersModule::class,
     ScriptingModule::class,
-    NetworkModule::class
+    NetworkModule::class,
+    EventModule::class
 ])
 interface ApplicationComponent {
 
@@ -152,6 +155,7 @@ interface ApplicationComponent {
 
     fun manager(): DaoSerializationManager
     fun dataDrivenConditionTypeAdapter(): OTDataDrivenTriggerCondition.ConditionTypeAdapter
+    fun eventConditionTypeAdapter(): OTEventTriggerCondition.ConditionTypeAdapter
 
     fun inject(wrapper: OTItemBuilderWrapperBase)
 
@@ -317,4 +321,6 @@ interface ApplicationComponent {
     fun inject(activity: SignUpActivity)
 
     fun inject(viewModel: LoggingTriggerListViewModel)
+
+    fun inject(wizardView: EventTriggerWizardView)
 }

@@ -27,8 +27,8 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.IAuthServerAPI
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
-import kr.ac.snu.hcil.omnitrack.core.di.global.ServerResponsive
+import kr.ac.snu.hcil.omnitrack.core.di.ForGeneric
+import kr.ac.snu.hcil.omnitrack.core.di.ServerResponsive
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.core.net.ServerError
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.SettingsActivity

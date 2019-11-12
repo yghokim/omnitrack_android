@@ -13,6 +13,7 @@ import io.reactivex.Single
 import kr.ac.snu.hcil.android.common.TextHelper
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
+import kr.ac.snu.hcil.omnitrack.core.OTAttachableFactory
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.system.OTMeasureFactoryManager
@@ -23,6 +24,18 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTMeasureFactoryManager
 class OTConnection {
 
     class ConnectionTypeAdapter(val measureFactoryManager: OTMeasureFactoryManager, val timeRangeQueryTypeAdapter: Lazy<OTTimeRangeQuery.TimeRangeQueryTypeAdapter>, val gson: Lazy<Gson>) : TypeAdapter<OTConnection>() {
+
+        val measureTypeAdapter = OTAttachableFactory.OTAttachableTypeAdapter(gson){
+            factoryCode, arguments ->
+            val factory = measureFactoryManager.getMeasureFactoryByCode(typeCode = factoryCode)
+            if (factory == null) {
+                println("$factoryCode is not supported in System.")
+                measureFactoryManager.serviceManager.unSupportedDummyMeasureFactory.makeMeasure(factoryCode, arguments)
+            } else {
+                factory.makeAttachable(arguments)
+            }
+        }
+
         override fun read(reader: JsonReader): OTConnection {
             val connection = OTConnection()
             reader.beginObject()
@@ -30,42 +43,7 @@ class OTConnection {
             while (reader.hasNext()) {
                 when (reader.nextName()) {
                     "measure" -> {
-                        if (reader.peek() == JsonToken.NULL) {
-                            reader.skipValue()
-                        } else {
-                            var factoryCode: String? = null
-                            var arguments: JsonObject? = null
-                            reader.beginObject()
-                            while (reader.hasNext()) {
-                                when (reader.nextName()) {
-                                    "code" -> {
-                                        if (reader.peek() == JsonToken.NULL) {
-                                            reader.nextNull()
-                                        } else {
-                                            factoryCode = reader.nextString()
-                                        }
-                                    }
-                                    "args" -> {
-                                        if (reader.peek() == JsonToken.NULL) {
-                                            reader.nextNull()
-                                        } else {
-                                            arguments = gson.get().fromJson(reader, JsonObject::class.java)
-                                        }
-                                    }
-                                }
-                            }
-                            reader.endObject()
-                            if (factoryCode != null) {
-                                val factory = measureFactoryManager.getMeasureFactoryByCode(typeCode = factoryCode)
-                                if (factory == null) {
-                                    println("$factoryCode is not supported in System.")
-
-                                    connection.source = measureFactoryManager.serviceManager.unSupportedDummyMeasureFactory.makeMeasure(factoryCode, arguments)
-                                } else {
-                                    connection.source = factory.makeMeasure(arguments)
-                                }
-                            }
-                        }
+                        connection.source = measureTypeAdapter.read(reader)
                     }
 
                     "query" -> {
@@ -84,10 +62,7 @@ class OTConnection {
 
             value.source?.let {
                 out.name("measure")
-                out.beginObject()
-                        .name("code").value(it.factoryCode)
-                        .name("args").jsonValue(gson.get().toJson(it.arguments))
-                out.endObject()
+                measureTypeAdapter.write(out, value.source)
             }
 
             value.rangedQuery?.let {

@@ -68,7 +68,8 @@ object OTTriggerInformationHelper {
     fun getConfigIconResId(trigger: OTTriggerDAO): Int? {
         return when (trigger.conditionType) {
             OTTriggerDAO.CONDITION_TYPE_TIME -> getTimeConfigIconResId((trigger.condition as OTTimeTriggerCondition).timeConditionType)
-            OTTriggerDAO.CONDITION_TYPE_DATA -> R.drawable.event_dark
+            OTTriggerDAO.CONDITION_TYPE_EVENT-> R.drawable.event_dark
+            OTTriggerDAO.CONDITION_TYPE_DATA -> R.drawable.ic_trending_up_black_24dp
             else -> null
         }
     }

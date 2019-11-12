@@ -122,7 +122,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
         val isRequiredObservable: Observable<Boolean> = BehaviorSubject.create<Boolean>()
         val stateObservable: Observable<OTItemBuilderWrapperBase.EAttributeValueState> = BehaviorSubject.create<OTItemBuilderWrapperBase.EAttributeValueState>()
 
-        val valueObservable = BehaviorSubject.createDefault<Nullable<AnyValueWithTimestamp>>(Nullable(null) as Nullable<AnyValueWithTimestamp>)
+        val valueObservable = BehaviorSubject.createDefault<Nullable<AnyValueWithTimestamp>>(Nullable(null))
 
         val validationObservable: Observable<Boolean> = BehaviorSubject.createDefault<Boolean>(true)
 

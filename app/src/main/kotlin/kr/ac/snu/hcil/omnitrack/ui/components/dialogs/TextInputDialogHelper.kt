@@ -22,8 +22,8 @@ object TextInputDialogHelper {
 
         if (pasteClipBoardFirst) {
             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            if (clipboard.hasPrimaryClip() && clipboard.primaryClipDescription.hasMimeType("text/plain") && clipboard.primaryClip.itemCount > 0) {
-                textInput.text = clipboard.primaryClip.getItemAt(0).text
+            if (clipboard.hasPrimaryClip() && clipboard.primaryClipDescription?.hasMimeType("text/plain") == true && clipboard.primaryClip?.itemCount?:0 > 0) {
+                textInput.text = clipboard.primaryClip?.getItemAt(0)?.text
             }
         }
 

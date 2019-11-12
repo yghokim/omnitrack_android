@@ -48,7 +48,7 @@ class DataDrivenTriggerConfigurationPanel : FrameLayout, IConditionConfiguration
         override val typeCode: String = serviceMeasureFactory.typeCode
 
         override fun makeMeasure(): OTMeasureFactory.OTMeasure {
-            return serviceMeasureFactory.makeMeasure()
+            return serviceMeasureFactory.makeAttachable()
         }
     }
 
@@ -88,15 +88,15 @@ class DataDrivenTriggerConfigurationPanel : FrameLayout, IConditionConfiguration
     override val onConditionChanged: Observable<ATriggerCondition>
         get() = impl.onConditionChanged
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
     init {
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
 
         //TODO change to merge
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        addView(inflater.inflate(R.layout.trigger_event_trigger_config_panel, this, false))
+        addView(inflater.inflate(R.layout.trigger_data_driven_trigger_config_panel, this, false))
 
 
         availableMeasures = externalServiceManager.getFilteredMeasureFactories {
@@ -178,7 +178,7 @@ class DataDrivenTriggerConfigurationPanel : FrameLayout, IConditionConfiguration
             }
 
             val holder = view.tag as MeasureViewHolder
-            holder.bind(getItem(position))
+            holder.bind(getItem(position)!!)
             return view
         }
     }

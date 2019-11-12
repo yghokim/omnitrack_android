@@ -24,7 +24,7 @@ class FitbitHeartRateMeasureFactory(context: Context, service: FitbitService) : 
     override val minimumGranularity: OTTimeRangeQuery.Granularity? = OTTimeRangeQuery.Granularity.Hour
     override val isDemandingUserInput: Boolean = false
 
-    override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+    override fun makeAttachable(arguments: JsonObject?): OTMeasure {
         return FitbitHeartRateMeasure(this, arguments)
     }
 

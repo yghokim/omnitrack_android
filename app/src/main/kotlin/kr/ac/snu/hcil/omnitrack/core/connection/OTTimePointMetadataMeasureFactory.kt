@@ -5,7 +5,7 @@ import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
-import kr.ac.snu.hcil.omnitrack.core.serialization.getLongCompat
+import kr.ac.snu.hcil.android.common.getLongCompat
 import kr.ac.snu.hcil.omnitrack.core.types.TimePoint
 
 abstract class OTTimePointMetadataMeasureFactory(context: Context, factoryTypeName: String) : OTItemMetadataMeasureFactory(context, factoryTypeName) {

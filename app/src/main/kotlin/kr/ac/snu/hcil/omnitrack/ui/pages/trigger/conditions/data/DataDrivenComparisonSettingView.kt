@@ -119,7 +119,7 @@ class DataDrivenComparisonSettingView : LinearLayout, TextWatcher, ExtendedSpinn
             }
 
             val holder = view.tag as MethodViewHolder
-            holder.bind(getItem(position))
+            holder.bind(getItem(position)!!)
             return view
         }
 

@@ -24,7 +24,7 @@ class OTLocalMediaCacheManager(val context: Context, val authManager: Lazy<OTAut
 
 
     fun getDefaultItemCacheDir(trackerId: String, createIfNotExist: Boolean = true): File {
-        val file = context.externalCacheDir.resolve("${authManager.get().userId
+        val file = context.externalCacheDir!!.resolve("${authManager.get().userId
                 ?: "anonymous"}/$trackerId")
         if (createIfNotExist && !file.exists()) {
             file.mkdirs()
@@ -140,7 +140,7 @@ class OTLocalMediaCacheManager(val context: Context, val authManager: Lazy<OTAut
                                 .findFirst() ?: realm.createObject(LocalMediaCacheEntry::class.java, UUID.randomUUID().toString())
 
                         cacheEntry.serverPath = serverFile.serverPath
-                        cacheEntry.localUri = localUri.path
+                        cacheEntry.localUri = localUri.path!!
                         cacheEntry.originalMimeType = serverFile.mimeType
                         cacheEntry.originalFileByteSize = serverFile.fileSize
                         cacheEntry.originalFileName = serverFile.originalFileName

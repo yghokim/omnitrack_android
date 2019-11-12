@@ -101,7 +101,7 @@ class AudioItemListView : ConstraintLayout {
                 iconView.visibility = View.VISIBLE
                 loadingIndicatorView.visibility = View.INVISIBLE
                 iconView.setImageResource(R.drawable.icon_waveform)
-                val metadata = AudioRecordMetadata.readMetadata(localFileUri.path, context)
+                val metadata = AudioRecordMetadata.readMetadata(localFileUri.path!!, context)
                 if (metadata != null) {
                     durationView.visibility = View.VISIBLE
                     durationView.text = ((metadata.durationMillis / 10) / 100f).toString()

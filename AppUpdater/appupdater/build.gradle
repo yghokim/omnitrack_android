@@ -32,6 +32,6 @@ dependencies {
     api "androidx.appcompat:appcompat:$rootProject.ext.androidx_appcompat_version"
     api "com.google.android.material:material:$rootProject.ext.androidx_material_version"
     api "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttp_version"
-    implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
+    implementation 'com.github.tbruyelle:rxpermissions:0.10.2' //no androidx
     implementation "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxjava_version"
 }

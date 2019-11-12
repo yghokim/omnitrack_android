@@ -13,7 +13,7 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -48,14 +48,14 @@ class ServiceWizardView: WizardView {
     constructor(context: Context, measureFactory: OTMeasureFactory) : super(context) {
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
         currentMeasureFactory = measureFactory
-        connection.source = measureFactory.makeMeasure()
+        connection.source = measureFactory.makeAttachable()
         setAdapter(adapter)
     }
 
     constructor(context: Context, measureFactory: OTMeasureFactory, attrs: AttributeSet?) : super(context, attrs) {
         (context.applicationContext as OTAndroidApp).applicationComponent.inject(this)
         currentMeasureFactory = measureFactory
-        connection.source = measureFactory.makeMeasure()
+        connection.source = measureFactory.makeAttachable()
         setAdapter(Adapter(context))
     }
 

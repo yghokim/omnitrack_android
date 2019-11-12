@@ -13,12 +13,12 @@ import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.models.*
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.flags.F
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
-import kr.ac.snu.hcil.omnitrack.core.serialization.getLongCompat
+import kr.ac.snu.hcil.android.common.getLongCompat
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager

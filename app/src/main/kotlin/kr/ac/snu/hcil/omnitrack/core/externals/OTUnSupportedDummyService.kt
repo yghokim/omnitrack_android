@@ -39,7 +39,7 @@ class OTUnSupportedDummyService(context: Context, pref: SharedPreferences) : OTE
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_STRING
 
 
-        override fun makeMeasure(arguments: JsonObject?): OTMeasure {
+        override fun makeAttachable(arguments: JsonObject?): OTMeasure {
             throw UnsupportedOperationException("This method is unused for UnSupportedDummyMeasure.")
         }
 

@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack
 
 import android.content.Context
-import kr.ac.snu.hcil.omnitrack.core.di.global.ApplicationComponent
+import kr.ac.snu.hcil.omnitrack.core.di.ApplicationComponent
 
 interface OTAndroidApp {
     val deviceId: String

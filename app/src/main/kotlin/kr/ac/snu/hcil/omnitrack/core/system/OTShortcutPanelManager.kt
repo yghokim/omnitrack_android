@@ -24,8 +24,8 @@ import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
-import kr.ac.snu.hcil.omnitrack.core.di.global.Default
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.Default
 import kr.ac.snu.hcil.omnitrack.core.flags.F
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity

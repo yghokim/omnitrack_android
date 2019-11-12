@@ -625,4 +625,10 @@
     <string name="msg_export_tracking_plan">Export Tracking Plan</string>
     <string name="activity_title_my_account">My Account</string>
 
+    <string name="event_location_proximity_name">Location Proximity</string>
+    <string name="event_location_proximity_desc">Actuated when the device is near a specific GPS point</string>
+
+    <string name="event_phone_call_name">Phone Call</string>
+    <string name="event_phone_call_desc">Actuated after finishing a phone call</string>
+
 </resources>

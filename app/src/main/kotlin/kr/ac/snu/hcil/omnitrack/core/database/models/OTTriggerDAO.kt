@@ -32,6 +32,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTDataDrivenTriggerCondition
+import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTEventTriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import org.jetbrains.anko.runOnUiThread
 
@@ -97,6 +98,7 @@ open class OTTriggerDAO : RealmObject() {
                             ?: OTTimeTriggerCondition()
                     CONDITION_TYPE_DATA -> serializedCondition?.let { OTApp.applicationComponent.dataDrivenConditionTypeAdapter().fromJson(it) }
                             ?: OTDataDrivenTriggerCondition()
+                    CONDITION_TYPE_EVENT -> serializedCondition?.let{ OTApp.applicationComponent.eventConditionTypeAdapter().fromJson(it) } ?: OTEventTriggerCondition()
                     else -> null
                 }
             }

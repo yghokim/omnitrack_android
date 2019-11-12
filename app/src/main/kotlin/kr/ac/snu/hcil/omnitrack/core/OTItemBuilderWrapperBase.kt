@@ -17,7 +17,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTItemBuilderDAO
-import kr.ac.snu.hcil.omnitrack.core.di.global.ForGeneric
+import kr.ac.snu.hcil.omnitrack.core.di.ForGeneric
 import kr.ac.snu.hcil.omnitrack.core.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import javax.inject.Inject

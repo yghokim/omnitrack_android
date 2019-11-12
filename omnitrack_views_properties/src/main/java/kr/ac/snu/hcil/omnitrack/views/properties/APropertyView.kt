@@ -46,7 +46,7 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
 
         try {
             if (a.hasValue(0))
-                title = a.getString(0)
+                title = a.getString(0)?:""
         } finally {
             a.recycle()
         }

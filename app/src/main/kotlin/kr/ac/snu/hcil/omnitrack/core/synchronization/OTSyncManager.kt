@@ -9,8 +9,8 @@ import dagger.Lazy
 import io.reactivex.Completable
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
-import kr.ac.snu.hcil.omnitrack.core.di.global.ServerFullSync
-import kr.ac.snu.hcil.omnitrack.core.di.global.ServerSyncOneShot
+import kr.ac.snu.hcil.omnitrack.core.di.ServerFullSync
+import kr.ac.snu.hcil.omnitrack.core.di.ServerSyncOneShot
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.core.workers.OTSynchronizationWorker

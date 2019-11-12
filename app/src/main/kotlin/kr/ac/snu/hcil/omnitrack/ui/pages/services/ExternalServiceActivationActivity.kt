@@ -92,7 +92,7 @@ class ExternalServiceActivationActivity : OTActivity(R.layout.activity_service_a
         serviceIdentifier = if (savedInstanceState == null) {
             intent.getStringExtra(INTENT_EXTRA_SERVICE_IDENTIFIER)
         } else {
-            savedInstanceState.getString(INTENT_EXTRA_SERVICE_IDENTIFIER)
+            savedInstanceState.getString(INTENT_EXTRA_SERVICE_IDENTIFIER)!!
         }
 
         viewModel.attachedService = externalServiceManager.findServiceByIdentifier(serviceIdentifier)

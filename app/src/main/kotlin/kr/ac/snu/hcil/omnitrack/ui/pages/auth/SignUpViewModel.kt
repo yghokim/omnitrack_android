@@ -12,7 +12,7 @@ import io.reactivex.subjects.Subject
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.di.global.ServerResponsive
+import kr.ac.snu.hcil.omnitrack.core.di.ServerResponsive
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import javax.inject.Inject
 import javax.inject.Provider

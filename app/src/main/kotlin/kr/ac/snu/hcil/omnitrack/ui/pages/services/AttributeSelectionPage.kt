@@ -23,7 +23,7 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.fields.FieldPresetInfo
 import kr.ac.snu.hcil.omnitrack.core.fields.OTFieldManager
 import kr.ac.snu.hcil.omnitrack.core.fields.SimpleFieldPresetInfo

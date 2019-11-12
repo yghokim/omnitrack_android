@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.di.global
+package kr.ac.snu.hcil.omnitrack.core.di
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -7,11 +7,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.internal.Factory
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.core.di.ExternalServiceModule
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
-import kr.ac.snu.hcil.omnitrack.core.triggers.ITriggerAlarmController
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataDrivenTriggerManager
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerAlarmManager
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
+import kr.ac.snu.hcil.omnitrack.core.triggers.*
 import javax.inject.Singleton
 
 /**
@@ -33,7 +31,18 @@ class TriggerSystemModule {
 
     @Provides
     @Singleton
-    fun provideTriggerSystemManager(triggerAlarmManager: Lazy<ITriggerAlarmController>, dataDrivenTriggerManager: Lazy<OTDataDrivenTriggerManager>, @Backend realmProvider: Factory<Realm>, context: Context): OTTriggerSystemManager {
-        return OTTriggerSystemManager(triggerAlarmManager, dataDrivenTriggerManager, realmProvider, context)
+    fun provideTriggerSystemManager(
+            triggerAlarmManager: Lazy<ITriggerAlarmController>,
+            dataDrivenTriggerManager: Lazy<OTDataDrivenTriggerManager>,
+            eventTriggerManager: Lazy<OTEventTriggerManager>,
+            @Backend realmProvider: Factory<Realm>,
+            context: Context): OTTriggerSystemManager {
+        return OTTriggerSystemManager(triggerAlarmManager, dataDrivenTriggerManager, eventTriggerManager, realmProvider, context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideEventTriggerManager(): OTEventTriggerManager{
+        return OTEventTriggerManager()
     }
 }

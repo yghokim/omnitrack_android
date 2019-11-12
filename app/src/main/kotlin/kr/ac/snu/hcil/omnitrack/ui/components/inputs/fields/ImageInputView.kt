@@ -223,10 +223,10 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AFieldInpu
         if (requestType == REQUEST_CODE_CAMERA && data.hasExtra(CameraPickDialogFragment.EXTRA_IMAGE_DATA)) {
             return handleCameraInputData(data.getByteArrayExtra(CameraPickDialogFragment.EXTRA_IMAGE_DATA))
         } else if (requestType == REQUEST_CODE_GALLERY) {
-            if (data.data != null) {
+            val d = data.data
+            if (d != null) {
                 val uri = Uri.fromFile(picker.createCacheImageFile(context))
-                resizeImage(data.data, uri)
-
+                resizeImage(d, uri)
                 this.picker.imageUri = uri
             }
 
