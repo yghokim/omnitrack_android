@@ -102,3 +102,15 @@
 # for DexGuard only
 #-keepresourcexmlelements manifest/application/meta-data@value=GlideModule
 # end Glide settings
+
+# R8 Configuration for Realm
+-keep @interface io.realm.annotations.RealmModule { *; }
+-keep class io.realm.annotations.RealmModule { *; }
+
+-keep @io.realm.annotations.RealmModule class *
+-keep class io.realm.internal.Keep
+-keep @io.realm.internal.Keep class *
+-dontwarn javax.**
+-keepnames public class * extends io.realm.RealmObject
+-keep public class * extends io.realm.RealmObject { *; }
+-keep class io.realm.** { *; }
