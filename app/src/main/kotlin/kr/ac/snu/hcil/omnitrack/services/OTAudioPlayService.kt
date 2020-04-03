@@ -15,18 +15,20 @@ import android.net.Uri
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.os.SystemClock
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecordMetadata
-import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
-import kr.ac.snu.hcil.omnitrack.utils.Ticker
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import org.jetbrains.anko.notificationManager
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by Young-Ho on 4/22/2017.
@@ -112,13 +114,13 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
                     .putExtra(INTENT_EXTRA_CURRENT_PROGRESS_RATIO, progressRatio)
         }
 
-        private fun makeAudioNotificationRemoteViews(context: Context, title: String, description: String, currentProgressSeconds: Int): RemoteViews {
+        private fun makeAudioNotificationRemoteViews(context: Context, title: String, description: String): RemoteViews {
             val remoteViews = RemoteViews(context.packageName, R.layout.remoteview_notification_audio_player)
             remoteViews.setImageViewBitmap(R.id.ui_audio_icon, VectorIconHelper.getConvertedBitmap(context, R.drawable.icon_small_audio, tint = Color.WHITE))
             remoteViews.setTextViewText(R.id.ui_title, title)
             remoteViews.setTextViewText(R.id.ui_description, description)
 
-            remoteViews.setTextViewText(R.id.ui_duration_view, AudioRecorderView.formatTime(currentProgressSeconds))
+            remoteViews.setChronometer(R.id.ui_duration_view, SystemClock.elapsedRealtime(), null, true)
 
             remoteViews.setImageViewBitmap(R.id.ui_player_button, VectorIconHelper.getConvertedBitmap(context, R.drawable.ex))
 
@@ -140,6 +142,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
                     .setSmallIcon(R.drawable.icon_simple)
                     .setAutoCancel(false)
                     .setOngoing(true)
+                            .setDefaults(NotificationCompat.DEFAULT_LIGHTS or NotificationCompat.DEFAULT_SOUND).setVibrate(longArrayOf())
                     .setContentTitle("OmniTrack Audio Record Player") as NotificationCompat.Builder
 
             lastNotificationBuilder = builder
@@ -170,26 +173,13 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
 
     private val commandReceiver = CommandReceiver()
 
-    private val secondTicker = Ticker(1000)
-
     class AudioServiceBinder(val service: OTAudioPlayService) : Binder()
 
     override fun onBind(p0: Intent?): IBinder {
         return binder
     }
 
-    init {
-
-        secondTicker.tick += {
-            _, _ ->
-            if (isSoundPlaying && currentSessionId != null) {
-                LocalBroadcastManager.getInstance(this)
-                        .sendBroadcast(makeOnProgressEventIntent(currentSessionId!!, currentPlayPositionSecond, currentProgressRatio))
-
-                putNotificationControl(this, makeAudioNotificationRemoteViews(this, title, description, currentPlayPositionSecond))
-            }
-        }
-    }
+    private var ticker: Disposable? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -213,12 +203,14 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
         currentFile = null
 
         dismissNotificationControl(this)
+
+        this.ticker?.dispose()
+        this.ticker = null
     }
 
     private fun stopMedia(): Boolean {
         if (currentPlayer?.isPlaying == true) {
             currentPlayer?.stop()
-            secondTicker.stop()
             return true
         } else return false
     }
@@ -227,8 +219,6 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
         if (currentPlayer?.isPlaying == true) {
             currentPlayer?.pause()
             pausedPosition = currentPlayer?.currentPosition ?: -1
-
-            secondTicker.stop()
             return true
         } else {
             return false
@@ -239,7 +229,6 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
         if (currentPlayer?.isPlaying == false) {
             currentPlayer?.seekTo(pausedPosition)
             currentPlayer?.start()
-            secondTicker.start()
             return true
         } else return false
     }
@@ -272,8 +261,13 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
         if (currentPlayer?.isPlaying == false) {
             println("play current media")
             currentPlayer?.start()
-            secondTicker.start()
-            putNotificationControl(this, makeAudioNotificationRemoteViews(this, title, description, 0))
+            putNotificationControl(this, makeAudioNotificationRemoteViews(this, title, description))
+            this.ticker = Observable.interval(50, TimeUnit.MILLISECONDS).subscribe {
+                if (isSoundPlaying && currentSessionId != null) {
+                    LocalBroadcastManager.getInstance(this)
+                            .sendBroadcast(makeOnProgressEventIntent(currentSessionId!!, currentPlayPositionSecond, currentProgressRatio))
+                }
+            }
         }
     }
 

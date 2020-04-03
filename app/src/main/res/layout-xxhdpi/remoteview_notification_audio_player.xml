@@ -61,18 +61,18 @@
         android:textStyle="italic"
         tools:text="Logged at 19:00 PM, Mar 25, 2017" />
 
-    <TextView
+    <Chronometer
         android:id="@+id/ui_duration_view"
         style="@style/numberPropertyDigitViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="12dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="12dp"
         android:layout_toStartOf="@+id/ui_player_button_container"
         android:fontFamily="sans-serif-light"
         android:textColor="#afffffff"
-        tools:text="0:30" />
+        android:format="MM:SS" />
 
     <ImageView
         android:layout_width="wrap_content"

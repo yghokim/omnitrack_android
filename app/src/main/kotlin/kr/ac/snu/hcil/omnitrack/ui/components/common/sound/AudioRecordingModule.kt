@@ -12,13 +12,14 @@ import java.util.*
  */
 class AudioRecordingModule(var listener: RecordingListener?,
                            val fileUri: Uri, val samplingRate: Int = 11025,
-                           val maxLengthMillis: Int = DateUtils.MINUTE_IN_MILLIS.toInt(),
-                           progressTerm: Int = 200) : AAudioModule(progressTerm), MediaRecorder.OnInfoListener, AudioRecorderProgressBar.AmplitudeTimelineProvider {
+                           val maxLengthMillis: Int = DateUtils.MINUTE_IN_MILLIS.toInt()) : MediaRecorder.OnInfoListener, AudioRecorderProgressBar.AmplitudeTimelineProvider {
 
     interface RecordingListener {
-        fun onRecordingProgress(module: AudioRecordingModule, volume: Int)
         fun onRecordingFinished(module: AudioRecordingModule, resultUri: Uri?)
     }
+
+    var startedAt: Long = 0
+        private set
 
     private val recorder: MediaRecorder
 
@@ -41,25 +42,12 @@ class AudioRecordingModule(var listener: RecordingListener?,
         recorder.setOnInfoListener(this)
     }
 
-    override fun isRunning(): Boolean {
+    fun isRunning(): Boolean {
         return _isRecording
     }
 
-    override fun getCurrentProgressRatio(now: Long): Float {
-        return getCurrentProgressDuration(now).toFloat() / maxLengthMillis
-    }
 
-    override fun getCurrentProgressDuration(now: Long): Int {
-        return (now - startedAt).toInt()
-    }
-
-    override fun onTick(time: Long) {
-        amplitudes.add(Pair(getCurrentProgressRatio(time), recorder.maxAmplitude))
-        listener?.onRecordingProgress(this, recorder.maxAmplitude)
-    }
-
-
-    override fun onStart() {
+    fun startAsync() {
 
         try {
             recorder.prepare()
@@ -74,10 +62,28 @@ class AudioRecordingModule(var listener: RecordingListener?,
 
         amplitudes.clear()
         recorder.start()
+        startedAt = System.currentTimeMillis()
         println("Start recording")
     }
 
-    override fun onStop(cancel: Boolean) {
+    fun getCurrentProgressRatio(now: Long): Float {
+        return getCurrentProgressDuration(now).toFloat() / maxLengthMillis
+    }
+
+    fun getCurrentProgressDuration(now: Long): Int {
+        return (now - startedAt).toInt()
+    }
+
+
+    fun stop() {
+        onStop(false)
+    }
+
+    fun cancel() {
+        onStop(true)
+    }
+
+    fun onStop(cancel: Boolean) {
         recorder.stop()
         recorder.release()
         _isRecording = false

@@ -13,17 +13,20 @@ import android.net.Uri
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.os.SystemClock
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecordingModule
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import org.jetbrains.anko.notificationManager
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by junhoe on 2017. 9. 11..
@@ -103,18 +106,7 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
     private val commandReceiver = CommandReceiver()
     private var remoteViews: RemoteViews? = null
 
-    private var currentAudioRatio: Float = 0f
-        set(value) {
-            if (field != value) {
-                field = value
-                if (currentSessionId != null) {
-                    val progressSeconds = currentRecordingModule!!.getCurrentProgressDuration(System.currentTimeMillis()) / 1000
-                    LocalBroadcastManager.getInstance(this)
-                            .sendBroadcast(OTAudioRecordService.makeProgressIntent(currentSessionId!!, progressSeconds, field))
-                    updateRemoteView(progressSeconds)
-                }
-            }
-        }
+    private var ticker: Disposable? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -139,7 +131,7 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
 
                     currentSessionId = sessionId
                     currentRecordingModule = AudioRecordingModule(this, filePath)
-                    remoteViews = initRemoteViews(this, currentSessionId!!, title, 0)
+                    remoteViews = initRemoteViews(this, currentSessionId!!, title)
                     putNotificationControl(remoteViews)
                     startRecording()
                 }
@@ -167,6 +159,12 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
         println("send recording start callback intent")
         LocalBroadcastManager.getInstance(this)
                 .sendBroadcast(makeStartCallbackIntent(currentSessionId!!, currentRecordingModule!!.fileUri))
+        ticker?.dispose()
+        ticker = Observable.interval(50, TimeUnit.MILLISECONDS).subscribe {
+            val now = System.currentTimeMillis()
+            LocalBroadcastManager.getInstance(this)
+                    .sendBroadcast(makeProgressIntent(currentSessionId!!, currentRecordingModule!!.getCurrentProgressDuration(now) / 1000, currentRecordingModule!!.getCurrentProgressRatio(now)))
+        }
     }
 
     private fun stopRecording() {
@@ -183,10 +181,6 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
         }
     }
 
-    override fun onRecordingProgress(module: AudioRecordingModule, volume: Int) = currentSessionId?.let {
-        currentAudioRatio = currentRecordingModule!!.getCurrentProgressRatio(System.currentTimeMillis())
-    } ?: Unit
-
     override fun onRecordingFinished(module: AudioRecordingModule, resultUri: Uri?) {
         if (currentRecordingModule != null) {
             LocalBroadcastManager.getInstance(this)
@@ -199,14 +193,13 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
 
     private fun initRemoteViews(context: Context,
                                 sessionId: String,
-                                title: String,
-                                currentProgressSeconds: Int): RemoteViews {
+                                title: String): RemoteViews {
         return RemoteViews(context.packageName,
                 R.layout.remoteview_notification_record_player).apply {
 
             setImageViewBitmap(R.id.ui_audio_icon, VectorIconHelper.getConvertedBitmap(context, R.drawable.icon_small_audio, tint = Color.WHITE))
             setTextViewText(R.id.ui_title, title)
-            setTextViewText(R.id.ui_duration_view, AudioRecorderView.formatTime(currentProgressSeconds))
+            setChronometer(R.id.ui_duration_view, SystemClock.elapsedRealtime(), null, true)
             setImageViewBitmap(R.id.ui_player_button, VectorIconHelper.getConvertedBitmap(context, R.drawable.stop_dark, 24, Color.WHITE))
             setImageViewBitmap(R.id.ui_discard_button, VectorIconHelper.getConvertedBitmap(context, R.drawable.trashcan, 24, Color.WHITE))
             setOnClickPendingIntent(R.id.ui_player_button, PendingIntent.getService(context,
@@ -218,11 +211,6 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
                     makeDiscardIntent(context, sessionId),
                     PendingIntent.FLAG_ONE_SHOT))
         }
-    }
-
-    private fun updateRemoteView(currentProgressSeconds: Int) {
-        remoteViews?.setTextViewText(R.id.ui_duration_view, AudioRecorderView.formatTime(currentProgressSeconds))
-        putNotificationControl(remoteViews)
     }
 
     private val notificationBuilder: NotificationCompat.Builder by lazy {
@@ -261,6 +249,8 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
         currentSessionId = null
         remoteViews = null
         isRecording = false
+        ticker?.dispose()
+        ticker = null
         dismissNotificationControl()
     }
 
