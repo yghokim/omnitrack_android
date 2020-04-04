@@ -21,7 +21,7 @@ object OTNotificationManager {
 
     @TargetApi(Build.VERSION_CODES.O)
     fun refreshChannels(context: Context) {
-        val widgetsChannel = NotificationChannel(CHANNEL_ID_WIDGETS, context.getString(R.string.msg_notification_channel_name_widgets), NotificationManager.IMPORTANCE_HIGH)
+        val widgetsChannel = NotificationChannel(CHANNEL_ID_WIDGETS, context.getString(R.string.msg_notification_channel_name_widgets), NotificationManager.IMPORTANCE_DEFAULT)
         val alertChannel = NotificationChannel(CHANNEL_ID_IMPORTANT, context.getString(R.string.msg_notification_channel_name_alerts), NotificationManager.IMPORTANCE_HIGH)
         val systemChannel = NotificationChannel(CHANNEL_ID_SYSTEM, context.getString(R.string.msg_notification_channel_name_system_messages), NotificationManager.IMPORTANCE_DEFAULT)
         val noticeChannel = NotificationChannel(CHANNEL_ID_NOTICE, context.getString(R.string.msg_notification_channel_name_notice), NotificationManager.IMPORTANCE_LOW)

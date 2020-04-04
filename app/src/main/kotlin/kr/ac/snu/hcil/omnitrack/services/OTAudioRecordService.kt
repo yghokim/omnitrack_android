@@ -1,7 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.services
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
@@ -11,7 +9,6 @@ import android.content.IntentFilter
 import android.graphics.Color
 import android.net.Uri
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
 import android.os.SystemClock
 import android.util.Log
@@ -20,9 +17,9 @@ import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecordingModule
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import org.jetbrains.anko.notificationManager
@@ -38,7 +35,6 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
         private const val TAG = "AudioRecordService"
 
         const val RECORD_NOTIFICATION_ID = 2443
-        const val CHANNEL_ID_RECORD = "${BuildConfig.APPLICATION_ID}.notification.channel.record"
         const val INTENT_EXTRA_SESSION_ID = "audioRecordSessionId"
         const val INTENT_EXTRA_CURRENT_PROGRESS_SECONDS = "audioCurrentRecordProgressSeconds"
         const val INTENT_EXTRA_CURRENT_PROGRESS_RATIO = "audioCurrentRecordProgressRatio"
@@ -214,24 +210,11 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
     }
 
     private val notificationBuilder: NotificationCompat.Builder by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(CHANNEL_ID_RECORD,
-                    "OmniTrack Audio Record Player",
-                    NotificationManager.IMPORTANCE_DEFAULT)
-            notificationManager.createNotificationChannel(channel)
-            NotificationCompat.Builder(this)
+        NotificationCompat.Builder(this, OTNotificationManager.CHANNEL_ID_WIDGETS)
                     .setSmallIcon(R.drawable.icon_simple)
                     .setAutoCancel(false)
                     .setOngoing(true)
-                    .setChannelId(CHANNEL_ID_RECORD)
-                    .setContentTitle("OmniTrack Audio Record Player") as NotificationCompat.Builder
-        } else {
-            NotificationCompat.Builder(this)
-                    .setSmallIcon(R.drawable.icon_simple)
-                    .setAutoCancel(false)
-                    .setOngoing(true)
-                    .setContentTitle("OmniTrack Audio Record Player") as NotificationCompat.Builder
-        }
+                .setContentTitle("OmniTrack Audio Record Player")
     }
 
     private fun putNotificationControl(rv: RemoteViews?) {
