@@ -17,6 +17,7 @@ class ScriptingModule {
     fun provideSupportedFunctions(context: Context): Array<Expression.LazyFunction> {
         return arrayOf(
                 TodayLogCountExpression(context),
+                TodayLogCountWithFieldValueExpression(context),
                 DailyLogCountExpression(context),
                 LatestItemTimestampExpression(context),
                 StartOfDayRelativeExpression(),

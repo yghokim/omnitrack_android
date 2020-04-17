@@ -261,7 +261,7 @@ dependencies {
 
     implementation "com.google.android.material:material:$rootProject.ext.androidx_material_version"
     implementation "androidx.legacy:legacy-support-v4:$rootProject.ext.android_support_version"
-    implementation "androidx.vectordrawable:vectordrawable:1.0.1"
+    implementation "androidx.vectordrawable:vectordrawable:1.1.0"
     implementation "androidx.vectordrawable:vectordrawable-animated:$rootProject.ext.android_support_version"
     implementation "androidx.exifinterface:exifinterface:$rootProject.ext.android_support_version"
 
@@ -270,13 +270,13 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.gms:play-services-fitness:18.0.0'
 
-    implementation 'com.google.firebase:firebase-core:17.1.0'
-    implementation 'com.google.firebase:firebase-messaging:20.0.0'
+    implementation 'com.google.firebase:firebase-core:17.3.0'
+    implementation 'com.google.firebase:firebase-messaging:20.1.5'
 
-    def lifecycle_version = '2.0.0'
+    def lifecycle_version = '2.2.0'
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
-    def work_version = "2.2.0"
+    def work_version = "2.3.4"
     implementation "androidx.work:work-runtime:$work_version"
     implementation "androidx.work:work-rxjava2:$work_version"
 

@@ -13,6 +13,7 @@ class ExpressionConstants {
         const val COMMAND_TRACKER_LOG_COUNT_TODAY = "todayLogCountOf"
         const val COMMAND_TRACKER_LATEST_ITEM_TIME = "latestItemTimeOf"
         const val COMMAND_TIME_START_OF_DAY_RELATIVE = "startOfDayRelative"
+        const val COMMAND_TRACKER_LOG_COUNT_TODAY_WITH_FIELD_VALUE = "todayLogCountWithFieldValue"
         const val COMMAND_IS_WEEKEND = "isWeekend"
 
         val EXPRESSION_ZERO: Expression.LazyNumber by lazy{
