@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    tools:padding="@dimen/activity_horizontal_margin"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <Chronometer
+        android:id="@+id/ui_chronometer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/ui_button_delete"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <kr.ac.snu.hcil.android.common.view.tint.TintFancyButton
+        android:id="@+id/ui_button_delete"
+        style="@style/AudioRecordFancyButtonStyle"
+        android:layout_width="@dimen/button_height_small"
+        android:layout_height="@dimen/button_height_small"
+        android:visibility="invisible"
+        app:drawableTint="@color/textColorLightLight"
+        app:fb_borderColor="@color/textColorLightLight"
+        app:fb_borderWidth="1dp"
+        app:fb_defaultColor="@color/transparent"
+        app:fb_iconResource="@drawable/trashcan"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/ui_button_main"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <kr.ac.snu.hcil.android.common.view.tint.TintFancyButton
+        android:id="@+id/ui_button_main"
+        style="@style/AudioRecordFancyButtonStyle"
+        app:fb_iconResource="@drawable/pause"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/ui_button_stop"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <kr.ac.snu.hcil.android.common.view.tint.TintFancyButton
+        android:id="@+id/ui_button_stop"
+        style="@style/AudioRecordFancyButtonStyle"
+        android:layout_width="@dimen/button_height_small"
+        android:layout_height="@dimen/button_height_small"
+        android:layout_marginEnd="0dp"
+        android:visibility="invisible"
+        app:drawableTint="@color/buttonIconColorDark"
+        app:fb_borderColor="@color/textColorLightLight"
+        app:fb_borderWidth="1dp"
+        app:fb_defaultColor="@color/transparent"
+        app:fb_iconResource="@drawable/stop_round"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+</merge>

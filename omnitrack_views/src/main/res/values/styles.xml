@@ -80,5 +80,12 @@
         <item name="android:dividerPadding">0dp</item>
     </style>
 
+    <style name="AudioRecordFancyButtonStyle" parent="TinyCircularFancyButtonStyle">
+
+        <item name="android:layout_width">@dimen/button_height_normal</item>
+        <item name="android:layout_height">@dimen/button_height_normal</item>
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+
 
 </resources>

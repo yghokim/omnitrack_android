@@ -20,7 +20,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.di.global.Backend
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.core.types.OTServerFile
-import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
+import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView2
 import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
 
@@ -90,10 +90,8 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AFie
             }
         }
 
-    val valueView: AudioRecorderView = findViewById(R.id.ui_audio_recorder)
+    val valueView: AudioRecorderView2 = findViewById(R.id.ui_audio_recorder)
     val loadingIndicator: SpinKitView = findViewById(R.id.ui_loading_indicator)
-
-    private var audioTitleInformation: String = ""
 
     private val loadingSubscription = SerialDisposable()
     private val subscriptions = CompositeDisposable()
@@ -134,7 +132,10 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AFie
 
     override fun forceApplyValueAsync(): Single<Nullable<out Any>> {
         @Suppress("UNCHECKED_CAST")
-        return valueView.stopRecordingAndApplyUri().flatMap { (uri) -> convertNewUriToServerFile(uri ?: Uri.EMPTY) } as Single<Nullable<out Any>>
+        return Single.defer {
+            valueView.finishRecording()
+            return@defer convertNewUriToServerFile(valueView.audioFileUri)
+        }
     }
 
     override fun onDetachedFromWindow() {
@@ -157,10 +158,5 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AFie
             valueView.audioTitle = "${attributeInfo.name} | $trackerName"
         }
         realm.close()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        valueView.dispose()
     }
 }

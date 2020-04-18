@@ -23,6 +23,7 @@ import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.services.OTAudioPlayService
 import kr.ac.snu.hcil.omnitrack.services.OTAudioRecordService
+import kr.ac.snu.hcil.omnitrack.views.recording.IAudioRecorderView
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -31,7 +32,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 2016. 9. 27
  */
-class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.AnimatorUpdateListener {
+class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.AnimatorUpdateListener, IAudioRecorderView {
     companion object {
 
         private val TAG = "AudioRecorderView"
@@ -81,7 +82,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
         }
     }
 
-    var audioFileUri: Uri = Uri.EMPTY
+    override var audioFileUri: Uri = Uri.EMPTY
         set(value) {
             field = value
             if (value != Uri.EMPTY) {
@@ -100,10 +101,8 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
             audioFileUriChanged.invoke(this, value)
         }
 
-    private var currentRecordingUri: Uri? = null
-
     var audioLengthSeconds: Int = 60
-        set(value) {
+        private set(value) {
             if (field != value) {
                 field = value
                 refreshTimeViews(0)
@@ -112,9 +111,9 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
 
     var audioTitle: String = ""
 
-    var recordingOutputDirectoryPathOverride: File? = null
+    override var recordingOutputDirectoryPathOverride: File? = null
 
-    val audioFileUriChanged = Event<Uri>()
+    override val audioFileUriChanged = Event<Uri>()
 
     var mediaSessionId: String by Delegates.observable(UUID.randomUUID().toString()) {
         prop, old, new ->
@@ -149,8 +148,6 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
             }
         }
     }
-
-    val fileRemoved = Event<Long>()
 
     private val mainButton: AudioRecordingButton
     private val playBar: AudioRecorderProgressBar
@@ -337,7 +334,6 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
             this.audioFileUri = Uri.EMPTY
             state = State.RECORD
             playerModeTransitionAnimator.reverse()
-            fileRemoved.invoke(this, 0)
         }
     }
 
@@ -392,7 +388,6 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
                         playBar.currentProgressRatio = 0f
                         playBar.amplitudeTimelineProvider = OTAudioRecordService.currentRecordingModule
                         state = State.RECORDING
-                        currentRecordingUri = intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_RECORD_URI)?.let { Uri.parse(it) }
                     } else {
 
                     }

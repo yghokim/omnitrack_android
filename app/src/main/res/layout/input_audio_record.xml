@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView2
         android:id="@+id/ui_audio_recorder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

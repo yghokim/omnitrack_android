@@ -36,6 +36,13 @@ open class TintFancyButton : FancyButton {
         }
     }
 
+    override fun setIconResource(drawable: Int) {
+        super.setIconResource(drawable)
+        tintColor?.let {
+            applyTint(it)
+        }
+    }
+
     override fun setIconResource(drawable: Drawable?) {
         super.setIconResource(drawable)
         tintColor?.let {
