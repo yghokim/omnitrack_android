@@ -48,10 +48,13 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
         const val INTENT_EXTRA_AUDIO_TITLE = "audioTitle"
 
         const val INTENT_ACTION_PLAY = "${OTApp.PREFIX_ACTION}.AUDIO_PLAY"
+        const val INTENT_ACTION_PAUSE = "${OTApp.PREFIX_ACTION}.AUDIO_PAUSE"
+        const val INTENT_ACTION_RESUME = "${OTApp.PREFIX_ACTION}.AUDIO_RESUME"
         const val INTENT_ACTION_STOP = "${OTApp.PREFIX_ACTION}.AUDIO_STOP"
         const val INTENT_ACTION_STOP_ALL = "${OTApp.PREFIX_ACTION}.AUDIO_STOP_ALL"
 
         const val INTENT_ACTION_EVENT_AUDIO_COMPLETED = "${OTApp.PREFIX_ACTION}.AUDIO_COMPLETED"
+
         const val INTENT_ACTION_EVENT_AUDIO_PROGRESS = "${OTApp.PREFIX_ACTION}.AUDIO_PROGRESS"
 
         var currentSessionId: String? = null
@@ -71,27 +74,33 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
             }
             */
 
-        var currentPlayer: MediaPlayer? = null
-            private set
+        val player: MediaPlayer = MediaPlayer().apply {
 
-        val currentPlayPositionSecond: Int get() {
-            return ((currentPlayer?.currentPosition ?: 0) / 1000)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                setAudioAttributes(AudioAttributes.Builder().setLegacyStreamType(AudioManager.STREAM_MUSIC).build())
+            } else {
+                @Suppress("DEPRECATION")
+                setAudioStreamType(AudioManager.STREAM_MUSIC)
+            }
         }
 
-        val currentProgressRatio: Float get() {
-            val currentPlayer = currentPlayer
-            if (currentPlayer != null) {
-                return currentPlayer.currentPosition / currentPlayer.duration.toFloat()
-            } else return 0f
-        }
+        val currentPlayPositionSecond: Int
+            get() = ((player.currentPosition) / 1000)
+
+        val currentProgressRatio: Float
+            get() = player.currentPosition / player.duration.toFloat()
 
         val isSoundPlaying: Boolean
-            get() {
-                return currentPlayer?.isPlaying == true
+            get() = try {
+                player.isPlaying
+            } catch (ex: IllegalStateException) {
+                false
             }
 
         private val commandFilter = IntentFilter().apply {
             addAction(INTENT_ACTION_STOP)
+            addAction(INTENT_ACTION_PAUSE)
+            addAction(INTENT_ACTION_RESUME)
         }
 
 
@@ -103,6 +112,11 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
 
         fun makeStopCommandIntent(sessionId: String): Intent =
                 Intent(INTENT_ACTION_STOP).putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
+
+        fun makePauseCommandIntent(sessionId: String): Intent = Intent(INTENT_ACTION_PAUSE).putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
+
+        fun makeResumeCommandIntent(sessionId: String): Intent = Intent(INTENT_ACTION_RESUME).putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
+
 
         private fun makeCompleteEventIntent(sessionId: String): Intent =
                 Intent(INTENT_ACTION_EVENT_AUDIO_COMPLETED).putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
@@ -139,11 +153,11 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
         private fun putNotificationControl(context: Context, rv: RemoteViews) {
             val builder = lastNotificationBuilder
                     ?: NotificationCompat.Builder(context, OTNotificationManager.CHANNEL_ID_WIDGETS)
-                    .setSmallIcon(R.drawable.icon_simple)
-                    .setAutoCancel(false)
-                    .setOngoing(true)
+                            .setSmallIcon(R.drawable.icon_simple)
+                            .setAutoCancel(false)
+                            .setOngoing(true)
                             .setDefaults(NotificationCompat.DEFAULT_LIGHTS or NotificationCompat.DEFAULT_SOUND).setVibrate(longArrayOf())
-                    .setContentTitle("OmniTrack Audio Record Player") as NotificationCompat.Builder
+                            .setContentTitle("OmniTrack Audio Record Player") as NotificationCompat.Builder
 
             lastNotificationBuilder = builder
 
@@ -184,6 +198,8 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
     override fun onCreate() {
         super.onCreate()
 
+        player.setOnCompletionListener(this)
+
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(commandReceiver, commandFilter)
     }
@@ -197,9 +213,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
 
         currentSessionId = null
 
-        reset()
-
-        currentPlayer = null
+        player.reset()
         currentFile = null
 
         dismissNotificationControl(this)
@@ -209,16 +223,18 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
     }
 
     private fun stopMedia(): Boolean {
-        if (currentPlayer?.isPlaying == true) {
-            currentPlayer?.stop()
-            return true
-        } else return false
+        return try {
+            player.stop()
+            true
+        } catch (ex: IllegalStateException) {
+            false
+        }
     }
 
     private fun pauseMedia(): Boolean {
-        if (currentPlayer?.isPlaying == true) {
-            currentPlayer?.pause()
-            pausedPosition = currentPlayer?.currentPosition ?: -1
+        if (player.isPlaying == true) {
+            player.pause()
+            pausedPosition = player.currentPosition
             return true
         } else {
             return false
@@ -226,41 +242,17 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
     }
 
     private fun resumeMedia(): Boolean {
-        if (currentPlayer?.isPlaying == false) {
-            currentPlayer?.seekTo(pausedPosition)
-            currentPlayer?.start()
+        if (isSoundPlaying == false) {
+            player.seekTo(pausedPosition)
+            player.start()
             return true
         } else return false
     }
 
-    private fun reset() {
-        try {
-            stopMedia()
-            currentPlayer?.reset()
-        } catch(e: Exception) {
-            e.printStackTrace()
-        } finally {
-            currentPlayer?.release()
-        }
-    }
-
-    private fun initPlayer() {
-        currentPlayer = MediaPlayer()
-        currentPlayer?.setOnCompletionListener(this)
-        currentPlayer?.reset()
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            currentPlayer?.setAudioAttributes(AudioAttributes.Builder().setLegacyStreamType(AudioManager.STREAM_MUSIC).build())
-        } else {
-            @Suppress("DEPRECATION")
-            currentPlayer?.setAudioStreamType(AudioManager.STREAM_MUSIC)
-        }
-    }
-
     private fun playMedia() {
-        if (currentPlayer?.isPlaying == false) {
+        if (isSoundPlaying == false) {
             println("play current media")
-            currentPlayer?.start()
+            player.start()
             putNotificationControl(this, makeAudioNotificationRemoteViews(this, title, description))
             this.ticker = Observable.interval(50, TimeUnit.MILLISECONDS).subscribe {
                 if (isSoundPlaying && currentSessionId != null) {
@@ -273,8 +265,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
 
     private fun startNewFile(file: Uri): Boolean {
         try {
-            currentPlayer?.let {
-                it.setDataSource(file.path)
+            player.setDataSource(file.path)
                 this.currentFile = file
                 val metadata = AudioRecordMetadata.readMetadata(file.path, this)
                 if (metadata != null) {
@@ -282,13 +273,12 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
                 }
 
                 Thread {
-                    it.prepare()
+                    player.prepare()
                     println("sound player prepared.")
                     playMedia()
                 }.start()
-            } ?: return false
             return true
-        } catch(ex: Exception) {
+        } catch (ex: Exception) {
             ex.printStackTrace()
             return false
         }
@@ -315,14 +305,13 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
         when (focusState) {
             AudioManager.AUDIOFOCUS_GAIN -> {
                 println("audioFocus gained")
-                if (currentPlayer == null) {
-                    initPlayer()
+                if (player == null) {
                     this.currentFile?.let {
                         startNewFile(it)
                     }
                 } else playMedia()
 
-                currentPlayer?.setVolume(1f, 1f)
+                player.setVolume(1f, 1f)
             }
 
             AudioManager.AUDIOFOCUS_LOSS -> {
@@ -339,8 +328,8 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
                 println("lost audioFocus transient but can ignore")
                 // Lost focus for a short time, but it's ok to keep playing
                 // at an attenuated level
-                if (currentPlayer?.isPlaying == true) {
-                    currentPlayer?.setVolume(0.1f, 0.1f)
+                if (isSoundPlaying == true) {
+                    player.setVolume(0.1f, 0.1f)
                 }
             }
         }
@@ -355,11 +344,10 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
                 title = intent.getStringExtra(INTENT_EXTRA_AUDIO_TITLE)
                 if (filePath != null && sessionId != null) {
                     Log.d(TAG, "Play audio file: $filePath, $sessionId")
-                    if (currentSessionId != sessionId && currentPlayer?.isPlaying == true) {
+                    if (currentSessionId != sessionId && player.isPlaying == true) {
                         disposePlayer()
                     }
 
-                    initPlayer()
                     currentSessionId = sessionId
                     currentFile = filePath
                     if (!requestAudioFocus()) {
@@ -383,6 +371,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
         super.onDestroy()
         stopMedia()
         disposePlayer()
+        player.release()
         removeAudioFocus()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(commandReceiver)
     }
@@ -393,16 +382,27 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
 
     inner class CommandReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                INTENT_ACTION_STOP -> {
-                    val sessionId = intent.getStringExtra(INTENT_EXTRA_SESSION_ID)
-                    if (currentSessionId == sessionId) {
+            println("Received play service local broadcast message- ${intent.action}")
+            val sessionId = intent.getStringExtra(INTENT_EXTRA_SESSION_ID)
+            if (currentSessionId == sessionId) {
+                when (intent.action) {
+                    INTENT_ACTION_STOP -> {
+
+                        println("Play service - stop media")
                         stopMedia()
                         disposePlayer()
+                    }
+                    INTENT_ACTION_PAUSE -> {
+                        println("Play service - pause media")
+                        pauseMedia()
+                    }
+                    INTENT_ACTION_RESUME -> {
+
+                        println("Play service - resume media")
+                        resumeMedia()
                     }
                 }
             }
         }
-
     }
 }

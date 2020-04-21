@@ -1,27 +1,30 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.sound
 
+import android.media.AudioFormat
 import android.media.MediaRecorder
 import android.net.Uri
 import android.text.format.DateUtils
+import androidx.core.net.toFile
+import kr.ac.snu.hcil.android.common.containers.WritablePair
+import omrecorder.*
 import java.io.File
-import java.io.IOException
 import java.util.*
 
 /**
  * Created by younghokim on 2016. 9. 27..
  */
 class AudioRecordingModule(var listener: RecordingListener?,
-                           val fileUri: Uri, val samplingRate: Int = 11025,
-                           val maxLengthMillis: Int = DateUtils.MINUTE_IN_MILLIS.toInt()) : MediaRecorder.OnInfoListener, AudioRecorderProgressBar.AmplitudeTimelineProvider {
+                           val fileUri: Uri,
+                           val maxLengthMillis: Int = 2 * DateUtils.MINUTE_IN_MILLIS.toInt()) : PullTransport.OnAudioChunkPulledListener, AudioRecorderProgressBar.AmplitudeTimelineProvider {
 
     interface RecordingListener {
         fun onRecordingFinished(module: AudioRecordingModule, resultUri: Uri?)
     }
 
-    var startedAt: Long = 0
-        private set
 
-    private val recorder: MediaRecorder
+    private val sessionTimestamps = ArrayList<WritablePair<Long, Long?>>()
+
+    private val recorder: Recorder
 
     private var _isRecording: Boolean = false
 
@@ -29,17 +32,40 @@ class AudioRecordingModule(var listener: RecordingListener?,
 
     override val amplitudeTimeline: List<Pair<Float, Int>> get() = amplitudes
 
+    private val audioSource: PullableSource by lazy {
+        PullableSource.AutomaticGainControl(
+                PullableSource.Default(
+                        AudioRecordConfig.Default(
+                                MediaRecorder.AudioSource.MIC,
+                                AudioFormat.ENCODING_PCM_16BIT,
+                                AudioFormat.CHANNEL_IN_MONO, 11000
+                        )
+                )
+        )
+    }
+
+    val recordedDurationMillis: Int
+        get() {
+            return if (sessionTimestamps.size > 1) {
+                sessionTimestamps.sumBy {
+                    ((it.second ?: System.currentTimeMillis()) - it.first).toInt()
+                }
+            } else ((sessionTimestamps.last().second
+                    ?: System.currentTimeMillis()) - sessionTimestamps.last().first).toInt()
+        }
+
     init {
 
-        recorder = MediaRecorder()
-        recorder.setAudioSource(MediaRecorder.AudioSource.MIC)
-        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-        recorder.setOutputFile(fileUri.path)
-        recorder.setAudioSamplingRate(samplingRate)
-        recorder.setMaxDuration(maxLengthMillis)
+        recorder = OmRecorder.wav(
+                PullTransport.Default(
+                        audioSource, this
+                ), fileUri.toFile())
 
-        recorder.setOnInfoListener(this)
+    }
+
+
+    override fun onAudioChunkPulled(audioChunk: AudioChunk?) {
+        println("audioChunk: ${audioChunk?.maxAmplitude()}")
     }
 
     fun isRunning(): Boolean {
@@ -48,44 +74,41 @@ class AudioRecordingModule(var listener: RecordingListener?,
 
 
     fun startAsync() {
-
-        try {
-            recorder.prepare()
-        } catch(e: IOException) {
-            e.printStackTrace()
-            println("audioRecorder cannot be initialized.")
-            listener?.onRecordingFinished(this, null)
-            return
-        }
-
         _isRecording = true
 
         amplitudes.clear()
-        recorder.start()
-        startedAt = System.currentTimeMillis()
+        recorder.startRecording()
+        sessionTimestamps.clear()
+        sessionTimestamps.add(WritablePair(System.currentTimeMillis(), null))
         println("Start recording")
     }
 
     fun getCurrentProgressRatio(now: Long): Float {
-        return getCurrentProgressDuration(now).toFloat() / maxLengthMillis
+        return recordedDurationMillis.toFloat() / maxLengthMillis
     }
-
-    fun getCurrentProgressDuration(now: Long): Int {
-        return (now - startedAt).toInt()
-    }
-
 
     fun stop() {
+        sessionTimestamps.lastOrNull()?.second = System.currentTimeMillis()
         onStop(false)
     }
 
     fun cancel() {
+        sessionTimestamps.lastOrNull()?.second = System.currentTimeMillis()
         onStop(true)
     }
 
+    fun pause() {
+        sessionTimestamps.lastOrNull()?.second = System.currentTimeMillis()
+        recorder.pauseRecording()
+    }
+
+    fun resume() {
+        sessionTimestamps.add(WritablePair(System.currentTimeMillis(), null))
+        recorder.resumeRecording()
+    }
+
     fun onStop(cancel: Boolean) {
-        recorder.stop()
-        recorder.release()
+        recorder.stopRecording()
         _isRecording = false
         if (cancel) {
             File(fileUri.path).delete()
@@ -94,14 +117,6 @@ class AudioRecordingModule(var listener: RecordingListener?,
         } else {
             listener?.onRecordingFinished(this, fileUri)
             println("successfully finished the audio recording.")
-        }
-    }
-
-
-    override fun onInfo(p0: MediaRecorder?, what: Int, extra: Int) {
-        if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
-            //max duration reached.
-            stop()
         }
     }
 }

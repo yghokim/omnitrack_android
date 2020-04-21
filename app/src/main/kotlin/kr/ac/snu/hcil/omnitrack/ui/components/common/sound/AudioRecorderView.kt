@@ -278,7 +278,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
         val dirPath: File = recordingOutputDirectoryPathOverride ?: context.filesDir
         val recordingOutputPath = File.createTempFile(
                 "audio_record_${System.currentTimeMillis()}", /* prefix */
-                ".3gp", /* suffix */
+                ".wav", /* suffix */
                 dirPath      /* directory */)
 
         val uri = Uri.Builder().scheme("file")
@@ -395,7 +395,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
 
                 OTAudioRecordService.INTENT_ACTION_EVENT_RECORD_PROGRESS -> {
                     val sessionId = intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_SESSION_ID)
-                    val currentSeconds = intent.getIntExtra(OTAudioRecordService.INTENT_EXTRA_CURRENT_PROGRESS_SECONDS, 0)
+                    val currentSeconds = intent.getIntExtra(OTAudioRecordService.INTENT_EXTRA_CURRENT_PROGRESS_MilliSECONDS, 0)
                     val currentRatio = intent.getFloatExtra(OTAudioRecordService.INTENT_EXTRA_CURRENT_PROGRESS_RATIO, 0f)
                     if (sessionId == mediaSessionId) {
                         refreshTimeViews(currentSeconds)

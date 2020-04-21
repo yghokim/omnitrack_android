@@ -1,8 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.views.recording
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.transition.TransitionManager
@@ -31,12 +31,13 @@ abstract class AudioRecorderViewBase(context: Context, attr: AttributeSet?) : Co
                         val mmr = MediaMetadataRetriever()
                         mmr.setDataSource(context, value)
                         val duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toInt()
-                        audioLengthSeconds = duration / 1000
+                        audioLengthMillis = duration
                     } else {
                         println("recorded file does not exists.")
                         this.setViewState(EMode.Recorder, this.status)
                     }
                 } else {
+                    audioLengthMillis = 0
                     this.setViewState(EMode.Recorder, EStatus.Idle)
                 }
 
@@ -66,11 +67,19 @@ abstract class AudioRecorderViewBase(context: Context, attr: AttributeSet?) : Co
         private set
 
 
-    protected var audioLengthSeconds: Int = 60
+    protected var audioLengthMillis: Int = 0
         private set(value) {
             if (field != value) {
                 field = value
-                //TODO refresh to chronometer
+                refreshUIStyles()
+            }
+        }
+
+    protected var currentRecordedDurationMillis: Int = 0
+        set(value) {
+            if (field != value) {
+                field = value
+                refreshUIStyles()
             }
         }
 
@@ -106,25 +115,54 @@ abstract class AudioRecorderViewBase(context: Context, attr: AttributeSet?) : Co
         //handle main button
         this.ui_button_main.apply {
             if (status == EStatus.Running) {
-                this.tintColor = ContextCompat.getColor(context, R.color.buttonIconColorDark)
-                this.setIconResource(R.drawable.pause)
                 this.setBackgroundColor(ContextCompat.getColor(context, R.color.editTextFormBackground))
             } else {
                 when (mode) {
                     EMode.Recorder -> {
-                        this.setIconResource(null as Drawable?)
                         this.setBackgroundColor(ContextCompat.getColor(context, R.color.colorRed))
                     }
                     EMode.Player -> {
-                        this.tintColor = Color.parseColor("#ffffff")
-                        this.setIconResource(R.drawable.play_dark)
                         this.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPointed_Light))
                     }
                 }
             }
         }
 
+        this.ui_icon_main.apply {
+            if (status == EStatus.Running) {
+                this.setImageResource(R.drawable.pause)
+                this.setColorFilter(ContextCompat.getColor(context, R.color.buttonIconColorDark))
+                this.visibility = View.VISIBLE
+            } else {
+                when (mode) {
+                    EMode.Recorder -> {
+                        this.visibility = View.GONE
+                    }
+                    EMode.Player -> {
+                        this.setImageResource(R.drawable.play_dark)
+                        this.setColorFilter(Color.parseColor("#FFFFFFFF"))
+                        this.visibility = View.VISIBLE
+                    }
+                }
+            }
+        }
+
         this.ui_button_delete.visibility = if (status == EStatus.Idle && mode == EMode.Player) View.VISIBLE else View.GONE
+
+        //update values
+
+        val duration = when (mode) {
+            EMode.Recorder -> currentRecordedDurationMillis
+            EMode.Player -> audioLengthMillis
+        }
+
+
+        val minute = duration / 60000
+        val second = (duration % 60000) / 1000
+        val millis = duration % 1000
+
+        @SuppressLint("SetTextI18n")
+        this.ui_chronometer.text = "$minute:${second.toString().padStart(2, '0')}.${(millis / 100)}"
     }
 
     protected fun setViewState(mode: EMode, status: EStatus, animate: Boolean = true) {
@@ -168,21 +206,26 @@ abstract class AudioRecorderViewBase(context: Context, attr: AttributeSet?) : Co
 
     protected fun onDeleteButtonClicked() {
         this.setViewState(EMode.Recorder, EStatus.Idle)
+        this.currentRecordedDurationMillis = 0
         this.clearRecordedFile()
     }
 
     protected fun onStopButtonClicked() {
-        this.setViewState(if (this.mode == EMode.Recorder) EMode.Player else EMode.Recorder, EStatus.Idle)
-        if (this.mode == EMode.Recorder) {
+        val originalMode = this.mode
+        this.setViewState(EMode.Player, EStatus.Idle)
+        if (originalMode == EMode.Recorder) {
             this.onFinishRecording()
         } else this.onStopPlayingRecordedAudio()
     }
 
     fun finishRecording() {
-        this.setViewState(if (this.mode == EMode.Recorder) EMode.Player else EMode.Recorder, EStatus.Idle)
-        if (this.mode == EMode.Recorder) {
-            this.onFinishRecording()
-        } else this.onStopPlayingRecordedAudio()
+        this.setViewState(EMode.Player, EStatus.Idle)
+        this.onFinishRecording()
+    }
+
+    fun stopPlayingRecordedAudio() {
+        this.setViewState(EMode.Player, EStatus.Idle)
+        this.onStopPlayingRecordedAudio()
     }
 
     protected abstract fun onStartRecording()

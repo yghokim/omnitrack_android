@@ -9,17 +9,20 @@
     tools:padding="@dimen/activity_horizontal_margin"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
-    <Chronometer
+    <TextView
         android:id="@+id/ui_chronometer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
 
-        android:textSize="24sp"
+        android:textFontWeight="200"
+        android:textSize="30sp"
+        app:layout_constraintTop_toTopOf="parent"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/ui_button_delete"
         app:layout_constraintStart_toStartOf="parent"
 
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:text="02:33.44" />
 
     <kr.ac.snu.hcil.android.common.view.tint.TintFancyButton
         android:id="@+id/ui_button_delete"
@@ -38,11 +41,28 @@
 
     <kr.ac.snu.hcil.android.common.view.tint.TintFancyButton
         android:id="@+id/ui_button_main"
-        style="@style/AudioRecordFancyButtonStyle"
-        app:fb_iconResource="@drawable/pause"
+        android:layout_width="@dimen/button_height_normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/ui_button_stop"
+        android:layout_height="@dimen/button_height_normal"
+        android:layout_marginRight="8dp"
+        app:drawableTint="@color/buttonIconColorDark"
+        app:fb_radius="50dp"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ui_icon_main"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ui_button_main"
+        app:layout_constraintEnd_toEndOf="@+id/ui_button_main"
+        app:layout_constraintStart_toStartOf="@+id/ui_button_main"
+        app:layout_constraintTop_toTopOf="@+id/ui_button_main"
+        app:srcCompat="@drawable/pause"
+        app:tint="@color/semiTransparentWhite"
+
+        />
 
     <kr.ac.snu.hcil.android.common.view.tint.TintFancyButton
         android:id="@+id/ui_button_stop"

@@ -34,9 +34,11 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
 
         private const val TAG = "AudioRecordService"
 
+        const val DEBUG_USE_NOTIFICATION = false
+
         const val RECORD_NOTIFICATION_ID = 2443
         const val INTENT_EXTRA_SESSION_ID = "audioRecordSessionId"
-        const val INTENT_EXTRA_CURRENT_PROGRESS_SECONDS = "audioCurrentRecordProgressSeconds"
+        const val INTENT_EXTRA_CURRENT_PROGRESS_MilliSECONDS = "audioCurrentRecordProgressMilliSeconds"
         const val INTENT_EXTRA_CURRENT_PROGRESS_RATIO = "audioCurrentRecordProgressRatio"
         const val INTENT_EXTRA_RECORD_URI = "recordURI"
         const val INTENT_EXTRA_RECORD_TITLE = "recordTitle"
@@ -51,10 +53,15 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
 
         private val commandFilter = IntentFilter().apply {
             addAction(INTENT_ACTION_RECORD_STOP)
+            addAction(INTENT_ACTION_RECORD_PAUSE)
+            addAction(INTENT_ACTION_RECORD_RESUME)
         }
 
         const val INTENT_ACTION_RECORD_START = "${OTApp.PREFIX_ACTION}.RECORD_START"
+        const val INTENT_ACTION_RECORD_PAUSE = "${OTApp.PREFIX_ACTION}.RECORD_PAUSE"
+        const val INTENT_ACTION_RECORD_RESUME = "${OTApp.PREFIX_ACTION}.RECORD_RESUME"
         const val INTENT_ACTION_RECORD_STOP = "${OTApp.PREFIX_ACTION}.RECORD_STOP"
+
         const val INTENT_ACTION_RECORD_DISCARD = "${OTApp.PREFIX_ACTION}.RECORD_DISCARD"
 
         const val INTENT_ACTION_EVENT_RECORD_START_CALLBACK = "${OTApp.PREFIX_ACTION}.RECORD_START_CALLBACK"
@@ -74,10 +81,10 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
                     .putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
         }
 
-        private fun makeProgressIntent(sessionId: String, progressSeconds: Int = 0, progressRatio: Float): Intent {
+        private fun makeProgressIntent(sessionId: String, progressMilliSeconds: Int = 0, progressRatio: Float): Intent {
             return Intent(INTENT_ACTION_EVENT_RECORD_PROGRESS)
                     .putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
-                    .putExtra(INTENT_EXTRA_CURRENT_PROGRESS_SECONDS, progressSeconds)
+                    .putExtra(INTENT_EXTRA_CURRENT_PROGRESS_MilliSECONDS, progressMilliSeconds)
                     .putExtra(INTENT_EXTRA_CURRENT_PROGRESS_RATIO, progressRatio)
         }
 
@@ -95,6 +102,16 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
             return Intent(INTENT_ACTION_EVENT_RECORD_COMPLETED)
                     .putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
                     .putExtra(INTENT_EXTRA_RECORD_URI, uri.toString())
+        }
+
+        fun makePauseIntent(sessionId: String): Intent {
+            return Intent(INTENT_ACTION_RECORD_PAUSE)
+                    .putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
+        }
+
+        fun makeResumeIntent(sessionId: String): Intent {
+            return Intent(INTENT_ACTION_RECORD_RESUME)
+                    .putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
         }
     }
 
@@ -159,7 +176,7 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
         ticker = Observable.interval(50, TimeUnit.MILLISECONDS).subscribe {
             val now = System.currentTimeMillis()
             LocalBroadcastManager.getInstance(this)
-                    .sendBroadcast(makeProgressIntent(currentSessionId!!, currentRecordingModule!!.getCurrentProgressDuration(now) / 1000, currentRecordingModule!!.getCurrentProgressRatio(now)))
+                    .sendBroadcast(makeProgressIntent(currentSessionId!!, currentRecordingModule!!.recordedDurationMillis, currentRecordingModule!!.getCurrentProgressRatio(now)))
         }
     }
 
@@ -218,12 +235,16 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
     }
 
     private fun putNotificationControl(rv: RemoteViews?) {
-        val notification = notificationBuilder.setContent(rv).build()
-        notificationManager.notify(TAG, RECORD_NOTIFICATION_ID, notification)
+        if (DEBUG_USE_NOTIFICATION) {
+            val notification = notificationBuilder.setContent(rv).build()
+            notificationManager.notify(TAG, RECORD_NOTIFICATION_ID, notification)
+        }
     }
 
     private fun dismissNotificationControl() {
-        notificationManager.cancel(TAG, RECORD_NOTIFICATION_ID)
+        if (DEBUG_USE_NOTIFICATION) {
+            notificationManager.cancel(TAG, RECORD_NOTIFICATION_ID)
+        }
     }
 
     private fun disposeRecorder() {
@@ -246,11 +267,20 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
 
     inner class CommandReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                INTENT_ACTION_RECORD_STOP -> {
-                    val sessionId = intent.getStringExtra(INTENT_EXTRA_SESSION_ID)
-                    if (currentSessionId == sessionId) {
+            val sessionId = intent.getStringExtra(INTENT_EXTRA_SESSION_ID)
+            if (currentSessionId == sessionId) {
+                when (intent.action) {
+                    INTENT_ACTION_RECORD_STOP -> {
                         stopRecording()
+                    }
+                    INTENT_ACTION_RECORD_PAUSE -> {
+                        println("recorder pause!")
+                        currentRecordingModule?.pause()
+                    }
+
+                    INTENT_ACTION_RECORD_RESUME -> {
+                        println("recorder resume!")
+                        currentRecordingModule?.resume()
                     }
                 }
             }

@@ -3,8 +3,8 @@ package kr.ac.snu.hcil.omnitrack.core.fields.helpers
 import android.Manifest
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.fields.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
+import kr.ac.snu.hcil.omnitrack.core.fields.NumericCharacteristics
 import java.util.*
 
 /**
@@ -35,6 +35,6 @@ class OTAudioRecordFieldHelper(context: Context) : OTFileInvolvedFieldHelper(con
     }
 
     override fun makeRelativeFilePathFromValue(field: OTFieldDAO, value: Any?, uniqKey: String?): String {
-        return "audios/audio_${field.load()}_${uniqKey ?: UUID.randomUUID().toString()}.3gp"
+        return "audios/audio_${field.load()}_${uniqKey ?: UUID.randomUUID().toString()}.wav"
     }
 }
