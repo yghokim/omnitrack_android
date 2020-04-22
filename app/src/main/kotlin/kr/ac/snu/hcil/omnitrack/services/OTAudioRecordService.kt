@@ -175,8 +175,10 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
         ticker?.dispose()
         ticker = Observable.interval(50, TimeUnit.MILLISECONDS).subscribe {
             val now = System.currentTimeMillis()
-            LocalBroadcastManager.getInstance(this)
-                    .sendBroadcast(makeProgressIntent(currentSessionId!!, currentRecordingModule!!.recordedDurationMillis, currentRecordingModule!!.getCurrentProgressRatio(now)))
+            if (currentSessionId != null && currentRecordingModule != null) {
+                LocalBroadcastManager.getInstance(this)
+                        .sendBroadcast(makeProgressIntent(currentSessionId!!, currentRecordingModule!!.recordedDurationMillis, currentRecordingModule!!.getCurrentProgressRatio(now)))
+            }
         }
     }
 
