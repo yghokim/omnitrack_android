@@ -78,6 +78,8 @@ data class AudioRecordMetadata(var durationMillis: Int, var fileSizeBytes: Long,
                     localTimeFormats.FORMAT_DAY.format(Date(parseFormatWithoutTimeZone(dateString, "yyyy MM dd")))
                 } catch (ex: ParseException) {
                     localTimeFormats.FORMAT_DAY.format(Date(parseFormatWithoutTimeZone(dateString, "dd MMMM yyyy")))
+                } catch (ex: IllegalStateException) {
+                    ""
                 }
 
                 val fileSize = File(filePath).length()
