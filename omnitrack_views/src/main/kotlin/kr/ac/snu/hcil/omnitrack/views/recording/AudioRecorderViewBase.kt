@@ -10,11 +10,16 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.component_audio_recorder.view.*
+import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.events.Event
 import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.views.R
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 
 abstract class AudioRecorderViewBase(context: Context, attr: AttributeSet?) : ConstraintLayout(context, attr), IAudioRecorderView {
@@ -218,9 +223,13 @@ abstract class AudioRecorderViewBase(context: Context, attr: AttributeSet?) : Co
         } else this.onStopPlayingRecordedAudio()
     }
 
-    fun finishRecording() {
-        this.setViewState(EMode.Player, EStatus.Idle)
-        this.onFinishRecording()
+    fun finishRecordingAndGetUri(): Single<Nullable<Uri>> {
+        return Single.defer {
+            this.setViewState(EMode.Player, EStatus.Idle)
+            this.onFinishRecording()
+            this.audioFileUriChanged.observable.map { (sender, args) -> Nullable(args) }.firstOrError().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                    .timeout(2, TimeUnit.SECONDS).onErrorReturn { Nullable(null) }
+        }
     }
 
     fun stopPlayingRecordedAudio() {

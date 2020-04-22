@@ -232,7 +232,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
     }
 
     private fun pauseMedia(): Boolean {
-        if (player.isPlaying == true) {
+        if (isSoundPlaying == true) {
             player.pause()
             pausedPosition = player.currentPosition
             return true
@@ -344,7 +344,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
                 title = intent.getStringExtra(INTENT_EXTRA_AUDIO_TITLE)
                 if (filePath != null && sessionId != null) {
                     Log.d(TAG, "Play audio file: $filePath, $sessionId")
-                    if (currentSessionId != sessionId && player.isPlaying == true) {
+                    if (currentSessionId != sessionId && isSoundPlaying == true) {
                         disposePlayer()
                     }
 

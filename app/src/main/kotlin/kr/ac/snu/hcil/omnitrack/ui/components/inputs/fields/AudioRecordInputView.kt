@@ -132,9 +132,10 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AFie
 
     override fun forceApplyValueAsync(): Single<Nullable<out Any>> {
         @Suppress("UNCHECKED_CAST")
-        return Single.defer {
-            valueView.finishRecording()
-            return@defer convertNewUriToServerFile(valueView.audioFileUri)
+        return valueView.finishRecordingAndGetUri().flatMap {
+            return@flatMap if (it.datum != null) {
+                convertNewUriToServerFile(it.datum!!)
+            } else Single.just(Nullable(null))
         }
     }
 
