@@ -189,7 +189,7 @@ class AudioRecorderView2(context: Context, attr: AttributeSet?) : AudioRecorderV
                     val sessionId = intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_SESSION_ID)
                     println("this sessionId: $mediaSessionId / intent session id: $sessionId")
                     if (sessionId == mediaSessionId) {
-                        setViewState(EMode.Recorder, EStatus.Running)
+                        setViewState(EMode.Recorder, EStatus.Running, false)
                     }
                 }
 

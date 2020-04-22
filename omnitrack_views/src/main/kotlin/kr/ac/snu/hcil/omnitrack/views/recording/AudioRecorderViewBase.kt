@@ -31,7 +31,7 @@ abstract class AudioRecorderViewBase(context: Context, attr: AttributeSet?) : Co
                 field = value
                 if (value != Uri.EMPTY) {
                     if (File(value.path).exists()) {
-                        this.setViewState(EMode.Player, EStatus.Idle)
+                        this.setViewState(EMode.Player, EStatus.Idle, false)
 
                         val mmr = MediaMetadataRetriever()
                         mmr.setDataSource(context, value)
@@ -39,11 +39,11 @@ abstract class AudioRecorderViewBase(context: Context, attr: AttributeSet?) : Co
                         audioLengthMillis = duration
                     } else {
                         println("recorded file does not exists.")
-                        this.setViewState(EMode.Recorder, this.status)
+                        this.setViewState(EMode.Recorder, this.status, false)
                     }
                 } else {
                     audioLengthMillis = 0
-                    this.setViewState(EMode.Recorder, EStatus.Idle)
+                    this.setViewState(EMode.Recorder, EStatus.Idle, false)
                 }
 
                 audioFileUriChanged.invoke(this, value)
