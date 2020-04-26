@@ -243,13 +243,21 @@ abstract class AudioRecorderViewBase(context: Context, attr: AttributeSet?) : Co
 
     fun finishRecordingAndGetUri(): Single<Nullable<Uri>> {
         return Single.defer {
-            if (mode == EMode.Recorder && status == EStatus.Idle) {
-                return@defer Single.just(Nullable<Uri>(null))
+            if (mode == EMode.Recorder) {
+                if (status == EStatus.Idle) {
+                    return@defer Single.just(Nullable<Uri>(null))
+                } else {
+                    this.setViewState(EMode.Player, EStatus.Idle)
+                    this.onFinishRecording()
+                    return@defer this.audioFileUriChanged.observable.filter { it.second != Uri.EMPTY }.map { (_, args) -> Nullable(args) }.firstOrError().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                            .timeout(2, TimeUnit.SECONDS).onErrorReturn { Nullable(null) }
+                }
             } else {
-                this.setViewState(EMode.Player, EStatus.Idle)
-                this.onFinishRecording()
-                this.audioFileUriChanged.observable.map { (sender, args) -> Nullable(args) }.firstOrError().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
-                        .timeout(2, TimeUnit.SECONDS).onErrorReturn { Nullable(null) }
+                if (status != EStatus.Idle) {
+                    this.stopPlayingRecordedAudio()
+                }
+
+                return@defer Single.just(Nullable(this.audioFileUri))
             }
         }
     }
