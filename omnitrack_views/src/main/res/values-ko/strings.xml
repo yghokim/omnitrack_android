@@ -45,5 +45,7 @@
     <string name="msg_auth_confirm_password_invalid">두 패스워드 입력값이 다릅니다.</string>
     <string name="msg_auth_invitation_code_empty">초대 코드를 입력해 주세요.</string>
     <string name="msg_gotit">알겠습니다</string>
+    <string name="msg_discard_recording_title">녹음 초기화</string>
+    <string name="msg_discard_recording_message">녹음된 오디오를 초기화하시겠습니까?</string>
 
 </resources>

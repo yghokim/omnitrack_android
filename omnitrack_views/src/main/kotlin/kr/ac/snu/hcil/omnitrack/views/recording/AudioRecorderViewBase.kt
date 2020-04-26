@@ -5,17 +5,18 @@ import android.content.Context
 import android.graphics.Color
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.transition.TransitionManager
 import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.transition.*
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.component_audio_recorder.view.*
 import kr.ac.snu.hcil.android.common.containers.Nullable
 import kr.ac.snu.hcil.android.common.events.Event
+import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.android.common.view.inflateContent
 import kr.ac.snu.hcil.omnitrack.views.R
 import java.io.File
@@ -88,11 +89,23 @@ abstract class AudioRecorderViewBase(context: Context, attr: AttributeSet?) : Co
             }
         }
 
+    private val modeChangeTransition: Transition by lazy {
+        TransitionSet()
+                .setOrdering(TransitionSet.ORDERING_TOGETHER)
+                .addTransition(Fade(Fade.MODE_OUT).setDuration(500))
+                .addTransition(ChangeBounds().setDuration(500))
+                .addTransition(Fade(Fade.MODE_IN).setDuration(500))
+    }
+
 
     init {
         inflateContent(R.layout.component_audio_recorder, true)
 
-        this.ui_button_stop.setOnClickListener { this.onStopButtonClicked() }
+        this.ui_button_stop.setOnClickListener {
+
+            this.onStopButtonClicked()
+
+        }
         this.ui_button_main.setOnClickListener { this.onMainButtonClicked() }
         this.ui_button_delete.setOnClickListener { this.onDeleteButtonClicked() }
 
@@ -174,7 +187,7 @@ abstract class AudioRecorderViewBase(context: Context, attr: AttributeSet?) : Co
         this.mode = mode
         this.status = status
         if (animate) {
-            TransitionManager.beginDelayedTransition(this)
+            TransitionManager.beginDelayedTransition(this, modeChangeTransition)
         }
         refreshUIStyles()
     }
@@ -210,9 +223,14 @@ abstract class AudioRecorderViewBase(context: Context, attr: AttributeSet?) : Co
     }
 
     protected fun onDeleteButtonClicked() {
-        this.setViewState(EMode.Recorder, EStatus.Idle)
-        this.currentRecordedDurationMillis = 0
-        this.clearRecordedFile()
+        DialogHelper.makeNegativePhrasedYesNoDialogBuilder(context,
+                context.getString(R.string.msg_discard_recording_title),
+                context.getString(R.string.msg_discard_recording_message),
+                onYes = {
+                    this.setViewState(EMode.Recorder, EStatus.Idle)
+                    this.currentRecordedDurationMillis = 0
+                    this.clearRecordedFile()
+                }).show()
     }
 
     protected fun onStopButtonClicked() {
@@ -225,10 +243,14 @@ abstract class AudioRecorderViewBase(context: Context, attr: AttributeSet?) : Co
 
     fun finishRecordingAndGetUri(): Single<Nullable<Uri>> {
         return Single.defer {
-            this.setViewState(EMode.Player, EStatus.Idle)
-            this.onFinishRecording()
-            this.audioFileUriChanged.observable.map { (sender, args) -> Nullable(args) }.firstOrError().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
-                    .timeout(2, TimeUnit.SECONDS).onErrorReturn { Nullable(null) }
+            if (mode == EMode.Recorder && status == EStatus.Idle) {
+                return@defer Single.just(Nullable<Uri>(null))
+            } else {
+                this.setViewState(EMode.Player, EStatus.Idle)
+                this.onFinishRecording()
+                this.audioFileUriChanged.observable.map { (sender, args) -> Nullable(args) }.firstOrError().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                        .timeout(2, TimeUnit.SECONDS).onErrorReturn { Nullable(null) }
+            }
         }
     }
 

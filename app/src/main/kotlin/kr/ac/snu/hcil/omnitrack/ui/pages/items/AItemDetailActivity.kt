@@ -231,7 +231,9 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
                     ui_attribute_list.layoutManager?.startSmoothScroll(topFitScroller)
                 }
 
-                Toast.makeText(this@AItemDetailActivity, "${ex.inCompleteFieldLocalIds.size} required fields are not completed.", Toast.LENGTH_LONG).show()
+                runOnUiThread {
+                    Toast.makeText(this@AItemDetailActivity, "${ex.inCompleteFieldLocalIds.size} required fields are not completed.", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }

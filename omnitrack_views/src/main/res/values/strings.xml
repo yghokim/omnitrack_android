@@ -46,6 +46,8 @@
     <string name="msg_auth_confirm_password_invalid">Two password inputs are different.</string>
     <string name="msg_auth_invitation_code_empty">Invitation Code should not be blank.</string>
     <string name="msg_gotit">Got it</string>
+    <string name="msg_discard_recording_title">Discard recording</string>
+    <string name="msg_discard_recording_message">Discard the current recorded audio?</string>
 
 
 </resources>
