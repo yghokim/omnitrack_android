@@ -284,6 +284,10 @@ open class OTFieldDAO : RealmObject() {
         return (context.applicationContext as OTAndroidApp).applicationComponent.getAttributeManager().get(type)
     }
 
+    fun isValueValid(value: Any?, context: Context): Boolean {
+        return isRequired == false || value != null
+    }
+
     fun initializeUserCreated(context: Context) {
         val lockedFlags = LockedPropertiesHelper.generateDefaultFlags(LockFlagLevel.Field, true)
         serializedLockedPropertyInfo = lockedFlags.toString()

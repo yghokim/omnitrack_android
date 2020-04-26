@@ -215,7 +215,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
             } else {
                 return@flatMapCompletable Completable.complete()
             }
-        }.doOnError { ex ->
+        }.observeOn(AndroidSchedulers.mainThread()).doOnError { ex ->
             if (ex is RequiredFieldsNotCompleteException) {
                 val incompleteFields = currentAttributeViewModelList.asSequence().mapIndexed { index, attributeInputViewModel -> Pair(index, attributeInputViewModel) }.filter { ex.inCompleteFieldLocalIds.contains(it.second.fieldLocalId) }.toList()
 
@@ -231,9 +231,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
                     ui_attribute_list.layoutManager?.startSmoothScroll(topFitScroller)
                 }
 
-                runOnUiThread {
-                    Toast.makeText(this@AItemDetailActivity, "${ex.inCompleteFieldLocalIds.size} required fields are not completed.", Toast.LENGTH_LONG).show()
-                }
+                Toast.makeText(this@AItemDetailActivity, "${ex.inCompleteFieldLocalIds.size} required fields are not completed.", Toast.LENGTH_LONG).show()
             }
         }
     }

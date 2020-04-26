@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProviders
@@ -131,13 +132,18 @@ class AttributeEditDialogFragment : DialogFragment() {
                                 valueView.forceApplyValueAsync().subscribe { (value) ->
                                     val changed: Boolean
                                     if (viewModel.initialized) {
-                                        changed = viewModel.originalValue != viewModel.frontalItemValue.value?.datum
-                                        for (listener in listeners) {
-                                            listener.onOkAttributeEditDialog(changed, value, viewModel.trackerId, viewModel.fieldLocalId, viewModel.itemId)
-                                        }
-                                    }
+                                        val newValue = viewModel.frontalItemValue.value?.datum
+                                        if (viewModel.validateInputValue(newValue)) {
+                                            changed = viewModel.originalValue != viewModel.frontalItemValue.value?.datum
 
-                                    dialog.dismiss()
+                                            for (listener in listeners) {
+                                                listener.onOkAttributeEditDialog(changed, value, viewModel.trackerId, viewModel.fieldLocalId, viewModel.itemId)
+                                            }
+                                            dialog.dismiss()
+                                        } else {
+                                            Toast.makeText(context, "Not a valid input.", Toast.LENGTH_SHORT).show()
+                                        }
+                                    } else dialog.dismiss()
                                 }
                         )
                     }
@@ -315,6 +321,10 @@ class AttributeEditDialogFragment : DialogFragment() {
 
                 })
             }
+        }
+
+        fun validateInputValue(value: Any?): Boolean {
+            return this.field.isValueValid(value, getApplication())
         }
 
         override fun onCleared() {

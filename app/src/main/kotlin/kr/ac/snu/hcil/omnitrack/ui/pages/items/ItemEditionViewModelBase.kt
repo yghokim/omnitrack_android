@@ -185,7 +185,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
         }
 
         private fun validateValue() {
-            isValidated = !(isRequired == true && value?.value == null)
+            isValidated = fieldDAO.isValueValid(value?.value, getApplication())
         }
 
     }
