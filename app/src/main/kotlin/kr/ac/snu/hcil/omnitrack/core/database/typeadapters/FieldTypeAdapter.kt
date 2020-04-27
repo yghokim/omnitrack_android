@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.database.typeadapters
 
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
@@ -8,6 +9,7 @@ import com.google.gson.stream.JsonWriter
 import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldValidatorDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTStringStringEntryDAO
 import kr.ac.snu.hcil.omnitrack.core.serialization.getBooleanCompat
 import kr.ac.snu.hcil.omnitrack.core.serialization.getIntCompat
@@ -55,6 +57,7 @@ class FieldTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerComp
                     "properties" -> {
                         val list = ArrayList<OTStringStringEntryDAO>()
 
+                        @Suppress("NON_EXHAUSTIVE_WHEN")
                         when (reader.peek()) {
 
                             JsonToken.BEGIN_ARRAY -> {
@@ -108,6 +111,50 @@ class FieldTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerComp
 
                         dao.properties.addAll(list)
                     }
+
+                    "validators" -> {
+                        val list = ArrayList<OTFieldValidatorDAO>()
+                        reader.beginArray()
+                        while (reader.hasNext()) {
+                            var id: String? = null
+                            var type: String? = null
+                            var serializedParameterArray: String? = null
+                            reader.beginObject()
+                            while (reader.hasNext()) {
+                                when (reader.nextName()) {
+                                    "id" -> {
+                                        id = reader.nextString()
+                                    }
+                                    "type" -> {
+                                        type = reader.nextString()
+                                    }
+                                    "params" -> {
+                                        serializedParameterArray = when (reader.peek()) {
+                                            JsonToken.NULL -> {
+                                                reader.nextNull()
+                                                null
+                                            }
+                                            JsonToken.BEGIN_ARRAY -> gson.get().fromJson<JsonArray>(reader, JsonArray::class.java)?.toString()
+                                            else -> gson.get().fromJson<JsonObject>(reader, JsonObject::class.java)?.toString()
+                                        }
+                                    }
+                                }
+                            }
+                            reader.endObject()
+
+
+                            if (type != null && serializedParameterArray != null) {
+                                list.add(OTFieldValidatorDAO().apply {
+                                    this.id = id ?: UUID.randomUUID().toString()
+                                    this.type = type
+                                    this.serializedParameterArray = serializedParameterArray
+                                })
+                            }
+                        }
+                        reader.endArray()
+
+                        dao.validators.addAll(list)
+                    }
                     else -> reader.skipValue()
                 }
             }
@@ -157,7 +204,6 @@ class FieldTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerComp
                 writer.beginObject()
 
                 writer.name("id").value(prop.id)
-
                 writer.name("key").value(prop.key)
                 writer.name("sVal").value(prop.value)
                 writer.endObject()
@@ -165,6 +211,17 @@ class FieldTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerComp
 
             writer.endArray()
         }
+
+        writer.name("validators").beginArray()
+        value.validators.forEach { validator ->
+            writer.beginObject()
+            writer.name("type").value(validator.type)
+            if (validator.serializedParameterArray != null) {
+                writer.name("params").jsonValue(validator.serializedParameterArray)
+            }
+            writer.endObject()
+        }
+        writer.endArray()
 
         writer.endObject()
     }
@@ -196,6 +253,36 @@ class FieldTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerComp
                         val toRemoves = applyTo.properties.filter { prop -> jsonProperties.find { it["key"].asString == prop.key } == null }
                         applyTo.properties.removeAll(toRemoves)
                         toRemoves.forEach { it.deleteFromRealm() }
+                    }
+                }
+
+                "validators" -> {
+                    if (json[key].isJsonArray) {
+                        val jsonValidators = json[key].asJsonArray.mapNotNull { if (it.isJsonObject) it.asJsonObject else null }
+                        if (applyTo.validators.size > jsonValidators.size) {
+                            val toReduce = applyTo.validators.subList(jsonValidators.size, applyTo.validators.size)
+                            applyTo.validators.removeAll(toReduce)
+                            toReduce.forEach { it.deleteFromRealm() }
+                        }
+
+                        jsonValidators.forEachIndexed { index, jsonValidator ->
+                            val match = if (applyTo.validators.size > index) {
+                                applyTo.validators[index]!!
+                            } else {
+                                OTFieldValidatorDAO()
+                            }
+
+                            if (jsonValidator["params"] != null) {
+                                match.serializedParameterArray = jsonValidator["params"].asJsonObject.toString()
+                            } else match.serializedParameterArray = null
+
+                            match.type = jsonValidator["type"].asString
+
+
+                            if (applyTo.validators.size <= index) {
+                                applyTo.validators.add(match)
+                            }
+                        }
                     }
                 }
 

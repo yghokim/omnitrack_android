@@ -102,7 +102,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
     fun checkAllInputCompleteAndReturn(): Boolean {
         val isComplete = currentAttributeViewModelList.none { attributeViewModel ->
-            attributeViewModel.isRequired && attributeViewModel.value?.value == null
+            attributeViewModel.fieldDAO.isValueValid(attributeViewModel.value?.value, getItemPivotTime())
         }
 
         this.isAllInputCompleteObservable.onNextIfDifferAndNotNull(isComplete)
@@ -185,12 +185,16 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
         }
 
         private fun validateValue() {
-            isValidated = fieldDAO.isValueValid(value?.value, getApplication())
+            isValidated = fieldDAO.isValueValid(value?.value, getItemPivotTime())
         }
 
     }
 
     abstract fun isViewModelsDirty(): Boolean
+
+    protected open fun getItemPivotTime(): Long {
+        return System.currentTimeMillis()
+    }
 
     protected open fun setValueOfAttribute(fieldLocalId: String, valueWithTimestamp: AnyValueWithTimestamp) {
         val match = currentAttributeViewModelList.find { it.fieldLocalId == fieldLocalId }

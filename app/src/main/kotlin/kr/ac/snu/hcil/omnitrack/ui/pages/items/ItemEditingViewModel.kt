@@ -107,4 +107,8 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
             }
         } else return Maybe.just(null)
     }
+
+    override fun getItemPivotTime(): Long {
+        return originalUnmanagedItemDao.timestamp
+    }
 }

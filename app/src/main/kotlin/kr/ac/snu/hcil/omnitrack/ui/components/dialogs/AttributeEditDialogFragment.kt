@@ -324,7 +324,7 @@ class AttributeEditDialogFragment : DialogFragment() {
         }
 
         fun validateInputValue(value: Any?): Boolean {
-            return this.field.isValueValid(value, getApplication())
+            return this.field.isValueValid(value, item.timestamp)
         }
 
         override fun onCleared() {
