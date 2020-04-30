@@ -207,7 +207,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
                 attributeListAdapter.inputViews.map { it.forceApplyValueAsync() }
         ) { zipped -> zipped }.flatMapCompletable {
             val incompleteFieldLocalIds = currentAttributeViewModelList.asSequence().filter { attributeViewModel ->
-                attributeViewModel.isRequired && attributeViewModel.value?.value == null
+                attributeViewModel.isValidated == false
             }.map { it.fieldLocalId }.toList()
 
             if (incompleteFieldLocalIds.isNotEmpty()) {
