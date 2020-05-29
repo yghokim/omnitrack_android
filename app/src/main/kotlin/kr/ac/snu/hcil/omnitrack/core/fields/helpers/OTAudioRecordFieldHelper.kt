@@ -35,6 +35,6 @@ class OTAudioRecordFieldHelper(context: Context) : OTFileInvolvedFieldHelper(con
     }
 
     override fun makeRelativeFilePathFromValue(field: OTFieldDAO, value: Any?, uniqKey: String?): String {
-        return "audios/audio_${field.load()}_${uniqKey ?: UUID.randomUUID().toString()}.wav"
+        return "audios/audio_${field.localId}_${uniqKey ?: UUID.randomUUID().toString()}.wav"
     }
 }
