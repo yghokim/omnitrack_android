@@ -168,6 +168,8 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
 
     private fun handleDumpCommand(data: Map<String, String>) {
         (application as OTAndroidApp).applicationComponent.getSyncManager().apply {
+            clearSynchronizationOnDevice()
+            refreshWorkers()
             queueFullSync(SyncDirection.UPLOAD, true)
             reserveSyncServiceNow()
         }
