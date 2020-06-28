@@ -14,8 +14,10 @@ import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTDescriptionPanelDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
 import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTrackerLayoutElementDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -37,7 +39,11 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
     val hasItemRemovedOutside = BehaviorSubject.create<String>()
 
     val trackerNameObservable = BehaviorSubject.create<String>()
-    val attributeViewModelListObservable = BehaviorSubject.create<List<AttributeInputViewModel>>()
+    val schemaInformationObservable = BehaviorSubject.create<Triple<
+            List<AttributeInputViewModel>,
+            Array<OTDescriptionPanelDAO>?,
+            Array<OTTrackerLayoutElementDAO>?
+            >>()
 
     val isAllInputCompleteObservable = BehaviorSubject.createDefault(false)
 
@@ -75,9 +81,6 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
             if (trackerDao != null) {
                 this.trackerDao = trackerDao
 
-                println("layout count: " + this.trackerDao.layout?.size)
-                println("descriptionPanels: " + this.trackerDao.descriptionPanels?.size)
-
                 trackerNameObservable.onNext(trackerDao.name)
                 subscriptions.clear()
 
@@ -95,7 +98,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
                 currentAttributeViewModelList.clear()
 
                 currentAttributeViewModelList.addAll(unManagedTrackerDao.fields.asSequence().filter { !it.isHidden && !it.isInTrashcan }.map { AttributeInputViewModel(it) }.toList())
-                attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+                schemaInformationObservable.onNext(Triple(currentAttributeViewModelList, unManagedTrackerDao.descriptionPanels?.toTypedArray(), unManagedTrackerDao.layout?.toTypedArray()))
 
                 this.checkAllInputCompleteAndReturn()
 

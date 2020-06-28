@@ -323,6 +323,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-scalars:$rootProject.ext.retrofit_version"
     implementation "com.squareup.picasso:picasso:$rootProject.ext.picasso_version"
     implementation 'us.feras.mdv:markdownview:1.1.0'
+    implementation "io.noties.markwon:core:4.4.0"
     implementation 'com.github.tbruyelle:rxpermissions:0.10.2' //no androidx
     implementation 'com.patloew.rxlocation:rxlocation:1.0.5' //no androidx
     implementation 'uk.co.samuelwall:material-tap-target-prompt:2.15.0' //no androidx

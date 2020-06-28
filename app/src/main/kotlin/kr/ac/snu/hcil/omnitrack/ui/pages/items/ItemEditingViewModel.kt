@@ -109,6 +109,8 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
     }
 
     override fun getItemPivotTime(): Long {
-        return originalUnmanagedItemDao.timestamp
+        if (this::originalUnmanagedItemDao.isInitialized) {
+            return originalUnmanagedItemDao.timestamp
+        } else return 0L
     }
 }

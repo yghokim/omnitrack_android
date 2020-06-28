@@ -8,6 +8,12 @@ import io.realm.annotations.PrimaryKey
  */
 
 open class OTTrackerLayoutElementDAO : RealmObject() {
+
+    companion object {
+        const val TYPE_FIELD = "field"
+        const val TYPE_DESCRIPTION = "desc"
+    }
+
     @PrimaryKey
     var id: String = ""
     var type: String = ""

@@ -20,11 +20,13 @@ import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.salomonbrys.kotson.*
 import com.google.gson.JsonObject
+import io.noties.markwon.Markwon
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_new_item.*
+import kotlinx.android.synthetic.main.description_panel_frame.view.*
 import kr.ac.snu.hcil.android.common.containers.AnyValueWithTimestamp
 import kr.ac.snu.hcil.android.common.view.DialogHelper
 import kr.ac.snu.hcil.android.common.view.InterfaceHelper
@@ -34,6 +36,8 @@ import kr.ac.snu.hcil.android.common.view.indicator.LoadingIndicatorBar
 import kr.ac.snu.hcil.omnitrack.OTAndroidApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
+import kr.ac.snu.hcil.omnitrack.core.database.models.OTDescriptionPanelDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTrackerLayoutElementDAO
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.fields.AFieldInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
@@ -55,7 +59,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
         const val REQUEST_CODE_REDIRECT_SURVEY = 23153
     }
 
-    private val attributeListAdapter = AttributeListAdapter()
+    private val schemaAdapter = SchemaAdapter()
 
     protected lateinit var viewModel: ViewModelType
 
@@ -64,6 +68,8 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
     private val loadingIndicatorBar: LoadingIndicatorBar by bindView(R.id.ui_loading_indicator)
 
     protected val currentAttributeViewModelList = ArrayList<ItemEditionViewModelBase.AttributeInputViewModel>()
+    private val currentDescriptionPanelList = ArrayList<OTDescriptionPanelDAO>()
+    private val schemaLayout = ArrayList<OTTrackerLayoutElementDAO>()
 
     //State=============================================================================================================
     protected var itemSaved: Boolean = false
@@ -95,8 +101,14 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
         this.viewModel.onSaveInstanceState(outState)
     }
 
+    private lateinit var markwon: Markwon
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        markwon = Markwon.create(this.baseContext)
+
         setActionBarButtonMode(MultiButtonActionBarActivity.Mode.SaveCancel)
         rightActionBarTextButton?.visibility = View.GONE
         rightActionBarButton?.visibility = View.GONE
@@ -107,7 +119,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
         ui_attribute_list.layoutManager = layoutManager
         ui_attribute_list.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
         (ui_attribute_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        ui_attribute_list.adapter = attributeListAdapter
+        ui_attribute_list.adapter = schemaAdapter
 
         loadingIndicatorBar.setMessage(R.string.msg_indicator_message_item_autocomplete)
 
@@ -133,12 +145,34 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
         )
 
         creationSubscriptions.add(
+                viewModel.schemaInformationObservable.subscribe { (attrViewModelList, panelList, layout) ->
+                    currentAttributeViewModelList.clear()
+                    currentAttributeViewModelList.addAll(attrViewModelList)
+
+                    currentDescriptionPanelList.clear()
+                    if (panelList != null) {
+                        currentDescriptionPanelList.addAll(panelList)
+                    }
+
+                    schemaLayout.clear()
+                    if (layout != null) {
+                        schemaLayout.addAll(layout)
+                    } else {
+                        schemaLayout.addAll(currentAttributeViewModelList.map { OTTrackerLayoutElementDAO().apply { this.type = OTTrackerLayoutElementDAO.TYPE_FIELD; this.reference = it._id!! } })
+                    }
+
+                    schemaAdapter.notifyDataSetChanged()
+                }
+        )
+
+        /*
+        creationSubscriptions.add(
                 viewModel.attributeViewModelListObservable.subscribe { list ->
                     currentAttributeViewModelList.clear()
                     currentAttributeViewModelList.addAll(list)
                     attributeListAdapter.notifyDataSetChanged()
                 }
-        )
+        )*/
 
         creationSubscriptions.add(
                 viewModel.hasTrackerRemovedOutside.subscribe {
@@ -167,14 +201,14 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
     override fun onPause() {
         super.onPause()
 
-        for (inputView in attributeListAdapter.inputViews) {
+        for (inputView in schemaAdapter.inputViews) {
             inputView.clearFocus()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        for (inputView in attributeListAdapter.inputViews) {
+        for (inputView in schemaAdapter.inputViews) {
             inputView.onDestroy()
         }
 
@@ -182,7 +216,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
     override fun onLowMemory() {
         super.onLowMemory()
-        for (inputView in attributeListAdapter.inputViews) {
+        for (inputView in schemaAdapter.inputViews) {
             inputView.onLowMemory()
         }
     }
@@ -204,7 +238,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
 
     protected fun checkInputComplete(): Completable {
         return Single.zip(
-                attributeListAdapter.inputViews.map { it.forceApplyValueAsync() }
+                schemaAdapter.inputViews.map { it.forceApplyValueAsync() }
         ) { zipped -> zipped }.flatMapCompletable {
             val incompleteFieldLocalIds = currentAttributeViewModelList.asSequence().filter { attributeViewModel ->
                 attributeViewModel.isValidated == false
@@ -247,47 +281,88 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
         if (!preOnActivityResult(requestCode, resultCode, data)) {
             if (resultCode == Activity.RESULT_OK && data != null) {
                 val attributePosition = AFieldInputView.getPositionFromRequestCode(requestCode)
-                val inputView = attributeListAdapter.inputViews.find { it.position == attributePosition }
+                val inputView = schemaAdapter.inputViews.find { it.position == attributePosition }
                 inputView?.setValueFromActivityResult(data, AFieldInputView.getRequestTypeFromRequestCode(requestCode))
             }
         }
     }
 
-    inner class AttributeListAdapter : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>() {
+    inner class SchemaAdapter : RecyclerView.Adapter<SchemaAdapter.ViewHolder>() {
 
         val inputViews = HashSet<AFieldInputView<*>>()
 
-        fun getItem(position: Int): ItemEditionViewModelBase.AttributeInputViewModel {
-            return currentAttributeViewModelList[position]
+        fun getItem(position: Int): OTTrackerLayoutElementDAO {
+            return schemaLayout[position]
         }
 
         override fun getItemViewType(position: Int): Int {
-            val attr = getItem(position).fieldDAO
-            return (applicationContext as OTAndroidApp).applicationComponent.getAttributeViewFactoryManager().get(attr.type).getInputViewType(false, attr)
+
+            val layoutElm = getItem(position)
+
+            return when (layoutElm.type) {
+                OTTrackerLayoutElementDAO.TYPE_FIELD -> {
+                    val attr = currentAttributeViewModelList.find { it._id == layoutElm.reference }!!.fieldDAO
+                    (applicationContext as OTAndroidApp).applicationComponent.getAttributeViewFactoryManager().get(attr.type).getInputViewType(false, attr)
+                }
+                OTTrackerLayoutElementDAO.TYPE_DESCRIPTION -> -1
+                else -> -1
+            }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SchemaAdapter.ViewHolder {
 
-            val frame = LayoutInflater.from(this@AItemDetailActivity).inflate(R.layout.attribute_input_frame, parent, false)
+            if (viewType == -1) {
+                val frame = LayoutInflater.from(this@AItemDetailActivity).inflate(R.layout.description_panel_frame, parent, false)
+                return DescriptionViewHolder(frame)
+            } else {
+                val frame = LayoutInflater.from(this@AItemDetailActivity).inflate(R.layout.attribute_input_frame, parent, false)
 
-            val inputView = AFieldInputView.makeInstance(viewType, this@AItemDetailActivity)
-            inputViews.add(inputView)
+                val inputView = AFieldInputView.makeInstance(viewType, this@AItemDetailActivity)
+                inputViews.add(inputView)
 
-            inputView.onCreate(null)
+                inputView.onCreate(null)
 
-            return ViewHolder(inputView, frame)
+                return FieldViewHolder(inputView, frame)
+            }
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(getItem(position))
-            holder.inputView.position = position
+            holder.bindLayoutElm(getItem(position), position)
         }
 
         override fun getItemCount(): Int {
-            return currentAttributeViewModelList.size
+            return schemaLayout.size
         }
 
-        inner class ViewHolder(val inputView: AFieldInputView<out Any>, frame: View) : View.OnClickListener, RecyclerView.ViewHolder(frame) {
+        abstract inner class ViewHolder(frame: View) : RecyclerView.ViewHolder(frame) {
+            fun bindLayoutElm(layoutElm: OTTrackerLayoutElementDAO, position: Int) {
+                when (layoutElm.type) {
+                    OTTrackerLayoutElementDAO.TYPE_FIELD -> {
+                        val v = currentAttributeViewModelList.find { it._id == layoutElm.reference }
+                        if (v != null) {
+                            onBindField(v, position)
+                        }
+                    }
+                    OTTrackerLayoutElementDAO.TYPE_DESCRIPTION -> {
+                        val v = currentDescriptionPanelList.find { it._id == layoutElm.reference }
+                        if (v != null) {
+                            onBindDescription(v)
+                        }
+                    }
+                }
+            }
+
+            protected open fun onBindField(fieldViewModel: ItemEditionViewModelBase.AttributeInputViewModel, position: Int) {}
+            protected open fun onBindDescription(descriptionPanel: OTDescriptionPanelDAO) {}
+        }
+
+        inner class DescriptionViewHolder(frame: View) : ViewHolder(frame) {
+            override fun onBindDescription(descriptionPanel: OTDescriptionPanelDAO) {
+                markwon.setMarkdown(this.itemView.ui_description, descriptionPanel.content)
+            }
+        }
+
+        inner class FieldViewHolder(val inputView: AFieldInputView<out Any>, frame: View) : View.OnClickListener, ViewHolder(frame) {
 
             private val columnNameView: TextView by bindView(R.id.ui_column_name)
             private val requiredMarker: View by bindView(R.id.ui_required_marker)
@@ -370,7 +445,9 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
                 }
             }
 
-            fun bind(attributeViewModel: ItemEditionViewModelBase.AttributeInputViewModel) {
+            override fun onBindField(attributeViewModel: ItemEditionViewModelBase.AttributeInputViewModel, position: Int) {
+
+                inputView.position = position
 
                 InterfaceHelper.alertBackground(this.itemView)
 
