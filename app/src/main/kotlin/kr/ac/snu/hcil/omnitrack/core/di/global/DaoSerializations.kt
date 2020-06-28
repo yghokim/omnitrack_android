@@ -8,10 +8,7 @@ import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTFieldDAO
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.models.*
 import kr.ac.snu.hcil.omnitrack.core.database.typeadapters.*
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalServiceManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTMeasureFactoryManager
@@ -40,23 +37,33 @@ class DaoSerializationModule {
     @ForTrigger
     fun provideTriggerAdapter(@ForGeneric gson: Lazy<Gson>, @Backend realmProvider: Factory<Realm>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(false, gson, realmProvider)
 
+
     @Provides
     @Singleton
     @ForServerTrigger
     fun provideServerTriggerAdapter(@ForGeneric gson: Lazy<Gson>, @Backend realmProvider: Factory<Realm>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(true, gson, realmProvider)
 
+
+    @Provides
+    @Singleton
+    @ForDescriptionPanel
+    fun provideDescriptionPanelAdapter(@ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTDescriptionPanelDAO> = DescriptionPanelTypeAdapter(gson)
+
+
     @Provides
     @Singleton
     @ForTracker
     fun provideTrackerAdapter(@ForAttribute fieldTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTFieldDAO>>,
-                              @ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTTrackerDAO> = TrackerTypeAdapter(false, fieldTypeAdapter, gson)
+                              @ForDescriptionPanel descriptionPanelTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTDescriptionPanelDAO>>,
+                              @ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTTrackerDAO> = TrackerTypeAdapter(false, fieldTypeAdapter, descriptionPanelTypeAdapter, gson)
 
 
     @Provides
     @Singleton
     @ForServerTracker
     fun provideServerTrackerAdapter(@ForServerAttribute fieldTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTFieldDAO>>,
-                                    @ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTTrackerDAO> = TrackerTypeAdapter(true, fieldTypeAdapter, gson)
+                                    @ForDescriptionPanel descriptionPanelTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTDescriptionPanelDAO>>,
+                                    @ForGeneric gson: Lazy<Gson>): ServerCompatibleTypeAdapter<OTTrackerDAO> = TrackerTypeAdapter(true, fieldTypeAdapter, descriptionPanelTypeAdapter, gson)
 
     @Provides
     @Singleton
@@ -99,6 +106,10 @@ class DaoSerializationModule {
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class ForAttribute
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class ForDescriptionPanel
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class ForItem

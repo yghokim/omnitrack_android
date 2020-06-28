@@ -74,6 +74,10 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
             val trackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirst()
             if (trackerDao != null) {
                 this.trackerDao = trackerDao
+
+                println("layout count: " + this.trackerDao.layout?.size)
+                println("descriptionPanels: " + this.trackerDao.descriptionPanels?.size)
+
                 trackerNameObservable.onNext(trackerDao.name)
                 subscriptions.clear()
 

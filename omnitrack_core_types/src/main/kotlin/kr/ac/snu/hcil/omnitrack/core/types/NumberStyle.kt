@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.types
 
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import kr.ac.snu.hcil.android.common.isNumericPrimitive
 import org.atteo.evo.inflector.English
@@ -28,12 +29,17 @@ class NumberStyle {
 
                 input.beginObject()
                 while (input.hasNext()) {
-                    when (input.nextName()) {
-                        "unitPosition" -> this.unitPositionId = input.nextInt()
-                        "unit" -> this.unit = input.nextString()
-                        "pluralize" -> this.pluralizeUnit = input.nextBoolean()
-                        "fraction" -> this.fractionPart = input.nextInt()
-                        "comma" -> this.commaUnit = input.nextInt()
+                    val name = input.nextName()
+                    if (input.peek() == JsonToken.NULL) {
+                        input.skipValue()
+                    } else {
+                        when (name) {
+                            "unitPosition" -> this.unitPositionId = input.nextInt()
+                            "unit" -> this.unit = input.nextString()
+                            "pluralize" -> this.pluralizeUnit = input.nextBoolean()
+                            "fraction" -> this.fractionPart = input.nextInt()
+                            "comma" -> this.commaUnit = input.nextInt()
+                        }
                     }
                 }
                 input.endObject()

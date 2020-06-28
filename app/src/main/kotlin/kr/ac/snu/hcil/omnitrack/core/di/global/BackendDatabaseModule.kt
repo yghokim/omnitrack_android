@@ -18,7 +18,8 @@ import javax.inject.Singleton
  */
 
 @Qualifier
-@Retention(AnnotationRetention.RUNTIME) annotation class Backend
+@Retention(AnnotationRetention.RUNTIME)
+annotation class Backend
 
 @Module(includes = [AuthModule::class, NetworkModule::class, DaoSerializationModule::class])
 class BackendDatabaseModule {
@@ -30,7 +31,7 @@ class BackendDatabaseModule {
         return RealmConfiguration.Builder()
                 .name("backend.db")
                 .modules(BackendRealmModule())
-                .schemaVersion(0)
+                .schemaVersion(1)
                 .apply {
                     if (BuildConfig.DEBUG == true) {
                         this.deleteRealmIfMigrationNeeded()
@@ -49,22 +50,24 @@ class BackendDatabaseModule {
 }
 
 @RealmModule(classes = [
-        OTTrackerDAO::class,
-        OTFieldDAO::class,
+    OTTrackerDAO::class,
+    OTFieldDAO::class,
     OTFieldValidatorDAO::class,
-        OTTriggerDAO::class,
-        OTItemDAO::class,
-        OTItemValueEntryDAO::class,
-        OTItemBuilderFieldValueEntry::class,
-        OTItemBuilderDAO::class,
-        OTItemBuilderFieldValueEntry::class,
-        OTStringStringEntryDAO::class,
-        OTIntegerStringEntryDAO::class,
-        OTTriggerAlarmInstance::class,
-        OTTriggerReminderEntry::class,
-        OTTriggerSchedule::class,
+    OTDescriptionPanelDAO::class,
+    OTTrackerLayoutElementDAO::class,
+    OTTriggerDAO::class,
+    OTItemDAO::class,
+    OTItemValueEntryDAO::class,
+    OTItemBuilderFieldValueEntry::class,
+    OTItemBuilderDAO::class,
+    OTItemBuilderFieldValueEntry::class,
+    OTStringStringEntryDAO::class,
+    OTIntegerStringEntryDAO::class,
+    OTTriggerAlarmInstance::class,
+    OTTriggerReminderEntry::class,
+    OTTriggerSchedule::class,
     OTTriggerMeasureEntry::class,
     OTTriggerMeasureHistoryEntry::class,
-        UploadTaskInfo::class
+    UploadTaskInfo::class
 ])
 class BackendRealmModule
