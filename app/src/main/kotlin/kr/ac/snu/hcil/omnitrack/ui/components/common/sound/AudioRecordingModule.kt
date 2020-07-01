@@ -38,7 +38,7 @@ class AudioRecordingModule(var listener: RecordingListener?,
                         AudioRecordConfig.Default(
                                 MediaRecorder.AudioSource.MIC,
                                 AudioFormat.ENCODING_PCM_16BIT,
-                                AudioFormat.CHANNEL_IN_MONO, 11000
+                                AudioFormat.CHANNEL_IN_MONO, 22050
                         )
                 )
         )
