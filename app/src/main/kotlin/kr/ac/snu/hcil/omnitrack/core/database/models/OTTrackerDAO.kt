@@ -14,6 +14,7 @@ import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.android.common.view.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.database.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.models.helpermodels.OTTrackerLayoutElementDAO
 import kr.ac.snu.hcil.omnitrack.core.flags.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.flags.F
 import kr.ac.snu.hcil.omnitrack.core.flags.LockFlagLevel
@@ -43,6 +44,10 @@ open class OTTrackerDAO : RealmObject() {
     var isBookmarked: Boolean = false
 
     var fields = RealmList<OTFieldDAO>()
+
+    var descriptionPanels: RealmList<OTDescriptionPanelDAO>? = null
+
+    var layout: RealmList<OTTrackerLayoutElementDAO>? = null
 
     fun makeAttributesQuery(inTrashcan: Boolean? = false, hidden: Boolean? = false): RealmQuery<OTFieldDAO> {
         var query = fields.where()

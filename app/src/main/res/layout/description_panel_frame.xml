@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/frontalBackground"
+    android:paddingStart="@dimen/activity_horizontal_margin"
+    android:paddingTop="17dp"
+    android:paddingEnd="@dimen/activity_horizontal_margin"
+    android:paddingBottom="20dp">
+
+    <TextView
+        android:id="@+id/ui_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingMultiplier="1.25"
+        android:textSize="16sp"
+        tools:text="Markdown content will be displayed here. Multiline content is supported." />
+</FrameLayout>
