@@ -200,6 +200,12 @@ class OTAuthManager @Inject constructor(
         updateToken(responseData.token)
 
         if (firstSignIn) {
+            realmFactory.get().use { realm ->
+                realm.executeTransactionIfNotIn {
+                    realm.deleteAll()
+                }
+            }
+
             context.runOnUiThread { notifySignedIn() }
             triggerSystemManager.get().checkInAllToSystem(userId!!)
             syncManager.reservePeriodicSyncWorker()

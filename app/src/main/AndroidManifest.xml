@@ -35,7 +35,7 @@
 
     <application
         android:name=".OTApp"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@drawable/icon"
         android:label="${appName}${appNameSuffix}"
         android:supportsRtl="true"

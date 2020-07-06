@@ -34,7 +34,7 @@ class BackendDatabaseModule {
                 .schemaVersion(1)
                 .apply {
                     if (BuildConfig.DEBUG == true) {
-                        this.deleteRealmIfMigrationNeeded()
+                        //this.deleteRealmIfMigrationNeeded()
                     }
                 }
                 .migration(BackendRealmMigration())
