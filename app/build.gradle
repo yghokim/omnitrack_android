@@ -141,7 +141,7 @@ android {
             manifestPlaceholders.appNameSuffix = ""
         }
         debug {
-            applicationIdSuffix '.debug'
+            //applicationIdSuffix '.debug'
             versionNameSuffix '-Debug'
 
             manifestPlaceholders.appNameSuffix = " Debug"

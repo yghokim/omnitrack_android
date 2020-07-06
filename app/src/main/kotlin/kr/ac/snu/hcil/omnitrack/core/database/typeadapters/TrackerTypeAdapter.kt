@@ -85,6 +85,31 @@ class TrackerTypeAdapter(isServerMode: Boolean, val fieldTypeAdapter: Lazy<Serve
                     reader.endArray()
                 }
 
+                "layout" -> {
+                    reader.beginArray()
+
+                    while (reader.hasNext()) {
+                        val layoutElm = OTTrackerLayoutElementDAO()
+                        layoutElm.id = UUID.randomUUID().toString()
+
+                        reader.beginObject()
+                        while (reader.hasNext()) {
+                            when (reader.nextName()) {
+                                "type" -> layoutElm.type = reader.nextString()
+                                "reference" -> layoutElm.reference = reader.nextString()
+                                else -> reader.skipValue()
+                            }
+                        }
+                        reader.endObject()
+
+                        if (dao.layout == null) {
+                            dao.layout = RealmList()
+                        }
+                        dao.layout?.add(layoutElm)
+                    }
+                    reader.endArray()
+                }
+
                 else -> reader.skipValue()
             }
         }

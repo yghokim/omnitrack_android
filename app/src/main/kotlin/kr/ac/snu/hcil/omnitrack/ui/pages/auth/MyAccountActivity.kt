@@ -40,10 +40,6 @@ class MyAccountActivity : MultiButtonActionBarActivity(R.layout.activity_my_acco
         if (BuildConfig.DEFAULT_EXPERIMENT_ID == null) {
             ui_btn_drop_experiment.visibility = View.GONE
         }
-
-        if (!BuildConfig.DEBUG) {
-            ui_btn_logout.visibility = View.GONE
-        }
     }
 
     override fun onClick(v: View?) {

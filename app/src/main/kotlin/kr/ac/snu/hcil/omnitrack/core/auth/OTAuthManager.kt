@@ -209,6 +209,7 @@ class OTAuthManager @Inject constructor(
             context.runOnUiThread { notifySignedIn() }
             triggerSystemManager.get().checkInAllToSystem(userId!!)
             syncManager.reservePeriodicSyncWorker()
+            syncManager.reserveSyncServiceNow()
         }
     }
 
