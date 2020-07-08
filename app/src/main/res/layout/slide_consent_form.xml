@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:paddingTop="@dimen/activity_vertical_margin">
 
@@ -13,9 +14,17 @@
         android:paddingRight="24dp"
         android:text="@string/msg_informed_consent" />
 
-    <us.feras.mdv.MarkdownView
-        android:id="@+id/ui_markdown"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/ui_markdown"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:textSize="16sp"
+            tools:text="markdown content text will be displayed here." />
+    </ScrollView>
 </LinearLayout>
