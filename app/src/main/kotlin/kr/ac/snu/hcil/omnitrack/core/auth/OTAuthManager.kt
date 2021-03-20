@@ -115,7 +115,7 @@ class OTAuthManager @Inject constructor(
         }
 
     fun isUserSignedIn(): Boolean {
-        return decodedToken?.isExpired(0) == false
+        return decodedToken != null
     }
 
     val currentSignedInLevel: SignedInLevel get() {
