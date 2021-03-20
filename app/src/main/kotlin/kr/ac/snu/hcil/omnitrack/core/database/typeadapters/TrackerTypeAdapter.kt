@@ -151,7 +151,7 @@ class TrackerTypeAdapter(isServerMode: Boolean, val fieldTypeAdapter: Lazy<Serve
 
         //panels
         value.descriptionPanels?.let { panels ->
-            writer.beginArray()
+            writer.name("descriptionPanels").beginArray()
             for (panel in panels) {
                 descriptionPanelTypeAdapter.get().write(writer, panel)
             }
@@ -160,7 +160,7 @@ class TrackerTypeAdapter(isServerMode: Boolean, val fieldTypeAdapter: Lazy<Serve
 
         //layout
         value.layout?.let { layout ->
-            writer.beginArray()
+            writer.name("layout").beginArray()
             for (elm in layout) {
                 writer.beginObject()
                 writer.name("type").value(elm.type)

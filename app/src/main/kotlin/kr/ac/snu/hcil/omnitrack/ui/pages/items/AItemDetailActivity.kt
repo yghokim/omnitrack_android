@@ -155,7 +155,7 @@ abstract class AItemDetailActivity<ViewModelType : ItemEditionViewModelBase>(val
                     }
 
                     schemaLayout.clear()
-                    if (layout != null) {
+                    if (layout != null && layout.isNotEmpty()) {
                         schemaLayout.addAll(layout)
                     } else {
                         schemaLayout.addAll(currentAttributeViewModelList.map { OTTrackerLayoutElementDAO().apply { this.type = OTTrackerLayoutElementDAO.TYPE_FIELD; this.reference = it._id!! } })
